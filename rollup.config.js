@@ -29,18 +29,5 @@ export default [
       resolve(),
       terser(terserOptions)
     ]
-  },
-
-  {
-    input: "app/javascript/ui/index_with_name_deprecation.js",
-    output: {
-      file: "app/assets/javascripts/ui.js",
-      format: "umd",
-      name: "UI"
-    },
-    plugins: [
-      resolve(),
-      terser(terserOptions)
-    ]
-  },
+  }
 ]
