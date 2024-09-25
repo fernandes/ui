@@ -25,6 +25,9 @@ export default [
         format: "es"
       }
     ],
+    watch: {
+      include: 'app/javascript/**/*.js'
+    },
     plugins: [
       resolve(),
       terser(terserOptions)

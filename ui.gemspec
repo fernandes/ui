@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", ">= 7.1.3.2"
   spec.add_dependency "phlex", ">= 2.0.0.beta2"
   spec.add_dependency "phlex-rails", ">= 2.0.0.beta2"
+  spec.add_dependency "tailwind_merge", '~> 0.13.0'
 end

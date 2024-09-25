@@ -1,5 +1,7 @@
-import hello from "./hello"
+import RadioGroupController from "./radio_group_controller"
+import HelloController from "./hello_controller"
 
 export {
-  hello
+  HelloController,
+  RadioGroupController
 }
