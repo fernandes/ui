@@ -1,2 +1,2 @@
-Ui::Engine.routes.draw do
+UI::Engine.routes.draw do
 end

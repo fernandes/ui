@@ -1,4 +1,4 @@
-module Ui
+module UI
   class ApplicationRecord < ActiveRecord::Base
     self.abstract_class = true
   end

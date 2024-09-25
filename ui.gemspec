@@ -2,7 +2,7 @@ require_relative "lib/ui/version"
 
 Gem::Specification.new do |spec|
   spec.name        = "ui"
-  spec.version     = Ui::VERSION
+  spec.version     = UI::VERSION
   spec.authors     = ["Celso Fernandes"]
   spec.email       = ["celso.fernandes@gmail.com"]
   spec.homepage    = "https://github.com/fernandes/ui"
@@ -21,4 +21,6 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_dependency "rails", ">= 7.1.3.2"
+  spec.add_dependency "phlex", ">= 2.0.0.beta2"
+  spec.add_dependency "phlex-rails", ">= 2.0.0.beta2"
 end
