@@ -20,8 +20,12 @@ Gem::Specification.new do |spec|
     Dir["CHANGELOG.md", "MIT-LICENSE", "Rakefile", "README.md", "lib/**/*", "app/assets/javascripts/*.js"]
   end
 
-  spec.add_dependency "rails", ">= 7.1.3.2"
+  spec.add_dependency "lucide-rails", "~> 0.5.0"
   spec.add_dependency "phlex", ">= 2.0.0.beta2"
   spec.add_dependency "phlex-rails", ">= 2.0.0.beta2"
+  spec.add_dependency "rails", ">= 7.1.3.2"
+  spec.add_dependency "hashids"
   spec.add_dependency "tailwind_merge", '~> 0.13.0'
+  spec.add_development_dependency "guard"
+  spec.add_development_dependency "guard-minitest"
 end

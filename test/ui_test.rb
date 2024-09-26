@@ -2,6 +2,6 @@ require "test_helper"
 
 class UiTest < ActiveSupport::TestCase
   test "it has a version number" do
-    assert Ui::VERSION
+    assert UI::VERSION
   end
 end

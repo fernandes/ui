@@ -1,7 +1,7 @@
-import RadioGroupController from "./radio_group_controller"
-import HelloController from "./hello_controller"
+import AccordionController from "./accordion_controller"
+import AccordionItemController from "./accordion_item_controller"
 
 export {
-  HelloController,
-  RadioGroupController
+  AccordionController,
+  AccordionItemController
 }

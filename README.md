@@ -1,28 +1,43 @@
-# Ui
-Short description and motivation.
+# UI
+
+UI components organized on a way that makes sense to me, I'm mostly focused on backend, so probably what's here doesn't make sense at all.
+
+This would not be possible without [ShadCN](https://ui.shadcn.com/), if you want to use on rails, please use [RBUI](https://github.com/rbui-labs/rbui) the people there are great and they know what they are doing!
 
 ## Usage
-How to use my plugin.
+
+TBD
 
 ## Installation
-Add this line to your application's Gemfile:
+
+Create a new Rails app
+
+```bash
+rails new ui-wrap-bun --javascript=bun --css=tailwind
+```
+
+Then add the gem on your Gemfile
 
 ```ruby
-gem "ui"
+gem "ui", github: "fernandes/ui"
 ```
 
-And then execute:
+and also the NPM package.
+
 ```bash
-$ bundle
+yarn add @fernandes/ui
 ```
 
-Or install it yourself as:
-```bash
-$ gem install ui
-```
+Please check our lookbook to see how to use the components.
 
 ## Contributing
+
 Contribution directions go here.
 
+## TODO
+
+- [ ] Accordion support opening just one or multiple items
+
 ## License
+
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

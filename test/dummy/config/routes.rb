@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Ui::Engine => "/ui"
+  mount UI::Engine => "/ui"
 end

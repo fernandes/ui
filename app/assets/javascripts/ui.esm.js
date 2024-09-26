@@ -510,116 +510,810 @@ Controller.outlets = [];
 
 Controller.values = {};
 
-class radio_group_controller extends Controller {
-  static targets=[ "radio", "input" ];
+class accordion_controller extends Controller {
   connect() {
-    this.radioClickHandlerBind = this.radioClickHandler.bind(this);
-    this.radioTargets.forEach((x => x.addEventListener("click", this.radioClickHandlerBind, {
-      capture: true
-    })));
-    if (this.checkedRadio() === undefined) {
-      this.radioTargets.forEach((x => x.tabIndex = 0));
+    this.element.textContent = "Hello from Accordion";
+  }
+}
+
+function addUniqueItem(array, item) {
+  array.indexOf(item) === -1 && array.push(item);
+}
+
+const clamp = (min, max, v) => Math.min(Math.max(v, min), max);
+
+const defaults = {
+  duration: .3,
+  delay: 0,
+  endDelay: 0,
+  repeat: 0,
+  easing: "ease"
+};
+
+const isNumber = value => typeof value === "number";
+
+const isEasingList = easing => Array.isArray(easing) && !isNumber(easing[0]);
+
+const wrap = (min, max, v) => {
+  const rangeSize = max - min;
+  return ((v - min) % rangeSize + rangeSize) % rangeSize + min;
+};
+
+function getEasingForSegment(easing, i) {
+  return isEasingList(easing) ? easing[wrap(0, easing.length, i)] : easing;
+}
+
+const mix = (min, max, progress) => -progress * min + progress * max + min;
+
+const noop = () => {};
+
+const noopReturn = v => v;
+
+const progress = (min, max, value) => max - min === 0 ? 1 : (value - min) / (max - min);
+
+function fillOffset(offset, remaining) {
+  const min = offset[offset.length - 1];
+  for (let i = 1; i <= remaining; i++) {
+    const offsetProgress = progress(0, remaining, i);
+    offset.push(mix(min, 1, offsetProgress));
+  }
+}
+
+function defaultOffset(length) {
+  const offset = [ 0 ];
+  fillOffset(offset, length - 1);
+  return offset;
+}
+
+function interpolate(output, input = defaultOffset(output.length), easing = noopReturn) {
+  const length = output.length;
+  const remainder = length - input.length;
+  remainder > 0 && fillOffset(input, remainder);
+  return t => {
+    let i = 0;
+    for (;i < length - 2; i++) {
+      if (t < input[i + 1]) break;
+    }
+    let progressInRange = clamp(0, 1, progress(input[i], input[i + 1], t));
+    const segmentEasing = getEasingForSegment(easing, i);
+    progressInRange = segmentEasing(progressInRange);
+    return mix(output[i], output[i + 1], progressInRange);
+  };
+}
+
+const isCubicBezier = easing => Array.isArray(easing) && isNumber(easing[0]);
+
+const isEasingGenerator = easing => typeof easing === "object" && Boolean(easing.createAnimation);
+
+const isFunction = value => typeof value === "function";
+
+const isString = value => typeof value === "string";
+
+const time = {
+  ms: seconds => seconds * 1e3,
+  s: milliseconds => milliseconds / 1e3
+};
+
+const calcBezier = (t, a1, a2) => (((1 - 3 * a2 + 3 * a1) * t + (3 * a2 - 6 * a1)) * t + 3 * a1) * t;
+
+const subdivisionPrecision = 1e-7;
+
+const subdivisionMaxIterations = 12;
+
+function binarySubdivide(x, lowerBound, upperBound, mX1, mX2) {
+  let currentX;
+  let currentT;
+  let i = 0;
+  do {
+    currentT = lowerBound + (upperBound - lowerBound) / 2;
+    currentX = calcBezier(currentT, mX1, mX2) - x;
+    if (currentX > 0) {
+      upperBound = currentT;
+    } else {
+      lowerBound = currentT;
+    }
+  } while (Math.abs(currentX) > subdivisionPrecision && ++i < subdivisionMaxIterations);
+  return currentT;
+}
+
+function cubicBezier(mX1, mY1, mX2, mY2) {
+  if (mX1 === mY1 && mX2 === mY2) return noopReturn;
+  const getTForX = aX => binarySubdivide(aX, 0, 1, mX1, mX2);
+  return t => t === 0 || t === 1 ? t : calcBezier(getTForX(t), mY1, mY2);
+}
+
+const steps = (steps, direction = "end") => progress => {
+  progress = direction === "end" ? Math.min(progress, .999) : Math.max(progress, .001);
+  const expanded = progress * steps;
+  const rounded = direction === "end" ? Math.floor(expanded) : Math.ceil(expanded);
+  return clamp(0, 1, rounded / steps);
+};
+
+const namedEasings = {
+  ease: cubicBezier(.25, .1, .25, 1),
+  "ease-in": cubicBezier(.42, 0, 1, 1),
+  "ease-in-out": cubicBezier(.42, 0, .58, 1),
+  "ease-out": cubicBezier(0, 0, .58, 1)
+};
+
+const functionArgsRegex = /\((.*?)\)/;
+
+function getEasingFunction(definition) {
+  if (isFunction(definition)) return definition;
+  if (isCubicBezier(definition)) return cubicBezier(...definition);
+  const namedEasing = namedEasings[definition];
+  if (namedEasing) return namedEasing;
+  if (definition.startsWith("steps")) {
+    const args = functionArgsRegex.exec(definition);
+    if (args) {
+      const argsArray = args[1].split(",");
+      return steps(parseFloat(argsArray[0]), argsArray[1].trim());
     }
   }
-  disconnect() {
-    this.radioTargets.forEach((x => x.removeEventListener("click", this.radioClickHandlerBind, {
-      capture: true
-    })));
+  return noopReturn;
+}
+
+class Animation {
+  constructor(output, keyframes = [ 0, 1 ], {easing: easing, duration: initialDuration = defaults.duration, delay: delay = defaults.delay, endDelay: endDelay = defaults.endDelay, repeat: repeat = defaults.repeat, offset: offset, direction: direction = "normal", autoplay: autoplay = true} = {}) {
+    this.startTime = null;
+    this.rate = 1;
+    this.t = 0;
+    this.cancelTimestamp = null;
+    this.easing = noopReturn;
+    this.duration = 0;
+    this.totalDuration = 0;
+    this.repeat = 0;
+    this.playState = "idle";
+    this.finished = new Promise(((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    }));
+    easing = easing || defaults.easing;
+    if (isEasingGenerator(easing)) {
+      const custom = easing.createAnimation(keyframes);
+      easing = custom.easing;
+      keyframes = custom.keyframes || keyframes;
+      initialDuration = custom.duration || initialDuration;
+    }
+    this.repeat = repeat;
+    this.easing = isEasingList(easing) ? noopReturn : getEasingFunction(easing);
+    this.updateDuration(initialDuration);
+    const interpolate$1 = interpolate(keyframes, offset, isEasingList(easing) ? easing.map(getEasingFunction) : noopReturn);
+    this.tick = timestamp => {
+      var _a;
+      delay = delay;
+      let t = 0;
+      if (this.pauseTime !== undefined) {
+        t = this.pauseTime;
+      } else {
+        t = (timestamp - this.startTime) * this.rate;
+      }
+      this.t = t;
+      t /= 1e3;
+      t = Math.max(t - delay, 0);
+      if (this.playState === "finished" && this.pauseTime === undefined) {
+        t = this.totalDuration;
+      }
+      const progress = t / this.duration;
+      let currentIteration = Math.floor(progress);
+      let iterationProgress = progress % 1;
+      if (!iterationProgress && progress >= 1) {
+        iterationProgress = 1;
+      }
+      iterationProgress === 1 && currentIteration--;
+      const iterationIsOdd = currentIteration % 2;
+      if (direction === "reverse" || direction === "alternate" && iterationIsOdd || direction === "alternate-reverse" && !iterationIsOdd) {
+        iterationProgress = 1 - iterationProgress;
+      }
+      const p = t >= this.totalDuration ? 1 : Math.min(iterationProgress, 1);
+      const latest = interpolate$1(this.easing(p));
+      output(latest);
+      const isAnimationFinished = this.pauseTime === undefined && (this.playState === "finished" || t >= this.totalDuration + endDelay);
+      if (isAnimationFinished) {
+        this.playState = "finished";
+        (_a = this.resolve) === null || _a === void 0 ? void 0 : _a.call(this, latest);
+      } else if (this.playState !== "idle") {
+        this.frameRequestId = requestAnimationFrame(this.tick);
+      }
+    };
+    if (autoplay) this.play();
   }
-  checkedRadio() {
-    this.radioTargets.find((x => x.checked));
+  play() {
+    const now = performance.now();
+    this.playState = "running";
+    if (this.pauseTime !== undefined) {
+      this.startTime = now - this.pauseTime;
+    } else if (!this.startTime) {
+      this.startTime = now;
+    }
+    this.cancelTimestamp = this.startTime;
+    this.pauseTime = undefined;
+    this.frameRequestId = requestAnimationFrame(this.tick);
   }
-  radioClickHandler(e) {
-    const buttonTargeted = this.radioTargets.find((x => x.contains(e.target)));
-    if (buttonTargeted.ariaChecked === "true") {
+  pause() {
+    this.playState = "paused";
+    this.pauseTime = this.t;
+  }
+  finish() {
+    this.playState = "finished";
+    this.tick(0);
+  }
+  stop() {
+    var _a;
+    this.playState = "idle";
+    if (this.frameRequestId !== undefined) {
+      cancelAnimationFrame(this.frameRequestId);
+    }
+    (_a = this.reject) === null || _a === void 0 ? void 0 : _a.call(this, false);
+  }
+  cancel() {
+    this.stop();
+    this.tick(this.cancelTimestamp);
+  }
+  reverse() {
+    this.rate *= -1;
+  }
+  commitStyles() {}
+  updateDuration(duration) {
+    this.duration = duration;
+    this.totalDuration = duration * (this.repeat + 1);
+  }
+  get currentTime() {
+    return this.t;
+  }
+  set currentTime(t) {
+    if (this.pauseTime !== undefined || this.rate === 0) {
+      this.pauseTime = t;
+    } else {
+      this.startTime = performance.now() - t / this.rate;
+    }
+  }
+  get playbackRate() {
+    return this.rate;
+  }
+  set playbackRate(rate) {
+    this.rate = rate;
+  }
+}
+
+var invariant = function() {};
+
+if (process.env.NODE_ENV !== "production") {
+  invariant = function(check, message) {
+    if (!check) {
+      throw new Error(message);
+    }
+  };
+}
+
+class MotionValue {
+  setAnimation(animation) {
+    this.animation = animation;
+    animation === null || animation === void 0 ? void 0 : animation.finished.then((() => this.clearAnimation())).catch((() => {}));
+  }
+  clearAnimation() {
+    this.animation = this.generator = undefined;
+  }
+}
+
+const data = new WeakMap;
+
+function getAnimationData(element) {
+  if (!data.has(element)) {
+    data.set(element, {
+      transforms: [],
+      values: new Map
+    });
+  }
+  return data.get(element);
+}
+
+function getMotionValue(motionValues, name) {
+  if (!motionValues.has(name)) {
+    motionValues.set(name, new MotionValue);
+  }
+  return motionValues.get(name);
+}
+
+const axes = [ "", "X", "Y", "Z" ];
+
+const order = [ "translate", "scale", "rotate", "skew" ];
+
+const transformAlias = {
+  x: "translateX",
+  y: "translateY",
+  z: "translateZ"
+};
+
+const rotation = {
+  syntax: "<angle>",
+  initialValue: "0deg",
+  toDefaultUnit: v => v + "deg"
+};
+
+const baseTransformProperties = {
+  translate: {
+    syntax: "<length-percentage>",
+    initialValue: "0px",
+    toDefaultUnit: v => v + "px"
+  },
+  rotate: rotation,
+  scale: {
+    syntax: "<number>",
+    initialValue: 1,
+    toDefaultUnit: noopReturn
+  },
+  skew: rotation
+};
+
+const transformDefinitions = new Map;
+
+const asTransformCssVar = name => `--motion-${name}`;
+
+const transforms = [ "x", "y", "z" ];
+
+order.forEach((name => {
+  axes.forEach((axis => {
+    transforms.push(name + axis);
+    transformDefinitions.set(asTransformCssVar(name + axis), baseTransformProperties[name]);
+  }));
+}));
+
+const compareTransformOrder = (a, b) => transforms.indexOf(a) - transforms.indexOf(b);
+
+const transformLookup = new Set(transforms);
+
+const isTransform = name => transformLookup.has(name);
+
+const addTransformToElement = (element, name) => {
+  if (transformAlias[name]) name = transformAlias[name];
+  const {transforms: transforms} = getAnimationData(element);
+  addUniqueItem(transforms, name);
+  element.style.transform = buildTransformTemplate(transforms);
+};
+
+const buildTransformTemplate = transforms => transforms.sort(compareTransformOrder).reduce(transformListToString, "").trim();
+
+const transformListToString = (template, name) => `${template} ${name}(var(${asTransformCssVar(name)}))`;
+
+const isCssVar = name => name.startsWith("--");
+
+const registeredProperties = new Set;
+
+function registerCssVariable(name) {
+  if (registeredProperties.has(name)) return;
+  registeredProperties.add(name);
+  try {
+    const {syntax: syntax, initialValue: initialValue} = transformDefinitions.has(name) ? transformDefinitions.get(name) : {};
+    CSS.registerProperty({
+      name: name,
+      inherits: false,
+      syntax: syntax,
+      initialValue: initialValue
+    });
+  } catch (e) {}
+}
+
+const testAnimation = (keyframes, options) => document.createElement("div").animate(keyframes, options);
+
+const featureTests = {
+  cssRegisterProperty: () => typeof CSS !== "undefined" && Object.hasOwnProperty.call(CSS, "registerProperty"),
+  waapi: () => Object.hasOwnProperty.call(Element.prototype, "animate"),
+  partialKeyframes: () => {
+    try {
+      testAnimation({
+        opacity: [ 1 ]
+      });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  },
+  finished: () => Boolean(testAnimation({
+    opacity: [ 0, 1 ]
+  }, {
+    duration: .001
+  }).finished),
+  linearEasing: () => {
+    try {
+      testAnimation({
+        opacity: 0
+      }, {
+        easing: "linear(0, 1)"
+      });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+};
+
+const results = {};
+
+const supports = {};
+
+for (const key in featureTests) {
+  supports[key] = () => {
+    if (results[key] === undefined) results[key] = featureTests[key]();
+    return results[key];
+  };
+}
+
+const resolution = .015;
+
+const generateLinearEasingPoints = (easing, duration) => {
+  let points = "";
+  const numPoints = Math.round(duration / resolution);
+  for (let i = 0; i < numPoints; i++) {
+    points += easing(progress(0, numPoints - 1, i)) + ", ";
+  }
+  return points.substring(0, points.length - 2);
+};
+
+const convertEasing = (easing, duration) => {
+  if (isFunction(easing)) {
+    return supports.linearEasing() ? `linear(${generateLinearEasingPoints(easing, duration)})` : defaults.easing;
+  } else {
+    return isCubicBezier(easing) ? cubicBezierAsString(easing) : easing;
+  }
+};
+
+const cubicBezierAsString = ([a, b, c, d]) => `cubic-bezier(${a}, ${b}, ${c}, ${d})`;
+
+function hydrateKeyframes(keyframes, readInitialValue) {
+  for (let i = 0; i < keyframes.length; i++) {
+    if (keyframes[i] === null) {
+      keyframes[i] = i ? keyframes[i - 1] : readInitialValue();
+    }
+  }
+  return keyframes;
+}
+
+const keyframesList = keyframes => Array.isArray(keyframes) ? keyframes : [ keyframes ];
+
+function getStyleName(key) {
+  if (transformAlias[key]) key = transformAlias[key];
+  return isTransform(key) ? asTransformCssVar(key) : key;
+}
+
+const style = {
+  get: (element, name) => {
+    name = getStyleName(name);
+    let value = isCssVar(name) ? element.style.getPropertyValue(name) : getComputedStyle(element)[name];
+    if (!value && value !== 0) {
+      const definition = transformDefinitions.get(name);
+      if (definition) value = definition.initialValue;
+    }
+    return value;
+  },
+  set: (element, name, value) => {
+    name = getStyleName(name);
+    if (isCssVar(name)) {
+      element.style.setProperty(name, value);
+    } else {
+      element.style[name] = value;
+    }
+  }
+};
+
+function stopAnimation(animation, needsCommit = true) {
+  if (!animation || animation.playState === "finished") return;
+  try {
+    if (animation.stop) {
+      animation.stop();
+    } else {
+      needsCommit && animation.commitStyles();
+      animation.cancel();
+    }
+  } catch (e) {}
+}
+
+function getUnitConverter(keyframes, definition) {
+  var _a;
+  let toUnit = (definition === null || definition === void 0 ? void 0 : definition.toDefaultUnit) || noopReturn;
+  const finalKeyframe = keyframes[keyframes.length - 1];
+  if (isString(finalKeyframe)) {
+    const unit = ((_a = finalKeyframe.match(/(-?[\d.]+)([a-z%]*)/)) === null || _a === void 0 ? void 0 : _a[2]) || "";
+    if (unit) toUnit = value => value + unit;
+  }
+  return toUnit;
+}
+
+function getDevToolsRecord() {
+  return window.__MOTION_DEV_TOOLS_RECORD;
+}
+
+function animateStyle(element, key, keyframesDefinition, options = {}, AnimationPolyfill) {
+  const record = getDevToolsRecord();
+  const isRecording = options.record !== false && record;
+  let animation;
+  let {duration: duration = defaults.duration, delay: delay = defaults.delay, endDelay: endDelay = defaults.endDelay, repeat: repeat = defaults.repeat, easing: easing = defaults.easing, persist: persist = false, direction: direction, offset: offset, allowWebkitAcceleration: allowWebkitAcceleration = false, autoplay: autoplay = true} = options;
+  const data = getAnimationData(element);
+  const valueIsTransform = isTransform(key);
+  let canAnimateNatively = supports.waapi();
+  valueIsTransform && addTransformToElement(element, key);
+  const name = getStyleName(key);
+  const motionValue = getMotionValue(data.values, name);
+  const definition = transformDefinitions.get(name);
+  stopAnimation(motionValue.animation, !(isEasingGenerator(easing) && motionValue.generator) && options.record !== false);
+  return () => {
+    const readInitialValue = () => {
+      var _a, _b;
+      return (_b = (_a = style.get(element, name)) !== null && _a !== void 0 ? _a : definition === null || definition === void 0 ? void 0 : definition.initialValue) !== null && _b !== void 0 ? _b : 0;
+    };
+    let keyframes = hydrateKeyframes(keyframesList(keyframesDefinition), readInitialValue);
+    const toUnit = getUnitConverter(keyframes, definition);
+    if (isEasingGenerator(easing)) {
+      const custom = easing.createAnimation(keyframes, key !== "opacity", readInitialValue, name, motionValue);
+      easing = custom.easing;
+      keyframes = custom.keyframes || keyframes;
+      duration = custom.duration || duration;
+    }
+    if (isCssVar(name)) {
+      if (supports.cssRegisterProperty()) {
+        registerCssVariable(name);
+      } else {
+        canAnimateNatively = false;
+      }
+    }
+    if (valueIsTransform && !supports.linearEasing() && (isFunction(easing) || isEasingList(easing) && easing.some(isFunction))) {
+      canAnimateNatively = false;
+    }
+    if (canAnimateNatively) {
+      if (definition) {
+        keyframes = keyframes.map((value => isNumber(value) ? definition.toDefaultUnit(value) : value));
+      }
+      if (keyframes.length === 1 && (!supports.partialKeyframes() || isRecording)) {
+        keyframes.unshift(readInitialValue());
+      }
+      const animationOptions = {
+        delay: time.ms(delay),
+        duration: time.ms(duration),
+        endDelay: time.ms(endDelay),
+        easing: !isEasingList(easing) ? convertEasing(easing, duration) : undefined,
+        direction: direction,
+        iterations: repeat + 1,
+        fill: "both"
+      };
+      animation = element.animate({
+        [name]: keyframes,
+        offset: offset,
+        easing: isEasingList(easing) ? easing.map((thisEasing => convertEasing(thisEasing, duration))) : undefined
+      }, animationOptions);
+      if (!animation.finished) {
+        animation.finished = new Promise(((resolve, reject) => {
+          animation.onfinish = resolve;
+          animation.oncancel = reject;
+        }));
+      }
+      const target = keyframes[keyframes.length - 1];
+      animation.finished.then((() => {
+        if (persist) return;
+        style.set(element, name, target);
+        animation.cancel();
+      })).catch(noop);
+      if (!allowWebkitAcceleration) animation.playbackRate = 1.000001;
+    } else if (AnimationPolyfill && valueIsTransform) {
+      keyframes = keyframes.map((value => typeof value === "string" ? parseFloat(value) : value));
+      if (keyframes.length === 1) {
+        keyframes.unshift(parseFloat(readInitialValue()));
+      }
+      animation = new AnimationPolyfill((latest => {
+        style.set(element, name, toUnit ? toUnit(latest) : latest);
+      }), keyframes, Object.assign(Object.assign({}, options), {
+        duration: duration,
+        easing: easing
+      }));
+    } else {
+      const target = keyframes[keyframes.length - 1];
+      style.set(element, name, definition && isNumber(target) ? definition.toDefaultUnit(target) : target);
+    }
+    if (isRecording) {
+      record(element, key, keyframes, {
+        duration: duration,
+        delay: delay,
+        easing: easing,
+        repeat: repeat,
+        offset: offset
+      }, "motion-one");
+    }
+    motionValue.setAnimation(animation);
+    if (animation && !autoplay) animation.pause();
+    return animation;
+  };
+}
+
+const getOptions = (options, key) => options[key] ? Object.assign(Object.assign({}, options), options[key]) : Object.assign({}, options);
+
+function resolveElements(elements, selectorCache) {
+  var _a;
+  if (typeof elements === "string") {
+    if (selectorCache) {
+      (_a = selectorCache[elements]) !== null && _a !== void 0 ? _a : selectorCache[elements] = document.querySelectorAll(elements);
+      elements = selectorCache[elements];
+    } else {
+      elements = document.querySelectorAll(elements);
+    }
+  } else if (elements instanceof Element) {
+    elements = [ elements ];
+  }
+  return Array.from(elements || []);
+}
+
+const createAnimation = factory => factory();
+
+const withControls = (animationFactory, options, duration = defaults.duration) => new Proxy({
+  animations: animationFactory.map(createAnimation).filter(Boolean),
+  duration: duration,
+  options: options
+}, controls);
+
+const getActiveAnimation = state => state.animations[0];
+
+const controls = {
+  get: (target, key) => {
+    const activeAnimation = getActiveAnimation(target);
+    switch (key) {
+     case "duration":
+      return target.duration;
+
+     case "currentTime":
+      return time.s((activeAnimation === null || activeAnimation === void 0 ? void 0 : activeAnimation[key]) || 0);
+
+     case "playbackRate":
+     case "playState":
+      return activeAnimation === null || activeAnimation === void 0 ? void 0 : activeAnimation[key];
+
+     case "finished":
+      if (!target.finished) {
+        target.finished = Promise.all(target.animations.map(selectFinished)).catch(noop);
+      }
+      return target.finished;
+
+     case "stop":
+      return () => {
+        target.animations.forEach((animation => stopAnimation(animation)));
+      };
+
+     case "forEachNative":
+      return callback => {
+        target.animations.forEach((animation => callback(animation, target)));
+      };
+
+     default:
+      return typeof (activeAnimation === null || activeAnimation === void 0 ? void 0 : activeAnimation[key]) === "undefined" ? undefined : () => target.animations.forEach((animation => animation[key]()));
+    }
+  },
+  set: (target, key, value) => {
+    switch (key) {
+     case "currentTime":
+      value = time.ms(value);
+
+     case "playbackRate":
+      for (let i = 0; i < target.animations.length; i++) {
+        target.animations[i][key] = value;
+      }
       return true;
     }
-    this.setButtonAsActive(buttonTargeted);
+    return false;
   }
-  setButtonAsActive(button) {
-    this.radioTargets.forEach((x => {
-      const checked = x == button;
-      if (checked) {
-        this.radioMarkAsChecked(x);
-      } else {
-        this.radioMarkAsUnchecked(x);
-      }
-    }));
-  }
-  radioMarkAsChecked(radio) {
-    radio.querySelector("span");
-    radio.ariaChecked = true;
-    radio.setAttribute("aria-checked", true);
-    radio.tabIndex = 0;
-    radio.focus();
-    this.inputTarget.value = radio.value;
-  }
-  radioMarkAsUnchecked(radio) {
-    radio.querySelector("span");
-    radio.ariaChecked = false;
-    radio.setAttribute("aria-checked", false);
-    radio.tabIndex = -1;
-  }
-  handleKeyUp(e) {
-    if (this.buttonInsideHasFocus()) {
-      e.preventDefault();
-      const currentFocused = this.focusedRadioButton();
-      const buttonBeforeFocused = this.radioButtonBefore(currentFocused);
-      this.setButtonAsActive(buttonBeforeFocused);
-    }
-  }
-  handleKeyDown(e) {
-    if (this.buttonInsideHasFocus()) {
-      e.preventDefault();
-      const currentFocused = this.focusedRadioButton();
-      const buttonAfterFocused = this.radioButtonAfter(currentFocused);
-      this.setButtonAsActive(buttonAfterFocused);
-    }
-  }
-  handleKeyEsc(e) {
-    if (this.buttonInsideHasFocus()) {
-      const currentFocused = this.focusedRadioButton();
-      currentFocused.blur();
-    }
-  }
-  buttonInsideHasFocus(e) {
-    let focusInside = false;
-    this.radioTargets.forEach((x => {
-      if (x == document.activeElement) {
-        focusInside = true;
-      }
-    }));
-    return focusInside;
-  }
-  focusedRadioButton() {
-    return this.radioTargets.find((x => x == document.activeElement));
-  }
-  isFocusedFirstItem() {
-    return this.focusedRadioButton() == this.radioTargets[0];
-  }
-  isFocusedLastItem() {
-    return this.focusedRadioButton() == this.radioTargets[-1];
-  }
-  radioButtonAfter(button) {
-    if (button == this.radioTargets.at(-1)) {
-      return this.radioTargets.at(0);
-    }
-    const buttonIndex = this.radioTargets.findIndex((el => el == button));
-    return this.radioTargets.at(buttonIndex + 1);
-  }
-  radioButtonBefore(button) {
-    if (button == this.radioTargets.at(0)) {
-      return this.radioTargets.at(-1);
-    }
-    const buttonIndex = this.radioTargets.findIndex((el => el == button));
-    return this.radioTargets.at(buttonIndex - 1);
-  }
+};
+
+const selectFinished = animation => animation.finished;
+
+function resolveOption(option, i, total) {
+  return isFunction(option) ? option(i, total) : option;
 }
 
-class hello_controller extends Controller {
+function createAnimate(AnimatePolyfill) {
+  return function animate(elements, keyframes, options = {}) {
+    elements = resolveElements(elements);
+    const numElements = elements.length;
+    invariant(Boolean(numElements), "No valid element provided.");
+    invariant(Boolean(keyframes), "No keyframes defined.");
+    const animationFactories = [];
+    for (let i = 0; i < numElements; i++) {
+      const element = elements[i];
+      for (const key in keyframes) {
+        const valueOptions = getOptions(options, key);
+        valueOptions.delay = resolveOption(valueOptions.delay, i, numElements);
+        const animation = animateStyle(element, key, keyframes[key], valueOptions, AnimatePolyfill);
+        animationFactories.push(animation);
+      }
+    }
+    return withControls(animationFactories, options, options.duration);
+  };
+}
+
+const animate$1 = createAnimate(Animation);
+
+function animateProgress(target, options = {}) {
+  return withControls([ () => {
+    const animation = new Animation(target, [ 0, 1 ], options);
+    animation.finished.catch((() => {}));
+    return animation;
+  } ], options, options.duration);
+}
+
+function animate(target, keyframesOrOptions, options) {
+  const factory = isFunction(target) ? animateProgress : animate$1;
+  return factory(target, keyframesOrOptions, options);
+}
+
+class accordion_item_controller extends Controller {
+  static targets=[ "icon", "content", "button" ];
+  static values={
+    open: {
+      type: Boolean,
+      default: false
+    },
+    animationDuration: {
+      type: Number,
+      default: .15
+    },
+    animationEasing: {
+      type: String,
+      default: "ease-in-out"
+    },
+    rotateIcon: {
+      type: Number,
+      default: 180
+    }
+  };
   connect() {
-    this.element.textContent = "Hello From UIz8";
+    let originalAnimationDuration = this.animationDurationValue;
+    this.animationDurationValue = 0;
+    this.openValue ? this.open() : this.close();
+    this.animationDurationValue = originalAnimationDuration;
+  }
+  toggle() {
+    this.openValue = !this.openValue;
+  }
+  openValueChanged(isOpen, wasOpen) {
+    if (isOpen) {
+      this.open();
+    } else {
+      this.close();
+    }
+  }
+  open() {
+    if (this.hasContentTarget) {
+      this.buttonTarget.ariaExpanded = "true";
+      this.revealContent();
+      this.hasIconTarget && this.rotateIcon();
+      this.openValue = true;
+    }
+  }
+  close() {
+    if (this.hasContentTarget) {
+      this.buttonTarget.ariaExpanded = "false";
+      this.hideContent();
+      this.hasIconTarget && this.rotateIcon();
+      this.openValue = false;
+    }
+  }
+  revealContent() {
+    const contentHeight = this.contentTarget.scrollHeight;
+    animate(this.contentTarget, {
+      height: `${contentHeight}px`
+    }, {
+      duration: this.animationDurationValue,
+      easing: this.animationEasingValue
+    });
+  }
+  hideContent() {
+    animate(this.contentTarget, {
+      height: 0
+    }, {
+      duration: this.animationDurationValue,
+      easing: this.animationEasingValue
+    });
+  }
+  rotateIcon() {
+    animate(this.iconTarget, {
+      rotate: `${this.openValue ? this.rotateIconValue : 0}deg`
+    });
   }
 }
 
-export { hello_controller as HelloController, radio_group_controller as RadioGroupController };
+export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController };
