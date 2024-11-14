@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ["radio", "input"]
+  static targets = ["radio", "anput"]
 
   connect() {
     this.radioClickHandlerBind = this.radioClickHandler.bind(this)
@@ -16,12 +16,12 @@ export default class extends Controller {
   }
 
   checkedRadio() {
-    this.radioTargets.find((x) => x.checked)
+    return this.radioTargets.find((x) => (x.dataset.state == "checked"))
   }
 
   radioClickHandler(e) {
     const buttonTargeted = this.radioTargets.find((x) => x.contains(e.target))
-    if (buttonTargeted.ariaChecked === "true") {
+    if (buttonTargeted.dataset.state === "checked") {
       return true;
     }
     this.setButtonAsActive(buttonTargeted)
@@ -40,19 +40,23 @@ export default class extends Controller {
 
   radioMarkAsChecked(radio) {
     let span = radio.querySelector("span")
-    radio.ariaChecked = true
     radio.setAttribute("aria-checked", true)
+    radio.dataset.state = "checked"
     radio.tabIndex = 0
     radio.focus();
-    this.inputTarget.value = radio.value
+    span.dataset.state = "checked"
+    span.classList.remove("hidden")
+    // this.inputTarget.value = radio.value
     // span.style["display"] = "flex"
   }
 
   radioMarkAsUnchecked(radio) {
     let span = radio.querySelector("span")
-    radio.ariaChecked = false
     radio.setAttribute("aria-checked", false)
+    radio.dataset.state = "unchecked"
     radio.tabIndex = -1
+    span.dataset.state = "unchecked"
+    span.classList.add("hidden")
     // span.style["display"] = "none"
   }
 

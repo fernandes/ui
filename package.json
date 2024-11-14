@@ -39,6 +39,7 @@
     "@vitest/ui": "^0.34.6",
     "eslint": "^8.40.0",
     "eslint-plugin-import": "^2.29.0",
+    "hotkeys-js": "^3.13.7",
     "jsdom": "^23.0.1",
     "karma": "^6.4.2",
     "karma-chrome-launcher": "^2.2.0",
@@ -50,12 +51,15 @@
     "rollup": "^2.35.1",
     "rollup-plugin-terser": "^7.0.2",
     "seamless-scroll-polyfill": "^2.3.4",
+    "stimulus-use": "^0.52.2",
     "stimulus-vite-helpers": "^3.0.1",
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
     "@floating-ui/dom": "^1.6.3",
     "@hotwired/stimulus": ">= 3",
-    "motion": "^10.18.0"
+    "motion": "^10.18.0",
+    "stimulus-use": "^0.52.2",
+    "hotkeys-js": "^3.13.7"
   }
 }

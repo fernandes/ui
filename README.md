@@ -36,7 +36,10 @@ Contribution directions go here.
 
 ## TODO
 
-- [ ] Accordion support opening just one or multiple items
+- [ ] Accordion : support opening just one or multiple items
+- [ ] Breadcrumbs : Enable dropdown as breadcrumbs items
+- [ ] Dropdown : with hover
+- [ ] Dropdown : enable as links, not as select items
 
 ## License
 

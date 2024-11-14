@@ -1,7 +1,7 @@
 class UI::Accordion::Item < UI::Base
   def initialize(open = false, **user_attrs, &block)
     @open = open
-    yield(self) if block_given?
+    yield(self) if block
     super(**user_attrs)
   end
 
@@ -10,7 +10,7 @@ class UI::Accordion::Item < UI::Base
   end
 
   def content(&block)
-    @content = Proc.new { yield } if block_given?
+    @content = proc { yield } if block
   end
 
   def open
@@ -28,7 +28,7 @@ class UI::Accordion::Item < UI::Base
       data_orientation: "vertical",
       class: "border-b",
       data: {
-        controller: "accordion-item",
+        controller: "ui--accordion-item",
         accordion_item_open_value: open
       }
     ) do
@@ -40,13 +40,13 @@ class UI::Accordion::Item < UI::Base
           id: @button_id,
           data_orientation: "vertical",
           data: {
-            action: "click->accordion-item#toggle",
-            accordion_item_target: "button" 
+            action: "click->ui--accordion-item#toggle",
+            ui__accordion_item_target: "button"
           },
           class: "flex flex-1 items-center justify-between py-4 font-medium",
         ) do
           plain @title
-          render UI::Icon.new(:chevron_down, class: "h-4 w-4 shrink-0", data: { accordion_item_target: "icon" })
+          render UI::Icon.new(:chevron_down, class: "h-4 w-4 shrink-0", data: {accordion_item_target: "icon"})
         end
       end
       div(
@@ -55,10 +55,10 @@ class UI::Accordion::Item < UI::Base
         aria_labelledby: @button_id,
         data_orientation: "vertical",
         data: {
-          accordion_item_target: "content" 
+          ui__accordion_item_target: "content"
         },
         class: [
-          ("overflow-hidden text-sm"),
+          "overflow-hidden text-sm",
           ("h-0" unless open?)
         ],
       ) do
@@ -67,5 +67,3 @@ class UI::Accordion::Item < UI::Base
     end
   end
 end
-
-

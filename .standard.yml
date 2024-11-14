@@ -1,0 +1,45 @@
+parallel: true
+ruby_version: 3.0.3
+ignore:
+  - 'app/helpers/theme_helper.rb':
+    - Style/GlobalVars # Is there a better tool for this job?
+  - 'db/*_schema.rb':
+    - Layout/EmptyLinesAroundBlockBody
+    - Layout/SpaceInsideHashLiteralBraces
+  - 'scripts/projects/examples/engine.rb':
+    - Naming/ClassAndModuleCamelCase # TODO
+  - 'app/controllers/concerns/loads_and_authorizes_resource.rb':
+    - Security/Eval # TODO we should have this audited.
+    - Style/EvalWithLocation # TODO we should have this audited.
+  - 'app/controllers/api/v1/loads_and_authorizes_api_resource.rb':
+    - Security/Eval # TODO we should have this audited.
+    - Style/EvalWithLocation # TODO we should have this audited.
+  - 'app/models/webhooks/outgoing/delivery_attempt.rb':
+    - Lint/RescueException # TODO would it be okay to rescue `StandardError`?
+  - '**/*':
+    - Style/TrailingCommaInArguments
+    - Style/TrailingCommaInArrayLiteral
+    - Style/TrailingCommaInHashLiteral
+    - Style/CommentedKeyword
+    - Lint/RequireParentheses
+  - 'app/controllers/**/*':
+    - Style/RedundantAssignment
+  - 'lib/legacy_scaffolding/transformer.rb':
+    - Layout/EndAlignment # TODO this causes an endless loop!
+  - 'app/models/refine/**/*':
+    - Style/ConditionalAssignment
+    - Style/SlicingWithRange
+    - Style/IfWithBooleanLiteralBranches
+    - Style/TernaryParentheses
+    - Style/RedundantBegin
+    - Lint/UselessAssignment
+    - Style/StringLiterals
+    - Layout/IndentationWidth
+    - Style/StringLiterals
+  - 'app/controllers/refine/**/*'
+  - 'app/workers/turbo_render_async_worker.rb':
+    - Security/YAMLLoad
+  - 'config/application.rb':
+    - Lint/ConstantDefinitionInBlock # TODO I wasn't able to get this working any other way.
+  - 'app/models/workspaces/provision_cf_chat_account_action.rb':
+    - Performance/FixedSize

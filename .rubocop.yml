@@ -1,0 +1,15 @@
+require:
+  - standard
+  - ./custom_cops/sidekiq_inline_with_block
+
+inherit_gem:
+  standard: config/base.yml
+
+AllCops:
+  TargetRubyVersion: 2.7.5
+
+Lint/Debugger:
+  Enabled: true
+  DebuggerMethods:
+    DebugLogger:
+      - DebugLogger.log
