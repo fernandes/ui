@@ -1,5 +1,5 @@
-class InputOTPPreview < Lookbook::Preview
+class InputOtpPreview < Lookbook::Preview
   def default
-    render UI::InputOTP.new
+    render UI::InputOtp.new
   end
 end

@@ -24,7 +24,7 @@ module UI::Tags
     "DropdownMenu",
     "Form",
     "HoverCard",
-    "InputOTP",
+    "InputOtp",
     "Label",
     "Menubar",
     "NavigationMenu",
@@ -51,34 +51,33 @@ module UI::Tags
   ]
 
   def self.generate
-
     NAMES.each do |name|
       content = <<~EOF
-      class #{name}Preview < Lookbook::Preview
-        def default
-          render UI::#{name}.new
+        class #{name}Preview < Lookbook::Preview
+          def default
+            render UI::#{name}.new
+          end
         end
-      end
       EOF
       File.write(Rails.root.join("../../test/components/previews/#{name.underscore}_preview.rb"), content)
 
       content = <<~EOF
-      class UI::#{name} < UI::Base
-        def view_template
-          div(class: "w-full") { "Component #{name}" }
+        class UI::#{name} < UI::Base
+          def view_template
+            div(class: "w-full") { "Component #{name}" }
+          end
         end
-      end
       EOF
       File.write(Rails.root.join("../../app/models/ui/#{name.underscore}.rb"), content)
 
       content = <<~EOF
-      import { Controller } from '@hotwired/stimulus';
+        import { Controller } from '@hotwired/stimulus';
 
-      export default class extends Controller {
-        connect() {
-          this.element.textContent = "Hello from #{name}"
+        export default class extends Controller {
+          connect() {
+            this.element.textContent = "Hello from #{name}"
+          }
         }
-      }
       EOF
       File.write(Rails.root.join("../../app/javascript/ui/#{name.underscore}_controller.js"), content)
     end
