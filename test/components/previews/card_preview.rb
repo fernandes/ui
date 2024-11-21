@@ -1,6 +1,6 @@
 class CardPreview < Lookbook::Preview
   def default
-    render UI::Card.new do |card|
+    render UI::Card.new(class: "w-[350px]") do |card|
       card.header do |header|
         header.title { "Create project" }
         header.description { "Deploy your new project in one-click." }

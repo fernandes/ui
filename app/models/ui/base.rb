@@ -45,7 +45,18 @@ module UI
     def self.ui_attribute(name, klass = nil)
       define_method name do |**args, &b|
         klass = klass.present? ? klass : self.class.const_get(name.to_s.camelize)
-        instance_variable_set(:"@#{name.to_s}", klass.new(**args, &b))
+        instance_variable_set(:"@#{name}", klass.new(**args, &b))
+      end
+    end
+
+    def self.ui_collection(name, klass = nil)
+      define_method name do |**args, &b|
+        klass = klass.present? ? klass : self.class.const_get(name.to_s.camelize)
+        var_name = name.to_s.pluralize
+        collection = instance_variable_get(:"@#{var_name}") || instance_variable_set(:"@#{var_name}", [])
+        item = klass.new(**args, &b)
+        collection.push(item)
+        item
       end
     end
   end

@@ -8,6 +8,7 @@ module UI::KeyToHuman
 
     def humanize(key)
       return "⌘" if key == "meta"
+      return "⇧" if key == "shift"
       key.upcase
     end
   end

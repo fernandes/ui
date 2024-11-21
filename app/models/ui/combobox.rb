@@ -26,7 +26,10 @@ class UI::Combobox < UI::Base
           tabindex: "-1",
           class:
             "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
-          cmdk_root: ""
+          cmdk_root: "",
+          data: {
+            controller: "ui--filter"
+          }
         ) do
           render(@search)
           div(
@@ -51,7 +54,6 @@ class UI::Combobox < UI::Base
               ) do
                 div(cmdk_group_items: "", role: "group") do
                   @items.each do |item|
-                    puts "rendeing : #{item}"
                     render(item)
                   end
                 end
@@ -90,7 +92,11 @@ class UI::Combobox < UI::Base
         aria_selected: "false",
         data_disabled: "false",
         data_selected: "false",
-        data_value: @id
+        data_value: @id,
+        data: {
+          ui__filter_target: :item,
+          ui__filter_search_value: @label.downcase
+        }
       ) do
         render UI::Icon.new(
           @icon,
@@ -130,7 +136,11 @@ class UI::Combobox < UI::Base
           aria_controls: ":r174:",
           aria_labelledby: ":r175:",
           id: ":r176:",
-          value: ""
+          value: "",
+          data: {
+            ui__filter_target: :input,
+            action: "input->ui--filter#handleInput"
+          }
         )
       end
     end

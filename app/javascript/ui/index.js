@@ -2,6 +2,7 @@ import AccordionController from "./accordion_controller"
 import AccordionItemController from "./accordion_item_controller"
 import AvatarController from "./avatar_controller"
 import CheckboxController from "./checkbox_controller"
+import FilterController from "./filter_controller"
 import PopoverController from "./popover_controller"
 import RadioGroupController from "./radio_group_controller"
 import SelectController from "./select_controller"
@@ -14,6 +15,7 @@ export {
   AccordionItemController,
   AvatarController,
   CheckboxController,
+  FilterController,
   PopoverController,
   RadioGroupController,
   SelectController,

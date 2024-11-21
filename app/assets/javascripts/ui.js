@@ -1227,6 +1227,40 @@
       }
     }
   }
+  class filter_controller extends Controller {
+    static targets=[ "item", "input" ];
+    connect() {
+      console.log("filterrrr");
+      this.clearFilter();
+    }
+    handleInput(e) {
+      const filterString = this.inputTarget.value;
+      if (typeof filterString === "string" && filterString.length === 0) {
+        this.clearFilter();
+      } else if (filterString === null) {
+        this.clearFilter();
+      } else {
+        this.filterItems(filterString);
+      }
+    }
+    filterItems(filterString) {
+      const regex = new RegExp(`${filterString}`, "i");
+      this.itemTargets.forEach((x => {
+        const searchTerm = x.dataset["ui-FilterSearchValue"];
+        const found = searchTerm.match(regex);
+        if (found) {
+          x.classList.remove("hidden");
+        } else {
+          x.classList.add("hidden");
+        }
+      }));
+    }
+    clearFilter() {
+      this.itemTargets.forEach((x => {
+        x.classList.remove("hidden");
+      }));
+    }
+  }
   const sides = [ "top", "right", "bottom", "left" ];
   const alignments = [ "start", "end" ];
   const placements = sides.reduce(((acc, side) => acc.concat(side, side + "-" + alignments[0], side + "-" + alignments[1])), []);
@@ -2781,6 +2815,18 @@
       placement: {
         type: String,
         default: "bottom"
+      },
+      openDelay: {
+        type: Number,
+        default: 10
+      },
+      closeDelay: {
+        type: Number,
+        default: 10
+      },
+      mouseout: {
+        typer: String,
+        default: "keep"
       }
     };
     connect() {
@@ -2788,7 +2834,16 @@
       this.contentTarget;
       this.updatePosition.bind(this);
       useClickOutside(this);
-      console.log("placementValue", this.placementValue);
+      this.mouseOnContent = false;
+    }
+    handleMouseenterContent() {
+      this.mouseOnContent = true;
+    }
+    handleMouseleaveContent() {
+      this.mouseOnContent = false;
+      if (this.mouseoutValue == "close") {
+        this.closePopover();
+      }
     }
     clickOutside(event) {
       if (this.isOpen()) {
@@ -2804,11 +2859,16 @@
       }
     }
     openPopover() {
+      clearTimeout(this.closeTimer);
+      this.openTimer = window.setTimeout((() => this.setPopoverOpen()), this.openDelayValue);
+    }
+    setPopoverOpen() {
       this.dispatch("ui:before-open", {
         target: this.contentTarget
       });
       this.updatePosition(true);
       this.triggerTarget.dataset["state"] = "open";
+      this.contentTarget.dataset["state"] = "open";
       this.contentTarget.style["display"] = "block";
       this.bodyOverflow = document.body.style["overflow-y"];
       document.body.style["overflow-y"] = "hidden";
@@ -2817,11 +2877,30 @@
       });
     }
     closePopover() {
+      clearTimeout(this.openTimer);
+      if (!this.mouseOnContent) {
+        this.closeTimer = window.setTimeout((() => this.setPopoverClose()), this.closeDelayValue);
+      }
+    }
+    setPopoverClose() {
+      if (this.mouseOnContent) {
+        return true;
+      }
       this.triggerTarget.dataset["state"] = "closed";
-      this.contentTarget.style["display"] = "none";
       document.body.style["overflow-y"] = this.bodyOverflow;
+      this.closePopoverContent(this.contentTarget);
+      this.closeNestedPopovers();
+    }
+    closeNestedPopovers() {
+      this.contentTarget.querySelectorAll('[data-ui--popover-target="content"]').forEach((x => {
+        this.closePopoverContent(x);
+      }));
+    }
+    closePopoverContent(el) {
+      el.style["display"] = "none";
+      el.dataset.state = "closed";
       this.dispatch("close", {
-        target: this.contentTarget
+        target: el
       });
     }
     isOpen() {
@@ -2847,8 +2926,7 @@
               availableHeight = window.innerHeight;
             }
             Object.assign(elements.floating.style, {
-              maxWidth: `${availableWidth}px`,
-              maxHeight: `${availableHeight}px`
+              maxWidth: `${availableWidth}px`
             });
           }
         }) ]
@@ -3008,10 +3086,7 @@
         checked.dataset.selected = "true";
       }
     }
-    handlePopoverClose() {
-      this.state = "closed";
-      this.triggerTarget.focus();
-    }
+    handlePopoverClose() {}
     cleanHovered() {
       this.itemTargets.forEach((x => {
         x.setAttribute("aria-selected", "false");
@@ -3237,6 +3312,7 @@
   exports.AccordionItemController = accordion_item_controller;
   exports.AvatarController = avatar_controller;
   exports.CheckboxController = checkbox_controller;
+  exports.FilterController = filter_controller;
   exports.PopoverController = popover_controller;
   exports.RadioGroupController = radio_group_controller;
   exports.ScrollButtonsController = scroll_buttons_controller;

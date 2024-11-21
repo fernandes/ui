@@ -113,7 +113,7 @@ class UI::Select < UI::Base
         role: "presentation",
         class:
           "p-1 h-[250px] w-full min-w-[var(--radix-select-trigger-width)]",
-        style: "position:relative;flex:1 1 0;overflow:auto;",
+        style: "position:relative;flex:1 1 0;overflow:auto;max-height: inherit;",
         data: {
           ui__scroll_buttons_target: :body,
           action: "scroll->ui--scroll-buttons#checkArrows",

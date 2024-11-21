@@ -18,7 +18,6 @@ class CommandPreview < Lookbook::Preview
 
   def button_to_open
     render ButtonToOpen.new
-    
   end
 
   class ButtonToOpen < UI::Base

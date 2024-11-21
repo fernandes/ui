@@ -1,5 +1,11 @@
 class UI::Skeleton < UI::Base
   def view_template
-    div(class: "w-full") { "Component Skeleton" }
+    div(**attrs)
+  end
+
+  def default_attrs
+    {
+      class: "animate-pulse rounded-md bg-muted"
+    }
   end
 end

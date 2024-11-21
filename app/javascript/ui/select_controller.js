@@ -48,8 +48,8 @@ export default class extends Controller {
   }
 
   handlePopoverClose() {
-    this.state = "closed"
-    this.triggerTarget.focus()
+    // this.state = "closed"
+    // this.triggerTarget.focus()
   }
 
   cleanHovered() {

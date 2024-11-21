@@ -5,7 +5,31 @@ class PopoverPreview < Lookbook::Preview
         pop.render UI::Button.new { "Open!" }
       end
 
-      pop.content(class: "p-4") do
+      pop.content(class: "p-4 w-80") do
+        pop.render PopoverContent.new
+      end
+    end
+  end
+
+  def hover
+    render UI::Popover.new(action: :hover, mouseout: :close) do |pop|
+      pop.trigger do
+        pop.render UI::Button.new(variant: :link) { "Open!" }
+      end
+
+      pop.content(class: "p-4 w-80") do
+        pop.render PopoverContent.new
+      end
+    end
+  end
+
+  def hover_with_delay
+    render UI::Popover.new(action: :hover, mouseout: :close, open_delay: 700, close_delay: 300) do |pop|
+      pop.trigger do
+        pop.render UI::Button.new(variant: :link) { "Open!" }
+      end
+
+      pop.content(class: "p-4 w-80") do
         pop.render PopoverContent.new
       end
     end

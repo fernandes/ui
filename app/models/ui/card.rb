@@ -7,15 +7,15 @@ class UI::Card < UI::Base
 
   def view_template
     div(**attrs) do
-      render(@header)
-      render(@content)
-      render(@footer)
+      render(@header) if @header
+      render(@content) if @content
+      render(@footer) if @footer
     end
   end
 
   def default_attrs
     {
-      class: "rounded-lg border bg-card text-card-foreground shadow-sm w-[350px]"
+      class: "rounded-lg border bg-card text-card-foreground shadow-sm"
     }
   end
 

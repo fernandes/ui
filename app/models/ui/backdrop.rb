@@ -4,6 +4,7 @@ class UI::Backdrop < UI::Base
   end
 
   private
+
   def default_attrs
     {
       data_state: "open",

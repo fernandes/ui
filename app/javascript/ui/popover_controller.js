@@ -24,21 +24,29 @@ export default class extends Controller {
   static targets = [ "trigger", "content"]
 
   static values = {
-    placement: { type: String, default: 'bottom' }
+    placement: { type: String, default: 'bottom' },
+    openDelay: { type: Number, default: 10 },
+    closeDelay: { type: Number, default: 10 },
+    mouseout: { typer: String, default: 'keep' }
   }
 
   connect() {
     const button = this.triggerTarget
     const content = this.contentTarget
     const updatePosition = this.updatePosition.bind(this)
-    // this.updatePosition(true)
-    // this.cleanup = autoUpdate(
-    //   button,
-    //   content,
-    //   updatePosition,
-    // );
     useClickOutside(this)
-    console.log("placementValue", this.placementValue)
+    this.mouseOnContent = false
+  }
+
+  handleMouseenterContent() {
+    this.mouseOnContent = true
+  }
+
+  handleMouseleaveContent() {
+    this.mouseOnContent = false
+    if(this.mouseoutValue == "close") {
+      this.closePopover()
+    } 
   }
 
   clickOutside(event) {
@@ -58,6 +66,11 @@ export default class extends Controller {
   }
 
   openPopover() {
+    clearTimeout(this.closeTimer);
+    this.openTimer = window.setTimeout(() => this.setPopoverOpen(), this.openDelayValue);
+  }
+
+  setPopoverOpen() {
     this.dispatch(
       "ui:before-open",
       {
@@ -66,6 +79,7 @@ export default class extends Controller {
     )
     this.updatePosition(true)
     this.triggerTarget.dataset["state"] = "open"
+    this.contentTarget.dataset["state"] = "open"
     this.contentTarget.style["display"] = "block"
     this.bodyOverflow = document.body.style["overflow-y"]
     document.body.style["overflow-y"] = "hidden"
@@ -78,15 +92,38 @@ export default class extends Controller {
   }
 
   closePopover() {
+    clearTimeout(this.openTimer);
+    if(!this.mouseOnContent) {
+      this.closeTimer = window.setTimeout(() => this.setPopoverClose(), this.closeDelayValue);
+    }
+  }
+
+  setPopoverClose() {
+    if(this.mouseOnContent) {
+      return true
+    }
     this.triggerTarget.dataset["state"] = "closed"
-    this.contentTarget.style["display"] = "none"
     document.body.style["overflow-y"] = this.bodyOverflow
+    this.closePopoverContent(this.contentTarget)
+    this.closeNestedPopovers()
+  }
+
+  closeNestedPopovers() {
+    this.contentTarget.querySelectorAll('[data-ui--popover-target="content"]').forEach((x) => {
+      this.closePopoverContent(x)
+    })
+  }
+
+  closePopoverContent(el) {
+    el.style["display"] = "none"
+    el.dataset.state = "closed"
     this.dispatch(
       "close",
       {
-        target: this.contentTarget
+        target: el
       }
     )
+
   }
 
   isOpen() {
@@ -124,7 +161,7 @@ export default class extends Controller {
             // });
             Object.assign(elements.floating.style, {
               maxWidth: `${availableWidth}px`,
-              maxHeight: `${availableHeight}px`,
+              // maxHeight: `${Math.ceil(availableHeight)}px`,
               // height: `${availableHeight - 15}px`,
             });
             // Object.assign(body.style, {
