@@ -7,8 +7,8 @@ class UI::Button < UI::Base
     super(**attrs)
   end
 
-  def view_template(&)
-    button(**attrs, &)
+  def view_template(&block)
+    button(**attrs, &block)
   end
 
   private

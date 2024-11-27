@@ -1349,38 +1349,358 @@ class checkbox_controller extends Controller {
   }
 }
 
-class filter_controller extends Controller {
-  static targets=[ "item", "input" ];
+class combobox_controller extends Controller {
+  static targets=[ "trigger", "searchInput" ];
   connect() {
-    console.log("filterrrr");
-    this.clearFilter();
+    this.popoverOpen = false;
   }
-  handleInput(e) {
-    const filterString = this.inputTarget.value;
-    if (typeof filterString === "string" && filterString.length === 0) {
-      this.clearFilter();
-    } else if (filterString === null) {
-      this.clearFilter();
+  handlePopoverOpen() {
+    console.log("handlePopoverOpen@combobox");
+    this.popoverOpen = true;
+    this.highlightSearchOrFirstItem();
+  }
+  highlightSearchOrFirstItem() {
+    if (this.hasSearchInputTarget) {
+      this.searchInputTarget.focus();
     } else {
-      this.filterItems(filterString);
+      this.element.setAttribute("tabindex", 0);
+      this.element.focus();
     }
   }
-  filterItems(filterString) {
-    const regex = new RegExp(`${filterString}`, "i");
-    this.itemTargets.forEach((x => {
-      const searchTerm = x.dataset["ui-FilterSearchValue"];
-      const found = searchTerm.match(regex);
-      if (found) {
-        x.classList.remove("hidden");
+  handlePopoverClose() {
+    this.popoverOpen = false;
+    if (this.hasTriggerTarget) {
+      this.triggerTarget.focus({
+        focusVisible: true
+      });
+    }
+  }
+  handleEsc(e) {
+    console.log("escinngngngngg", this.popoverOpen);
+  }
+  handleFocus() {
+    console.log("handleFocus@comboboxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    this.highlightSearchOrFirstItem();
+    this.element.setAttribute("tabindex", -1);
+  }
+  handleEnter() {
+    if (!this.popoverOpen && document.activeElement == this.element) {
+      console.log("open the gatesssssssssssss");
+      this.openPopover();
+    }
+  }
+  handleSpace() {}
+  handleItemChecked(e) {
+    const value = e.detail.value;
+    if (this.hasTriggerTarget) {
+      this.triggerTarget.innerText = value;
+    }
+    console.log("handleItemChecked@combobox", e);
+  }
+  handleInputKeyLeft(e) {
+    console.log("handleInputKeyLeft@combobox");
+    e.stopPropagation();
+  }
+  handleInputKeyRight(e) {
+    console.log("handleInputKeyRight@combobox");
+    e.stopPropagation();
+  }
+  handleInputKeyDown() {}
+  handleInputKeyUp() {}
+}
+
+class combobox_content_controller extends Controller {
+  static targets=[ "item" ];
+  static values={
+    search: {
+      type: Boolean,
+      default: false
+    }
+  };
+  connect() {
+    const checkedItem = this.checkedItem();
+    if (checkedItem) {
+      this.checkItem(checkedItem);
+    }
+  }
+  handleFilterApplied() {
+    this.unselectAllItems();
+    this.selectItem(this.visibleItems()[0]);
+  }
+  visibleItems() {
+    return this.itemTargets.filter((x => !x.classList.contains("hidden")));
+  }
+  handlePopoverOpen() {
+    this.unselectAllItems();
+    this.selectItem(this.itemTargets[0]);
+    if (!this.searchValue) {
+      this.element.focus();
+    }
+  }
+  handlePopoverClose() {
+    this.unselectAllItems();
+  }
+  handleMouseEnter(e) {
+    e.target;
+    this.unselectAllItems();
+    this.selectItem(e.target);
+  }
+  handleClick(e) {
+    e.target;
+    this.uncheckAllItems();
+    this.checkItem(e.target);
+  }
+  handleUp(e) {
+    this.goToElement("up");
+  }
+  handleDown(e) {
+    this.goToElement("down");
+  }
+  handleEnter(e) {
+    const selectedItem = this.selectedItem();
+    if (selectedItem) {
+      this.uncheckAllItems();
+      this.checkItem(selectedItem);
+    }
+  }
+  goToElement(direction) {
+    const availableItems = this.visibleItems();
+    const selectedItem = this.selectedItem();
+    if (selectedItem == undefined) {
+      this.selectItem(availableItems[0]);
+    } else {
+      const currentPosition = availableItems.indexOf(selectedItem);
+      let nextElement = undefined;
+      if (direction == "up") {
+        nextElement = availableItems[currentPosition - 1];
       } else {
-        x.classList.add("hidden");
+        nextElement = availableItems[currentPosition + 1];
       }
+      if (nextElement) {
+        this.unselectAllItems();
+        this.selectItem(nextElement);
+      }
+    }
+  }
+  uncheckAllItems() {
+    this.itemTargets.forEach((x => {
+      this.uncheckItem(x);
     }));
   }
-  clearFilter() {
+  unselectAllItems() {
     this.itemTargets.forEach((x => {
-      x.classList.remove("hidden");
+      this.unselectItem(x);
     }));
+  }
+  checkedItem() {
+    return this.itemTargets.find((x => x.dataset.checked == "true"));
+  }
+  selectedItem() {
+    return this.itemTargets.find((x => x.dataset.selected == "true"));
+  }
+  checkItem(item) {
+    this.dispatch("checked", {
+      detail: {
+        value: item.innerText
+      }
+    });
+    item.dataset.checked = "true";
+    item.setAttribute("aria-checked", "true");
+    this.checkIcon(item);
+  }
+  checkIcon(item) {
+    const icon = item.querySelector("svg");
+    const uncheckedClass = icon.dataset.uncheckedClass;
+    icon.classList.add("opacity-100");
+    icon.classList.remove(uncheckedClass);
+  }
+  uncheckItem(item) {
+    this.dispatch("unchecked", {
+      detail: {
+        value: item.innerText
+      }
+    });
+    item.dataset.checked = "false";
+    item.setAttribute("aria-checked", "false");
+    this.uncheckIcon(item);
+  }
+  uncheckIcon(item) {
+    const icon = item.querySelector("svg");
+    const uncheckedClass = icon.dataset.uncheckedClass;
+    icon.classList.remove("opacity-100");
+    icon.classList.add(uncheckedClass);
+  }
+  selectItem(item) {
+    if (item == undefined) {
+      return false;
+    }
+    this.dispatch("selected", {
+      default: {
+        value: item.innerText
+      }
+    });
+    item.dataset.selected = "true";
+    item.setAttribute("aria-selected", "true");
+  }
+  unselectItem(item) {
+    this.dispatch("unselected", item);
+    item.dataset.selected = "false";
+    item.setAttribute("aria-selected", "false");
+  }
+  dispatchEvent(event, target) {
+    this.dispatch(event, {
+      target: target
+    });
+  }
+}
+
+class combobox_trigger_controller extends Controller {
+  handleItemChecked(e) {
+    console.log("handleItemChecked@combobox-trigger");
+  }
+}
+
+class dropdown_content_controller extends Controller {
+  static targets=[ "item" ];
+  connect() {
+    console.log("contenttttttttttttttt", this.element.innerText);
+  }
+  handleKeyUp() {
+    console.log("handleKeyUp@content", this.element.innerText);
+    const highlighted = this.findHighlighted();
+    let nextElement = undefined;
+    if (highlighted == undefined) {
+      nextElement = this.itemTargets.at(-1);
+    } else {
+      const indexOf = this.itemTargets.indexOf(highlighted);
+      nextElement = this.itemTargets[indexOf - 1];
+    }
+    if (nextElement) {
+      this.deemphaziAllElements();
+      this.highlightElement(nextElement);
+    }
+  }
+  handleKeyDown() {
+    console.log("handleKeyDown@content", this.element.innerText);
+    const highlighted = this.findHighlighted();
+    const indexOf = this.itemTargets.indexOf(highlighted);
+    const nextElement = this.itemTargets[indexOf + 1];
+    if (nextElement) {
+      this.deemphaziAllElements();
+      this.highlightElement(nextElement);
+    }
+  }
+  handleKeyLeft() {
+    console.log("handleKeyLeft@content", this.element.innerText);
+    this.closeRequest();
+  }
+  handleKeyEsc() {
+    console.log("handleKeyLeft@content", this.element.innerText);
+    this.closeRequest();
+  }
+  closeRequest() {
+    this.deemphaziAllElements();
+    this.dispatch("closerequest");
+  }
+  handleFocus(e) {
+    console.log("handleFocus@content", this.element.innerText, this.itemTargets.length);
+    if (this.skipFirstHighlight) {
+      this.skipFirstHighlight = false;
+      return true;
+    }
+    if (this.itemTargets.length == 0) {
+      console.log("focus on ", this.element.children[0]);
+      const child = this.element.children[0];
+      child.setAttribute("tabindex", 0);
+      return child.focus();
+    }
+    const highlighted = this.findHighlighted();
+    if (highlighted) {
+      this.highlightElement(highlighted);
+    } else {
+      this.highlightElement(this.itemTargets[0]);
+    }
+  }
+  handleContentClosed() {
+    console.log("handleContentClosed@content", this.element.innerText);
+    this.element.focus({
+      focusVisible: true
+    });
+    this.handleFocus();
+  }
+  handleMouseEnterItem(e) {
+    console.log("handleMouseEnterItem@content", e.target.innerText);
+    this.deemphaziAllElements();
+    this.highlightElement(e.target);
+    this.dispatch("mouseenter");
+  }
+  handleMouseLeaveItem(e) {
+    console.log("handleMouseLeaveItem@content", e.target.innerText);
+    this.deemphaziElement(e.target);
+    this.skipFirstHighlight = true;
+    this.element.focus();
+    this.dispatch("mouseleave");
+  }
+  shutdown() {
+    this.deemphaziAllElements();
+  }
+  findHighlighted() {
+    return this.itemTargets.find((x => x.dataset.highlighted == ""));
+  }
+  highlightElement(el) {
+    console.log("highlighting", el.innerText);
+    el.dataset.highlighted = "";
+    el.setAttribute("tabindex", 0);
+    el.focus({
+      focusVisible: true
+    });
+  }
+  deemphaziAllElements() {
+    this.itemTargets.forEach((el => {
+      this.deemphaziElement(el);
+    }));
+  }
+  deemphaziElement(el) {
+    el.dataset.highlighted = false;
+    el.setAttribute("tabindex", -1);
+    const submenuController = this.application.getControllerForElementAndIdentifier(el, "ui--dropdown-submenu");
+    if (submenuController) {
+      submenuController.handleElementDeemphazied();
+    }
+  }
+}
+
+class dropdown_menu_controller extends Controller {
+  static targets=[ "item", "content" ];
+  handleKeyUp() {
+    console.log("handleKeyUp@dropdown menu");
+  }
+  handleKeyDown() {
+    console.log("handleKeyUp@dropdown menu");
+  }
+  handleEsc() {
+    console.log("handleEsc@dropdown menu");
+    this.shutdown();
+  }
+  shutdown() {
+    const contents = this.element.querySelectorAll('[data-controller="ui--dropdown-content"]');
+    contents.forEach((x => {
+      const contentController = this.application.getControllerForElementAndIdentifier(x, "ui--dropdown-content");
+      contentController.shutdown();
+    }));
+    const submenus = this.element.querySelectorAll('[data-controller="ui--dropdown-submenu"]');
+    submenus.forEach((x => {
+      const submenuController = this.application.getControllerForElementAndIdentifier(x, "ui--dropdown-submenu");
+      submenuController.shutdown();
+    }));
+  }
+  handlePopoverOpen() {
+    console.log("handlePopoverOpened@dropdown menu");
+    this.contentTarget.setAttribute("tabindex", 0);
+    this.contentTarget.focus();
+  }
+  handlePopoverClose() {
+    console.log("handlePopoverClosed@dropdown menu");
   }
 }
 
@@ -3041,8 +3361,181 @@ class ThrottleController extends Controller {}
 
 ThrottleController.throttles = [];
 
+class dropdown_submenu_controller extends Controller {
+  static targets=[ "content" ];
+  static values={
+    placement: {
+      type: String,
+      default: "right-start"
+    },
+    openDelay: {
+      type: Number,
+      default: 150
+    },
+    closeDelay: {
+      type: Number,
+      default: 200
+    }
+  };
+  connect() {
+    this.updatePosition.bind(this);
+    useClickOutside(this);
+    this.element.dataset.state = "closed";
+  }
+  handleMouseEnter() {
+    console.log("handleMouseLeave@dropdown submenu");
+    this.openPopover({
+      contentFocus: false
+    });
+  }
+  handleMouseEnterContentItem() {
+    this.openPopover({
+      contentFocus: false
+    });
+  }
+  handleEsc(e) {
+    if (this.isOpen()) {
+      e.preventDefault();
+      this.closePopover();
+    }
+  }
+  handleSubmenuKeyRight() {
+    this.setPopoverOpen({
+      contentFocus: true
+    });
+  }
+  handleSubmenuKeyUp() {
+    console.log("handleSubmenuKeyUp@submenu", this.element.innerText);
+  }
+  handleSubmenuKeyDown() {
+    console.log("handleSubmenuKeyDown@submenu", this.element.innerText);
+  }
+  handleContentCloseRequest(e) {
+    console.log("handleContentCloseRequest@submenu");
+    this.closePopover();
+    this.dispatch("content-closed");
+  }
+  clickOutside(event) {
+    if (this.isOpen()) {
+      event.preventDefault();
+      this.setPopoverClose();
+    }
+  }
+  toggle() {
+    if (this.isOpen()) {
+      this.closePopover();
+    } else {
+      this.openPopover({
+        contentFocus: false
+      });
+    }
+  }
+  openPopover(options) {
+    clearTimeout(this.closeTimer);
+    this.openTimer = window.setTimeout((() => this.setPopoverOpen(options)), this.openDelayValue);
+  }
+  setPopoverOpen(options = {}) {
+    console.log("setting popover open");
+    this.element.dataset["state"] = "open";
+    this.contentTarget.dataset["state"] = "open";
+    this.contentTarget.setAttribute("tabindex", 0);
+    if (options.contentFocus) {
+      this.contentTarget.focus({
+        focusVisible: true
+      });
+      this.contentTarget.focus;
+    }
+    this.updatePosition(true);
+    console.log("openedPopover : ", document.activeElement.innerText);
+  }
+  closePopover() {
+    clearTimeout(this.openTimer);
+    if (!this.mouseOnContent) {
+      this.closeTimer = window.setTimeout((() => this.setPopoverClose()), this.closeDelayValue);
+    }
+  }
+  setPopoverClose(force = false) {
+    console.log("setPopoverClose");
+    this.element.dataset["state"] = "closed";
+    this.contentTarget.dataset["state"] = "closed";
+    this.contentTarget.setAttribute("tabindex", -1);
+  }
+  shutdown() {
+    this.setPopoverClose();
+  }
+  isOpen() {
+    return this.element.dataset.state == "open";
+  }
+  handleElementDeemphazied() {
+    if (this.element.dataset.state == "open") {
+      this.closePopover();
+    }
+  }
+  updatePosition(force = false) {
+    const rect = this.element.getBoundingClientRect();
+    rect.top + rect.height + 4;
+    computePosition(this.element, this.contentTarget, {
+      placement: this.placementValue,
+      middleware: [ offset(2) ]
+    }).then((({x: x, y: y, placement: placement, strategy: strategy, middlewareData: middlewareData}) => {
+      Object.assign(this.contentTarget.style, {
+        left: `${x}px`,
+        top: `${y}px`
+      });
+    }));
+  }
+}
+
+class filter_controller extends Controller {
+  static targets=[ "item", "input" ];
+  connect() {
+    this.clearFilter();
+  }
+  handlePopoverClose() {
+    this.clearFilter();
+  }
+  handleInput(e) {
+    const filterString = this.inputTarget.value;
+    if (typeof filterString === "string" && filterString.length === 0) {
+      this.clearFilter();
+    } else if (filterString === null) {
+      this.clearFilter();
+    } else {
+      this.filterItems(filterString);
+    }
+  }
+  filterItems(filterString) {
+    const regex = new RegExp(`${filterString}`, "i");
+    this.itemTargets.forEach((x => {
+      const searchTerm = x.dataset["ui-FilterSearchValue"];
+      const found = searchTerm.match(regex);
+      if (found) {
+        x.classList.remove("hidden");
+      } else {
+        x.classList.add("hidden");
+      }
+    }));
+    this.dispatch("filtered", {
+      detail: {
+        string: filterString
+      }
+    });
+  }
+  clearFilter() {
+    this.inputTarget.value = "";
+    this.itemTargets.forEach((x => {
+      x.classList.remove("hidden");
+    }));
+    this.dispatch("filtered", {
+      detail: {
+        string: ""
+      }
+    });
+  }
+}
+
 class popover_controller extends Controller {
-  static targets=[ "trigger", "content" ];
+  static targets=[ "trigger", "content", "receiver" ];
   static values={
     placement: {
       type: String,
@@ -3059,14 +3552,17 @@ class popover_controller extends Controller {
     mouseout: {
       typer: String,
       default: "keep"
+    },
+    level: {
+      type: Number,
+      default: 0
     }
   };
   connect() {
-    this.triggerTarget;
-    this.contentTarget;
     this.updatePosition.bind(this);
     useClickOutside(this);
     this.mouseOnContent = false;
+    this.element.dataset.state = "closed";
   }
   handleMouseenterContent() {
     this.mouseOnContent = true;
@@ -3074,6 +3570,12 @@ class popover_controller extends Controller {
   handleMouseleaveContent() {
     this.mouseOnContent = false;
     if (this.mouseoutValue == "close") {
+      this.closePopover();
+    }
+  }
+  handleEsc(e) {
+    if (this.isOpen()) {
+      e.preventDefault();
       this.closePopover();
     }
   }
@@ -3095,18 +3597,32 @@ class popover_controller extends Controller {
     this.openTimer = window.setTimeout((() => this.setPopoverOpen()), this.openDelayValue);
   }
   setPopoverOpen() {
-    this.dispatch("ui:before-open", {
-      target: this.contentTarget
-    });
+    const eventDetails = {
+      detail: {
+        content: this.contentTarget,
+        trigger: this.triggerTarget,
+        level: this.levelValue
+      }
+    };
+    this.dispatch("ui:before-open", eventDetails);
+    this.receiverTargets.forEach((x => {
+      x.dispatchEvent(new CustomEvent("ui--popover:before-open", eventDetails));
+    }));
     this.updatePosition(true);
     this.triggerTarget.dataset["state"] = "open";
+    this.element.dataset["state"] = "open";
     this.contentTarget.dataset["state"] = "open";
     this.contentTarget.style["display"] = "block";
+    this.contentTarget.focus({
+      focusVisible: true
+    });
     this.bodyOverflow = document.body.style["overflow-y"];
     document.body.style["overflow-y"] = "hidden";
-    this.dispatch("open", {
-      target: this.contentTarget
-    });
+    this.dispatch("open", eventDetails);
+    this.receiverTargets.forEach((x => {
+      console.log("receivers", x);
+      x.dispatchEvent(new CustomEvent("ui--popover:open", eventDetails));
+    }));
   }
   closePopover() {
     clearTimeout(this.openTimer);
@@ -3114,29 +3630,49 @@ class popover_controller extends Controller {
       this.closeTimer = window.setTimeout((() => this.setPopoverClose()), this.closeDelayValue);
     }
   }
-  setPopoverClose() {
-    if (this.mouseOnContent) {
+  setPopoverClose(force = false) {
+    if (this.mouseOnContent && !force) {
       return true;
     }
-    this.triggerTarget.dataset["state"] = "closed";
+    this.mouseOnContent = false;
+    if (this.hasTriggerTarget) {
+      this.triggerTarget.dataset["state"] = "closed";
+    }
+    this.element.dataset["state"] = "closed";
     document.body.style["overflow-y"] = this.bodyOverflow;
-    this.closePopoverContent(this.contentTarget);
-    this.closeNestedPopovers();
+    if (this.hasContentTarget) {
+      this.closePopoverContent(this.contentTarget);
+      this.closeNestedPopovers();
+    }
   }
   closeNestedPopovers() {
-    this.contentTarget.querySelectorAll('[data-ui--popover-target="content"]').forEach((x => {
-      this.closePopoverContent(x);
-    }));
+    if (this.hasContentTarget) {
+      this.contentTarget.querySelectorAll('[data-ui--popover-target="content"]').forEach((x => {
+        this.closePopoverContent(x);
+      }));
+    }
   }
-  closePopoverContent(el) {
+  handleRequestClose(e) {
+    console.log("[popover] requested to close..", e.detail.trigger);
+    this.setPopoverClose();
+  }
+  closePopoverContent(el, via = "mouse") {
     el.style["display"] = "none";
     el.dataset.state = "closed";
-    this.dispatch("close", {
-      target: el
-    });
+    const eventDetails = {
+      detail: {
+        content: this.contentTarget,
+        trigger: this.triggerTarget,
+        level: this.levelValue
+      }
+    };
+    this.dispatch("close", eventDetails);
+    this.receiverTargets.forEach((x => {
+      x.dispatchEvent(new CustomEvent("ui--popover:close", eventDetails));
+    }));
   }
   isOpen() {
-    return this.triggerTarget.dataset["state"] == "open";
+    return this.element.dataset.state == "open";
   }
   updatePosition(force = false) {
     if (this.triggerTarget.dataset["state"] == "open" && !force) {
@@ -3281,6 +3817,112 @@ class radio_group_controller extends Controller {
   }
 }
 
+class scroll_buttons_controller extends Controller {
+  static targets=[ "body", "up", "down" ];
+  checkArrows(e) {
+    if (this.bodyTarget.scrollTop > 25) {
+      this.upTarget.classList.remove("hidden");
+    } else {
+      this.upTarget.classList.add("hidden");
+    }
+    if (this.bodyTarget.scrollHeight > this.bodyTarget.clientHeight) {
+      if (this.bodyTarget.scrollHeight - this.bodyTarget.clientHeight - 25 < this.bodyTarget.scrollTop) {
+        this.downTarget.classList.add("hidden");
+      } else {
+        this.downTarget.classList.remove("hidden");
+      }
+    }
+  }
+  update(e) {
+    if (this.lastScrollTop > e.target.scrollTop) {
+      this.scrollDirection = "up";
+    } else {
+      this.scrollDirection = "down";
+    }
+    this.lastScrollTop = e.target.scrollTop;
+    const scrollTop = e.target.scrollTop;
+    const scrollHeight = e.target.scrollHeight;
+    const optionsHeight = this.bodyTarget.clientHeight;
+    if (scrollTop > 32) {
+      this.upTarget.style.display = "flex";
+    } else {
+      this.upTarget.style.display = "none";
+      clearInterval(this.repeaterUp);
+    }
+    if (this.scrollDirection == "down") {
+      if (scrollTop + optionsHeight + 28 < scrollHeight) {
+        this.downTarget.style.display = "flex";
+      } else {
+        this.downTarget.style.display = "none";
+        clearInterval(this.repeaterDown);
+      }
+    } else if (this.scrollDirection == "up") {
+      if (scrollTop + optionsHeight + 15 < scrollHeight) {
+        this.downTarget.style.display = "flex";
+      }
+    }
+  }
+  showArrows(e) {
+    this.update(e);
+    this.downTarget.style.display = "flex";
+    this.bodyTarget.style.overflowX = "auto";
+  }
+  hideArrows() {
+    this.downTarget.style.display = "none";
+    this.upTarget.style.display = "none";
+    this.bodyTarget.style.overflowX = "hidden";
+  }
+  preventScroll(e) {
+    if (e.target !== this.bodyTarget) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+  handlePopoverOpen(e) {
+    console.log("popover open");
+    this.bodyTarget.scroll({
+      top: 0,
+      behavior: "instant"
+    });
+    this.checkArrows(e);
+  }
+  handlePopoverClose(e) {
+    console.log("popover closed");
+    this.bodyTarget.scroll({
+      top: 0,
+      behavior: "instant"
+    });
+  }
+  scrollUp() {
+    this.bodyTarget.scroll({
+      top: this.bodyTarget.scrollTop - 50,
+      behavior: "smooth"
+    });
+  }
+  mouseoverUp() {
+    this.repeaterUp = setInterval((() => {
+      this.scrollUp();
+    }), 50);
+  }
+  mouseoutUp() {
+    clearInterval(this.repeaterUp);
+  }
+  mouseoverDown() {
+    this.repeaterDown = setInterval((() => {
+      this.scrollDown();
+    }), 50);
+  }
+  mouseoutDown() {
+    clearInterval(this.repeaterDown);
+  }
+  scrollDown() {
+    this.bodyTarget.scroll({
+      top: this.bodyTarget.scrollTop + 50,
+      behavior: "smooth"
+    });
+  }
+}
+
 class select_controller extends Controller {
   static targets=[ "trigger", "content", "item" ];
   connect() {
@@ -3412,7 +4054,8 @@ class select_item_controller extends Controller {
   }
   handleClick(e) {
     this.dispatch("checked", {
-      target: e.currentTarget
+      target: e.currentTarget,
+      value: e.currentTarget.innerText
     });
   }
   hoverItem() {
@@ -3422,112 +4065,6 @@ class select_item_controller extends Controller {
   leaveItem() {
     this.element.setAttribute("aria-selected", "false");
     this.element.dataset.selected = "false";
-  }
-}
-
-class scroll_buttons_controller extends Controller {
-  static targets=[ "body", "up", "down" ];
-  checkArrows(e) {
-    if (this.bodyTarget.scrollTop > 25) {
-      this.upTarget.classList.remove("hidden");
-    } else {
-      this.upTarget.classList.add("hidden");
-    }
-    if (this.bodyTarget.scrollHeight > this.bodyTarget.clientHeight) {
-      if (this.bodyTarget.scrollHeight - this.bodyTarget.clientHeight - 25 < this.bodyTarget.scrollTop) {
-        this.downTarget.classList.add("hidden");
-      } else {
-        this.downTarget.classList.remove("hidden");
-      }
-    }
-  }
-  update(e) {
-    if (this.lastScrollTop > e.target.scrollTop) {
-      this.scrollDirection = "up";
-    } else {
-      this.scrollDirection = "down";
-    }
-    this.lastScrollTop = e.target.scrollTop;
-    const scrollTop = e.target.scrollTop;
-    const scrollHeight = e.target.scrollHeight;
-    const optionsHeight = this.bodyTarget.clientHeight;
-    if (scrollTop > 32) {
-      this.upTarget.style.display = "flex";
-    } else {
-      this.upTarget.style.display = "none";
-      clearInterval(this.repeaterUp);
-    }
-    if (this.scrollDirection == "down") {
-      if (scrollTop + optionsHeight + 28 < scrollHeight) {
-        this.downTarget.style.display = "flex";
-      } else {
-        this.downTarget.style.display = "none";
-        clearInterval(this.repeaterDown);
-      }
-    } else if (this.scrollDirection == "up") {
-      if (scrollTop + optionsHeight + 15 < scrollHeight) {
-        this.downTarget.style.display = "flex";
-      }
-    }
-  }
-  showArrows(e) {
-    this.update(e);
-    this.downTarget.style.display = "flex";
-    this.bodyTarget.style.overflowX = "auto";
-  }
-  hideArrows() {
-    this.downTarget.style.display = "none";
-    this.upTarget.style.display = "none";
-    this.bodyTarget.style.overflowX = "hidden";
-  }
-  preventScroll(e) {
-    if (e.target !== this.bodyTarget) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }
-  handlePopoverOpen(e) {
-    console.log("popover open");
-    this.bodyTarget.scroll({
-      top: 0,
-      behavior: "instant"
-    });
-    this.checkArrows(e);
-  }
-  handlePopoverClose(e) {
-    console.log("popover closed");
-    this.bodyTarget.scroll({
-      top: 0,
-      behavior: "instant"
-    });
-  }
-  scrollUp() {
-    this.bodyTarget.scroll({
-      top: this.bodyTarget.scrollTop - 50,
-      behavior: "smooth"
-    });
-  }
-  mouseoverUp() {
-    this.repeaterUp = setInterval((() => {
-      this.scrollUp();
-    }), 50);
-  }
-  mouseoutUp() {
-    clearInterval(this.repeaterUp);
-  }
-  mouseoverDown() {
-    this.repeaterDown = setInterval((() => {
-      this.scrollDown();
-    }), 50);
-  }
-  mouseoutDown() {
-    clearInterval(this.repeaterDown);
-  }
-  scrollDown() {
-    this.bodyTarget.scroll({
-      top: this.bodyTarget.scrollTop + 50,
-      behavior: "smooth"
-    });
   }
 }
 
@@ -3546,4 +4083,4 @@ class switch_controller extends Controller {
   }
 }
 
-export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, filter_controller as FilterController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController };
+export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController };

@@ -7,4 +7,3 @@ module UI::IdGenerator
     hashids.encode(time)
   end
 end
-

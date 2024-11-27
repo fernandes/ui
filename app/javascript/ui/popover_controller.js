@@ -21,21 +21,21 @@ import {
 import { useClickOutside } from "stimulus-use"
 
 export default class extends Controller {
-  static targets = [ "trigger", "content"]
+  static targets = [ "trigger", "content", "receiver"]
 
   static values = {
     placement: { type: String, default: 'bottom' },
     openDelay: { type: Number, default: 10 },
     closeDelay: { type: Number, default: 10 },
-    mouseout: { typer: String, default: 'keep' }
+    mouseout: { typer: String, default: 'keep' },
+    level: { type: Number, default: 0 }
   }
 
   connect() {
-    const button = this.triggerTarget
-    const content = this.contentTarget
     const updatePosition = this.updatePosition.bind(this)
     useClickOutside(this)
     this.mouseOnContent = false
+    this.element.dataset.state = "closed"
   }
 
   handleMouseenterContent() {
@@ -47,6 +47,14 @@ export default class extends Controller {
     if(this.mouseoutValue == "close") {
       this.closePopover()
     } 
+  }
+
+  handleEsc(e) {
+    if(this.isOpen()) {
+      // example to close a modal
+      e.preventDefault()
+      this.closePopover()
+    }
   }
 
   clickOutside(event) {
@@ -71,24 +79,34 @@ export default class extends Controller {
   }
 
   setPopoverOpen() {
-    this.dispatch(
-      "ui:before-open",
-      {
-        target: this.contentTarget
+    const eventDetails = {
+      detail: {
+        content: this.contentTarget,
+        trigger: this.triggerTarget,
+        level: this.levelValue
       }
-    )
+    }
+    this.dispatch( "ui:before-open", eventDetails)
+    this.receiverTargets.forEach((x) => {
+      x.dispatchEvent(
+        new CustomEvent("ui--popover:before-open", eventDetails)
+      )
+    })
     this.updatePosition(true)
     this.triggerTarget.dataset["state"] = "open"
+    this.element.dataset["state"] = "open"
     this.contentTarget.dataset["state"] = "open"
     this.contentTarget.style["display"] = "block"
+    this.contentTarget.focus({focusVisible: true})
     this.bodyOverflow = document.body.style["overflow-y"]
     document.body.style["overflow-y"] = "hidden"
-    this.dispatch(
-      "open",
-      {
-        target: this.contentTarget
-      }
-    )
+    this.dispatch( "open", eventDetails )
+    this.receiverTargets.forEach((x) => {
+      console.log("receivers", x)
+      x.dispatchEvent(
+        new CustomEvent("ui--popover:open", eventDetails)
+      )
+    })
   }
 
   closePopover() {
@@ -98,40 +116,62 @@ export default class extends Controller {
     }
   }
 
-  setPopoverClose() {
-    if(this.mouseOnContent) {
+  setPopoverClose(force = false) {
+    if(this.mouseOnContent && !force) {
       return true
     }
-    this.triggerTarget.dataset["state"] = "closed"
+    this.mouseOnContent = false
+    if(this.hasTriggerTarget) {
+      this.triggerTarget.dataset["state"] = "closed"
+    }
+    this.element.dataset["state"] = "closed"
     document.body.style["overflow-y"] = this.bodyOverflow
-    this.closePopoverContent(this.contentTarget)
-    this.closeNestedPopovers()
+    if(this.hasContentTarget) {
+      this.closePopoverContent(this.contentTarget)
+      this.closeNestedPopovers()
+    }
   }
 
   closeNestedPopovers() {
-    this.contentTarget.querySelectorAll('[data-ui--popover-target="content"]').forEach((x) => {
-      this.closePopoverContent(x)
+    if(this.hasContentTarget) {
+      this.contentTarget.querySelectorAll('[data-ui--popover-target="content"]').forEach((x) => {
+        this.closePopoverContent(x)
+      })
+    }
+  }
+
+  handleRequestClose(e) {
+    console.log("[popover] requested to close..", e.detail.trigger)
+    // if(e.detail.level == this.levelValue) {
+      this.setPopoverClose()
+    // }
+  }
+
+  closePopoverContent(el, via = "mouse") {
+    el.style["display"] = "none"
+    el.dataset.state = "closed"
+    const eventDetails = {
+      detail: {
+        content: this.contentTarget,
+        trigger: this.triggerTarget,
+        level: this.levelValue
+      }
+    }
+    this.dispatch("close", eventDetails)
+    this.receiverTargets.forEach((x) => {
+      x.dispatchEvent(
+        new CustomEvent("ui--popover:close", eventDetails)
+      )
     })
   }
 
-  closePopoverContent(el) {
-    el.style["display"] = "none"
-    el.dataset.state = "closed"
-    this.dispatch(
-      "close",
-      {
-        target: el
-      }
-    )
-
-  }
-
   isOpen() {
-    return this.triggerTarget.dataset["state"] == "open"
+    return this.element.dataset.state == "open"
   }
 
   updatePosition(force = false) {
     if(this.triggerTarget.dataset["state"] == "open" && !force) {
+    // if(this.isOpen() && !force) {
       return true
     }
     const rect = this.triggerTarget.getBoundingClientRect()

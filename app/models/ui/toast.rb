@@ -100,29 +100,7 @@ class UI::Toast < UI::Base
             render @action
           end
 
-          button(
-            type: "button",
-            class:
-              "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
-            toast_close: "",
-            data_radix_toast_announce_exclude: ""
-          ) do
-            svg(
-              xmlns: "http://www.w3.org/2000/svg",
-              width: "24",
-              height: "24",
-              viewbox: "0 0 24 24",
-              fill: "none",
-              stroke: "currentColor",
-              stroke_width: "2",
-              stroke_linecap: "round",
-              stroke_linejoin: "round",
-              class: "lucide lucide-x h-4 w-4"
-            ) do |s|
-              s.path(d: "M18 6 6 18")
-              s.path(d: "m6 6 12 12")
-            end
-          end
+          close_button
         end
       end
       span(
@@ -131,6 +109,18 @@ class UI::Toast < UI::Base
         style:
           "position:fixed;border:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;overflow-wrap:normal"
       )
+    end
+  end
+
+  def close_button
+    button(
+      type: "button",
+      class:
+        "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      toast_close: "",
+      data_radix_toast_announce_exclude: ""
+    ) do
+      render UI::Icon.new(:x, class: "h-4 w-4")
     end
   end
 end

@@ -14,7 +14,7 @@ export default class extends Controller {
   }
 
   handleClick(e) {
-    this.dispatch("checked", {target: e.currentTarget})
+    this.dispatch("checked", {target: e.currentTarget, value: e.currentTarget.innerText})
   }
 
   hoverItem() {

@@ -1,6 +1,6 @@
 class UI::Label < UI::Base
-  def view_template(&)
-    label(**attrs, &)
+  def view_template(&block)
+    label(**attrs, &block)
   end
 
   def default_attrs

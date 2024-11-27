@@ -15,8 +15,8 @@ class ModalPreview < Lookbook::Preview
           }
         end
         content.footer do |footer|
-          footer.cancel { footer.render UI::Button.new(variant: :secondary) { "Cancel" }}
-          footer.action { footer.render UI::Button.new { "Continue" }}
+          footer.cancel { footer.render UI::Button.new(variant: :secondary) { "Cancel" } }
+          footer.action { footer.render UI::Button.new { "Continue" } }
         end
       end
     end
@@ -35,4 +35,3 @@ class ModalPreview < Lookbook::Preview
     end
   end
 end
-

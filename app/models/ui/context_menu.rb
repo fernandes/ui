@@ -25,19 +25,46 @@ class UI::ContextMenu < UI::Base
     end
   end
 
-  def item(text:, key: nil, disabled: false, &block)
-    div(
-      role: "menuitem",
-      class:
-        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 pl-8",
-      tabindex: "-1",
-      data_orientation: "vertical",
-      data_radix_collection_item: ""
-    ) do
-      plain text
-      span(class: "ml-auto text-xs tracking-widest text-muted-foreground") do
-        UI::KeyToHuman.convert(key)
+  def item(text:, key: nil, disabled: false, icon: nil, variant: :primary, **attrs, &block)
+    render Item.new(disabled: disabled, variant: variant, **attrs) do
+      if icon.present?
+        render UI::Icon.new(icon, class: "mr-2 h-4 w-4")
       end
+      plain text
+      if key.present?
+        span(
+          class: [
+            "ml-auto text-xs tracking-widest text-muted-foreground focus:text-accent-foreground",
+            ("text-red-600" if variant.to_sym == :destructive)
+          ]
+        ) do
+          UI::KeyToHuman.convert(key)
+        end
+      end
+    end
+  end
+
+  class Item < UI::Base
+    def initialize(variant: :primary, **attrs, &block)
+      @variant = variant
+      super(**attrs)
+    end
+
+    def view_template(&block)
+      div(**attrs, &block)
+    end
+
+    def default_attrs
+      {
+        role: "menuitem",
+        class: [
+          "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 pl-8",
+          ("focus:text-accent-foreground text-red-600" if @variant.to_sym == :destructive)
+        ],
+        tabindex: "-1",
+        data_orientation: "vertical",
+        data_radix_collection_item: ""
+      }
     end
   end
 

@@ -43,8 +43,8 @@ class UI::Badge < UI::Base
     super(**args)
   end
 
-  def view_template(&)
-    span(**attrs, &)
+  def view_template(&block)
+    span(**attrs, &block)
   end
 
   private
@@ -52,7 +52,7 @@ class UI::Badge < UI::Base
   def default_attrs
     {
       class: [
-        ("inline-flex items-center rounded-full border font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent"),
+        "inline-flex items-center rounded-full border font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent",
         (SIZES[@size]),
         (COLORS[@variant])
       ]

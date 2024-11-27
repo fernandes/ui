@@ -1,6 +1,6 @@
 class UI::Modal < UI::Base
-  def view_template(&)
-    div(**attrs, &)
+  def view_template(&block)
+    div(**attrs, &block)
   end
 
   def default_attrs

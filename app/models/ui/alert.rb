@@ -9,18 +9,18 @@ class UI::Alert < UI::Base
     render UI::Icon.new(name, **attrs)
   end
 
-  def title(**attrs, &)
+  def title(**attrs, &block)
     merge_class("mb-1 font-medium leading-none tracking-tight", attrs)
-		h5(**attrs, &)
-	end
+    h5(**attrs, &block)
+  end
 
-	def body(**attrs, &)
+  def body(**attrs, &block)
     merge_class("text-sm [&_p]:leading-relaxed", attrs)
-		div(**attrs, &)
-	end
+    div(**attrs, &block)
+  end
 
-  def view_template(&)
-    div(**attrs, &)
+  def view_template(&block)
+    div(**attrs, &block)
   end
 
   private
@@ -36,7 +36,7 @@ class UI::Alert < UI::Base
     when :success
       "ring-success/20 bg-success/5 text-success [&>svg]:text-success/80"
     when :destructive
-      "ring-destructive/20 bg-destructive/5 text-destructive [&>svg]:text-destructive/80"
+      "ring-destructive/20 text-destructive [&>svg]:text-destructive/80"
     end
   end
 
@@ -44,8 +44,8 @@ class UI::Alert < UI::Base
     base_classes = "backdrop-blur relative w-full ring-1 ring-inset rounded-lg px-4 py-4 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg~*]:pl-8"
     {
       class: [
-        (base_classes),
-        (colors)
+        base_classes,
+        colors
       ]
     }
   end

@@ -1,34 +1,36 @@
 class UI::Popover < UI::Base
-  include Phlex::DeferredRender
   attr_reader :placement
   attr_reader :scrolls
 
-  def initialize(action: :click, mouseout: :keep, open_delay: 0, close_delay: 100, placement: :bottom, **attrs)
+  def initialize(action: :click, mouseout: :keep, open_delay: 0, close_delay: 100, placement: :bottom, level: 0, **attrs)
     @action = action
     @placement = placement
     @scrolls = attrs.delete(:scrolls)
     @mouseout = mouseout
     @open_delay = open_delay
     @close_delay = close_delay
+    @level = level
     super(**attrs)
   end
 
   def view_template(&block)
-    div(**attrs) do
-      render(@trigger)
-      render(@content)
-    end
+    div(**attrs, &block)
   end
 
   def default_attrs
     {
       data: {
         controller: "ui--popover",
-        action: ["ui--popover:click:outside->popover#closePopover"],
+        action: [
+          "ui--popover:click:outside->popover#closePopover",
+          "requestopen->ui--popover#openPopover",
+          "requestclose->ui--popover#handleRequestClose:passive",
+        ],
         ui__popover: {
           placement_value: placement,
           open_delay_value: @open_delay,
           close_delay_value: @close_delay,
+          level_value: @level,
           mouseout_value: @mouseout
         }
       }
@@ -36,12 +38,12 @@ class UI::Popover < UI::Base
   end
 
   def trigger(**args, &block)
-    @trigger = Trigger.new(action: @action, mouseout: @mouseout, **args, &block)
+    render Trigger.new(action: @action, mouseout: @mouseout, **args, &block)
   end
 
   def content(**args, &block)
     args[:scrolls] = @scrolls
-    @content = Content.new(action: @action, **args, &block)
+    render Content.new(action: @action, **args, &block)
   end
 
   class Trigger < UI::Base
@@ -75,7 +77,9 @@ class UI::Popover < UI::Base
         data: {
           ui__popover_target: "trigger",
           action: [
-            "#{stimulus_action}->ui--popover##{stimulus_method} keydown.esc@window->ui--popover#closePopover",
+            "#{stimulus_action}->ui--popover##{stimulus_method}",
+            "keydown.esc@window->ui--popover#handleEsc:prevent",
+
             ("mouseleave->ui--popover#closePopover" if @mouseout == :close)
           ]
         }

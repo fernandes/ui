@@ -6,8 +6,8 @@ class UI::Breadcrumb < UI::Base
     @separator = user_attrs.delete(:separator) || :chevron_right
   end
 
-  def item(**attrs, &)
-    item = Item.new(**attrs, &)
+  def item(href: nil, **attrs, &block)
+    item = Item.new(href: href, **attrs, &block)
     @items << item
     item
   end
@@ -17,7 +17,6 @@ class UI::Breadcrumb < UI::Base
       ol(
         class: "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5"
       ) do
-        
         @items.each_with_index do |item, ix|
           render(item)
           separator unless last_item?(ix)
@@ -42,10 +41,21 @@ class UI::Breadcrumb < UI::Base
   end
 
   class Item < UI::Base
-    def view_template(&)
+    def initialize(href: nil, **attrs)
+      @href = href
+      super(**attrs)
+    end
+
+    def view_template(&block)
       li(class: "inline-flex items-center gap-1.5") do
-        a(class: "transition-colors hover:text-foreground", href: "/components") do
-          yield
+        if @href.present?
+          a(class: "transition-colors hover:text-foreground", href: @href) do
+            yield
+          end
+        else
+          div(class: "transition-colors") do
+            yield
+          end
         end
       end
     end

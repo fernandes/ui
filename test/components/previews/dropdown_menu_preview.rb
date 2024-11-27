@@ -67,4 +67,38 @@ class DropdownMenuPreview < Lookbook::Preview
       end
     end
   end
+
+  def multi_level
+    render UI::DropdownMenu.new do |d|
+      d.trigger do
+        d.render UI::Button.new(variant: :outline) { "Open" }
+      end
+
+      d.menu_content(class: "w-[200px]") do |m|
+        m.label { "Technologies" }
+        m.group do |grp|
+          grp.item("HTML")
+          grp.item("CSS")
+          grp.item("Javascript")
+          grp.submenu("1st Other", class: "min-w-[200px]") do |submenu|
+            submenu.item("Ruby")
+            submenu.item("Python")
+            submenu.submenu("2nd Other", class: "min-w-[200px]") do |submenu|
+              submenu.item("Ada")
+              submenu.item("Cobol")
+            end
+          end
+
+          grp.submenu("3rd Other", class: "min-w-[200px]") do |submenu|
+            submenu.item("Perl")
+            submenu.item("Bash")
+            submenu.submenu("4th Other", class: "min-w-[200px]") do |submenu|
+              submenu.item("Pascal")
+              submenu.item("Delphi")
+            end
+          end
+        end
+      end
+    end
+  end
 end

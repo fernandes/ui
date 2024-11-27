@@ -3,7 +3,10 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
   static targets = ["item", "input"]
   connect() {
-    console.log("filterrrr")
+    this.clearFilter()
+  }
+
+  handlePopoverClose() {
     this.clearFilter()
   }
 
@@ -29,11 +32,14 @@ export default class extends Controller {
         x.classList.add("hidden")
       }
     })
+    this.dispatch("filtered", { detail: { string: filterString } })
   }
 
   clearFilter() {
+    this.inputTarget.value = ""
     this.itemTargets.forEach((x) => {
       x.classList.remove("hidden")
     })
+    this.dispatch("filtered", { detail: { string: "" } })
   }
 }
