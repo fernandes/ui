@@ -3906,6 +3906,23 @@
       el.dataset.state = "active";
     }
   }
+  class toggle_controller extends Controller {
+    connect() {}
+    handleClick(e) {
+      this.toggle();
+    }
+    toggle() {
+      const el = this.element;
+      const state = el.dataset.state;
+      if (state == "on") {
+        el.dataset.state = "off";
+        el.setAttribute("aria-pressed", "false");
+      } else {
+        el.dataset.state = "on";
+        el.setAttribute("aria-pressed", "true");
+      }
+    }
+  }
   exports.AccordionController = accordion_controller;
   exports.AccordionItemController = accordion_item_controller;
   exports.AvatarController = avatar_controller;
@@ -3924,6 +3941,7 @@
   exports.SelectItemController = select_item_controller;
   exports.SwitchController = switch_controller;
   exports.TabsController = tabs_controller;
+  exports.ToggleController = toggle_controller;
   Object.defineProperty(exports, "__esModule", {
     value: true
   });

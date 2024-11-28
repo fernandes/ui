@@ -4151,4 +4151,22 @@ class tabs_controller extends Controller {
   }
 }
 
-export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController };
+class toggle_controller extends Controller {
+  connect() {}
+  handleClick(e) {
+    this.toggle();
+  }
+  toggle() {
+    const el = this.element;
+    const state = el.dataset.state;
+    if (state == "on") {
+      el.dataset.state = "off";
+      el.setAttribute("aria-pressed", "false");
+    } else {
+      el.dataset.state = "on";
+      el.setAttribute("aria-pressed", "true");
+    }
+  }
+}
+
+export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController, toggle_controller as ToggleController };
