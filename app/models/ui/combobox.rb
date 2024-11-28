@@ -53,6 +53,7 @@ class UI::Combobox < UI::Base
         }
       ) do
         pop.trigger do
+          @trigger.selected_label = @selected_label
           render(@trigger) if @trigger
         end
 
@@ -134,16 +135,24 @@ class UI::Combobox < UI::Base
   end
 
   class Trigger < UI::Base
+    include Phlex::DeferredRender
+
+    attr_accessor :selected_label
+
     def button(text, **attrs, &block)
-      render Button.new(text: text, **attrs, &block)
+      @button = Button.new(text: text, **attrs, &block)
     end
 
     def view_template(&block)
-      yield
+      if @button
+        @button.selected_label = selected_label
+        render @button
+      end
     end
 
     class Button < UI::Base
       attr_reader :text
+      attr_accessor :selected_label
 
       def initialize(text:, **attrs, &block)
         @text = text
@@ -152,7 +161,7 @@ class UI::Combobox < UI::Base
 
       def view_template(&block)
         render UI::Button.new(**attrs) do
-          span { @text }
+          span { @selected_label || @text }
           render UI::Icon.new(:chevrons_up_down, class: "ml-2 h-4 w-4 shrink-0 opacity-50")
         end
       end
@@ -161,7 +170,8 @@ class UI::Combobox < UI::Base
         {
           class: "text-primary text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-[200px] justify-between",
           data: {
-            ui__combobox_target: :trigger
+            ui__combobox_target: :trigger,
+            placeholder: @text,
           }
         }
       end

@@ -10,7 +10,7 @@ class UI::Badge < UI::Base
     primary: "text-primary-foreground bg-primary ring-primary/20 hover:bg-primary/80",
     secondary: "text-secondary-foreground bg-secondary ring-secondary/20",
     outline: "text-foreground bg-background ring-border border-inherit",
-    destructive: "text-destructive bg-destructive/10 ring-destructive/20",
+    destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
     success: "text-success bg-success/10 ring-success/20",
     warning: "text-warning bg-warning/10 ring-warning/20",
     slate: "text-slate-500 bg-slate-500/10 ring-slate-500/20",

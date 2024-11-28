@@ -10,7 +10,7 @@ class UI::Slider < UI::Base
 
   def view_template
     right = 100 - percentage
-    adjust = (1 - (percentage.to_f / 50)) * 10
+    adjust = (1 - (percentage.to_f / 50.to_f)) * 10
     adjust_signal = (adjust >= 0) ? "+" : "-"
     span(
       **attrs
