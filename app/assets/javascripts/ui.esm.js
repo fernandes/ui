@@ -4093,4 +4093,55 @@ class switch_controller extends Controller {
   }
 }
 
-export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController };
+class tabs_controller extends Controller {
+  static targets=[ "trigger", "content" ];
+  connect() {}
+  handleTriggerClick(e) {
+    console.log("handleTriggerClick@tabs");
+    const target = e.target;
+    const ariaControls = target.attributes["aria-controls"].value;
+    const content = this.findContentFor(ariaControls);
+    console.log("handleTriggerClick@tabs", "aria-controls", ariaControls);
+    console.log("handleTriggerClick@tabs", "content", content);
+    this.unselectAllTrigers();
+    this.selectTrigger(target);
+    this.hideAllContents();
+    this.showContent(content);
+  }
+  findContentFor(id) {
+    console.log("findContentFor@tabs", id);
+    return this.contentTargets.find((x => {
+      console.log("findContentFor@tabs find", x.attributes["aria-labelledby"]);
+      return x.id == id;
+    }));
+  }
+  unselectAllTrigers() {
+    this.triggerTargets.forEach((x => {
+      this.unselectTrigger(x);
+    }));
+  }
+  hideAllContents() {
+    this.contentTargets.forEach((x => {
+      this.hideContent(x);
+    }));
+  }
+  hideContent(el) {
+    el.dataset.state = "inactive";
+    el.setAttribute("tabindex", -1);
+  }
+  unselectTrigger(el) {
+    el.setAttribute("aria-selected", "false");
+    el.dataset.state = "inactive";
+  }
+  showContent(el) {
+    console.log("showContent@tabs", el);
+    el.dataset.state = "active";
+    el.setAttribute("tabindex", 0);
+  }
+  selectTrigger(el) {
+    el.setAttribute("aria-selected", "true");
+    el.dataset.state = "active";
+  }
+}
+
+export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController };

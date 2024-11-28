@@ -15,6 +15,7 @@ import ScrollButtonsController from "./scroll_buttons_controller"
 import SelectController from "./select_controller"
 import SelectItemController from "./select_item_controller"
 import SwitchController from "./switch_controller"
+import TabsController from "./tabs_controller"
 
 export {
   AccordionController,
@@ -33,5 +34,6 @@ export {
   SelectController,
   SelectItemController,
   ScrollButtonsController,
-  SwitchController
+  SwitchController,
+  TabsController
 }
