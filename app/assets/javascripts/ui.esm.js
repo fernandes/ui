@@ -1679,8 +1679,16 @@ class dropdown_menu_controller extends Controller {
     console.log("handleKeyUp@dropdown menu");
   }
   handleEsc() {
-    console.log("handleEsc@dropdown menu");
+    console.log("handleEsc@dropdown menuuuuuu");
     this.shutdown();
+    this.element.dispatchEvent(new CustomEvent("requestclose", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        forceClose: true
+      }
+    }));
   }
   shutdown() {
     const contents = this.element.querySelectorAll('[data-controller="ui--dropdown-content"]');
@@ -3653,8 +3661,10 @@ class popover_controller extends Controller {
     }
   }
   handleRequestClose(e) {
-    console.log("[popover] requested to close..", e.detail.trigger);
-    this.setPopoverClose();
+    console.log("[popover] requested to close..", e);
+    const forceClose = e.detail.forceClose == true;
+    console.log("should I force?", forceClose);
+    this.setPopoverClose(forceClose);
   }
   closePopoverContent(el, via = "mouse") {
     el.style["display"] = "none";

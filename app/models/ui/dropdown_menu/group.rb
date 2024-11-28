@@ -13,6 +13,9 @@ class UI::DropdownMenu < UI::Base
 
     def default_attrs
       {
+        class: [
+          "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-2"
+        ],
         role: :group,
         data: {
           controller: :ui__dropdown_content,

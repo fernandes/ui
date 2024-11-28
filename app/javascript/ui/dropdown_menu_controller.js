@@ -14,9 +14,18 @@ export default class extends Controller {
   }
 
   handleEsc() {
-    console.log("handleEsc@dropdown menu")
+    console.log("handleEsc@dropdown menuuuuuu")
     this.shutdown()
-    
+    this.element.dispatchEvent(
+      new CustomEvent("requestclose", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          forceClose: true
+        }
+      })
+    )
   }
 
   shutdown() {
@@ -31,6 +40,9 @@ export default class extends Controller {
       const submenuController = this.application.getControllerForElementAndIdentifier(x, 'ui--dropdown-submenu')
       submenuController.shutdown()
     })
+    // this.element.dispatchEvent(
+    //   new CustomEvent("requestclose")
+    // )
   }
 
   handlePopoverOpen() {

@@ -12,6 +12,12 @@ class UI::Breadcrumb < UI::Base
     item
   end
 
+  def dropdown(**attrs, &block)
+    item = Dropdown.new(**attrs, &block)
+    @items << item
+    item
+  end
+
   def view_template
     nav(aria_label: "breadcrumb") do
       ol(
@@ -58,6 +64,39 @@ class UI::Breadcrumb < UI::Base
           end
         end
       end
+    end
+  end
+
+  class Dropdown < UI::Base
+    include Phlex::DeferredRender
+
+    def initialize(**attrs)
+      @items = []
+      super
+    end
+
+    def view_template
+      render UI::DropdownMenu.new do |d|
+        d.trigger do
+          render UI::Icon.new(:ellipsis)
+        end
+
+        d.menu_content(class: "w-[200px]") do |m|
+          m.group do |grp|
+            @items.each do |item|
+              grp.item(item[:label], **item[:attrs])
+            end
+          end
+        end
+      end
+    end
+
+    def item(href: nil, **attrs, &block)
+      @items << {
+        href: href,
+        label: yield,
+        attrs: attrs
+      }
     end
   end
 end

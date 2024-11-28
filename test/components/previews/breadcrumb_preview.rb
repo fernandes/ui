@@ -14,4 +14,17 @@ class BreadcrumbPreview < Lookbook::Preview
       b.item { "Breadcrumb" }
     end
   end
+
+  def dropdown
+    render UI::Breadcrumb.new(separator: :slash) do |b|
+      b.item(href: "/home") { "Home" }
+      b.dropdown do |d|
+        d.item(href: "/documentation") { "Documentation" }
+        d.item(href: "/themes") { "Themes" }
+        d.item(href: "/github") { "Github" }
+      end
+      b.item(href: "/components") { "Components" }
+      b.item { "Breadcrumb" }
+    end
+  end
 end

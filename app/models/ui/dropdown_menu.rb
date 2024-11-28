@@ -37,6 +37,9 @@ class UI::DropdownMenu < UI::Base
 
   def default_attrs
     {
+      class: [
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      ],
       data: {
         dropdown_level: @level,
         controller: :ui__dropdown_menu,
@@ -48,7 +51,8 @@ class UI::DropdownMenu < UI::Base
           # "keydown.left->ui--dropdown-menu#handleKeyLeft",
           "ui--popover:open->ui--dropdown-menu#handlePopoverOpen",
           "ui--popover:close->ui--dropdown-menu#handlePopoverClose",
-          "keydown.esc->ui--dropdown-menu#handleEsc"
+          "keydown.esc->ui--dropdown-menu#handleEsc",
+          "ui--dropdown-content:closerequest->ui--dropdown-menu#handleContentCloseRequest:stop"
         ]
       }
     }

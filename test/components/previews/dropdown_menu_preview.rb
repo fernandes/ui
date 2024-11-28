@@ -13,9 +13,9 @@ class DropdownMenuPreview < Lookbook::Preview
           grp.item("Billing", icon: :credit_card, key: "meta.b")
           grp.item("Settings", icon: :settings, key: "meta.s")
           grp.item("Keyboard Shortcuts", icon: :keyboard, key: "meta.k")
-        end
-        m.separator
-        m.group do |grp|
+          # end
+          grp.separator
+          # m.group do |grp|
           grp.item("Users", icon: :users)
           grp.submenu("Invite Users", icon: :user_plus) do |submenu|
             submenu.item("Email", icon: :mail)
@@ -24,12 +24,13 @@ class DropdownMenuPreview < Lookbook::Preview
             submenu.item("More...", icon: :plus_circle)
           end
           grp.item("New Team", icon: :plus, key: "meta.t")
+          grp.separator
+          grp.separator
+          grp.item("Github", icon: :github)
+          grp.item("Support", icon: :life_buoy)
+          grp.item("API", icon: :cloud, disabled: true)
+          grp.item("Logout", icon: :log_out, key: "shit.meta.q")
         end
-        m.separator
-        m.item("Github", icon: :github)
-        m.item("Support", icon: :life_buoy)
-        m.item("API", icon: :cloud, disabled: true)
-        m.item("Logout", icon: :log_out, key: "shit.meta.q")
       end
     end
   end

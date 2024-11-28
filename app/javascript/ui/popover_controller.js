@@ -141,9 +141,11 @@ export default class extends Controller {
   }
 
   handleRequestClose(e) {
-    console.log("[popover] requested to close..", e.detail.trigger)
+    console.log("[popover] requested to close..", e)
+    const forceClose = e.detail.forceClose == true
+    console.log("should I force?", forceClose)
     // if(e.detail.level == this.levelValue) {
-      this.setPopoverClose()
+      this.setPopoverClose(forceClose)
     // }
   }
 
