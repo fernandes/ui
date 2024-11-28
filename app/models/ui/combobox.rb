@@ -148,6 +148,7 @@ class UI::Combobox < UI::Base
         @button.selected_label = selected_label
         render @button
       end
+      # yield if block
     end
 
     class Button < UI::Base
@@ -186,6 +187,7 @@ class UI::Combobox < UI::Base
       @selected = selected
       @item_unchecked_class = icon.present? ? "opacity-40" : "opacity-0"
       @icon = icon.present? ? icon : :check
+      @custom_icon = icon.present?.to_s
       @hide_check_marks = hide_check_marks
     end
 
@@ -202,6 +204,7 @@ class UI::Combobox < UI::Base
         data_selected: "false",
         data_checked: (@selected ? "true" : "false"),
         data_value: @id,
+        data_custom_icon: @custom_icon,
         data: {
           ui__filter_target: :item,
           ui__filter_search_value: @label.downcase,

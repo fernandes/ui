@@ -37,10 +37,8 @@ class ComboboxPreview < Lookbook::Preview
 
   def icons
     render UI::Combobox.new do |combobox|
-      combobox.trigger do
-        combobox.render UI::Button.new(class: "text-primary text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-[200px] justify-between") do
-          combobox.plain "+ Set Status"
-        end
+      combobox.trigger do |trigger|
+        trigger.button("+ Set Status")
       end
       combobox.search placeholder: "Change status..."
       combobox.option(id: "backlog", label: "Backlog", icon: :circle_help)
@@ -53,10 +51,11 @@ class ComboboxPreview < Lookbook::Preview
 
   def icons_with_selected
     render UI::Combobox.new do |combobox|
-      combobox.trigger do
-        combobox.render UI::Button.new(class: "text-primary text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-[200px] justify-between") do
-          combobox.plain "+ Set Status"
-        end
+      combobox.render UI::Button.new(class: "text-primary text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-[200px] justify-between") do
+        combobox.plain "+ Set Status"
+      end
+      combobox.trigger do |trigger|
+        trigger.button("+ Set Status")
       end
       combobox.search placeholder: "Change status..."
       combobox.option(id: "backlog", label: "Backlog", icon: :circle_help)

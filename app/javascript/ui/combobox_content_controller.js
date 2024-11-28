@@ -113,7 +113,7 @@ export default class extends Controller {
   }
 
   checkItem(item) {
-    this.dispatch("checked", { detail: { value: item.innerText } })
+    this.dispatch("checked", { detail: { value: item.innerText, el: item } })
     item.dataset.checked = "true"
     item.setAttribute("aria-checked", "true")
     this.checkIcon(item)

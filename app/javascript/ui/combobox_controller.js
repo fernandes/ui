@@ -58,11 +58,19 @@ export default class extends Controller {
   }
 
   handleItemChecked(e) {
-    const value = e.detail.value
-    if(this.hasTriggerTarget) {
+    console.log("handleItemChecked@combobox", e.target)
+    const option = e.detail.el
+    if(!this.hasTriggerTarget) return
+
+    if(option.dataset.customIcon == "true") {
+      const innerHTML = e.detail.el.innerHTML
+      this.triggerTarget.innerHTML = innerHTML
+      this.triggerTarget.classList.remove("justify-between")
+    } else {
+      const value = e.detail.value
       this.triggerTarget.innerText = value
+
     }
-    console.log("handleItemChecked@combobox", e)
   }
 
   handleInputKeyLeft(e) {
