@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ["trigger", "searchInput"]
+  static targets = ["trigger", "searchInput", "triggerText"]
 
   connect() {
     this.popoverOpen = false
@@ -58,17 +58,20 @@ export default class extends Controller {
   }
 
   handleItemChecked(e) {
-    console.log("handleItemChecked@combobox", e.target)
+    console.log("handleItemChecked@combobox", e.target, this.triggerTextTarget)
     const option = e.detail.el
-    if(!this.hasTriggerTarget) return
+    if(!this.hasTriggerTextTarget) return
 
     if(option.dataset.customIcon == "true") {
       const innerHTML = e.detail.el.innerHTML
-      this.triggerTarget.innerHTML = innerHTML
-      this.triggerTarget.classList.remove("justify-between")
+      this.triggerTextTarget.innerHTML = innerHTML
+      const icon = this.triggerTextTarget.querySelector("svg")
+      const uncheckedClass = icon.dataset.uncheckedClass
+      icon.classList.add("opacity-100")
+      icon.classList.remove(uncheckedClass)
     } else {
       const value = e.detail.value
-      this.triggerTarget.innerText = value
+      this.triggerTextTarget.innerText = value
 
     }
   }

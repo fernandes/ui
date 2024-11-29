@@ -162,7 +162,14 @@ class UI::Combobox < UI::Base
 
       def view_template(&block)
         render UI::Button.new(**attrs) do
-          span { @selected_label || @text }
+          div(
+            class: "flex items-center",
+            data: {
+              ui__combobox_target: :triggerText
+            }
+          ) do
+            plain "#{@selected_label || @text}"
+          end
           render UI::Icon.new(:chevrons_up_down, class: "ml-2 h-4 w-4 shrink-0 opacity-50")
         end
       end
