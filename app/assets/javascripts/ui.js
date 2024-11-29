@@ -3311,6 +3311,124 @@
       });
     }
   }
+  class input_otp_controller extends Controller {
+    static targets=[ "input", "slot" ];
+    static classes=[ "focus" ];
+    static values={
+      currentIndex: {
+        type: Number,
+        default: 0
+      },
+      maxSize: {
+        type: Number,
+        default: 6
+      }
+    };
+    connect() {
+      this.typedValue = [];
+      this.maxSizeValue = this.slotTargets.length;
+      this.inputTarget.setAttribute("maxlength", this.maxSizeValue);
+    }
+    handleClick() {
+      console.log("handleClick@input-otp");
+      this.focusCurrent();
+    }
+    handleFocus() {
+      console.log("handleFocus@input-otp");
+      this.focusCurrent();
+    }
+    handleInput(e) {
+      console.log("handleInput@input-otp", e);
+      if (e.keyCode >= 48 && e.keyCode <= 57) {
+        const value = e.key;
+        this.insertText(value);
+      } else if (e.key == "Backspace") {
+        this.deleteContentBackward();
+      }
+      console.log("this.currentIndexValue", this.currentIndexValue, "this.maxSizeValue", this.maxSizeValue);
+    }
+    insertText(value) {
+      console.log("insertText@input-otp", value);
+      this.writeSlotValue(value);
+      if (this.isOnLastSlot()) {
+        this.typedValue.pop();
+        this.typedValue.push(value);
+      } else {
+        this.typedValue.push(value);
+        this.moveToNextSlot();
+      }
+      this.inputTarget.setAttribute("value", this.typedValue.join(""));
+    }
+    deleteContentBackward() {
+      console.log("deleteContentBackward@input-otp");
+      this.writeSlotValue("");
+      if (this.isOnFirstSlot()) {
+        return;
+      } else if (this.isOnLastSlot()) {
+        this.typedValue.pop();
+        this.focusElement(this.currentSlot());
+      } else {
+        this.typedValue.pop();
+        this.moveToPreviousSlot();
+      }
+      this.inputTarget.setAttribute("value", this.typedValue.join(""));
+    }
+    focusCurrent() {
+      console.log("focusCurrent@otp");
+      const currentSlot = this.currentSlot();
+      console.log("current", currentSlot);
+      if (currentSlot) {
+        this.focusElement(currentSlot);
+      }
+    }
+    writeSlotValue(value) {
+      const currentSlot = this.currentSlot();
+      const span = currentSlot.querySelector("span");
+      span.classList.remove("hidden");
+      span.innerText = value;
+      currentSlot.querySelector("div").classList.add("hidden");
+    }
+    isOnLastSlot() {
+      return this.typedValue.length == this.maxSizeValue;
+    }
+    isOnFirstSlot() {
+      return this.typedValue.length == 0;
+    }
+    currentSlot() {
+      return this.slotTargets.at(this.currentIndexValue);
+    }
+    moveToNextSlot() {
+      if (this.currentIndexValue == this.maxSizeValue - 1) return;
+      const currentSlot = this.currentSlot();
+      this.blurElement(currentSlot);
+      this.currentIndexValue = this.currentIndexValue + 1;
+      const nextSlot = this.slotTargets.at(this.currentIndexValue);
+      if (!nextSlot) return;
+      this.focusElement(nextSlot);
+    }
+    moveToPreviousSlot() {
+      if (this.currentIndexValue == 0) return;
+      const currentSlot = this.currentSlot();
+      this.blurElement(currentSlot);
+      if (this.currentIndexValue > 0) {
+        this.currentIndexValue = this.currentIndexValue - 1;
+      }
+      const previousSlot = this.slotTargets.at(this.currentIndexValue);
+      if (!previousSlot) return;
+      this.focusElement(previousSlot);
+    }
+    focusElement(el) {
+      el.classList.add(...this.focusClasses);
+      el.querySelector("div").classList.remove("hidden");
+      el.querySelector("span").classList.add("hidden");
+    }
+    blurElement(el) {
+      if (this.currentIndexValue == this.maxSizeValue) return;
+      el.classList.remove(...this.focusClasses);
+      el.querySelector("div").classList.add("hidden");
+      el.querySelector("span").classList.remove("hidden");
+    }
+  }
   class popover_controller extends Controller {
     static targets=[ "trigger", "content", "receiver" ];
     static values={
@@ -3934,6 +4052,7 @@
   exports.DropdownMenuController = dropdown_menu_controller;
   exports.DropdownSubmenuController = dropdown_submenu_controller;
   exports.FilterController = filter_controller;
+  exports.InputOtpController = input_otp_controller;
   exports.PopoverController = popover_controller;
   exports.RadioGroupController = radio_group_controller;
   exports.ScrollButtonsController = scroll_buttons_controller;

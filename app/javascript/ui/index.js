@@ -9,6 +9,7 @@ import DropdownContentController from "./dropdown_content_controller"
 import DropdownMenuController from "./dropdown_menu_controller"
 import DropdownSubmenuController from "./dropdown_submenu_controller"
 import FilterController from "./filter_controller"
+import InputOtpController from "./input_otp_controller"
 import PopoverController from "./popover_controller"
 import RadioGroupController from "./radio_group_controller"
 import ScrollButtonsController from "./scroll_buttons_controller"
@@ -30,6 +31,7 @@ export {
   DropdownMenuController,
   DropdownSubmenuController,
   FilterController,
+  InputOtpController,
   PopoverController,
   RadioGroupController,
   SelectController,
