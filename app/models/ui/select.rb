@@ -38,7 +38,8 @@ class UI::Select < UI::Base
           "keydown.down->ui--select#handleKeyDown",
           "keydown.up->ui--select#handleKeyUp",
           "keydown.enter->ui--select#handleEnter",
-          "keydown.space->ui--select#handleEnter"
+          "keydown.space->ui--select#handleEnter",
+          "keydown.esc->ui--select#handleEsc"
         ]
       }
     }

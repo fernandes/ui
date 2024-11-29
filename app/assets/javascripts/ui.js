@@ -3847,16 +3847,23 @@
       this.state = "opened";
       const checked = this.checkedItem();
       this.cleanHovered();
+      let el;
       if (checked) {
-        checked.scrollIntoView({
-          block: "center",
-          inline: "center"
-        });
-        checked.setAttribute("aria-selected", "true");
-        checked.dataset.selected = "true";
+        el = checked;
+      } else {
+        el = this.itemTargets[0];
       }
+      el.scrollIntoView({
+        block: "center",
+        inline: "center"
+      });
+      el.setAttribute("aria-selected", "true");
+      el.dataset.selected = "true";
     }
-    handlePopoverClose() {}
+    handlePopoverClose() {
+      this.state = "closed";
+      this.triggerTarget.focus();
+    }
     cleanHovered() {
       this.itemTargets.forEach((x => {
         x.setAttribute("aria-selected", "false");
@@ -3928,12 +3935,23 @@
       }
     }
     handleEnter(e) {
+      console.log("this.state", this.state);
       if (this.state == "closed") {
         return true;
       }
       const hovered = this.hoveredItem();
       this.cleanChecked();
       this.checkItem(hovered);
+    }
+    handleEsc(e) {
+      this.element.dispatchEvent(new CustomEvent("requestclose", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          forceClose: true
+        }
+      }));
     }
   }
   class select_item_controller extends Controller {
