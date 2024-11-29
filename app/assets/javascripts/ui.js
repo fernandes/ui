@@ -1227,6 +1227,32 @@
       }
     }
   }
+  class collapsible_controller extends Controller {
+    static targets=[ "trigger", "content" ];
+    handleClick(e) {
+      console.log("handleClick collapsible");
+      this.toggle();
+    }
+    toggle() {
+      const el = this.element;
+      const trigger = this.triggerTarget;
+      const content = this.contentTarget;
+      if (this.isOpen()) {
+        el.dataset.state = "closed";
+        content.dataset.state = "closed";
+        trigger.dataset.state = "closed";
+        trigger.ariaExpanded = "false";
+      } else {
+        el.dataset.state = "open";
+        content.dataset.state = "open";
+        trigger.dataset.state = "open";
+        trigger.ariaExpanded = "true";
+      }
+    }
+    isOpen() {
+      return this.element.dataset.state == "open";
+    }
+  }
   class combobox_controller extends Controller {
     static targets=[ "trigger", "searchInput", "triggerText" ];
     connect() {
@@ -4066,6 +4092,7 @@
   exports.AccordionItemController = accordion_item_controller;
   exports.AvatarController = avatar_controller;
   exports.CheckboxController = checkbox_controller;
+  exports.CollapsibleController = collapsible_controller;
   exports.ComboboxContentController = combobox_content_controller;
   exports.ComboboxController = combobox_controller;
   exports.ComboboxTriggerController = combobox_trigger_controller;

@@ -1349,6 +1349,33 @@ class checkbox_controller extends Controller {
   }
 }
 
+class collapsible_controller extends Controller {
+  static targets=[ "trigger", "content" ];
+  handleClick(e) {
+    console.log("handleClick collapsible");
+    this.toggle();
+  }
+  toggle() {
+    const el = this.element;
+    const trigger = this.triggerTarget;
+    const content = this.contentTarget;
+    if (this.isOpen()) {
+      el.dataset.state = "closed";
+      content.dataset.state = "closed";
+      trigger.dataset.state = "closed";
+      trigger.ariaExpanded = "false";
+    } else {
+      el.dataset.state = "open";
+      content.dataset.state = "open";
+      trigger.dataset.state = "open";
+      trigger.ariaExpanded = "true";
+    }
+  }
+  isOpen() {
+    return this.element.dataset.state == "open";
+  }
+}
+
 class combobox_controller extends Controller {
   static targets=[ "trigger", "searchInput", "triggerText" ];
   connect() {
@@ -4309,4 +4336,4 @@ class toggle_controller extends Controller {
   }
 }
 
-export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, input_otp_controller as InputOtpController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController, toggle_controller as ToggleController };
+export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, collapsible_controller as CollapsibleController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, input_otp_controller as InputOtpController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController, toggle_controller as ToggleController };

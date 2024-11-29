@@ -2,6 +2,7 @@ import AccordionController from "./accordion_controller"
 import AccordionItemController from "./accordion_item_controller"
 import AvatarController from "./avatar_controller"
 import CheckboxController from "./checkbox_controller"
+import CollapsibleController from "./collapsible_controller"
 import ComboboxController from "./combobox_controller"
 import ComboboxContentController from "./combobox_content_controller"
 import ComboboxTriggerController from "./combobox_trigger_controller"
@@ -24,6 +25,7 @@ export {
   AccordionItemController,
   AvatarController,
   CheckboxController,
+  CollapsibleController,
   ComboboxController,
   ComboboxContentController,
   ComboboxTriggerController,

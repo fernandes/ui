@@ -1,6 +1,6 @@
 class CollapsiblePreview < Lookbook::Preview
   def default
-    render UI::Collapsible.new(open: true, class: "w-[350px] space-y-2") do |c|
+    render UI::Collapsible.new(class: "w-[350px] space-y-2") do |c|
       c.div(class: "flex items-center justify-between space-x-4 px-4") do
         c.h4(class: "text-sm font-semibold") { " @peduarte starred 3 repositories" }
         c.trigger(:chevrons_up_down)
@@ -21,8 +21,8 @@ class CollapsiblePreview < Lookbook::Preview
     end
   end
 
-  def closed
-    render UI::Collapsible.new(open: false, class: "w-[350px] space-y-2") do |c|
+  def open
+    render UI::Collapsible.new(open: true, class: "w-[350px] space-y-2") do |c|
       c.div(class: "flex items-center justify-between space-x-4 px-4") do
         c.h4(class: "text-sm font-semibold") { " @peduarte starred 3 repositories" }
         c.trigger(:chevrons_up_down)
