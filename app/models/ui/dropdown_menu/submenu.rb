@@ -4,14 +4,19 @@ class UI::DropdownMenu < UI::Base
 
     attr_reader :label, :icon
 
-    def initialize(label, icon:, level:, placement: :right_start, **attrs)
+    def initialize(label, icon:, level:, placement: :right_start, no_padding: true, **attrs)
       @label = label
       @icon = icon
       @level = level
       @placement = placement
       @item_level = level
       @level = level + 1
+      @no_padding = no_padding
       super(**attrs)
+    end
+
+    def no_padding?
+      true
     end
 
     def view_template(&block)
@@ -21,7 +26,9 @@ class UI::DropdownMenu < UI::Base
         render UI::Icon.new(:chevron_right, class: "ml-auto")
         div(
           class: [
-            "ui-popover-content z-50 rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-content min-w-[250px] data-[state=closed]:hidden"
+            "ui-popover-content z-50 rounded-md border bg-popover text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-content min-w-[250px] data-[state=closed]:hidden",
+            ("p-1" unless no_padding?),
+            ("p-0" if no_padding?)
           ],
           data: {
             controller: :ui__dropdown_content,

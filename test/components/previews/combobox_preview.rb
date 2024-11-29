@@ -95,7 +95,7 @@ class ComboboxPreview < Lookbook::Preview
                 grp.item("Assign to...", icon: :user)
                 grp.item("Set due date..", icon: :calendar)
                 m.separator
-                grp.submenu("Apply label", icon: :tags) do |submenu|
+                grp.submenu("Apply label", icon: :tags, no_padding: true) do |submenu|
                   render UI::Combobox.new(hide_check_marks: true, class: "ml-auto") do |combobox|
                     combobox.search placeholder: "Filter label..."
                     combobox.option(id: "feature", label: "feature")
