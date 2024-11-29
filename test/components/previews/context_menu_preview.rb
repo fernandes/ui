@@ -1,23 +1,29 @@
 class ContextMenuPreview < Lookbook::Preview
   def default
     render UI::ContextMenu.new do |ctx|
-      ctx.item(text: "Back", key: "meta.[")
-      ctx.item(text: "Forward", key: "meta.]", disabled: true)
-      ctx.item(text: "Reload", key: "meta.R")
-
-      ctx.menu(text: "More Tools") do |menu|
+      ctx.trigger(class: "flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm") do |trigger|
+        trigger.plain "Right click here"
       end
 
-      ctx.separator
+      ctx.content do |c|
+        c.item(text: "Back", key: "meta.[")
+        c.item(text: "Forward", key: "meta.]", disabled: true)
+        c.item(text: "Reload", key: "meta.R")
 
-      ctx.checkbox(text: "Show Bookmarks Bar", key: "meta.shift.B", checked: true)
-      ctx.checkbox(text: "Show Fulls URLs", checked: false)
+        c.menu(text: "More Tools") do |menu|
+        end
 
-      ctx.separator
+        c.separator
 
-      ctx.radio_group("People") do
-        ctx.radio(text: "Pedro Duarte", selected: true)
-        ctx.radio(text: "Colm Tuite")
+        c.checkbox(text: "Show Bookmarks Bar", key: "meta.shift.B", checked: true)
+        c.checkbox(text: "Show Fulls URLs", checked: false)
+
+        c.separator
+
+        c.radio_group("People") do
+          c.radio(text: "Pedro Duarte", selected: true)
+          c.radio(text: "Colm Tuite")
+        end
       end
     end
   end

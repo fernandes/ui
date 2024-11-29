@@ -1471,6 +1471,145 @@
       console.log("handleItemChecked@combobox-trigger");
     }
   }
+  const composeEventName = (name, controller, eventPrefix) => {
+    let composedName = name;
+    if (eventPrefix === true) {
+      composedName = `${controller.identifier}:${name}`;
+    } else if (typeof eventPrefix === "string") {
+      composedName = `${eventPrefix}:${name}`;
+    }
+    return composedName;
+  };
+  const extendedEvent = (type, event, detail) => {
+    const {bubbles: bubbles, cancelable: cancelable, composed: composed} = event || {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    };
+    if (event) {
+      Object.assign(detail, {
+        originalEvent: event
+      });
+    }
+    const customEvent = new CustomEvent(type, {
+      bubbles: bubbles,
+      cancelable: cancelable,
+      composed: composed,
+      detail: detail
+    });
+    return customEvent;
+  };
+  function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+    const vertInView = rect.top <= windowHeight && rect.top + rect.height > 0;
+    const horInView = rect.left <= windowWidth && rect.left + rect.width > 0;
+    return vertInView && horInView;
+  }
+  const defaultOptions$5 = {
+    events: [ "click", "touchend" ],
+    onlyVisible: true,
+    dispatchEvent: true,
+    eventPrefix: true
+  };
+  const useClickOutside = (composableController, options = {}) => {
+    const controller = composableController;
+    const {onlyVisible: onlyVisible, dispatchEvent: dispatchEvent, events: events, eventPrefix: eventPrefix} = Object.assign({}, defaultOptions$5, options);
+    const onEvent = event => {
+      const targetElement = (options === null || options === void 0 ? void 0 : options.element) || controller.element;
+      if (targetElement.contains(event.target) || !isElementInViewport(targetElement) && onlyVisible) {
+        return;
+      }
+      if (controller.clickOutside) {
+        controller.clickOutside(event);
+      }
+      if (dispatchEvent) {
+        const eventName = composeEventName("click:outside", controller, eventPrefix);
+        const clickOutsideEvent = extendedEvent(eventName, event, {
+          controller: controller
+        });
+        targetElement.dispatchEvent(clickOutsideEvent);
+      }
+    };
+    const observe = () => {
+      events === null || events === void 0 ? void 0 : events.forEach((event => {
+        window.addEventListener(event, onEvent, true);
+      }));
+    };
+    const unobserve = () => {
+      events === null || events === void 0 ? void 0 : events.forEach((event => {
+        window.removeEventListener(event, onEvent, true);
+      }));
+    };
+    const controllerDisconnect = controller.disconnect.bind(controller);
+    Object.assign(controller, {
+      disconnect() {
+        unobserve();
+        controllerDisconnect();
+      }
+    });
+    observe();
+    return [ observe, unobserve ];
+  };
+  class DebounceController extends Controller {}
+  DebounceController.debounces = [];
+  class ThrottleController extends Controller {}
+  ThrottleController.throttles = [];
+  class context_menu_controller extends Controller {
+    static targets=[ "content", "trigger" ];
+    static values={
+      placement: {
+        type: String,
+        default: "right-start"
+      },
+      openDelay: {
+        type: Number,
+        default: 150
+      },
+      closeDelay: {
+        type: Number,
+        default: 200
+      }
+    };
+    connect() {
+      useClickOutside(this);
+      this.element.dataset.state = "closed";
+    }
+    handleContextMenu(e) {
+      console.log("handleContextMenu@context-menu", e);
+      const x = e.pageX + 1;
+      const y = e.pageY + 1;
+      Object.assign(this.contentTarget.style, {
+        left: `${x}px`,
+        top: `${y}px`
+      });
+      this.element.dataset["state"] = "open";
+      this.contentTarget.dataset["state"] = "open";
+      console.log("openedPopover : ", document.activeElement.innerText);
+    }
+    handleEsc(e) {
+      if (this.isOpen()) {
+        e.preventDefault();
+        this.closePopover();
+      }
+    }
+    clickOutside(event) {
+      if (this.isOpen()) {
+        event.preventDefault();
+        this.closePopover();
+      }
+    }
+    closePopover() {
+      console.log("setPopoverClose");
+      this.element.dataset["state"] = "closed";
+      this.contentTarget.dataset["state"] = "closed";
+      this.contentTarget.setAttribute("tabindex", -1);
+    }
+    isOpen() {
+      return this.element.dataset.state == "open";
+    }
+  }
   class dropdown_content_controller extends Controller {
     static targets=[ "item" ];
     connect() {
@@ -3084,91 +3223,6 @@
       platform: platformWithCache
     });
   };
-  const composeEventName = (name, controller, eventPrefix) => {
-    let composedName = name;
-    if (eventPrefix === true) {
-      composedName = `${controller.identifier}:${name}`;
-    } else if (typeof eventPrefix === "string") {
-      composedName = `${eventPrefix}:${name}`;
-    }
-    return composedName;
-  };
-  const extendedEvent = (type, event, detail) => {
-    const {bubbles: bubbles, cancelable: cancelable, composed: composed} = event || {
-      bubbles: true,
-      cancelable: true,
-      composed: true
-    };
-    if (event) {
-      Object.assign(detail, {
-        originalEvent: event
-      });
-    }
-    const customEvent = new CustomEvent(type, {
-      bubbles: bubbles,
-      cancelable: cancelable,
-      composed: composed,
-      detail: detail
-    });
-    return customEvent;
-  };
-  function isElementInViewport(el) {
-    const rect = el.getBoundingClientRect();
-    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
-    const vertInView = rect.top <= windowHeight && rect.top + rect.height > 0;
-    const horInView = rect.left <= windowWidth && rect.left + rect.width > 0;
-    return vertInView && horInView;
-  }
-  const defaultOptions$5 = {
-    events: [ "click", "touchend" ],
-    onlyVisible: true,
-    dispatchEvent: true,
-    eventPrefix: true
-  };
-  const useClickOutside = (composableController, options = {}) => {
-    const controller = composableController;
-    const {onlyVisible: onlyVisible, dispatchEvent: dispatchEvent, events: events, eventPrefix: eventPrefix} = Object.assign({}, defaultOptions$5, options);
-    const onEvent = event => {
-      const targetElement = (options === null || options === void 0 ? void 0 : options.element) || controller.element;
-      if (targetElement.contains(event.target) || !isElementInViewport(targetElement) && onlyVisible) {
-        return;
-      }
-      if (controller.clickOutside) {
-        controller.clickOutside(event);
-      }
-      if (dispatchEvent) {
-        const eventName = composeEventName("click:outside", controller, eventPrefix);
-        const clickOutsideEvent = extendedEvent(eventName, event, {
-          controller: controller
-        });
-        targetElement.dispatchEvent(clickOutsideEvent);
-      }
-    };
-    const observe = () => {
-      events === null || events === void 0 ? void 0 : events.forEach((event => {
-        window.addEventListener(event, onEvent, true);
-      }));
-    };
-    const unobserve = () => {
-      events === null || events === void 0 ? void 0 : events.forEach((event => {
-        window.removeEventListener(event, onEvent, true);
-      }));
-    };
-    const controllerDisconnect = controller.disconnect.bind(controller);
-    Object.assign(controller, {
-      disconnect() {
-        unobserve();
-        controllerDisconnect();
-      }
-    });
-    observe();
-    return [ observe, unobserve ];
-  };
-  class DebounceController extends Controller {}
-  DebounceController.debounces = [];
-  class ThrottleController extends Controller {}
-  ThrottleController.throttles = [];
   class dropdown_submenu_controller extends Controller {
     static targets=[ "content" ];
     static values={
@@ -4096,6 +4150,7 @@
   exports.ComboboxContentController = combobox_content_controller;
   exports.ComboboxController = combobox_controller;
   exports.ComboboxTriggerController = combobox_trigger_controller;
+  exports.ContextMenuController = context_menu_controller;
   exports.DropdownContentController = dropdown_content_controller;
   exports.DropdownMenuController = dropdown_menu_controller;
   exports.DropdownSubmenuController = dropdown_submenu_controller;

@@ -6,6 +6,7 @@ import CollapsibleController from "./collapsible_controller"
 import ComboboxController from "./combobox_controller"
 import ComboboxContentController from "./combobox_content_controller"
 import ComboboxTriggerController from "./combobox_trigger_controller"
+import ContextMenuController from "./context_menu_controller"
 import DropdownContentController from "./dropdown_content_controller"
 import DropdownMenuController from "./dropdown_menu_controller"
 import DropdownSubmenuController from "./dropdown_submenu_controller"
@@ -29,6 +30,7 @@ export {
   ComboboxController,
   ComboboxContentController,
   ComboboxTriggerController,
+  ContextMenuController,
   DropdownContentController,
   DropdownMenuController,
   DropdownSubmenuController,
