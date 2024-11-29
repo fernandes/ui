@@ -23,6 +23,21 @@ class ComboboxPreview < Lookbook::Preview
     end
   end
 
+  def scrolls
+    render UI::Combobox.new do |combobox|
+      combobox.trigger do |trigger|
+        trigger.button("Select framework..")
+      end
+      combobox.search placeholder: "Search framework.."
+      combobox.option(id: "hanami", label: "Hanami")
+      combobox.option(id: "rails", label: "Rails")
+      combobox.option(id: "sinatra", label: "Sinatra")
+      1.upto(20) do |n|
+        combobox.option(id: "sinatra-#{n}", label: "Sinatra ##{n}")
+      end
+    end
+  end
+
   def option_selected
     render UI::Combobox.new do |combobox|
       combobox.trigger do |trigger|

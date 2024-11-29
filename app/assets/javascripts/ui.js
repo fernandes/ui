@@ -1454,6 +1454,10 @@
       });
       item.dataset.selected = "true";
       item.setAttribute("aria-selected", "true");
+      item.scrollIntoView({
+        block: "center",
+        inline: "center"
+      });
     }
     unselectItem(item) {
       this.dispatch("unselected", item);
@@ -3551,6 +3555,9 @@
         this.closePopover();
       }
     }
+    handleWindowResize() {
+      this.updatePosition(true);
+    }
     handleEsc(e) {
       if (this.isOpen()) {
         e.preventDefault();
@@ -3597,10 +3604,17 @@
       this.bodyOverflow = document.body.style["overflow-y"];
       document.body.style["overflow-y"] = "hidden";
       this.dispatch("open", eventDetails);
+      this.checkArrows();
       this.receiverTargets.forEach((x => {
         console.log("receivers", x);
         x.dispatchEvent(new CustomEvent("ui--popover:open", eventDetails));
       }));
+    }
+    checkArrows() {
+      const scrollsController = this.application.getControllerForElementAndIdentifier(this.contentTarget, "ui--scroll-buttons");
+      if (scrollsController) {
+        scrollsController.checkArrows();
+      }
     }
     closePopover() {
       clearTimeout(this.openTimer);
@@ -3658,8 +3672,6 @@
       if (this.triggerTarget.dataset["state"] == "open" && !force) {
         return true;
       }
-      const rect = this.triggerTarget.getBoundingClientRect();
-      rect.top + rect.height + 4;
       computePosition(this.triggerTarget, this.contentTarget, {
         placement: this.placementValue,
         middleware: [ offset(4), flip(), shift({
@@ -3669,7 +3681,6 @@
             if (availableHeight < 200) {
               return;
             }
-            elements.floating.querySelector(".ui-select2-options");
             if (availableHeight > window.innerHeight) {
               availableHeight = window.innerHeight;
             }
@@ -3679,7 +3690,6 @@
           }
         }) ]
       }).then((({x: x, y: y, placement: placement, strategy: strategy, middlewareData: middlewareData}) => {
-        console.log("here!");
         Object.assign(this.contentTarget.style, {
           left: `${x}px`,
           top: `${y}px`
@@ -3798,6 +3808,7 @@
   class scroll_buttons_controller extends Controller {
     static targets=[ "body", "up", "down" ];
     checkArrows(e) {
+      console.log("checkig arrows for bodyyyyyyyyyyyy", this.bodyTarget);
       if (this.bodyTarget.scrollTop > 25) {
         this.upTarget.classList.remove("hidden");
       } else {

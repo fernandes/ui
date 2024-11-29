@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ['body', 'up', 'down'];
 
   checkArrows(e) {
+    console.log("checkig arrows for bodyyyyyyyyyyyy", this.bodyTarget)
     if(this.bodyTarget.scrollTop > 25) {
       this.upTarget.classList.remove("hidden")
     } else {

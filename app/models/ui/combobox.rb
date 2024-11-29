@@ -93,11 +93,20 @@ class UI::Combobox < UI::Base
         role: "listbox",
         aria_label: "Suggestions",
         id: ":r174:",
+        data: {
+          controller: :ui__scroll_buttons,
+          ui__popover_target: :receiver,
+          action: [
+            "ui--popover:open->ui--scroll-buttons#handlePopoverOpen",
+            "ui--popover:close->ui--scroll-buttons#handlePopoverClose",
+          ]
+        }
       ) do
         div do
+          scroll(:up)
           div(
             class:
-              "overflow-hidden p-1 text-foreground",
+              "p-1 text-foreground max-h-64 overflow-auto",
             role: "presentation",
             data: {
               value: "undefined",
@@ -107,8 +116,30 @@ class UI::Combobox < UI::Base
           ) do
             render Items.new(@items)
           end
+          scroll(:down)
         end
       end
+    end
+  end
+
+  def scroll(direction = :up)
+    div(
+      aria_hidden: "true",
+      class: [
+        "flex cursor-default items-center justify-center py-1 hidden",
+        "absolute w-full bg-white z-10 rounded-full",
+        ("bottom-0" if direction == :down)
+      ],
+      style: "flex-shrink:0",
+      data: {
+        ui__scroll_buttons_target: direction,
+        action: [
+          ("click->ui--scroll-buttons#scrollUp mouseover->ui--scroll-buttons#mouseoverUp mouseout->ui--scroll-buttons#mouseoutUp" if direction == :up),
+          ("click->ui--scroll-buttons#scrollDown mouseover->ui--scroll-buttons#mouseoverDown mouseout->ui--scroll-buttons#mouseoutDown" if direction == :down)
+        ]
+      }
+    ) do
+      render UI::Icon.new(:"chevron_#{direction}", class: "h-4 w-4")
     end
   end
 
@@ -128,6 +159,7 @@ class UI::Combobox < UI::Base
 
     def default_attrs
       {
+        class: "max-h-64",
         role: "group",
         data: {}
       }

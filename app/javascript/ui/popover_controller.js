@@ -49,6 +49,10 @@ export default class extends Controller {
     } 
   }
 
+  handleWindowResize() {
+    this.updatePosition(true)
+  }
+
   handleEsc(e) {
     if(this.isOpen()) {
       // example to close a modal
@@ -101,12 +105,20 @@ export default class extends Controller {
     this.bodyOverflow = document.body.style["overflow-y"]
     document.body.style["overflow-y"] = "hidden"
     this.dispatch( "open", eventDetails )
+    this.checkArrows()
     this.receiverTargets.forEach((x) => {
       console.log("receivers", x)
       x.dispatchEvent(
         new CustomEvent("ui--popover:open", eventDetails)
       )
     })
+  }
+
+  checkArrows() {
+    const scrollsController = this.application.getControllerForElementAndIdentifier(this.contentTarget, 'ui--scroll-buttons')
+    if(scrollsController) {
+      scrollsController.checkArrows()
+    }
   }
 
   closePopover() {
@@ -173,11 +185,8 @@ export default class extends Controller {
 
   updatePosition(force = false) {
     if(this.triggerTarget.dataset["state"] == "open" && !force) {
-    // if(this.isOpen() && !force) {
       return true
     }
-    const rect = this.triggerTarget.getBoundingClientRect()
-    const total = rect.top + rect.height + 4
     computePosition(this.triggerTarget, this.contentTarget, {
       placement: this.placementValue,
       middleware: [
@@ -190,32 +199,16 @@ export default class extends Controller {
             if(availableHeight < 200) {
               return
             }
-            const options = elements.floating.querySelector(".ui-select2-options")
-            // const body = elements.floating.querySelector(".ui-popover-content")
             if (availableHeight > window.innerHeight) {
               availableHeight = window.innerHeight
             }
-            // Change styles, e.g.
-            // Object.assign(elements.floating.style, {
-            //   maxWidth: `${availableWidth}px`,
-            //   maxHeight: `${availableHeight - 15}px`,
-            //   // height: `${availableHeight - 15}px`,
-            // });
             Object.assign(elements.floating.style, {
               maxWidth: `${availableWidth}px`,
-              // maxHeight: `${Math.ceil(availableHeight)}px`,
-              // height: `${availableHeight - 15}px`,
             });
-            // Object.assign(body.style, {
-            //   maxWidth: `${availableWidth}px`,
-            //   maxHeight: `${availableHeight - 40}px`,
-            //   // height: `${availableHeight - 15}px`,
-            // });
           },
         })
       ]
     }).then(({x, y, placement, strategy, middlewareData}) => {
-        console.log("here!")
       Object.assign(this.contentTarget.style, {
         left: `${x}px`,
         top: `${y}px`,

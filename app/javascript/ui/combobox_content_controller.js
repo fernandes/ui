@@ -147,6 +147,7 @@ export default class extends Controller {
     this.dispatch("selected", { default: {value: item.innerText }})
     item.dataset.selected = "true"
     item.setAttribute("aria-selected", "true")
+    item.scrollIntoView({block: "center", inline: "center"})
   }
 
   unselectItem(item) {
