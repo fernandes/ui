@@ -2,8 +2,8 @@ class UI::DropdownMenu < UI::Base
   class Group < UI::Base
     include Common
 
-    def initialize(level: 0, **attrs)
-      @level = level
+    def initialize(margin_left: false, **attrs)
+      @margin_left = margin_left
       super(**attrs)
     end
 

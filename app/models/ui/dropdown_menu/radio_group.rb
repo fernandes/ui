@@ -46,7 +46,7 @@ class UI::DropdownMenu < UI::Base
       super(**attrs)
     end
 
-    def radio_item(value:, **attrs, &block)
+    def radio(value:, **attrs, &block)
       render RadioItem.new(value: value, selected: @value, **attrs, &block)
     end
 

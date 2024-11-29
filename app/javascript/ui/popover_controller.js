@@ -50,7 +50,13 @@ export default class extends Controller {
   }
 
   handleWindowResize() {
-    this.updatePosition(true)
+    if(!this.isOpen()) return
+
+    if(this.placementValue == "cursor") {
+      this.closePopover()
+    } else {
+      this.updatePosition(true)
+    }
   }
 
   handleEsc(e) {
@@ -77,7 +83,11 @@ export default class extends Controller {
     }
   }
 
-  openPopover() {
+  openPopover(e) {
+    if(this.placementValue == "cursor") {
+      this.mouseX = e.pageX + 1
+      this.mouseY = e.pageY + 1
+    }
     clearTimeout(this.closeTimer);
     this.openTimer = window.setTimeout(() => this.setPopoverOpen(), this.openDelayValue);
   }
@@ -90,13 +100,20 @@ export default class extends Controller {
         level: this.levelValue
       }
     }
-    this.dispatch( "ui:before-open", eventDetails)
+    this.dispatch("ui:before-open", eventDetails)
     this.receiverTargets.forEach((x) => {
       x.dispatchEvent(
         new CustomEvent("ui--popover:before-open", eventDetails)
       )
     })
-    this.updatePosition(true)
+    if(this.placementValue == "cursor") {
+      Object.assign(this.contentTarget.style, {
+        left: `${this.mouseX}px`,
+        top: `${this.mouseY}px`,
+      });
+    } else {
+      this.updatePosition(true)
+    }
     this.triggerTarget.dataset["state"] = "open"
     this.element.dataset["state"] = "open"
     this.contentTarget.dataset["state"] = "open"

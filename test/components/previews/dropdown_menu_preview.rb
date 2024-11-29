@@ -25,11 +25,10 @@ class DropdownMenuPreview < Lookbook::Preview
           end
           grp.item("New Team", icon: :plus, key: "meta.t")
           grp.separator
-          grp.separator
           grp.item("Github", icon: :github)
           grp.item("Support", icon: :life_buoy)
           grp.item("API", icon: :cloud, disabled: true)
-          grp.item("Logout", icon: :log_out, key: "shit.meta.q")
+          grp.item("Logout", icon: :log_out, key: "shift.meta.q")
         end
       end
     end
@@ -44,9 +43,9 @@ class DropdownMenuPreview < Lookbook::Preview
       d.menu_content(class: "w-56") do |m|
         m.label { "Appearance" }
         m.separator
-        m.checkbox_item(checked: true) { "Status Bar" }
-        m.checkbox_item(disabled: true) { "Activity Bar" }
-        m.checkbox_item(checked: false) { "Panel" }
+        m.checkbox(checked: true) { "Status Bar" }
+        m.checkbox(disabled: true) { "Activity Bar" }
+        m.checkbox(checked: false) { "Panel" }
       end
     end
   end
@@ -61,9 +60,9 @@ class DropdownMenuPreview < Lookbook::Preview
         m.label { "Panel Position" }
         m.separator
         m.radio_group(value: "bottom") do |grp|
-          grp.radio_item(value: "top") { "Top" }
-          grp.radio_item(value: "bottom") { "Bottom" }
-          grp.radio_item(value: "right") { "Right" }
+          grp.radio(value: "top") { "Top" }
+          grp.radio(value: "bottom") { "Bottom" }
+          grp.radio(value: "right") { "Right" }
         end
       end
     end

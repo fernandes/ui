@@ -2,58 +2,58 @@ import { Controller } from '@hotwired/stimulus';
 import { useClickOutside } from "stimulus-use"
 
 export default class extends Controller {
-  static targets = ["content", "trigger"]
-
-  static values = {
-    placement: { type: String, default: "right-start" },
-    openDelay: { type: Number, default: 150 },
-    closeDelay: { type: Number, default: 200 },
-  }
+  static targets = ["dropdown", "trigger"]
 
   connect() {
-    useClickOutside(this)
-    this.element.dataset.state = "closed"
+    this.state = "closed"
   }
 
-  handleContextMenu(e) {
-    console.log("handleContextMenu@context-menu", e) 
-    // this.openPopover({contentFocus: true})
-    const x = e.pageX + 1
-    const y = e.pageY + 1
-    Object.assign(this.contentTarget.style, {
-      left: `${x}px`,
-      top: `${y}px`,
-    });
-    this.element.dataset["state"] = "open"
-    this.contentTarget.dataset["state"] = "open"
-    // this.contentTarget.setAttribute("tabindex", 0)
-    // this.contentTarget.focus
-    console.log("openedPopover : ", document.activeElement.innerText)
+  handlePopoverOpen() {
+    this.state = "open"
+    const dropdownController = this.application.getControllerForElementAndIdentifier(
+      this.dropdownTarget,
+      'ui--dropdown-menu'
+    )
+    dropdownController.handlePopoverOpen()
   }
 
-  handleEsc(e) {
-    if(this.isOpen()) {
-      // example to close a modal
-      e.preventDefault()
-      this.closePopover()
+  handlePopoverClose() {
+    this.state = "closed"
+    console.log("handlePopoverClose@context-menu")
+    this.triggerTarget.focus({focusVisible: true})
+    
+  }
+
+  handleEsc() {
+    console.log("handleEsc@context-menu")
+    // this.shutdown()
+    this.element.dispatchEvent(
+      new CustomEvent("requestclose", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          forceClose: true
+        }
+      })
+    )
+  }
+
+
+  handleKeyDown(e) {
+    // if(this.state == "closed") return
+
+    if(e.shiftKey && e.code == "F10") {
+      this.element.dispatchEvent(
+        new CustomEvent("requestopen", {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          detail: {
+            forceClose: true
+          }
+        })
+      )
     }
-  }
-
-  clickOutside(event) {
-    if (this.isOpen()) {
-      event.preventDefault()
-      this.closePopover()
-    }
-  }
-
-  closePopover() {
-    console.log('setPopoverClose')
-    this.element.dataset["state"] = "closed"
-    this.contentTarget.dataset["state"] = "closed"
-    this.contentTarget.setAttribute("tabindex", -1)
-  }
-
-  isOpen() {
-    return this.element.dataset.state == "open"
   }
 }

@@ -1,28 +1,34 @@
 class ContextMenuPreview < Lookbook::Preview
   def default
     render UI::ContextMenu.new do |ctx|
-      ctx.trigger(class: "flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm") do |trigger|
+      ctx.trigger(class: "flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm ", popover_class: "focus-visible:rounded-md focus-visible:ring-inset") do |trigger|
         trigger.plain "Right click here"
       end
 
       ctx.content do |c|
-        c.item(text: "Back", key: "meta.[")
-        c.item(text: "Forward", key: "meta.]", disabled: true)
-        c.item(text: "Reload", key: "meta.R")
+        c.item("Back", key: "meta.[")
+        c.item("Forward", key: "meta.]", disabled: true)
+        c.item("Reload", key: "meta.R")
 
-        c.menu(text: "More Tools") do |menu|
+        c.submenu("More Tools") do |submenu|
+          submenu.item("Save Page As..", key: "shift.meta.S")
+          submenu.item("Create Shortcut..")
+          submenu.item("Name Window..")
+          submenu.separator
+          submenu.item("Developer Tools")
         end
 
         c.separator
-
-        c.checkbox(text: "Show Bookmarks Bar", key: "meta.shift.B", checked: true)
-        c.checkbox(text: "Show Fulls URLs", checked: false)
+        c.checkbox(value: "show_bookmarks", checked: true) { "Show Bookmarks Bar" }
+        c.checkbox(value: "show_urls", checked: false) { "Show Fulls URLs" }
 
         c.separator
+        c.label { "People" }
+        c.separator
 
-        c.radio_group("People") do
-          c.radio(text: "Pedro Duarte", selected: true)
-          c.radio(text: "Colm Tuite")
+        c.radio_group(value: "pedro_duarte") do |grp|
+          grp.radio(value: "pedro_duarte") { "Pedro Duarte" }
+          grp.radio(value: "colm tuite") { "Colm Tuite" }
         end
       end
     end

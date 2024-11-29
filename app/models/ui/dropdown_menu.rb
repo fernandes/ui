@@ -1,7 +1,8 @@
 class UI::DropdownMenu < UI::Base
   include Common
 
-  def initialize(visible: false, **attrs)
+  def initialize(visible: false, margin_left: false, **attrs)
+    @margin_left = margin_left
     @visible = visible
     @level ||= 0
     super(**attrs)
@@ -59,6 +60,6 @@ class UI::DropdownMenu < UI::Base
   end
 
   def label(**attrs, &block)
-    render UI::DropdownMenu::Label.new(**attrs, &block)
+    render UI::DropdownMenu::Label.new(margin_left: @margin_left, **attrs, &block)
   end
 end

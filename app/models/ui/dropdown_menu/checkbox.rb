@@ -21,7 +21,7 @@ class UI::DropdownMenu < UI::Base
             render UI::Icon.new(:check, class: "h-4 w-4")
           end
         end
-        yield
+        yield if block
       end
     end
 

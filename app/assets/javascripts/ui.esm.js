@@ -1696,57 +1696,44 @@ class ThrottleController extends Controller {}
 ThrottleController.throttles = [];
 
 class context_menu_controller extends Controller {
-  static targets=[ "content", "trigger" ];
-  static values={
-    placement: {
-      type: String,
-      default: "right-start"
-    },
-    openDelay: {
-      type: Number,
-      default: 150
-    },
-    closeDelay: {
-      type: Number,
-      default: 200
-    }
-  };
+  static targets=[ "dropdown", "trigger" ];
   connect() {
-    useClickOutside(this);
-    this.element.dataset.state = "closed";
+    this.state = "closed";
   }
-  handleContextMenu(e) {
-    console.log("handleContextMenu@context-menu", e);
-    const x = e.pageX + 1;
-    const y = e.pageY + 1;
-    Object.assign(this.contentTarget.style, {
-      left: `${x}px`,
-      top: `${y}px`
+  handlePopoverOpen() {
+    this.state = "open";
+    const dropdownController = this.application.getControllerForElementAndIdentifier(this.dropdownTarget, "ui--dropdown-menu");
+    dropdownController.handlePopoverOpen();
+  }
+  handlePopoverClose() {
+    this.state = "closed";
+    console.log("handlePopoverClose@context-menu");
+    this.triggerTarget.focus({
+      focusVisible: true
     });
-    this.element.dataset["state"] = "open";
-    this.contentTarget.dataset["state"] = "open";
-    console.log("openedPopover : ", document.activeElement.innerText);
   }
-  handleEsc(e) {
-    if (this.isOpen()) {
-      e.preventDefault();
-      this.closePopover();
+  handleEsc() {
+    console.log("handleEsc@context-menu");
+    this.element.dispatchEvent(new CustomEvent("requestclose", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        forceClose: true
+      }
+    }));
+  }
+  handleKeyDown(e) {
+    if (e.shiftKey && e.code == "F10") {
+      this.element.dispatchEvent(new CustomEvent("requestopen", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          forceClose: true
+        }
+      }));
     }
-  }
-  clickOutside(event) {
-    if (this.isOpen()) {
-      event.preventDefault();
-      this.closePopover();
-    }
-  }
-  closePopover() {
-    console.log("setPopoverClose");
-    this.element.dataset["state"] = "closed";
-    this.contentTarget.dataset["state"] = "closed";
-    this.contentTarget.setAttribute("tabindex", -1);
-  }
-  isOpen() {
-    return this.element.dataset.state == "open";
   }
 }
 
@@ -3797,7 +3784,12 @@ class popover_controller extends Controller {
     }
   }
   handleWindowResize() {
-    this.updatePosition(true);
+    if (!this.isOpen()) return;
+    if (this.placementValue == "cursor") {
+      this.closePopover();
+    } else {
+      this.updatePosition(true);
+    }
   }
   handleEsc(e) {
     if (this.isOpen()) {
@@ -3818,7 +3810,11 @@ class popover_controller extends Controller {
       this.openPopover();
     }
   }
-  openPopover() {
+  openPopover(e) {
+    if (this.placementValue == "cursor") {
+      this.mouseX = e.pageX + 1;
+      this.mouseY = e.pageY + 1;
+    }
     clearTimeout(this.closeTimer);
     this.openTimer = window.setTimeout((() => this.setPopoverOpen()), this.openDelayValue);
   }
@@ -3834,7 +3830,14 @@ class popover_controller extends Controller {
     this.receiverTargets.forEach((x => {
       x.dispatchEvent(new CustomEvent("ui--popover:before-open", eventDetails));
     }));
-    this.updatePosition(true);
+    if (this.placementValue == "cursor") {
+      Object.assign(this.contentTarget.style, {
+        left: `${this.mouseX}px`,
+        top: `${this.mouseY}px`
+      });
+    } else {
+      this.updatePosition(true);
+    }
     this.triggerTarget.dataset["state"] = "open";
     this.element.dataset["state"] = "open";
     this.contentTarget.dataset["state"] = "open";

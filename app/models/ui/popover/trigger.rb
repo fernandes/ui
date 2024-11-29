@@ -16,13 +16,15 @@ class UI::Popover < UI::Base
       stimulus_action = case action
       when :click
         "click"
+      when :contextmenu
+        "contextmenu"
       when :hover
         "mouseenter"
       end
       stimulus_method = case action
       when :click
         "toggle"
-      when :hover
+      when :hover, :contextmenu
         "openPopover"
       end
       {
@@ -30,9 +32,10 @@ class UI::Popover < UI::Base
         data: {
           ui__popover_target: "trigger",
           action: [
-            "#{stimulus_action}->ui--popover##{stimulus_method}",
+            "#{stimulus_action}->ui--popover##{stimulus_method}:prevent",
             "keydown.esc@window->ui--popover#handleEsc:prevent",
-            ("mouseleave->ui--popover#closePopover" if @mouseout == :close)
+            ("mouseleave->ui--popover#closePopover" if @mouseout == :close),
+            ("click->ui--popover#closePopover" if action == :contextmenu)
           ]
         }
       }

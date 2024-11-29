@@ -4,14 +4,12 @@ class UI::DropdownMenu < UI::Base
 
     attr_reader :label, :icon
 
-    def initialize(label, icon:, level:, placement: :right_start, no_padding: true, **attrs)
+    def initialize(label, icon:, margin_left: false, placement: :right_start, no_padding: true, **attrs)
       @label = label
       @icon = icon
-      @level = level
       @placement = placement
-      @item_level = level
-      @level = level + 1
       @no_padding = no_padding
+      @submenu_margin_left = margin_left
       super(**attrs)
     end
 
@@ -21,7 +19,11 @@ class UI::DropdownMenu < UI::Base
 
     def view_template(&block)
       div(**attrs) do
-        render UI::Icon.new(icon) if icon.present?
+        if icon.present?
+          render UI::Icon.new(icon)
+        elsif @submenu_margin_left
+          div(class: "h-4 w-4")
+        end
         span { label }
         render UI::Icon.new(:chevron_right, class: "ml-auto")
         div(
@@ -63,7 +65,6 @@ class UI::DropdownMenu < UI::Base
         data_radix_collection_item: "",
         data: {
           controller: :ui__dropdown_submenu,
-          dropdown_level: @item_level,
           # ui__dropdown_menu_target: :item,
           ui__dropdown_content_target: :item,
           action: [
