@@ -41,11 +41,13 @@ class DropdownMenuPreview < Lookbook::Preview
       end
 
       d.menu_content(class: "w-56") do |m|
-        m.label { "Appearance" }
-        m.separator
-        m.checkbox(checked: true) { "Status Bar" }
-        m.checkbox(disabled: true) { "Activity Bar" }
-        m.checkbox(checked: false) { "Panel" }
+        m.group do |grp|
+          grp.label { "Appearance" }
+          grp.separator
+          grp.checkbox(checked: true) { "Status Bar" }
+          grp.checkbox(disabled: true) { "Activity Bar" }
+          grp.checkbox(checked: false) { "Panel" }
+        end
       end
     end
   end
@@ -57,12 +59,14 @@ class DropdownMenuPreview < Lookbook::Preview
       end
 
       d.menu_content(class: "w-56") do |m|
-        m.label { "Panel Position" }
-        m.separator
-        m.radio_group(value: "bottom") do |grp|
-          grp.radio(value: "top") { "Top" }
-          grp.radio(value: "bottom") { "Bottom" }
-          grp.radio(value: "right") { "Right" }
+        m.group do |grp|
+          grp.label { "Panel Position" }
+          grp.separator
+          grp.radio_group(value: "bottom") do |radio_grp|
+            radio_grp.radio(value: "top") { "Top" }
+            radio_grp.radio(value: "bottom") { "Bottom" }
+            radio_grp.radio(value: "right") { "Right" }
+          end
         end
       end
     end

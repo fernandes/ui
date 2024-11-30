@@ -1601,6 +1601,32 @@
       }
     }
   }
+  class dropdown_checkbox_controller extends Controller {
+    static targets=[ "icon" ];
+    handleClick() {
+      console.log("handleClick@dropdown-checkbox");
+      if (this.isChecked()) {
+        this.uncheck();
+      } else {
+        this.check();
+      }
+    }
+    check() {
+      const el = this.element;
+      el.setAttribute("aria-checked", "true");
+      el.dataset.state = "checked";
+      this.iconTarget.dataset.state = "checked";
+    }
+    uncheck() {
+      const el = this.element;
+      el.setAttribute("aria-checked", "false");
+      el.dataset.state = "unchecked";
+      this.iconTarget.dataset.state = "unchecked";
+    }
+    isChecked() {
+      return this.element.dataset.state == "checked";
+    }
+  }
   class dropdown_content_controller extends Controller {
     static targets=[ "item" ];
     connect() {
@@ -1611,21 +1637,24 @@
       const highlighted = this.findHighlighted();
       let nextElement = undefined;
       if (highlighted == undefined) {
-        nextElement = this.itemTargets.at(-1);
+        nextElement = this.availableItems().at(-1);
       } else {
-        const indexOf = this.itemTargets.indexOf(highlighted);
-        nextElement = this.itemTargets[indexOf - 1];
+        const indexOf = this.availableItems().indexOf(highlighted);
+        nextElement = this.availableItems()[indexOf - 1];
       }
       if (nextElement) {
         this.deemphaziAllElements();
         this.highlightElement(nextElement);
       }
     }
+    availableItems() {
+      return this.itemTargets.filter((x => x.dataset.disabled == undefined));
+    }
     handleKeyDown() {
       console.log("handleKeyDown@content", this.element.innerText);
       const highlighted = this.findHighlighted();
-      const indexOf = this.itemTargets.indexOf(highlighted);
-      const nextElement = this.itemTargets[indexOf + 1];
+      const indexOf = this.availableItems().indexOf(highlighted);
+      const nextElement = this.availableItems()[indexOf + 1];
       if (nextElement) {
         this.deemphaziAllElements();
         this.highlightElement(nextElement);
@@ -1749,6 +1778,32 @@
     }
     handlePopoverClose() {
       console.log("handlePopoverClosed@dropdown menu");
+    }
+  }
+  class dropdown_radio_group_controller extends Controller {
+    static targets=[ "radio" ];
+    handleClick(e) {
+      const target = e.target;
+      console.log("handleClick@dropdown-radio-group", target);
+      this.radioTargets.forEach((x => {
+        this.uncheck(x);
+      }));
+      this.check(target);
+    }
+    check(el) {
+      el.setAttribute("aria-checked", "true");
+      el.setAttribute("tabindex", "0");
+      el.dataset.state = "checked";
+      this.queryIcon(el).dataset.state = "checked";
+    }
+    uncheck(el) {
+      el.setAttribute("aria-checked", "false");
+      el.setAttribute("tabindex", "-1");
+      el.dataset.state = "unchecked";
+      this.queryIcon(el).dataset.state = "unchecked";
+    }
+    queryIcon(el) {
+      return el.querySelector(":scope > span > span");
     }
   }
   const sides = [ "top", "right", "bottom", "left" ];
@@ -4165,8 +4220,10 @@
   exports.ComboboxController = combobox_controller;
   exports.ComboboxTriggerController = combobox_trigger_controller;
   exports.ContextMenuController = context_menu_controller;
+  exports.DropdownCheckboxController = dropdown_checkbox_controller;
   exports.DropdownContentController = dropdown_content_controller;
   exports.DropdownMenuController = dropdown_menu_controller;
+  exports.DropdownRadioGroupController = dropdown_radio_group_controller;
   exports.DropdownSubmenuController = dropdown_submenu_controller;
   exports.FilterController = filter_controller;
   exports.InputOtpController = input_otp_controller;

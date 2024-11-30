@@ -46,10 +46,6 @@ class UI::DropdownMenu < UI::Base
         controller: :ui__dropdown_menu,
         ui__popover_target: :receiver,
         action: [
-          # "keydown.up->ui--dropdown-menu#handleKeyUp",
-          # "keydown.down->ui--dropdown-menu#handleKeyDown",
-          # "keydown.right->ui--dropdown-menu#handleKeyRight",
-          # "keydown.left->ui--dropdown-menu#handleKeyLeft",
           "ui--popover:open->ui--dropdown-menu#handlePopoverOpen",
           "ui--popover:close->ui--dropdown-menu#handlePopoverClose",
           "keydown.esc->ui--dropdown-menu#handleEsc",
@@ -57,9 +53,5 @@ class UI::DropdownMenu < UI::Base
         ]
       }
     }
-  end
-
-  def label(**attrs, &block)
-    render UI::DropdownMenu::Label.new(margin_left: @margin_left, **attrs, &block)
   end
 end

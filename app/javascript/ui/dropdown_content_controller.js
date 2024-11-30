@@ -13,10 +13,10 @@ export default class extends Controller {
     let nextElement = undefined
 
     if(highlighted == undefined) {
-      nextElement = this.itemTargets.at(-1)
+      nextElement = this.availableItems().at(-1)
     } else {
-      const indexOf = this.itemTargets.indexOf(highlighted)
-      nextElement = this.itemTargets[indexOf - 1]
+      const indexOf = this.availableItems().indexOf(highlighted)
+      nextElement = this.availableItems()[indexOf - 1]
     }
     
     if(nextElement) {
@@ -25,11 +25,15 @@ export default class extends Controller {
     }
   }
 
+  availableItems() {
+    return this.itemTargets.filter((x) => { return x.dataset.disabled == undefined })
+  }
+
   handleKeyDown() {
     console.log("handleKeyDown@content", this.element.innerText)
     const highlighted = this.findHighlighted()
-    const indexOf = this.itemTargets.indexOf(highlighted)
-    const nextElement = this.itemTargets[indexOf + 1]
+    const indexOf = this.availableItems().indexOf(highlighted)
+    const nextElement = this.availableItems()[indexOf + 1]
     if(nextElement) {
       this.deemphaziAllElements()
       this.highlightElement(nextElement)

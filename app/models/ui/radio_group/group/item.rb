@@ -9,7 +9,6 @@ class UI::RadioGroup::Group::Item < UI::Base
   def view_template
     attrs[:aria_checked] = (selected ? "true" : "false")
     attrs[:data][:state] = (selected ? "checked" : "unchecked")
-    attrs[:tabindex] = (selected ? "0" : "-1")
 
     button(**attrs) do
       span(

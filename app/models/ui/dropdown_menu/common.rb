@@ -23,5 +23,9 @@ class UI::DropdownMenu < UI::Base
     def checkbox(checked: false, disabled: false, **attrs, &block)
       render UI::DropdownMenu::Checkbox.new(checked: checked, disabled: disabled, **attrs, &block)
     end
+
+    def label(**attrs, &block)
+      render UI::DropdownMenu::Label.new(margin_left: @margin_left, **attrs, &block)
+    end
   end
 end

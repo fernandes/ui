@@ -1737,6 +1737,33 @@ class context_menu_controller extends Controller {
   }
 }
 
+class dropdown_checkbox_controller extends Controller {
+  static targets=[ "icon" ];
+  handleClick() {
+    console.log("handleClick@dropdown-checkbox");
+    if (this.isChecked()) {
+      this.uncheck();
+    } else {
+      this.check();
+    }
+  }
+  check() {
+    const el = this.element;
+    el.setAttribute("aria-checked", "true");
+    el.dataset.state = "checked";
+    this.iconTarget.dataset.state = "checked";
+  }
+  uncheck() {
+    const el = this.element;
+    el.setAttribute("aria-checked", "false");
+    el.dataset.state = "unchecked";
+    this.iconTarget.dataset.state = "unchecked";
+  }
+  isChecked() {
+    return this.element.dataset.state == "checked";
+  }
+}
+
 class dropdown_content_controller extends Controller {
   static targets=[ "item" ];
   connect() {
@@ -1747,21 +1774,24 @@ class dropdown_content_controller extends Controller {
     const highlighted = this.findHighlighted();
     let nextElement = undefined;
     if (highlighted == undefined) {
-      nextElement = this.itemTargets.at(-1);
+      nextElement = this.availableItems().at(-1);
     } else {
-      const indexOf = this.itemTargets.indexOf(highlighted);
-      nextElement = this.itemTargets[indexOf - 1];
+      const indexOf = this.availableItems().indexOf(highlighted);
+      nextElement = this.availableItems()[indexOf - 1];
     }
     if (nextElement) {
       this.deemphaziAllElements();
       this.highlightElement(nextElement);
     }
   }
+  availableItems() {
+    return this.itemTargets.filter((x => x.dataset.disabled == undefined));
+  }
   handleKeyDown() {
     console.log("handleKeyDown@content", this.element.innerText);
     const highlighted = this.findHighlighted();
-    const indexOf = this.itemTargets.indexOf(highlighted);
-    const nextElement = this.itemTargets[indexOf + 1];
+    const indexOf = this.availableItems().indexOf(highlighted);
+    const nextElement = this.availableItems()[indexOf + 1];
     if (nextElement) {
       this.deemphaziAllElements();
       this.highlightElement(nextElement);
@@ -1886,6 +1916,33 @@ class dropdown_menu_controller extends Controller {
   }
   handlePopoverClose() {
     console.log("handlePopoverClosed@dropdown menu");
+  }
+}
+
+class dropdown_radio_group_controller extends Controller {
+  static targets=[ "radio" ];
+  handleClick(e) {
+    const target = e.target;
+    console.log("handleClick@dropdown-radio-group", target);
+    this.radioTargets.forEach((x => {
+      this.uncheck(x);
+    }));
+    this.check(target);
+  }
+  check(el) {
+    el.setAttribute("aria-checked", "true");
+    el.setAttribute("tabindex", "0");
+    el.dataset.state = "checked";
+    this.queryIcon(el).dataset.state = "checked";
+  }
+  uncheck(el) {
+    el.setAttribute("aria-checked", "false");
+    el.setAttribute("tabindex", "-1");
+    el.dataset.state = "unchecked";
+    this.queryIcon(el).dataset.state = "unchecked";
+  }
+  queryIcon(el) {
+    return el.querySelector(":scope > span > span");
   }
 }
 
@@ -4405,4 +4462,4 @@ class toggle_controller extends Controller {
   }
 }
 
-export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, collapsible_controller as CollapsibleController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, context_menu_controller as ContextMenuController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, input_otp_controller as InputOtpController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController, toggle_controller as ToggleController };
+export { accordion_controller as AccordionController, accordion_item_controller as AccordionItemController, avatar_controller as AvatarController, checkbox_controller as CheckboxController, collapsible_controller as CollapsibleController, combobox_content_controller as ComboboxContentController, combobox_controller as ComboboxController, combobox_trigger_controller as ComboboxTriggerController, context_menu_controller as ContextMenuController, dropdown_checkbox_controller as DropdownCheckboxController, dropdown_content_controller as DropdownContentController, dropdown_menu_controller as DropdownMenuController, dropdown_radio_group_controller as DropdownRadioGroupController, dropdown_submenu_controller as DropdownSubmenuController, filter_controller as FilterController, input_otp_controller as InputOtpController, popover_controller as PopoverController, radio_group_controller as RadioGroupController, scroll_buttons_controller as ScrollButtonsController, select_controller as SelectController, select_item_controller as SelectItemController, switch_controller as SwitchController, tabs_controller as TabsController, toggle_controller as ToggleController };
