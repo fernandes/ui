@@ -85,8 +85,13 @@ export default class extends Controller {
 
   openPopover(e) {
     if(this.placementValue == "cursor") {
-      this.mouseX = e.pageX + 1
-      this.mouseY = e.pageY + 1
+      if(e.detail.positionX && e.detail.positionY) {
+        this.mouseX = e.detail.positionX
+        this.mouseY = e.detail.positionY
+      } else {
+        this.mouseX = e.pageX + 1
+        this.mouseY = e.pageY + 1
+      }
     }
     clearTimeout(this.closeTimer);
     this.openTimer = window.setTimeout(() => this.setPopoverOpen(), this.openDelayValue);

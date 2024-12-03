@@ -1590,15 +1590,25 @@
     }
     handleKeyDown(e) {
       if (e.shiftKey && e.code == "F10") {
+        const position = this.calculatePositions();
         this.element.dispatchEvent(new CustomEvent("requestopen", {
           view: window,
           bubbles: true,
           cancelable: true,
           detail: {
-            forceClose: true
+            forceClose: true,
+            positionX: position.x,
+            positionY: position.y
           }
         }));
       }
+    }
+    calculatePositions() {
+      const box = this.triggerTarget.getBoundingClientRect();
+      return {
+        x: (box.left + box.right) / 2,
+        y: (box.top + box.bottom) / 2
+      };
     }
   }
   class dropdown_checkbox_controller extends Controller {
@@ -3626,8 +3636,13 @@
     }
     openPopover(e) {
       if (this.placementValue == "cursor") {
-        this.mouseX = e.pageX + 1;
-        this.mouseY = e.pageY + 1;
+        if (e.detail.positionX && e.detail.positionY) {
+          this.mouseX = e.detail.positionX;
+          this.mouseY = e.detail.positionY;
+        } else {
+          this.mouseX = e.pageX + 1;
+          this.mouseY = e.pageY + 1;
+        }
       }
       clearTimeout(this.closeTimer);
       this.openTimer = window.setTimeout((() => this.setPopoverOpen()), this.openDelayValue);

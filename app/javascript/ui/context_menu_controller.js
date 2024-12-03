@@ -41,19 +41,28 @@ export default class extends Controller {
 
 
   handleKeyDown(e) {
-    // if(this.state == "closed") return
-
     if(e.shiftKey && e.code == "F10") {
+      const position = this.calculatePositions()
       this.element.dispatchEvent(
         new CustomEvent("requestopen", {
           view: window,
           bubbles: true,
           cancelable: true,
           detail: {
-            forceClose: true
+            forceClose: true,
+            positionX: position.x,
+            positionY: position.y
           }
         })
       )
+    }
+  }
+
+  calculatePositions() {
+    const box = this.triggerTarget.getBoundingClientRect()
+    return {
+      x: (box.left + box.right) / 2,
+      y: (box.top + box.bottom) / 2
     }
   }
 }
