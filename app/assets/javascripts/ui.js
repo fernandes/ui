@@ -474,7 +474,7 @@
   Controller.targets = [];
   Controller.outlets = [];
   Controller.values = {};
-  class accordion_controller extends Controller {
+  class AccordionController extends Controller {
     connect() {
       this.element.textContent = "Hello from Accordion";
     }
@@ -1121,7 +1121,7 @@
     const factory = isFunction(target) ? animateProgress : animate$1;
     return factory(target, keyframesOrOptions, options);
   }
-  class accordion_item_controller extends Controller {
+  class AccordionItemController extends Controller {
     static targets=[ "icon", "content", "button" ];
     static values={
       open: {
@@ -1196,7 +1196,7 @@
       });
     }
   }
-  class avatar_controller extends Controller {
+  class AvatarController extends Controller {
     static targets=[ "image", "fallback" ];
     connect() {
       const data_src = this.imageTarget.getAttribute("data-src");
@@ -1211,7 +1211,306 @@
       this.fallbackTarget.classList.add("hidden");
     }
   }
-  class checkbox_controller extends Controller {
+  class FetchResponse {
+    constructor(response) {
+      this.response = response;
+    }
+    get statusCode() {
+      return this.response.status;
+    }
+    get redirected() {
+      return this.response.redirected;
+    }
+    get ok() {
+      return this.response.ok;
+    }
+    get unauthenticated() {
+      return this.statusCode === 401;
+    }
+    get unprocessableEntity() {
+      return this.statusCode === 422;
+    }
+    get authenticationURL() {
+      return this.response.headers.get("WWW-Authenticate");
+    }
+    get contentType() {
+      const contentType = this.response.headers.get("Content-Type") || "";
+      return contentType.replace(/;.*$/, "");
+    }
+    get headers() {
+      return this.response.headers;
+    }
+    get html() {
+      if (this.contentType.match(/^(application|text)\/(html|xhtml\+xml)$/)) {
+        return this.text;
+      }
+      return Promise.reject(new Error(`Expected an HTML response but got "${this.contentType}" instead`));
+    }
+    get json() {
+      if (this.contentType.match(/^application\/.*json$/)) {
+        return this.responseJson || (this.responseJson = this.response.json());
+      }
+      return Promise.reject(new Error(`Expected a JSON response but got "${this.contentType}" instead`));
+    }
+    get text() {
+      return this.responseText || (this.responseText = this.response.text());
+    }
+    get isTurboStream() {
+      return this.contentType.match(/^text\/vnd\.turbo-stream\.html/);
+    }
+    get isScript() {
+      return this.contentType.match(/\b(?:java|ecma)script\b/);
+    }
+    async renderTurboStream() {
+      if (this.isTurboStream) {
+        if (window.Turbo) {
+          await window.Turbo.renderStreamMessage(await this.text);
+        } else {
+          console.warn("You must set `window.Turbo = Turbo` to automatically process Turbo Stream events with request.js");
+        }
+      } else {
+        return Promise.reject(new Error(`Expected a Turbo Stream response but got "${this.contentType}" instead`));
+      }
+    }
+    async activeScript() {
+      if (this.isScript) {
+        const script = document.createElement("script");
+        const metaTag = document.querySelector("meta[name=csp-nonce]");
+        const nonce = metaTag && metaTag.content;
+        if (nonce) {
+          script.setAttribute("nonce", nonce);
+        }
+        script.innerHTML = await this.text;
+        document.body.appendChild(script);
+      } else {
+        return Promise.reject(new Error(`Expected a Script response but got "${this.contentType}" instead`));
+      }
+    }
+  }
+  class RequestInterceptor {
+    static register(interceptor) {
+      this.interceptor = interceptor;
+    }
+    static get() {
+      return this.interceptor;
+    }
+    static reset() {
+      this.interceptor = undefined;
+    }
+  }
+  function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split("; ") : [];
+    const prefix = `${encodeURIComponent(name)}=`;
+    const cookie = cookies.find((cookie => cookie.startsWith(prefix)));
+    if (cookie) {
+      const value = cookie.split("=").slice(1).join("=");
+      if (value) {
+        return decodeURIComponent(value);
+      }
+    }
+  }
+  function compact(object) {
+    const result = {};
+    for (const key in object) {
+      const value = object[key];
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+  function metaContent(name) {
+    const element = document.head.querySelector(`meta[name="${name}"]`);
+    return element && element.content;
+  }
+  function stringEntriesFromFormData(formData) {
+    return [ ...formData ].reduce(((entries, [name, value]) => entries.concat(typeof value === "string" ? [ [ name, value ] ] : [])), []);
+  }
+  function mergeEntries(searchParams, entries) {
+    for (const [name, value] of entries) {
+      if (value instanceof window.File) continue;
+      if (searchParams.has(name) && !name.includes("[]")) {
+        searchParams.delete(name);
+        searchParams.set(name, value);
+      } else {
+        searchParams.append(name, value);
+      }
+    }
+  }
+  class FetchRequest {
+    constructor(method, url, options = {}) {
+      this.method = method;
+      this.options = options;
+      this.originalUrl = url.toString();
+    }
+    async perform() {
+      try {
+        const requestInterceptor = RequestInterceptor.get();
+        if (requestInterceptor) {
+          await requestInterceptor(this);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      const fetch = this.responseKind === "turbo-stream" && window.Turbo ? window.Turbo.fetch : window.fetch;
+      const response = new FetchResponse(await fetch(this.url, this.fetchOptions));
+      if (response.unauthenticated && response.authenticationURL) {
+        return Promise.reject(window.location.href = response.authenticationURL);
+      }
+      if (response.isScript) {
+        await response.activeScript();
+      }
+      const responseStatusIsTurboStreamable = response.ok || response.unprocessableEntity;
+      if (responseStatusIsTurboStreamable && response.isTurboStream) {
+        await response.renderTurboStream();
+      }
+      return response;
+    }
+    addHeader(key, value) {
+      const headers = this.additionalHeaders;
+      headers[key] = value;
+      this.options.headers = headers;
+    }
+    sameHostname() {
+      if (!this.originalUrl.startsWith("http:")) {
+        return true;
+      }
+      try {
+        return new URL(this.originalUrl).hostname === window.location.hostname;
+      } catch (_) {
+        return true;
+      }
+    }
+    get fetchOptions() {
+      return {
+        method: this.method.toUpperCase(),
+        headers: this.headers,
+        body: this.formattedBody,
+        signal: this.signal,
+        credentials: this.credentials,
+        redirect: this.redirect
+      };
+    }
+    get headers() {
+      const baseHeaders = {
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": this.contentType,
+        Accept: this.accept
+      };
+      if (this.sameHostname()) {
+        baseHeaders["X-CSRF-Token"] = this.csrfToken;
+      }
+      return compact(Object.assign(baseHeaders, this.additionalHeaders));
+    }
+    get csrfToken() {
+      return getCookie(metaContent("csrf-param")) || metaContent("csrf-token");
+    }
+    get contentType() {
+      if (this.options.contentType) {
+        return this.options.contentType;
+      } else if (this.body == null || this.body instanceof window.FormData) {
+        return undefined;
+      } else if (this.body instanceof window.File) {
+        return this.body.type;
+      }
+      return "application/json";
+    }
+    get accept() {
+      switch (this.responseKind) {
+       case "html":
+        return "text/html, application/xhtml+xml";
+
+       case "turbo-stream":
+        return "text/vnd.turbo-stream.html, text/html, application/xhtml+xml";
+
+       case "json":
+        return "application/json, application/vnd.api+json";
+
+       case "script":
+        return "text/javascript, application/javascript";
+
+       default:
+        return "*/*";
+      }
+    }
+    get body() {
+      return this.options.body;
+    }
+    get query() {
+      const originalQuery = (this.originalUrl.split("?")[1] || "").split("#")[0];
+      const params = new URLSearchParams(originalQuery);
+      let requestQuery = this.options.query;
+      if (requestQuery instanceof window.FormData) {
+        requestQuery = stringEntriesFromFormData(requestQuery);
+      } else if (requestQuery instanceof window.URLSearchParams) {
+        requestQuery = requestQuery.entries();
+      } else {
+        requestQuery = Object.entries(requestQuery || {});
+      }
+      mergeEntries(params, requestQuery);
+      const query = params.toString();
+      return query.length > 0 ? `?${query}` : "";
+    }
+    get url() {
+      return this.originalUrl.split("?")[0].split("#")[0] + this.query;
+    }
+    get responseKind() {
+      return this.options.responseKind || "html";
+    }
+    get signal() {
+      return this.options.signal;
+    }
+    get redirect() {
+      return this.options.redirect || "follow";
+    }
+    get credentials() {
+      return this.options.credentials || "same-origin";
+    }
+    get additionalHeaders() {
+      return this.options.headers || {};
+    }
+    get formattedBody() {
+      const bodyIsAString = Object.prototype.toString.call(this.body) === "[object String]";
+      const contentTypeIsJson = this.headers["Content-Type"] === "application/json";
+      if (contentTypeIsJson && !bodyIsAString) {
+        return JSON.stringify(this.body);
+      }
+      return this.body;
+    }
+  }
+  class CalendarController extends Controller {
+    static values={
+      nextPeriodMonth: Number,
+      nextPeriodYear: Number,
+      previousPeriodMonth: Number,
+      previousPeriodYear: Number,
+      weeks: {
+        type: Number,
+        default: 6
+      }
+    };
+    static targets=[ "nextButton", "previousButton" ];
+    handleClickNextPeriod() {
+      this.request(this.nextPeriodYearValue, this.nextPeriodMonthValue);
+    }
+    handleClickPreviousPeriod() {
+      this.request(this.previousPeriodYearValue, this.previousPeriodMonthValue);
+    }
+    async request(year, month) {
+      const request = new FetchRequest("post", `/ui/calendar/${year}/${month}`, {
+        body: JSON.stringify({
+          weeks: this.weeksValue
+        })
+      });
+      const response = await request.perform();
+      if (response.ok) {
+        const body = await response.text;
+        console.log("bodyjackkkkkkkk", this);
+        this.element.outerHTML = body;
+      }
+    }
+  }
+  class CheckboxController extends Controller {
     static targets=[ "span" ];
     handleToggle() {
       if (this.element.dataset.state == "checked") {
@@ -1227,7 +1526,7 @@
       }
     }
   }
-  class collapsible_controller extends Controller {
+  class CollapsibleController extends Controller {
     static targets=[ "trigger", "content" ];
     handleClick(e) {
       console.log("handleClick collapsible");
@@ -1253,7 +1552,7 @@
       return this.element.dataset.state == "open";
     }
   }
-  class combobox_controller extends Controller {
+  class ComboboxController extends Controller {
     static targets=[ "trigger", "searchInput", "triggerText" ];
     connect() {
       this.popoverOpen = false;
@@ -1321,7 +1620,7 @@
     handleInputKeyDown() {}
     handleInputKeyUp() {}
   }
-  class combobox_content_controller extends Controller {
+  class ComboboxContentController extends Controller {
     static targets=[ "item" ];
     static values={
       search: {
@@ -1470,7 +1769,7 @@
       });
     }
   }
-  class combobox_trigger_controller extends Controller {
+  class ComboboxTriggerController extends Controller {
     handleItemChecked(e) {
       console.log("handleItemChecked@combobox-trigger");
     }
@@ -1560,7 +1859,7 @@
   DebounceController.debounces = [];
   class ThrottleController extends Controller {}
   ThrottleController.throttles = [];
-  class context_menu_controller extends Controller {
+  class ContextMenuController extends Controller {
     static targets=[ "dropdown", "trigger" ];
     connect() {
       this.state = "closed";
@@ -1611,7 +1910,7 @@
       };
     }
   }
-  class dropdown_checkbox_controller extends Controller {
+  class DropdownCheckboxController extends Controller {
     static targets=[ "icon" ];
     handleClick() {
       console.log("handleClick@dropdown-checkbox");
@@ -1637,7 +1936,7 @@
       return this.element.dataset.state == "checked";
     }
   }
-  class dropdown_content_controller extends Controller {
+  class DropdownContentController extends Controller {
     static targets=[ "item" ];
     connect() {
       console.log("contenttttttttttttttt", this.element.innerText);
@@ -1749,7 +2048,7 @@
       }
     }
   }
-  class dropdown_menu_controller extends Controller {
+  class DropdownMenuController extends Controller {
     static targets=[ "item", "content" ];
     handleKeyUp() {
       console.log("handleKeyUp@dropdown menu");
@@ -1790,7 +2089,7 @@
       console.log("handlePopoverClosed@dropdown menu");
     }
   }
-  class dropdown_radio_group_controller extends Controller {
+  class DropdownRadioGroupController extends Controller {
     static targets=[ "radio" ];
     handleClick(e) {
       const target = e.target;
@@ -3279,7 +3578,7 @@
       platform: platformWithCache
     });
   };
-  class dropdown_submenu_controller extends Controller {
+  class DropdownSubmenuController extends Controller {
     static targets=[ "content" ];
     static values={
       placement: {
@@ -3403,7 +3702,7 @@
       }));
     }
   }
-  class filter_controller extends Controller {
+  class FilterController extends Controller {
     static targets=[ "item", "input" ];
     connect() {
       this.clearFilter();
@@ -3450,7 +3749,7 @@
       });
     }
   }
-  class input_otp_controller extends Controller {
+  class InputOtpController extends Controller {
     static targets=[ "input", "slot" ];
     static classes=[ "focus" ];
     static values={
@@ -3568,7 +3867,7 @@
       el.querySelector("span").classList.remove("hidden");
     }
   }
-  class popover_controller extends Controller {
+  class PopoverController extends Controller {
     static targets=[ "trigger", "content", "receiver" ];
     static values={
       placement: {
@@ -3770,7 +4069,7 @@
       }));
     }
   }
-  class radio_group_controller extends Controller {
+  class RadioGroupController extends Controller {
     static targets=[ "radio", "anput" ];
     connect() {
       this.radioClickHandlerBind = this.radioClickHandler.bind(this);
@@ -3878,7 +4177,7 @@
       return this.radioTargets.at(buttonIndex - 1);
     }
   }
-  class scroll_buttons_controller extends Controller {
+  class ScrollButtonsController extends Controller {
     static targets=[ "body", "up", "down" ];
     checkArrows(e) {
       console.log("checkig arrows for bodyyyyyyyyyyyy", this.bodyTarget);
@@ -3984,7 +4283,7 @@
       });
     }
   }
-  class select_controller extends Controller {
+  class SelectController extends Controller {
     static targets=[ "trigger", "content", "item" ];
     connect() {
       console.log(this.checkedItem());
@@ -4121,7 +4420,7 @@
       }));
     }
   }
-  class select_item_controller extends Controller {
+  class SelectItemController extends Controller {
     connect() {}
     handleMouseover() {
       this.dispatch("mouseover");
@@ -4145,7 +4444,7 @@
       this.element.dataset.selected = "false";
     }
   }
-  class switch_controller extends Controller {
+  class SwitchController extends Controller {
     static targets=[ "span" ];
     handleToggle() {
       if (this.element.dataset.state == "checked") {
@@ -4159,7 +4458,7 @@
       }
     }
   }
-  class tabs_controller extends Controller {
+  class TabsController extends Controller {
     static targets=[ "trigger", "content" ];
     connect() {}
     handleTriggerClick(e) {
@@ -4209,7 +4508,7 @@
       el.dataset.state = "active";
     }
   }
-  class toggle_controller extends Controller {
+  class ToggleController extends Controller {
     connect() {}
     handleClick(e) {
       this.toggle();
@@ -4218,38 +4517,97 @@
       const el = this.element;
       const state = el.dataset.state;
       if (state == "on") {
-        el.dataset.state = "off";
-        el.setAttribute("aria-pressed", "false");
+        this.unpress(el);
       } else {
-        el.dataset.state = "on";
-        el.setAttribute("aria-pressed", "true");
+        this.press(el);
       }
     }
+    press(el) {
+      el.dataset.state = "on";
+      el.setAttribute("aria-pressed", "true");
+      this.dispatch("press");
+    }
+    unpress(el) {
+      el.dataset.state = "off";
+      el.setAttribute("aria-pressed", "false");
+      this.dispatch("unpress");
+    }
   }
-  exports.AccordionController = accordion_controller;
-  exports.AccordionItemController = accordion_item_controller;
-  exports.AvatarController = avatar_controller;
-  exports.CheckboxController = checkbox_controller;
-  exports.CollapsibleController = collapsible_controller;
-  exports.ComboboxContentController = combobox_content_controller;
-  exports.ComboboxController = combobox_controller;
-  exports.ComboboxTriggerController = combobox_trigger_controller;
-  exports.ContextMenuController = context_menu_controller;
-  exports.DropdownCheckboxController = dropdown_checkbox_controller;
-  exports.DropdownContentController = dropdown_content_controller;
-  exports.DropdownMenuController = dropdown_menu_controller;
-  exports.DropdownRadioGroupController = dropdown_radio_group_controller;
-  exports.DropdownSubmenuController = dropdown_submenu_controller;
-  exports.FilterController = filter_controller;
-  exports.InputOtpController = input_otp_controller;
-  exports.PopoverController = popover_controller;
-  exports.RadioGroupController = radio_group_controller;
-  exports.ScrollButtonsController = scroll_buttons_controller;
-  exports.SelectController = select_controller;
-  exports.SelectItemController = select_item_controller;
-  exports.SwitchController = switch_controller;
-  exports.TabsController = tabs_controller;
-  exports.ToggleController = toggle_controller;
+  class ToggleGroupController extends Controller {
+    static targets=[ "toggle" ];
+    static values={
+      type: {
+        type: String,
+        default: "multiple"
+      }
+    };
+    handleTogglePressed(e) {
+      console.log("handleTogglePressed@toggle-group");
+      if (this.typeValue == "multiple") return;
+      const target = e.target;
+      this.toggleTargets.forEach((el => {
+        console.log("checking el", el, target, el == target);
+        if (el != target) {
+          const toggleController = this.application.getControllerForElementAndIdentifier(el, "ui--toggle");
+          toggleController.unpress(el);
+        }
+      }));
+    }
+  }
+  const registerControllers = application => {
+    application.register("ui--accordion", AccordionController);
+    application.register("ui--accordion-item", AccordionItemController);
+    application.register("ui--avatar", AvatarController);
+    application.register("ui--calendar", CalendarController);
+    application.register("ui--checkbox", CheckboxController);
+    application.register("ui--collapsible", CollapsibleController);
+    application.register("ui--combobox", ComboboxController);
+    application.register("ui--combobox-content", ComboboxContentController);
+    application.register("ui--combobox-trigger", ComboboxTriggerController);
+    application.register("ui--context-menu", ContextMenuController);
+    application.register("ui--dropdown-content", DropdownContentController);
+    application.register("ui--dropdown-checkbox", DropdownCheckboxController);
+    application.register("ui--dropdown-menu", DropdownMenuController);
+    application.register("ui--dropdown-radio-group", DropdownRadioGroupController);
+    application.register("ui--dropdown-submenu", DropdownSubmenuController);
+    application.register("ui--filter", FilterController);
+    application.register("ui--input-otp", InputOtpController);
+    application.register("ui--popover", PopoverController);
+    application.register("ui--radio-group", RadioGroupController);
+    application.register("ui--select", SelectController);
+    application.register("ui--select-item", SelectItemController);
+    application.register("ui--scroll-buttons", ScrollButtonsController);
+    application.register("ui--switch", SwitchController);
+    application.register("ui--tabs", TabsController);
+    application.register("ui--toggle", ToggleController);
+    application.register("ui--toggle-group", ToggleGroupController);
+  };
+  exports.AccordionController = AccordionController;
+  exports.AccordionItemController = AccordionItemController;
+  exports.AvatarController = AvatarController;
+  exports.CheckboxController = CheckboxController;
+  exports.CollapsibleController = CollapsibleController;
+  exports.ComboboxContentController = ComboboxContentController;
+  exports.ComboboxController = ComboboxController;
+  exports.ComboboxTriggerController = ComboboxTriggerController;
+  exports.ContextMenuController = ContextMenuController;
+  exports.DropdownCheckboxController = DropdownCheckboxController;
+  exports.DropdownContentController = DropdownContentController;
+  exports.DropdownMenuController = DropdownMenuController;
+  exports.DropdownRadioGroupController = DropdownRadioGroupController;
+  exports.DropdownSubmenuController = DropdownSubmenuController;
+  exports.FilterController = FilterController;
+  exports.InputOtpController = InputOtpController;
+  exports.PopoverController = PopoverController;
+  exports.RadioGroupController = RadioGroupController;
+  exports.ScrollButtonsController = ScrollButtonsController;
+  exports.SelectController = SelectController;
+  exports.SelectItemController = SelectItemController;
+  exports.SwitchController = SwitchController;
+  exports.TabsController = TabsController;
+  exports.ToggleController = ToggleController;
+  exports.ToggleGroupController = ToggleGroupController;
+  exports.registerControllers = registerControllers;
   Object.defineProperty(exports, "__esModule", {
     value: true
   });

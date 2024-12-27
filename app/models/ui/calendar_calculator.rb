@@ -10,7 +10,7 @@ class UI::CalendarCalculator
     6 => :sa,
   }
 
-  attr_reader :month, :year, :total_weeks
+  attr_reader :month, :year, :total_weeks, :next_period, :previous_period
   def initialize(month:, year:)
     Date.beginning_of_week = :sunday
     @month = month
@@ -19,6 +19,9 @@ class UI::CalendarCalculator
     @last_day = @first_day.end_of_month
     @total_weeks = week_number(@last_day) - week_number(@first_day) + 1
     @days_in_month = @first_day.all_month
+
+    @next_period = @first_day.advance(months: 1)
+    @previous_period = @first_day.advance(months: -1)
   end
 
   def title

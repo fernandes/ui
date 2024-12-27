@@ -58,8 +58,9 @@
   "peerDependencies": {
     "@floating-ui/dom": "^1.6.3",
     "@hotwired/stimulus": ">= 3",
+    "@rails/request.js": "^0.0.11",
+    "hotkeys-js": "^3.13.7",
     "motion": "^10.18.0",
-    "stimulus-use": "^0.52.2",
-    "hotkeys-js": "^3.13.7"
+    "stimulus-use": "^0.52.2"
   }
 }

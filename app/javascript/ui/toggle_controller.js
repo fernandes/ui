@@ -12,11 +12,21 @@ export default class extends Controller {
     const el = this.element
     const state = el.dataset.state
     if(state == "on") {
-      el.dataset.state = "off"
-      el.setAttribute("aria-pressed", "false")
+      this.unpress(el)
     } else {
-      el.dataset.state = "on"
-      el.setAttribute("aria-pressed", "true")
+      this.press(el)
     }
+  }
+
+  press(el) {
+    el.dataset.state = "on"
+    el.setAttribute("aria-pressed", "true")
+    this.dispatch("press")
+  }
+
+  unpress(el) {
+    el.dataset.state = "off"
+    el.setAttribute("aria-pressed", "false")
+    this.dispatch("unpress")
   }
 }
