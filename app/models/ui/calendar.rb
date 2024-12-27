@@ -1,7 +1,17 @@
 class UI::Calendar < UI::Base
-  def initialize(month:, year:, weeks: nil, **user_attrs)
-    @calendar = UI::CalendarCalculator.new(month: month, year: year)
+  def initialize(month:, year:, weeks: nil, active_day: 0, jump_amount: 0, selected_value: nil, **user_attrs)
+    @month = month
+    @year = year
+    @selected_value = selected_value
+    @calendar = UI::CalendarCalculator.new(
+      month: month,
+      year: year,
+      active_day: active_day,
+      jump_amount: jump_amount,
+      selected_value: selected_value
+    )
     @calendar_weeks = weeks
+    @active_day = @calendar.active_day
     super(**user_attrs)
   end
 
@@ -9,11 +19,23 @@ class UI::Calendar < UI::Base
     data = {
       controller: :ui__calendar,
       ui__calendar: {
+        selected_value: @selected_value,
+        month_value: @month,
+        year_value: @year,
         next_period_month_value: @calendar.next_period.month,
         next_period_year_value: @calendar.next_period.year,
         previous_period_month_value: @calendar.previous_period.month,
         previous_period_year_value: @calendar.previous_period.year,
+        active_day_value: @active_day
       },
+      action: [
+        "keydown.up->ui--calendar#handleKeyUp:stop",
+        "keydown.down->ui--calendar#handleKeyDown:stop",
+        "keydown.right->ui--calendar#handleKeyRight:stop",
+        "keydown.left->ui--calendar#handleKeyLeft:stop",
+        "keydown.page_up->ui--calendar#handleKeyPageUp:stop",
+        "keydown.page_down->ui--calendar#handleKeyPageDown:stop",
+      ]
     }
     div(class: "rdp p-3 rounded-md border", data: data) do
       div(class: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0") do
@@ -111,15 +133,23 @@ class UI::Calendar < UI::Base
     ) do
       button(
         name: "day",
+        data: {
+          ui__calendar_target: :buttonDay,
+          status: status,
+          value: day,
+          action: [
+            "click->ui--calendar#handleButtonDayClick",
+          ],
+        },
         class:
         [
           day_classes,
           ("day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground" if status == :inactive),
           ("bg-accent text-accent-foreground" if status == :today),
-          # ("bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground bg-accent" if status == :today)
+          ("bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground" if status == :selected)
         ],
         role: "gridcell",
-        tabindex: "-1",
+        tabindex: ((status == :today && @active_day == 0) ? "0" : "-1"),
         type: "button"
       ) { day }
     end
@@ -127,6 +157,10 @@ class UI::Calendar < UI::Base
 
   def render_outside(day)
     button_day(day, status: :inactive)
+  end
+
+  def render_selected(day)
+    button_day(day, status: :selected)
   end
 
   def render_inside(day)

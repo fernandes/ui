@@ -7,7 +7,10 @@ module UI
       render UI::Calendar.new(
         month: params[:month].to_i,
         year: params[:year].to_i,
-        weeks: params[:weeks] || 6
+        weeks: params[:weeks] || 6,
+        active_day: params[:focused] || 1,
+        jump_amount: params[:jump_amount],
+        selected_value: params[:selected_value]
       )
     end
   end

@@ -11,7 +11,7 @@ class UI::CalendarCalculator
   }
 
   attr_reader :month, :year, :total_weeks, :next_period, :previous_period
-  def initialize(month:, year:)
+  def initialize(month:, year:, active_day: 0, jump_amount: 0, selected_value: nil)
     Date.beginning_of_week = :sunday
     @month = month
     @year = year
@@ -22,10 +22,27 @@ class UI::CalendarCalculator
 
     @next_period = @first_day.advance(months: 1)
     @previous_period = @first_day.advance(months: -1)
+    @active_day = active_day
+    @jump_amount = jump_amount
+    @selected_value = selected_value
+    @selected_date = Date.parse(selected_value) if @selected_value.present?
   end
 
   def title
     @first_day.strftime("%B %Y")
+  end
+
+  def active_day
+    return 0 if @active_day == 0
+
+    if @jump_amount > 0
+      (@previous_period.change(day: @active_day) + @jump_amount.days).day
+    elsif @jump_amount < 0
+      (@next_period.change(day: @active_day) + @jump_amount.days).day
+    elsif @jump_amount == 0
+      return @last_day.day if @active_day > @last_day.day
+      @active_day
+    end
   end
 
   def first_week
@@ -49,7 +66,10 @@ class UI::CalendarCalculator
 
   def calculate_week(base_date)
     base_date.all_week.map do |date|
-      role = if date == Date.today
+      puts "#{date} - #{@selected_date.present?} - #{date == @selected_date}"
+      role = if @selected_date.present? && date == @selected_date
+        :selected
+      elsif date == Date.today
         :today
       elsif @days_in_month.include?(date)
         :inside
