@@ -61,7 +61,7 @@ class UI::Calendar < UI::Base
               @calendar.weeks(@calendar_weeks) do |week|
                 tr(class: "flex w-full mt-2") do
                   week.each_pair do |dow, value|
-                    send(:"render_#{value[:role]}", value[:day])
+                    send(:"render_#{value[:role]}", value[:day], value[:month], value[:year])
                   end
                 end
               end
@@ -124,7 +124,7 @@ class UI::Calendar < UI::Base
     ) { text }
   end
 
-  def button_day(day, status: :active)
+  def button_day(day, month, year, status: :active)
     td(
       class:
         "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
@@ -136,7 +136,9 @@ class UI::Calendar < UI::Base
         data: {
           ui__calendar_target: :buttonDay,
           status: status,
-          value: day,
+          day: day,
+          month: month,
+          year: year,
           action: [
             "click->ui--calendar#handleButtonDayClick",
           ],
@@ -155,20 +157,20 @@ class UI::Calendar < UI::Base
     end
   end
 
-  def render_outside(day)
-    button_day(day, status: :inactive)
+  def render_outside(day, month, year)
+    button_day(day, month, year, status: :inactive)
   end
 
-  def render_selected(day)
-    button_day(day, status: :selected)
+  def render_selected(day, month, year)
+    button_day(day, month, year, status: :selected)
   end
 
-  def render_inside(day)
-    button_day(day)
+  def render_inside(day, month, year)
+    button_day(day, month, year)
   end
 
-  def render_today(day)
-    button_day(day, status: :today)
+  def render_today(day, month, year)
+    button_day(day, month, year, status: :today)
   end
 
   private

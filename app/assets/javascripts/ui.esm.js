@@ -1678,7 +1678,7 @@ class CalendarController extends Controller {
     return this.buttonDayTargets.find((x => x.attributes["tabindex"].value == "0"));
   }
   findPeriodElement(day) {
-    return this.buttonDayTargets.find((x => x.dataset.value == day && (x.dataset.status == "today" || x.dataset.status == "active")));
+    return this.buttonDayTargets.find((x => x.dataset.day == day && (x.dataset.status == "today" || x.dataset.status == "active" || x.dataset.status == "selected")));
   }
   focusElement(el) {
     el.setAttribute("tabindex", "0");
@@ -1688,7 +1688,7 @@ class CalendarController extends Controller {
   }
   findActiveDay() {
     const activeElement = this.findActiveElement();
-    return parseInt(activeElement.dataset["value"]);
+    return parseInt(activeElement.dataset["day"]);
   }
   moveFocus(amount) {
     const activeDay = this.findActiveDay();
@@ -1707,21 +1707,34 @@ class CalendarController extends Controller {
     }
   }
   handleButtonDayClick(e) {
-    const day = e.target.dataset.value;
-    this.selectedValue = `${this.yearValue}-${this.monthValue}-${day}`;
-    this.buttonDayTargets.forEach((x => {
-      if (x == e.target) {
-        this.selectElement(x);
-      } else {
-        this.unselectElement(x);
+    const day = e.target.dataset.day;
+    const month = e.target.dataset.month;
+    const year = e.target.dataset.year;
+    this.selectedValue = `${year}-${month}-${day}`;
+    if (month != this.monthValue) {
+      this.request(year, month, day, 0);
+    } else {
+      this.buttonDayTargets.forEach((x => {
+        if (x == e.target) {
+          this.selectElement(x);
+        } else {
+          this.unselectElement(x);
+        }
+      }));
+    }
+    this.dispatch("selected", {
+      detail: {
+        value: this.selectedValue
       }
-    }));
+    });
   }
   selectElement(el) {
     el.classList.add(...this.selectedClasses);
+    el.setAttribute("tabindex", "0");
   }
   unselectElement(el) {
     el.classList.remove(...this.selectedClasses);
+    el.setAttribute("tabindex", "-1");
   }
   async request(year, month, focused = 0, jumpAmount = 0) {
     const request = new FetchRequest("post", `/ui/calendar/${year}/${month}`, {
@@ -2152,6 +2165,29 @@ class ContextMenuController extends Controller {
       x: (box.left + box.right) / 2,
       y: (box.top + box.bottom) / 2
     };
+  }
+}
+
+class DatePickerController extends Controller {
+  static targets=[ "label" ];
+  connect() {}
+  async handleCalendarSelected(e) {
+    const formattedDate = await this.formatDate(e.detail.value);
+    if (this.hasLabelTarget) {
+      this.labelTarget.innerText = formattedDate;
+    }
+  }
+  async formatDate(value) {
+    const request = new FetchRequest("post", `/ui/calendar/format`, {
+      body: JSON.stringify({
+        value: value
+      })
+    });
+    const response = await request.perform();
+    if (response.ok) {
+      const body = await response.text;
+      return JSON.parse(body).value;
+    }
   }
 }
 
@@ -4926,6 +4962,7 @@ const registerControllers = application => {
   application.register("ui--combobox-content", ComboboxContentController);
   application.register("ui--combobox-trigger", ComboboxTriggerController);
   application.register("ui--context-menu", ContextMenuController);
+  application.register("ui--date-picker", DatePickerController);
   application.register("ui--dropdown-content", DropdownContentController);
   application.register("ui--dropdown-checkbox", DropdownCheckboxController);
   application.register("ui--dropdown-menu", DropdownMenuController);
@@ -4944,4 +4981,4 @@ const registerControllers = application => {
   application.register("ui--toggle-group", ToggleGroupController);
 };
 
-export { AccordionController, AccordionItemController, AvatarController, CheckboxController, CollapsibleController, ComboboxContentController, ComboboxController, ComboboxTriggerController, ContextMenuController, DropdownCheckboxController, DropdownContentController, DropdownMenuController, DropdownRadioGroupController, DropdownSubmenuController, FilterController, InputOtpController, PopoverController, RadioGroupController, ScrollButtonsController, SelectController, SelectItemController, SwitchController, TabsController, ToggleController, ToggleGroupController, registerControllers };
+export { AccordionController, AccordionItemController, AvatarController, CheckboxController, CollapsibleController, ComboboxContentController, ComboboxController, ComboboxTriggerController, ContextMenuController, DatePickerController, DropdownCheckboxController, DropdownContentController, DropdownMenuController, DropdownRadioGroupController, DropdownSubmenuController, FilterController, InputOtpController, PopoverController, RadioGroupController, ScrollButtonsController, SelectController, SelectItemController, SwitchController, TabsController, ToggleController, ToggleGroupController, registerControllers };

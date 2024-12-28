@@ -3,6 +3,11 @@ module UI
     skip_forgery_protection
     layout false
 
+    def format
+      date = Date.parse(params[:value])
+      render json: {value: date.to_fs(:long_ordinal)}
+    end
+
     def create
       render UI::Calendar.new(
         month: params[:month].to_i,

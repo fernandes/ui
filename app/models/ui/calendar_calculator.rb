@@ -22,8 +22,8 @@ class UI::CalendarCalculator
 
     @next_period = @first_day.advance(months: 1)
     @previous_period = @first_day.advance(months: -1)
-    @active_day = active_day
-    @jump_amount = jump_amount
+    @active_day = active_day.to_i
+    @jump_amount = jump_amount.to_i
     @selected_value = selected_value
     @selected_date = Date.parse(selected_value) if @selected_value.present?
   end
@@ -66,8 +66,7 @@ class UI::CalendarCalculator
 
   def calculate_week(base_date)
     base_date.all_week.map do |date|
-      puts "#{date} - #{@selected_date.present?} - #{date == @selected_date}"
-      role = if @selected_date.present? && date == @selected_date
+      role = if @selected_date.present? && date == @selected_date && date.month == @month
         :selected
       elsif date == Date.today
         :today
@@ -78,7 +77,7 @@ class UI::CalendarCalculator
       end
       [
         WEEKDAY_MAP[date.wday],
-        {day: date.day, role: role}
+        {day: date.day, month: date.month, year: date.year, role: role}
       ]
     end.to_h
   end

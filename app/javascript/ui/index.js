@@ -8,6 +8,7 @@ import ComboboxController from "./combobox_controller"
 import ComboboxContentController from "./combobox_content_controller"
 import ComboboxTriggerController from "./combobox_trigger_controller"
 import ContextMenuController from "./context_menu_controller"
+import DatePickerController from "./date_picker_controller"
 import DropdownCheckboxController from "./dropdown_checkbox_controller"
 import DropdownContentController from "./dropdown_content_controller"
 import DropdownMenuController from "./dropdown_menu_controller"
@@ -36,6 +37,7 @@ const registerControllers = (application) => {
   application.register("ui--combobox-content", ComboboxContentController)
   application.register("ui--combobox-trigger", ComboboxTriggerController)
   application.register("ui--context-menu", ContextMenuController)
+  application.register("ui--date-picker", DatePickerController)
   application.register("ui--dropdown-content", DropdownContentController)
   application.register("ui--dropdown-checkbox", DropdownCheckboxController)
   application.register("ui--dropdown-menu", DropdownMenuController)
@@ -64,6 +66,7 @@ export {
   ComboboxContentController,
   ComboboxTriggerController,
   ContextMenuController,
+  DatePickerController,
   DropdownCheckboxController,
   DropdownContentController,
   DropdownMenuController,
