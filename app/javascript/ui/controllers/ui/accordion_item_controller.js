@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { animate } from "motion"
+import { animate } from "https://cdn.jsdelivr.net/npm/motion@11.11.13/+esm"
 
 // Connects to data-controller="rbui--accordion"
 export default class extends Controller {

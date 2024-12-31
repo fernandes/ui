@@ -3,6 +3,10 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
   static targets = ["span"]
 
+  connect() {
+    console.log("hello from switch!")
+  }
+
   handleToggle() {
     if(this.element.dataset.state == "checked") {
       this.element.setAttribute("aria-checked", "false")

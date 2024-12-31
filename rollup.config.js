@@ -17,14 +17,21 @@ export default [
       {
         file: "app/assets/javascripts/ui.js",
         format: "umd",
-        name: "UI"
+        name: "UI",
+        globals: {
+          'https://cdn.jsdelivr.net/npm/motion@11.11.13/+esm': 'motion'
+        }
       },
 
       {
         file: "app/assets/javascripts/ui.esm.js",
-        format: "es"
+        format: "es",
+        globals: {
+          'https://cdn.jsdelivr.net/npm/motion@11.11.13/+esm': 'motion'
+        }
       }
     ],
+    external: ['https://cdn.jsdelivr.net/npm/motion@11.11.13/+esm'],
     watch: {
       include: 'app/javascript/**/*.js'
     },

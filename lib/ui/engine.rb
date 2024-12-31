@@ -58,18 +58,6 @@ module UI
 
     initializer "ui.importmap", before: "importmap" do |app|
       if Object.const_defined?("Hotwire::Spark")
-        Hotwire::Spark::FileWatcher.class_eval do
-          def process_changed_files(changed_files)
-            puts "lolzllzzjhsadhsjad"
-            changed_files.each do |file|
-              file.sub!(
-                "/Users/fernandes/ui/app/javascript/ui/controllers",
-                "/Users/fernandes/src/foo/app/javascript/controllers/"
-              )
-            end
-            super
-          end
-        end
         app.config.hotwire.spark.stimulus_paths << Engine.root.join("app/javascript/ui/controllers").to_s
         app.config.hotwire.spark.logging = true
       end
@@ -88,8 +76,7 @@ module UI
 
     initializer "ui.assets" do |app|
       app.config.assets.paths << root.join("app/javascript/ui/controllers")
-      # app.config.assets.precompile += %w[ui/manifest.js]
-      # app.config.assets.precompile += %w[ui_manifest.js]
+      app.config.assets.paths << root.join("app/stylesheets")
     end
   end
 end
