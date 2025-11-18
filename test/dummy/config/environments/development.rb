@@ -72,4 +72,21 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Configure Hotwire Spark for live reload
+  # Watch engine HTML files (views and components)
+  config.hotwire.spark.html_paths << Rails.root.join("../../app/views/ui")
+  config.hotwire.spark.html_paths << Rails.root.join("../../app/components/ui") if Rails.root.join("../../app/components/ui").exist?
+
+  # Watch engine CSS files
+  config.hotwire.spark.css_paths << Rails.root.join("../../app/assets/stylesheets/ui")
+
+  # Watch dummy app CSS
+  config.hotwire.spark.css_paths << Rails.root.join("app/assets/stylesheets")
+
+  # Watch engine JavaScript files
+  config.hotwire.spark.stimulus_paths << Rails.root.join("../../app/javascript/ui")
+
+  # Watch dummy app JavaScript
+  config.hotwire.spark.stimulus_paths << Rails.root.join("app/javascript")
 end

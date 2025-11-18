@@ -10,6 +10,8 @@ gem "sqlite3"
 gem "propshaft"
 gem "importmap-rails"
 gem "jsbundling-rails"
+gem "turbo-rails"
+gem "hotwire-spark"
 
 # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
 gem "rubocop-rails-omakase", require: false

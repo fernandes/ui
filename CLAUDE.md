@@ -5,6 +5,7 @@
 - **Package Manager**: Use `bun` instead of `npm` or `yarn` for all JavaScript dependencies
 - **Tailwind Version**: Tailwind CSS 4 (configuration via CSS, not JS config files)
 - **Asset Pipeline**: Multi-version support (Propshaft for Rails 8, Sprockets for Rails 6/7)
+- **Live Reload**: Hotwire Spark for instant feedback during development
 
 ## Important: Asset Architecture
 
@@ -141,6 +142,45 @@ bun add @ui/engine
 # or
 npm install @ui/engine
 ```
+
+## Hotwire Spark - Live Reload
+
+The dummy app is configured with **Hotwire Spark** for instant live reload during development.
+
+### Configuration (test/dummy/config/environments/development.rb)
+
+```ruby
+# Configure Hotwire Spark for live reload
+# Watch engine HTML files (views and components)
+config.hotwire.spark.html_paths << Rails.root.join("../../app/views/ui")
+config.hotwire.spark.html_paths << Rails.root.join("../../app/components/ui") if Rails.root.join("../../app/components/ui").exist?
+
+# Watch engine CSS files
+config.hotwire.spark.css_paths << Rails.root.join("../../app/assets/stylesheets/ui")
+
+# Watch dummy app CSS
+config.hotwire.spark.css_paths << Rails.root.join("app/assets/stylesheets")
+
+# Watch engine JavaScript files
+config.hotwire.spark.stimulus_paths << Rails.root.join("../../app/javascript/ui")
+
+# Watch dummy app JavaScript
+config.hotwire.spark.stimulus_paths << Rails.root.join("app/javascript")
+```
+
+### Routes (test/dummy/config/routes.rb)
+
+```ruby
+mount Hotwire::Spark::Engine => "/spark" if Rails.env.development?
+```
+
+**What gets live reloaded:**
+- ✅ Engine views (`.erb`, `.html.erb`)
+- ✅ Engine CSS files
+- ✅ Engine JavaScript files
+- ✅ Dummy app views, CSS, and JavaScript
+
+Simply run `bin/dev` and edit any watched file - changes reload automatically!
 
 ## Generator Usage
 

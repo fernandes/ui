@@ -13,5 +13,8 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.17"
+  },
+  "dependencies": {
+    "@hotwired/turbo": "^8.0.20"
   }
 }
