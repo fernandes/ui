@@ -1,6 +1,12 @@
-module Ui
+module UI
   class Engine < ::Rails::Engine
-    isolate_namespace Ui
+    isolate_namespace UI
+
+    initializer "setup_inflections" do
+      ActiveSupport::Inflector.inflections do |inflect|
+        inflect.acronym "UI"
+      end
+    end
 
     # Configure asset paths for different asset pipelines
     initializer "ui.assets" do |app|

@@ -1,6 +1,6 @@
 require "ui/version"
 require "ui/engine"
 
-module Ui
+module UI
   # Your code goes here...
 end

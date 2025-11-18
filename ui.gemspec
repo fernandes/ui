@@ -2,12 +2,12 @@ require_relative "lib/ui/version"
 
 Gem::Specification.new do |spec|
   spec.name        = "ui"
-  spec.version     = Ui::VERSION
+  spec.version     = UI::VERSION
   spec.authors     = [ "Celso Fernandes" ]
   spec.email       = [ "celso.fernandes@gmail.com" ]
   spec.homepage    = "TODO"
-  spec.summary     = "TODO: Summary of Ui."
-  spec.description = "TODO: Description of Ui."
+  spec.summary     = "TODO: Summary of UI."
+  spec.description = "TODO: Description of UI."
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the "allowed_push_host"

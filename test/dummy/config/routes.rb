@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  mount Ui::Engine => "/ui"
+  mount UI::Engine => "/ui"
 
   # Route to test bundled JavaScript (jsbundling-rails)
   get "/bundled", to: "bundled#index"

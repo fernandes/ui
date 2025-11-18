@@ -12,7 +12,7 @@ export default class extends Controller {
 
   greet() {
     const name = this.hasNameTarget ? this.nameTarget.value : "World"
-    const message = `${this.greetingValue}, ${name}!`
+    const message = ` >> ${this.greetingValue}, ${name}!`
 
     if (this.hasOutputTarget) {
       this.outputTarget.textContent = message
