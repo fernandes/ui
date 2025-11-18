@@ -1,5 +1,7 @@
 # UI Engine
 
+![UI Logo](./logo.png)
+
 A Rails engine providing a component library with Tailwind CSS 4 support. Designed to work seamlessly with multiple Rails versions (6, 7, and 8) and different asset pipelines (Propshaft, Sprockets, and Node/Bun).
 
 ## Features

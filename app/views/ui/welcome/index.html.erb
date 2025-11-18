@@ -1,5 +1,6 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-  <div class="max-w-2xl w-full">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+  <div class="max-w-2xl mx-auto space-y-6">
+    <!-- Header Card -->
     <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
       <div class="text-center space-y-4">
         <h1 class="text-4xl font-bold text-gray-900">
@@ -30,7 +31,7 @@
       </div>
 
       <div class="flex gap-3">
-        <button class="ui-btn-primary">
+        <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
           Get Started
         </button>
         <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-3 px-6 rounded-lg transition-colors">
@@ -38,5 +39,72 @@
         </button>
       </div>
     </div>
+
+    <!-- Stimulus Hello Controller Demo -->
+    <div class="bg-white rounded-2xl shadow-xl p-8"
+         data-controller="ui--hello"
+         data-ui--hello-greeting-value="Welcome">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        Stimulus Hello Controller Demo
+      </h2>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Enter your name:
+          </label>
+          <input
+            type="text"
+            data-ui--hello-target="name"
+            data-action="input->ui--hello#updateGreeting"
+            placeholder="Your name"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <button
+          data-action="click->ui--hello#greet"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
+          Greet Me
+        </button>
+
+        <div
+          data-ui--hello-target="output"
+          class="text-xl font-semibold text-blue-600 min-h-[2rem]"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Stimulus Dropdown Controller Demo -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        Stimulus Dropdown Controller Demo
+      </h2>
+
+      <div class="relative"
+           data-controller="ui--dropdown"
+           data-ui--dropdown-open-class="block">
+
+        <button
+          data-action="click->ui--dropdown#toggle"
+          class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
+          Toggle Dropdown
+        </button>
+
+        <div
+          data-ui--dropdown-target="menu"
+          class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-10"
+        >
+          <div class="py-2">
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Option 1</a>
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Option 2</a>
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Option 3</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

@@ -1,8 +1,14 @@
-# Pin npm packages by running ./bin/importmap
+# UI Engine - Importmap Configuration
+# This file is automatically loaded by Rails apps that use this engine with importmap-rails
 
-# Pin the UI engine's main JavaScript entry point
+# Main entry point
 pin "ui", to: "ui/index.js"
 
-# Add additional pins for any third-party dependencies your engine needs
-# Example:
-# pin "stimulus", to: "https://cdn.jsdelivr.net/npm/@hotwired/stimulus@3/dist/stimulus.js"
+# Internal dependencies
+pin "ui/common", to: "ui/common.js"
+pin "ui/application", to: "ui/application.js"
+
+# Controllers (automatically discover all controllers)
+pin_all_from File.expand_path("../app/javascript/ui/controllers", __dir__),
+             under: "ui/controllers",
+             to: "ui/controllers"

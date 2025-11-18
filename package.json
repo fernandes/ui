@@ -7,11 +7,14 @@
     "url": ""
   },
   "type": "module",
-  "main": "app/javascript/ui/index.js",
-  "module": "app/javascript/ui/index.js",
+  "main": "app/javascript/ui/bundler.js",
+  "module": "app/javascript/ui/bundler.js",
   "exports": {
-    ".": "./app/javascript/ui/index.js",
-    "./styles": "./app/assets/stylesheets/ui/application.css"
+    ".": "./app/javascript/ui/bundler.js",
+    "./importmap": "./app/javascript/ui/index.js",
+    "./styles": "./app/assets/stylesheets/ui/application.css",
+    "./controllers": "./app/javascript/ui/controllers/index.js",
+    "./application": "./app/javascript/ui/application.js"
   },
   "description": "UI Engine - Rails component library with Tailwind CSS",
   "files": [
@@ -28,7 +31,11 @@
   ],
   "license": "MIT",
   "packageManager": "bun@latest",
+  "peerDependencies": {
+    "@hotwired/stimulus": "^3.2.0"
+  },
   "devDependencies": {
+    "@hotwired/stimulus": "^3.2.0",
     "@tailwindcss/cli": "^4.1.17"
   }
 }

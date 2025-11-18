@@ -1,11 +1,13 @@
 <div class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
-  <div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+  <div class="max-w-4xl mx-auto space-y-8">
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
       <h1 class="text-4xl font-bold text-gray-900 mb-4">UI Engine - Bundled Version</h1>
-      <p class="text-xl text-gray-600">Rails component library with Tailwind CSS 4 + jsbundling-rails (Bun)</p>
+      <p class="text-xl text-gray-600">Rails component library with Tailwind CSS 4 + jsbundling-rails (Bun) + Stimulus</p>
     </div>
 
-    <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <!-- Feature grid -->
+    <div class="grid md:grid-cols-3 gap-6">
       <div class="bg-white rounded-xl shadow-lg p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-3">✓ Bun Bundler</h3>
         <p class="text-gray-600">JavaScript bundled via jsbundling-rails with Bun</p>
@@ -22,13 +24,72 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg p-6">
-      <button class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-        Get Started
-      </button>
-      <button class="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-        Learn More
-      </button>
+    <!-- Stimulus Hello Controller Demo -->
+    <div class="bg-white rounded-xl shadow-lg p-6"
+         data-controller="ui--hello"
+         data-ui--hello-greeting-value="Hey">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        Stimulus Hello Controller (Bundled)
+      </h2>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Enter your name:
+          </label>
+          <input
+            type="text"
+            data-ui--hello-target="name"
+            data-action="input->ui--hello#updateGreeting"
+            placeholder="Your name"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          />
+        </div>
+
+        <button
+          data-action="click->ui--hello#greet"
+          class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
+          Greet Me
+        </button>
+
+        <div
+          data-ui--hello-target="output"
+          class="text-xl font-semibold text-purple-600 min-h-[2rem]"
+        ></div>
+      </div>
     </div>
+
+    <!-- Stimulus Dropdown Controller Demo -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        Stimulus Dropdown Controller (Bundled)
+      </h2>
+
+      <div class="relative"
+           data-controller="ui--dropdown"
+           data-ui--dropdown-open-class="block">
+
+        <button
+          data-action="click->ui--dropdown#toggle"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
+          Toggle Menu
+        </button>
+
+        <div
+          data-ui--dropdown-target="menu"
+          class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-10"
+        >
+          <div class="py-2">
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Dashboard</a>
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-t">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

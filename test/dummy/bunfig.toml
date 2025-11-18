@@ -1,0 +1,7 @@
+[bundle]
+# Configure path aliases for bundling
+[bundle.alias]
+"ui" = "../../app/javascript/ui/bundler.js"
+"ui/application.js" = "../../app/javascript/ui/application.js"
+"ui/controllers/hello_controller.js" = "../../app/javascript/ui/controllers/hello_controller.js"
+"ui/controllers/dropdown_controller.js" = "../../app/javascript/ui/controllers/dropdown_controller.js"
