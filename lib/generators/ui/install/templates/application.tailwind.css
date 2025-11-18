@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/**
+ * Import UI Engine base styles and variables
+ * This provides CSS variables like --ui-primary, --ui-spacing-*, etc.
+ */
+@import "ui/application.css";
+
+/**
+ * Tailwind 4 configuration using CSS-based approach
+ * Register base path for Tailwind to automatically scan
+ */
+
+@source "../..";
+
+/**
+ * Custom theme configuration
+ * Customize the UI Engine variables or add your own
+ */
+
+@theme {
+  /* You can override UI Engine CSS variables here */
+  /* Example:
+  --color-primary: var(--ui-primary);
+  --font-family-sans: "Inter", sans-serif;
+  */
+}
+
+/**
+ * Custom CSS utilities and components
+ * Add any custom styles below
+ */

@@ -8,3 +8,25 @@
 /test/dummy/log/*.log
 /test/dummy/storage/
 /test/dummy/tmp/
+
+# Dummy app compiled assets
+/test/dummy/app/assets/builds/**/*.css
+/test/dummy/app/assets/builds/**/*.js
+
+# Node modules (root - for npm package development)
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dummy app node modules
+/test/dummy/node_modules/
+/test/dummy/bun.lockb
+
+# Package manager lock files
+/bun.lockb
+
+# Claude
+/.claude
+/.mcp.json
+/.playwright-mcp

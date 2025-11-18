@@ -7,7 +7,11 @@
 
   <%= yield :head %>
 
-  <%= stylesheet_link_tag    "ui/application", media: "all" %>
+  <%= stylesheet_link_tag "ui/application", media: "all" %>
+
+  <% if defined?(Importmap) %>
+    <%= javascript_importmap_tags %>
+  <% end %>
 </head>
 <body>
 

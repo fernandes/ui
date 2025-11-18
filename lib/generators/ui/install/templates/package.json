@@ -1,0 +1,13 @@
+{
+  "name": "app",
+  "private": true,
+  "packageManager": "bun@latest",
+  "scripts": {
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css",
+    "build:css:watch": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
+    "build:css:prod": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.17"
+  }
+}

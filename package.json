@@ -1,0 +1,34 @@
+{
+  "name": "@ui/engine",
+  "version": "0.1.0",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "type": "module",
+  "main": "app/javascript/ui/index.js",
+  "module": "app/javascript/ui/index.js",
+  "exports": {
+    ".": "./app/javascript/ui/index.js",
+    "./styles": "./app/assets/stylesheets/ui/application.css"
+  },
+  "description": "UI Engine - Rails component library with Tailwind CSS",
+  "files": [
+    "app/assets/stylesheets/**/*",
+    "app/javascript/**/*",
+    "app/views/**/*",
+    "app/components/**/*"
+  ],
+  "keywords": [
+    "rails",
+    "ui",
+    "components",
+    "tailwindcss"
+  ],
+  "license": "MIT",
+  "packageManager": "bun@latest",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.17"
+  }
+}

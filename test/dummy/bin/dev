@@ -1,2 +1,10 @@
-#!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+#!/usr/bin/env bash
+
+# Check if foreman is available
+if ! command -v foreman &> /dev/null; then
+  echo "Installing foreman..."
+  gem install foreman
+fi
+
+# Run Procfile.dev with foreman
+foreman start -f Procfile.dev "$@"

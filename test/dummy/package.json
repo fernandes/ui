@@ -1,0 +1,17 @@
+{
+  "name": "ui-dummy-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dummy app for testing UI Engine",
+  "packageManager": "bun@latest",
+  "scripts": {
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css",
+    "build:css:watch": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
+    "build:css:prod": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
+    "build:js": "bun build ./app/javascript/bundled.js --outdir=./app/assets/builds --target=browser --format=esm",
+    "build:js:watch": "bun build ./app/javascript/bundled.js --outdir=./app/assets/builds --target=browser --format=esm --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.17"
+  }
+}

@@ -22,5 +22,18 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   end
 
-  spec.add_dependency "rails", ">= 8.1.1"
+  # Core dependency - support Rails 6.0 and above
+  spec.add_dependency "rails", ">= 6.0"
+
+  # Optional dependencies for different asset pipelines
+  # These will be required based on the host application's configuration
+
+  # For Rails 8 with Propshaft (default)
+  # Propshaft is included in Rails 8 by default, no need to add explicitly
+
+  # For Rails 7/6 with Sprockets
+  # Add to your Gemfile: gem 'sprockets-rails'
+
+  # For importmap support (Rails 7+)
+  # Add to your Gemfile: gem 'importmap-rails'
 end

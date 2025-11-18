@@ -1,15 +1,71 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
+/**
+ * UI Engine - Base Styles and CSS Variables
  *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ * This file provides base CSS variables and utilities that can be imported
+ * by host applications using this engine.
  *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
- *
- *= require_tree .
- *= require_self
+ * Import this in your application:
+ * @import "ui/application.css";
  */
+
+:root {
+  /* UI Engine Colors */
+  --ui-primary: #3b82f6;
+  --ui-primary-hover: #2563eb;
+  --ui-secondary: #64748b;
+  --ui-success: #10b981;
+  --ui-warning: #f59e0b;
+  --ui-error: #ef4444;
+
+  /* UI Engine Spacing */
+  --ui-spacing-xs: 0.25rem;
+  --ui-spacing-sm: 0.5rem;
+  --ui-spacing-md: 1rem;
+  --ui-spacing-lg: 1.5rem;
+  --ui-spacing-xl: 2rem;
+
+  /* UI Engine Typography */
+  --ui-font-sans: ui-sans-serif, system-ui, sans-serif;
+  --ui-font-mono: ui-monospace, monospace;
+
+  /* UI Engine Borders */
+  --ui-border-radius: 0.5rem;
+  --ui-border-color: #e5e7eb;
+
+  /* UI Engine Shadows */
+  --ui-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ui-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --ui-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* Base utility classes that don't require Tailwind */
+.ui-container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--ui-spacing-md);
+  padding-right: var(--ui-spacing-md);
+}
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ui-spacing-sm) var(--ui-spacing-lg);
+  font-weight: 500;
+  border-radius: var(--ui-border-radius);
+  transition: all 150ms ease;
+  cursor: pointer;
+  border: none;
+}
+
+.ui-btn-primary {
+  @apply flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors;
+  background-color: var(--ui-primary);
+  color: white;
+}
+
+.ui-btn-primary:hover {
+  background-color: var(--ui-primary-hover);
+}
