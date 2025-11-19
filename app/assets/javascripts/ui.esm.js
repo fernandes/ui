@@ -66,10 +66,6 @@ function registerControllersInto(application, controllers) {
   }
 }
 
-console.log("UI Engine JavaScript loaded!");
-
-const version = "0.1.0";
-
 function registerControllers(application) {
   return registerControllersInto(application, {
     "ui--hello": HelloController,
@@ -77,4 +73,4 @@ function registerControllers(application) {
   });
 }
 
-export { registerControllers, registerControllersInto, version };
+export { registerControllers, registerControllersInto };

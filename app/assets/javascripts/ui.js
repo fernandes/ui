@@ -66,8 +66,6 @@
       }
     }
   }
-  console.log("UI Engine JavaScript loaded!");
-  const version = "0.1.0";
   function registerControllers(application) {
     return registerControllersInto(application, {
       "ui--hello": HelloController,
@@ -76,5 +74,4 @@
   }
   exports.registerControllers = registerControllers;
   exports.registerControllersInto = registerControllersInto;
-  exports.version = version;
 });

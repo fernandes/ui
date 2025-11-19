@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  mount UI::Engine => "/ui"
+  # Route to test importmap (default Rails 8 setup)
+  get "/importmap", to: "importmap#index"
 
   # Route to test bundled JavaScript (jsbundling-rails)
   get "/bundled", to: "bundled#index"

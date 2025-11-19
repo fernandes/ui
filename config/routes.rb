@@ -1,3 +1,3 @@
 UI::Engine.routes.draw do
-  root "welcome#index"
+  # Routes are defined by the host application
 end
