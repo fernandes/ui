@@ -1,8 +1,9 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /**
  * Import UI Engine base styles and variables
- * This provides CSS variables like --ui-primary, --ui-spacing-*, etc.
+ * This provides CSS variables and other utilities
  */
 @import "../../../../../app/assets/stylesheets/ui/application.css";
 

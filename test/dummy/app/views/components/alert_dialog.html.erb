@@ -1,0 +1,90 @@
+<div class="p-8 space-y-12">
+  <div>
+    <h1 class="text-4xl font-bold mb-2">Alert Dialog</h1>
+    <p class="text-muted-foreground text-lg">A modal dialog that interrupts the user with important content and expects a response.</p>
+  </div>
+
+  <%# Example 1: Default Alert Dialog %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Default</h2>
+    <p class="text-muted-foreground">Basic alert dialog with cancel and continue actions.</p>
+
+    <%= render UI::AlertDialog::AlertDialog.new do %>
+      <%= render UI::AlertDialog::Trigger.new do %>
+        <%= render UI::Button::Button.new { "Show Dialog" } %>
+      <% end %>
+
+      <%= render UI::AlertDialog::Overlay.new do %>
+        <%= render UI::AlertDialog::Content.new do %>
+          <%= render UI::AlertDialog::Header.new do %>
+            <%= render UI::AlertDialog::Title.new { "Are you absolutely sure?" } %>
+            <%= render UI::AlertDialog::Description.new do %>
+              This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+            <% end %>
+          <% end %>
+
+          <%= render UI::AlertDialog::Footer.new do %>
+            <%= render UI::AlertDialog::Cancel.new { "Cancel" } %>
+            <%= render UI::AlertDialog::Action.new { "Continue" } %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 2: Destructive Action %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Destructive Action</h2>
+    <p class="text-muted-foreground">Alert dialog with a destructive action button.</p>
+
+    <%= render UI::AlertDialog::AlertDialog.new do %>
+      <%= render UI::AlertDialog::Trigger.new do %>
+        <%= render UI::Button::Button.new(variant: :destructive) { "Delete Account" } %>
+      <% end %>
+
+      <%= render UI::AlertDialog::Overlay.new do %>
+        <%= render UI::AlertDialog::Content.new do %>
+          <%= render UI::AlertDialog::Header.new do %>
+            <%= render UI::AlertDialog::Title.new { "Delete Account" } %>
+            <%= render UI::AlertDialog::Description.new do %>
+              Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be undone.
+            <% end %>
+          <% end %>
+
+          <%= render UI::AlertDialog::Footer.new do %>
+            <%= render UI::AlertDialog::Cancel.new { "Cancel" } %>
+            <%= render UI::AlertDialog::Action.new(variant: :destructive) { "Delete" } %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 3: Save Changes Confirmation %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Save Changes</h2>
+    <p class="text-muted-foreground">Confirmation dialog for unsaved changes.</p>
+
+    <%= render UI::AlertDialog::AlertDialog.new do %>
+      <%= render UI::AlertDialog::Trigger.new do %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Save Changes" } %>
+      <% end %>
+
+      <%= render UI::AlertDialog::Overlay.new do %>
+        <%= render UI::AlertDialog::Content.new do %>
+          <%= render UI::AlertDialog::Header.new do %>
+            <%= render UI::AlertDialog::Title.new { "Save changes?" } %>
+            <%= render UI::AlertDialog::Description.new do %>
+              You have unsaved changes. Do you want to save them before leaving?
+            <% end %>
+          <% end %>
+
+          <%= render UI::AlertDialog::Footer.new do %>
+            <%= render UI::AlertDialog::Cancel.new { "Don't Save" } %>
+            <%= render UI::AlertDialog::Action.new { "Save Changes" } %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -6,6 +6,7 @@
 - **Tailwind Version**: Tailwind CSS 4 (configuration via CSS, not JS config files)
 - **Asset Pipeline**: Multi-version support (Propshaft for Rails 8, Sprockets for Rails 6/7)
 - **Live Reload**: Hotwire Spark for instant feedback during development
+- **Required CSS Dependency**: `tw-animate-css` for component animations (alert dialog, etc.)
 
 ## Important: Asset Architecture
 
@@ -16,9 +17,24 @@
 
 **Each application (including dummy app) configures its own Tailwind CSS:**
 - The host app creates `app/assets/stylesheets/application.tailwind.css`
+- The host app installs and imports `tw-animate-css`: `@import "tw-animate-css"`
 - The host app imports engine variables: `@import "ui/application.css"`
 - The host app configures `@source` paths to scan engine files for Tailwind classes
 - The host app compiles its own CSS to `app/assets/builds/application.css`
+
+**Required CSS Setup:**
+```css
+@import "tailwindcss";
+@import "tw-animate-css";  /* Required for animations */
+@import "ui/application.css";  /* Engine variables */
+
+@source "../path/to/engine/app";
+@source "../../app";
+
+@theme {
+  /* Your theme customizations */
+}
+```
 
 ## JavaScript Integration: Two Approaches
 
@@ -248,6 +264,136 @@ When implementing components, **always reference shadcn/ui and Radix UI**:
 - Data attributes for state management
 - Animation timings and easing functions
 
+### Animation Best Practices
+
+**Animations are a critical part of component implementation.** Follow these patterns from Radix UI:
+
+#### State Management with `data-state`
+
+Use `data-state` attribute to control animations via CSS, not JavaScript timing:
+
+```ruby
+# ❌ WRONG: JavaScript controls visibility with setTimeout
+def hide
+  set_state_to_closed
+  setTimeout(200) { add_hidden_class }  # Creates glitches!
+end
+
+# ✅ CORRECT: CSS controls everything, JS only changes state
+def hide
+  containerTarget.setAttribute("data-state", "closed")
+  # CSS animations handle the rest via data-[state=closed]:animate-out
+end
+```
+
+#### Container Visibility Pattern
+
+Use `visibility: hidden` (via `invisible` class), NEVER `display: none` (via `hidden` class):
+
+```ruby
+# ❌ WRONG: Using .hidden causes animations to be skipped
+"fixed inset-0 z-50 hidden"  # display: none prevents animations
+
+# ✅ CORRECT: Use invisible for smooth animations
+"data-[state=closed]:invisible data-[state=open]:visible fixed inset-0 z-50"
+```
+
+**Why `invisible` works better**:
+- `invisible` = `visibility: hidden` - element remains in layout, animations still run
+- `hidden` = `display: none` - element removed from layout, animations are cancelled
+- CSS transitions/animations need the element to be in the DOM to animate
+
+#### Animation Class Pattern
+
+Combine state-based animations with opacity and pointer-events:
+
+```ruby
+# Overlay example - fade in/out with visibility control
+"data-[state=open]:animate-in data-[state=closed]:animate-out \
+ data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 \
+ data-[state=closed]:opacity-0 data-[state=open]:opacity-100 \
+ data-[state=open]:pointer-events-auto data-[state=closed]:pointer-events-none \
+ fixed inset-0 z-50 bg-black/50"
+
+# Content example - fade + zoom with visibility control
+"data-[state=open]:animate-in data-[state=closed]:animate-out \
+ data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 \
+ data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 \
+ data-[state=closed]:opacity-0 data-[state=open]:opacity-100 \
+ data-[state=open]:pointer-events-auto data-[state=closed]:pointer-events-none"
+```
+
+#### JavaScript Controller Pattern
+
+Keep controllers simple - manage state only, let CSS handle animations:
+
+```javascript
+show() {
+  // Just change state - CSS does the animation work
+  if (this.hasContainerTarget) {
+    this.containerTarget.setAttribute("data-state", "open")
+  }
+  if (this.hasOverlayTarget) {
+    this.overlayTarget.setAttribute("data-state", "open")
+  }
+  if (this.hasContentTarget) {
+    this.contentTarget.setAttribute("data-state", "open")
+  }
+  // No setTimeout, no animationend listeners needed!
+}
+
+hide() {
+  // Just change state - CSS handles fade-out, zoom-out, etc.
+  if (this.hasContainerTarget) {
+    this.containerTarget.setAttribute("data-state", "closed")
+  }
+  if (this.hasOverlayTarget) {
+    this.overlayTarget.setAttribute("data-state", "closed")
+  }
+  if (this.hasContentTarget) {
+    this.contentTarget.setAttribute("data-state", "closed")
+  }
+  // invisible class prevents interaction during animation
+}
+```
+
+#### Testing Animations
+
+When testing animations:
+
+1. **Visual Test**: Open and close component multiple times - no flicker/glitches
+2. **Dev Tools**: Inspect computed styles during animation
+3. **Verify Classes**: Check that `data-state` correctly toggles `open`/`closed`
+4. **Browser Test**: Test in actual browser, not just automated tests (animations may not be visible in headless mode)
+
+#### Common Animation Pitfalls
+
+❌ **Using `.hidden` class**:
+```ruby
+containerTarget.classList.add("hidden")  # Kills animations!
+```
+
+❌ **Using `animationend` listeners unnecessarily**:
+```javascript
+// Complex and error-prone
+element.addEventListener("animationend", () => { /* ... */ })
+```
+
+❌ **Using `setTimeout` for animation timing**:
+```javascript
+// Brittle and causes glitches
+setTimeout(() => hide(), 200)
+```
+
+✅ **Let CSS do the work**:
+```ruby
+# In behavior module
+"data-[state=closed]:invisible"  # Element invisible after animation
+
+# In controller
+containerTarget.setAttribute("data-state", "closed")  # That's it!
+```
+
 ### Component Migration Checklist
 
 When migrating a component from shadcn/Radix:
@@ -259,6 +405,52 @@ When migrating a component from shadcn/Radix:
 5. ✅ Test with Playwright to compare visual appearance
 6. ✅ Ensure all CSS variables are in both `:root` and `@theme`
 7. ✅ Verify Tailwind generates all needed utility classes
+8. ✅ **Generate LLM documentation** (see below)
+
+### LLM Documentation
+
+After migrating a component, generate documentation for LLMs in `docs/llm/`:
+
+**Structure**:
+```
+docs/llm/
+├── phlex.md          # Overview of Phlex usage
+├── erb.md            # Overview of ERB usage
+├── vc.md             # Overview of ViewComponent usage
+├── phlex/
+│   ├── button.md
+│   ├── accordion.md
+│   └── alert_dialog.md
+├── erb/
+│   ├── button.md
+│   ├── accordion.md
+│   └── alert_dialog.md
+└── vc/
+    ├── button.md
+    ├── accordion.md
+    └── alert_dialog.md
+```
+
+**IMPORTANT: Always consult LLM docs before using components**
+
+When using components in examples, showcases, or migrations:
+
+1. **Check the LLM docs first**: `docs/llm/{format}/{component}.md`
+2. **Follow the syntax exactly**: Copy the correct usage pattern
+3. **Common errors prevented by docs**:
+   - ❌ `UI::Button.new` (module, not component)
+   - ✅ `UI::Button::Button.new` (correct Phlex)
+   - ✅ `UI::Button::ButtonComponent.new` (correct ViewComponent)
+   - ✅ `render "ui/button"` (correct ERB)
+
+**Documentation template includes**:
+- Component path and class names
+- All parameters with types and defaults
+- Variants and sizes
+- Common usage examples
+- Integration patterns
+- Error prevention (common mistakes)
+- Format-specific notes (Phlex vs ERB vs ViewComponent)
 
 ## Generator Usage
 

@@ -11,6 +11,7 @@
 import HelloController from "./controllers/hello_controller.js";
 import DropdownController from "./controllers/dropdown_controller.js";
 import AccordionController from "./controllers/accordion_controller.js";
+import AlertDialogController from "./controllers/alert_dialog_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -23,7 +24,8 @@ export function registerControllers(application) {
   return registerControllersInto(application, {
     "ui--hello": HelloController,
     "ui--dropdown": DropdownController,
-    "ui--accordion": AccordionController
+    "ui--accordion": AccordionController,
+    "ui--alert-dialog": AlertDialogController
   });
 }
 
@@ -31,4 +33,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController };

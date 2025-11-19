@@ -8,4 +8,8 @@ class ComponentsController < ApplicationController
   def accordion
     # Renders app/views/components/accordion.html.erb
   end
+
+  def alert_dialog
+    # Renders app/views/components/alert_dialog.html.erb
+  end
 end

@@ -6,10 +6,70 @@
  *
  * Import this in your application:
  * @import "ui/application.css";
+ *
+ * IMPORTANT: Host app must have tw-animate-css installed and imported:
+ * @import "tw-animate-css";
  */
 
 @import "./sonner.css"
 @custom-variant dark (&:is(.dark *));
+
+/**
+ * Base layer - Apply design system colors globally
+ * This ensures all borders and outlines use theme colors by default
+ */
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: var(--ring);
+  }
+  @supports (color:color-mix(in lab, red, red)) {
+    * {
+      outline-color:color-mix(in oklab,var(--ring)50%,transparent)
+    }
+  }
+  ::selection {
+    background-color:var(--selection);
+    color:var(--selection-foreground)
+  }
+  html {
+    overscroll-behavior-y:none;
+    scroll-behavior:smooth
+  }
+  body {
+    font-synthesis-weight:none;
+    text-rendering:optimizeLegibility
+  }
+  [data-slot=layout] {
+    overscroll-behavior:none
+  }
+  @media (min-width:1600px) {
+    [data-slot=layout] {
+      padding:calc(var(--spacing)*2)
+    }
+    [data-slot=layout]:is(.layout-fixed *) {
+      padding:calc(var(--spacing)*0)
+    }
+  }
+  @supports (font:-apple-system-body) and (appearance:none) {
+    @media (min-width:1800px) {
+      [data-wrapper] {
+        border-top-style:var(--tw-border-style);
+        border-top-width:1px
+      }
+    }
+  }
+  a:active,
+  button:active {
+    opacity:.6
+  }
+  @media (min-width:48rem) {
+    a:active,
+    button:active {
+      opacity:1
+    }
+  }
+}
 
 :root {
   --radius:.625rem;
