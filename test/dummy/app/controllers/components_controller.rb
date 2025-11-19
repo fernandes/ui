@@ -21,6 +21,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/avatar.html.erb
   end
 
+  def badge
+    # Renders app/views/components/badge.html.erb
+  end
+
   def button
     # Renders app/views/components/button.html.erb
   end
