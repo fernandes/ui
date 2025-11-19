@@ -216,6 +216,65 @@ class AlertDialogController extends Controller {
   }
 }
 
+class AvatarController extends Controller {
+  static targets=[ "image", "fallback" ];
+  connect() {
+    if (this.hasImageTarget) {
+      this.boundOnImageLoad = this.onImageLoad.bind(this);
+      this.boundOnImageError = this.onImageError.bind(this);
+      this.setupImageHandlers();
+    }
+  }
+  setupImageHandlers() {
+    if (this.imageTarget.complete) {
+      if (this.imageTarget.naturalHeight > 0) {
+        this.showImage();
+        this.hideFallback();
+      } else {
+        this.hideImage();
+        this.showFallback();
+      }
+    } else {
+      this.imageTarget.addEventListener("load", this.boundOnImageLoad);
+      this.imageTarget.addEventListener("error", this.boundOnImageError);
+    }
+  }
+  onImageLoad() {
+    this.showImage();
+    this.hideFallback();
+  }
+  onImageError() {
+    this.hideImage();
+    this.showFallback();
+  }
+  showImage() {
+    if (this.hasImageTarget) {
+      this.imageTarget.classList.remove("hidden");
+    }
+  }
+  hideImage() {
+    if (this.hasImageTarget) {
+      this.imageTarget.classList.add("hidden");
+    }
+  }
+  hideFallback() {
+    if (this.hasFallbackTarget) {
+      this.fallbackTarget.classList.add("hidden");
+    }
+  }
+  showFallback() {
+    if (this.hasFallbackTarget) {
+      this.fallbackTarget.classList.remove("hidden");
+    }
+  }
+  disconnect() {
+    if (this.hasImageTarget && this.boundOnImageLoad) {
+      this.imageTarget.removeEventListener("load", this.boundOnImageLoad);
+      this.imageTarget.removeEventListener("error", this.boundOnImageError);
+    }
+  }
+}
+
 class DialogController extends Controller {
   static targets=[ "container", "overlay", "content" ];
   static values={
@@ -333,8 +392,9 @@ function registerControllers(application) {
     "ui--dropdown": DropdownController,
     "ui--accordion": AccordionController,
     "ui--alert-dialog": AlertDialogController,
+    "ui--avatar": AvatarController,
     "ui--dialog": DialogController
   });
 }
 
-export { AccordionController, AlertDialogController, DialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, DialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };

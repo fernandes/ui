@@ -12,6 +12,7 @@ import HelloController from "./controllers/hello_controller.js";
 import DropdownController from "./controllers/dropdown_controller.js";
 import AccordionController from "./controllers/accordion_controller.js";
 import AlertDialogController from "./controllers/alert_dialog_controller.js";
+import AvatarController from "./controllers/avatar_controller.js";
 import DialogController from "./controllers/dialog_controller.js";
 
 // Import registration function
@@ -27,6 +28,7 @@ export function registerControllers(application) {
     "ui--dropdown": DropdownController,
     "ui--accordion": AccordionController,
     "ui--alert-dialog": AlertDialogController,
+    "ui--avatar": AvatarController,
     "ui--dialog": DialogController
   });
 }
@@ -35,4 +37,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, DialogController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController };

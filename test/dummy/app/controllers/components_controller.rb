@@ -17,6 +17,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/aspect_ratio.html.erb
   end
 
+  def avatar
+    # Renders app/views/components/avatar.html.erb
+  end
+
   def button
     # Renders app/views/components/button.html.erb
   end

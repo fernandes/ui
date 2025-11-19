@@ -60,6 +60,42 @@ This engine supports **two different approaches** for JavaScript integration:
 
 Both approaches work simultaneously in the dummy app for testing!
 
+## CRITICAL: Stimulus Controller Registration
+
+**ALWAYS register new Stimulus controllers in `app/javascript/ui/index.js`** when creating a new component with JavaScript behavior.
+
+### Steps to Register a Controller:
+
+1. **Import the controller** at the top of `app/javascript/ui/index.js`:
+   ```javascript
+   import AvatarController from "./controllers/avatar_controller.js";
+   ```
+
+2. **Add to registerControllers function** (maintain alphabetical order):
+   ```javascript
+   export function registerControllers(application) {
+     return registerControllersInto(application, {
+       "ui--accordion": AccordionController,
+       "ui--alert-dialog": AlertDialogController,
+       "ui--avatar": AvatarController,  // Add here
+       "ui--dialog": DialogController,
+       // ... other controllers
+     });
+   }
+   ```
+
+3. **Export the controller** at the bottom:
+   ```javascript
+   export { HelloController, AccordionController, AvatarController, DialogController };
+   ```
+
+4. **Rebuild JavaScript**:
+   ```bash
+   bun run build:js
+   ```
+
+**⚠️ WARNING**: If you forget this step, the Stimulus controller will NOT load and components with JavaScript behavior (like Avatar image loading, Dialog animations, etc.) will NOT work correctly!
+
 ## Development Commands
 
 ```bash

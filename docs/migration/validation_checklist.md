@@ -275,6 +275,34 @@ end
 - [ ] Uses Stimulus targets/values
 - [ ] Clear method names
 
+### ⚠️ CRITICAL: Controller Registration
+
+**MUST DO for every component with JavaScript:**
+
+- [ ] Controller imported in `app/javascript/ui/index.js`
+- [ ] Controller added to `registerControllers` function
+- [ ] Controller exported at the bottom
+- [ ] JavaScript rebuilt with `bun run build:js`
+
+**Example:**
+```javascript
+// 1. Import
+import AvatarController from "./controllers/avatar_controller.js";
+
+// 2. Register (alphabetical order)
+export function registerControllers(application) {
+  return registerControllersInto(application, {
+    "ui--avatar": AvatarController,
+    // ...
+  });
+}
+
+// 3. Export
+export { AvatarController };
+```
+
+**⚠️ If you forget this, the controller will NOT load and component will NOT work!**
+
 ## Final Verification
 
 - [ ] Component works in isolation

@@ -1,0 +1,18 @@
+<%
+  src ||= ""
+  alt ||= ""
+  classes ||= ""
+
+  # Instance variables for behavior module
+  @src = src
+  @alt = alt
+  @classes = classes
+
+  # Include behavior module
+  extend UI::Avatar::AvatarImageBehavior
+
+  # Get HTML attributes from behavior
+  attrs = avatar_image_html_attributes
+  all_classes = attrs[:class]
+  data_attrs = attrs[:data]
+%><img src="<%= attrs[:src] %>" alt="<%= attrs[:alt] %>" class="<%= all_classes %>" data-ui--avatar-target="image" data-slot="<%= data_attrs[:slot] %>">

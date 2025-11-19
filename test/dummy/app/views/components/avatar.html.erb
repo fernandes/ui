@@ -1,0 +1,324 @@
+<div class="container mx-auto py-8 space-y-8">
+  <div>
+    <h1 class="text-3xl font-bold mb-2">Avatar</h1>
+    <p class="text-muted-foreground">An image element with a fallback for representing users.</p>
+  </div>
+
+  <!-- Phlex Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Phlex</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Avatar -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Basic Avatar</h3>
+        <div class="flex items-center gap-4">
+          <%= render UI::Avatar::Avatar.new do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "@fernandes"
+            ) %>
+            <%= render UI::Avatar::Fallback.new { "FF" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Avatar Sizes -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Sizes</h3>
+        <div class="flex items-center gap-4">
+          <%= render UI::Avatar::Avatar.new(classes: "size-6") do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Very small"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(classes: "text-xs") { "XS" } %>
+          <% end %>
+
+          <%= render UI::Avatar::Avatar.new do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Default"
+            ) %>
+            <%= render UI::Avatar::Fallback.new { "FF" } %>
+          <% end %>
+
+          <%= render UI::Avatar::Avatar.new(classes: "size-12") do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Large"
+            ) %>
+            <%= render UI::Avatar::Fallback.new { "FF" } %>
+          <% end %>
+
+          <%= render UI::Avatar::Avatar.new(classes: "size-16") do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Extra large"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(classes: "text-lg") { "FF" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Rounded Square -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Rounded Square</h3>
+        <div class="flex items-center gap-4">
+          <%= render UI::Avatar::Avatar.new(classes: "rounded-lg") do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "User"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(classes: "rounded-lg") { "FF" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Colored Fallback -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Colored Fallback</h3>
+        <div class="flex items-center gap-4">
+          <%= render UI::Avatar::Avatar.new do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://invalid-url.com/image.jpg",
+              alt: "User"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(
+              classes: "bg-primary text-primary-foreground"
+            ) { "AB" } %>
+          <% end %>
+
+          <%= render UI::Avatar::Avatar.new do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://invalid-url.com/image.jpg",
+              alt: "User"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(
+              classes: "bg-destructive text-destructive-foreground"
+            ) { "CD" } %>
+          <% end %>
+
+          <%= render UI::Avatar::Avatar.new do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://invalid-url.com/image.jpg",
+              alt: "User"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(
+              classes: "bg-green-500 text-white"
+            ) { "EF" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Avatar Group -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Avatar Group</h3>
+        <div class="flex -space-x-2">
+          <% (1..5).each do |i| %>
+            <%= render UI::Avatar::Avatar.new(classes: "ring-2 ring-background") do %>
+              <%= render UI::Avatar::Image.new(
+                src: "https://i.pravatar.cc/150?img=#{i}",
+                alt: "User #{i}"
+              ) %>
+              <%= render UI::Avatar::Fallback.new { "U#{i}" } %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Avatar with Status -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">With Status Indicator</h3>
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <%= render UI::Avatar::Avatar.new do %>
+              <%= render UI::Avatar::Image.new(
+                src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+                alt: "Online user"
+              ) %>
+              <%= render UI::Avatar::Fallback.new { "FF" } %>
+            <% end %>
+            <span class="absolute bottom-0 right-0 block size-3 rounded-full bg-green-500 ring-2 ring-background"></span>
+          </div>
+
+          <div class="relative">
+            <%= render UI::Avatar::Avatar.new do %>
+              <%= render UI::Avatar::Image.new(
+                src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+                alt: "Away user"
+              ) %>
+              <%= render UI::Avatar::Fallback.new { "FF" } %>
+            <% end %>
+            <span class="absolute bottom-0 right-0 block size-3 rounded-full bg-yellow-500 ring-2 ring-background"></span>
+          </div>
+
+          <div class="relative">
+            <%= render UI::Avatar::Avatar.new do %>
+              <%= render UI::Avatar::Image.new(
+                src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+                alt: "Offline user"
+              ) %>
+              <%= render UI::Avatar::Fallback.new { "FF" } %>
+            <% end %>
+            <span class="absolute bottom-0 right-0 block size-3 rounded-full bg-muted ring-2 ring-background"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERB Partials Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ERB Partials</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Avatar -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Basic Avatar</h3>
+        <div class="flex items-center gap-4">
+          <%= render "ui/avatar/avatar" do %>
+            <%= render "ui/avatar/avatar_image", src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4", alt: "@fernandes" %>
+            <%= render "ui/avatar/avatar_fallback" do %>
+              FF
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Avatar in Card -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">In Card Header</h3>
+        <div class="rounded-lg border bg-card p-6 max-w-md">
+          <div class="flex items-center gap-4">
+            <%= render "ui/avatar/avatar" do %>
+              <%= render "ui/avatar/avatar_image", src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4", alt: "User" %>
+              <%= render "ui/avatar/avatar_fallback" do %>
+                FF
+              <% end %>
+            <% end %>
+
+            <div>
+              <h3 class="font-semibold">Celso Fernandes</h3>
+              <p class="text-sm text-muted-foreground">@fernandes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback Only (Image Error) -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Fallback Display (Image Error)</h3>
+        <div class="flex items-center gap-4">
+          <%= render "ui/avatar/avatar" do %>
+            <%= render "ui/avatar/avatar_image", src: "https://invalid-url.com/error.jpg", alt: "Failed" %>
+            <%= render "ui/avatar/avatar_fallback" do %>
+              FB
+            <% end %>
+          <% end %>
+          <p class="text-sm text-muted-foreground">Try opening DevTools Network tab and refresh - image fails to load</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ViewComponent Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ViewComponent</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Avatar -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Basic Avatar</h3>
+        <div class="flex items-center gap-4">
+          <%= render(UI::Avatar::AvatarComponent.new) do %>
+            <%= render(UI::Avatar::ImageComponent.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "@fernandes"
+            )) %>
+            <%= render(UI::Avatar::FallbackComponent.new) { "FF" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Different Sizes -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Different Sizes</h3>
+        <div class="flex items-center gap-4">
+          <%= render(UI::Avatar::AvatarComponent.new(classes: "size-8")) do %>
+            <%= render(UI::Avatar::ImageComponent.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Small"
+            )) %>
+            <%= render(UI::Avatar::FallbackComponent.new(classes: "text-xs")) { "FF" } %>
+          <% end %>
+
+          <%= render(UI::Avatar::AvatarComponent.new(classes: "size-12")) do %>
+            <%= render(UI::Avatar::ImageComponent.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Medium"
+            )) %>
+            <%= render(UI::Avatar::FallbackComponent.new) { "FF" } %>
+          <% end %>
+
+          <%= render(UI::Avatar::AvatarComponent.new(classes: "size-20")) do %>
+            <%= render(UI::Avatar::ImageComponent.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Huge"
+            )) %>
+            <%= render(UI::Avatar::FallbackComponent.new(classes: "text-2xl")) { "FF" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Dropdown Trigger -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">As Button/Dropdown Trigger</h3>
+        <button class="flex items-center gap-2 rounded-full ring-offset-background transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-2 p-1">
+          <%= render(UI::Avatar::AvatarComponent.new) do %>
+            <%= render(UI::Avatar::ImageComponent.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "User"
+            )) %>
+            <%= render(UI::Avatar::FallbackComponent.new) { "FF" } %>
+          <% end %>
+          <span class="pr-2">Celso Fernandes</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Interactive Demo</h2>
+    <div class="rounded-lg border bg-card p-6">
+      <p class="text-sm text-muted-foreground mb-4">
+        The Avatar component automatically handles image loading states. Try toggling your network connection or refreshing the page to see the fallback behavior.
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <p class="text-sm font-medium mb-2">Working Image (loads successfully):</p>
+          <%= render UI::Avatar::Avatar.new(classes: "size-16") do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
+              alt: "Working"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(classes: "text-lg") { "FF" } %>
+          <% end %>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium mb-2">Broken Image (shows fallback):</p>
+          <%= render UI::Avatar::Avatar.new(classes: "size-16") do %>
+            <%= render UI::Avatar::Image.new(
+              src: "https://this-will-fail.invalid/image.jpg",
+              alt: "Broken"
+            ) %>
+            <%= render UI::Avatar::Fallback.new(classes: "text-lg bg-orange-500 text-white") { "BI" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

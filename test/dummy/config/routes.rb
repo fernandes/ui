@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   get "/components/alert", to: "components#alert"
   get "/components/alert_dialog", to: "components#alert_dialog"
   get "/components/aspect_ratio", to: "components#aspect_ratio"
+  get "/components/avatar", to: "components#avatar"
   get "/components/button", to: "components#button"
   get "/components/dialog", to: "components#dialog"
 
