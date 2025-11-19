@@ -207,6 +207,36 @@ Simply run `bin/dev` and edit any watched file - changes reload automatically!
 - ❌ **NEVER**: `style="height: 300px"` or custom CSS in `<style>` tags
 - ✅ **ALWAYS**: Use Tailwind classes like `h-[300px]` or arbitrary values `transition-[height]`
 
+#### Global Design System Colors (@layer base)
+
+To ensure all elements use theme colors by default, the engine includes a `@layer base` rule in `app/assets/stylesheets/ui/application.css`:
+
+```css
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: var(--ring);
+  }
+  @supports (color:color-mix(in lab, red, red)) {
+    * {
+      outline-color: color-mix(in oklab, var(--ring) 50%, transparent)
+    }
+  }
+}
+```
+
+**Why this is needed:**
+- Without this, borders default to browser's default color (usually black/dark gray)
+- shadcn/ui uses this pattern - it's NOT generated automatically by Tailwind
+- Eliminates need to add `border-border` class to every component
+- Ensures consistent theme colors across all elements
+
+**Where it's defined:**
+- Engine file: `app/assets/stylesheets/ui/application.css`
+- Automatically imported by host apps via `@import "ui/application.css"`
+
+This is a one-time setup in the engine - components don't need to worry about border colors.
+
 ### CSS Variables in Tailwind 4
 
 When adding CSS variables that Tailwind needs to use:
@@ -405,7 +435,12 @@ When migrating a component from shadcn/Radix:
 5. ✅ Test with Playwright to compare visual appearance
 6. ✅ Ensure all CSS variables are in both `:root` and `@theme`
 7. ✅ Verify Tailwind generates all needed utility classes
-8. ✅ **Generate LLM documentation** (see below)
+8. ✅ **Evaluate asChild composition needs** (see `docs/patterns/as_child.md`):
+   - Does the component render a wrapper that might break layouts?
+   - Does it need to accept `as_child: true` to yield attributes to a child?
+   - Does it need to consume attributes from a parent using asChild?
+   - Example: `Dialog::Trigger` provides asChild, `Button` can receive it
+9. ✅ **Generate LLM documentation** (see below)
 
 ### LLM Documentation
 

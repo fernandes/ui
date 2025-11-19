@@ -216,6 +216,104 @@ class AlertDialogController extends Controller {
   }
 }
 
+class DialogController extends Controller {
+  static targets=[ "container", "overlay", "content" ];
+  static values={
+    open: {
+      type: Boolean,
+      default: false
+    },
+    closeOnEscape: {
+      type: Boolean,
+      default: true
+    },
+    closeOnOverlayClick: {
+      type: Boolean,
+      default: true
+    }
+  };
+  connect() {
+    if (this.openValue) {
+      this.show();
+    }
+  }
+  open() {
+    this.openValue = true;
+    this.show();
+  }
+  close() {
+    this.openValue = false;
+    this.hide();
+  }
+  show() {
+    if (this.hasContainerTarget) {
+      this.containerTarget.setAttribute("data-state", "open");
+    }
+    if (this.hasOverlayTarget) {
+      this.overlayTarget.setAttribute("data-state", "open");
+    }
+    if (this.hasContentTarget) {
+      this.contentTarget.setAttribute("data-state", "open");
+    }
+    document.body.style.overflow = "hidden";
+    this.setupFocusTrap();
+    if (this.closeOnEscapeValue) {
+      this.escapeHandler = e => {
+        if (e.key === "Escape") {
+          this.close();
+        }
+      };
+      document.addEventListener("keydown", this.escapeHandler);
+    }
+    this.element.dispatchEvent(new CustomEvent("dialog:open", {
+      bubbles: true,
+      detail: {
+        open: true
+      }
+    }));
+  }
+  hide() {
+    if (this.hasContainerTarget) {
+      this.containerTarget.setAttribute("data-state", "closed");
+    }
+    if (this.hasOverlayTarget) {
+      this.overlayTarget.setAttribute("data-state", "closed");
+    }
+    if (this.hasContentTarget) {
+      this.contentTarget.setAttribute("data-state", "closed");
+    }
+    document.body.style.overflow = "";
+    if (this.escapeHandler) {
+      document.removeEventListener("keydown", this.escapeHandler);
+      this.escapeHandler = null;
+    }
+    this.element.dispatchEvent(new CustomEvent("dialog:close", {
+      bubbles: true,
+      detail: {
+        open: false
+      }
+    }));
+  }
+  closeOnOverlayClick(event) {
+    if (this.closeOnOverlayClickValue) {
+      this.close();
+    }
+  }
+  setupFocusTrap() {
+    if (!this.hasContentTarget) return;
+    const focusableElements = this.contentTarget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusableElements.length > 0) {
+      focusableElements[0].focus();
+    }
+  }
+  disconnect() {
+    document.body.style.overflow = "";
+    if (this.escapeHandler) {
+      document.removeEventListener("keydown", this.escapeHandler);
+    }
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -234,8 +332,9 @@ function registerControllers(application) {
     "ui--hello": HelloController,
     "ui--dropdown": DropdownController,
     "ui--accordion": AccordionController,
-    "ui--alert-dialog": AlertDialogController
+    "ui--alert-dialog": AlertDialogController,
+    "ui--dialog": DialogController
   });
 }
 
-export { AccordionController, AlertDialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, DialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };
