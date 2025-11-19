@@ -1,87 +1,78 @@
-# Phlex Components - LLM Reference
+# Phlex Components - Overview
 
-This document provides LLM-friendly reference for using Phlex components in the UI Engine.
+## About Phlex
 
-## General Usage Pattern
+Phlex is a Ruby framework for building fast, object-oriented HTML views. In UI Engine, Phlex is the primary component format.
 
-Phlex components are Ruby classes that inherit from `Phlex::HTML`. They are rendered using the `render` helper.
+## Namespace Pattern
 
-### Basic Syntax
+All components follow this structure:
 
-```ruby
-<%= render UI::ComponentName::SubComponent.new(param: value) do %>
-  Content here
-<% end %>
+```
+UI::ComponentName::SubComponent
 ```
 
-### Key Concepts
+Examples:
+- `UI::Button::Button` - The button component
+- `UI::Dialog::Dialog` - Dialog container
+- `UI::Dialog::Trigger` - Dialog trigger button
+- `UI::Dialog::Content` - Dialog content area
 
-1. **Namespace**: All components are under the `UI` module
-2. **Instantiation**: Always use `.new()` to create instances
-3. **Parameters**: Pass as keyword arguments to `.new()`
-4. **Content**: Provide via block using `do...end`
-5. **Nesting**: Components can be nested inside other components
-
-### Common Parameters
-
-- `variant:` - Component style variant (`:default`, `:outline`, `:destructive`, etc.)
-- `size:` - Component size (`:default`, `:sm`, `:lg`, `:icon`)
-- `classes:` - Additional CSS classes (String)
-- `attributes:` - Additional HTML attributes (Hash)
-
-### Example: Button Component
+## Common Pattern
 
 ```ruby
-# Simple button
-<%= render UI::Button.new { "Click me" } %>
+# Rendering a component
+render UI::ComponentName::SubComponent.new(**options) do
+  # Block content
+end
 
-# Button with variant and size
-<%= render UI::Button.new(variant: :outline, size: :lg) { "Large Outline Button" } %>
+# With parameters
+render UI::Button::Button.new(variant: :outline, size: :lg) do
+  "Click me"
+end
 
-# Button with custom classes
-<%= render UI::Button.new(classes: "w-full") { "Full Width Button" } %>
+# With asChild composition
+render UI::Dialog::Trigger.new(as_child: true) do |attrs|
+  render UI::Button::Button.new(**attrs, variant: :destructive) do
+    "Delete"
+  end
+end
 ```
 
-## Available Components
+## Common Parameters
 
-See individual component documentation in `docs/llm/phlex/` directory:
+Most components support:
 
-- [Button](phlex/button.md) - Interactive button component
-- [Accordion](phlex/accordion.md) - Collapsible content sections
-- [Alert Dialog](phlex/alert_dialog.md) - Modal confirmation dialogs
+- `classes:` - Additional Tailwind classes
+- `**attributes` - Any HTML attributes (id, data, aria, etc.)
 
-## Component Composition
+Components that support composition:
+- `as_child:` - Boolean, yields attributes to block instead of rendering wrapper
 
-Components can be composed together. Child components are passed to parent via blocks:
+## Important Notes
+
+### ❌ Common Mistakes
 
 ```ruby
-<%= render UI::Parent.new do %>
-  <%= render UI::Child.new { "Child content" } %>
-<% end %>
+# WRONG: Using module name
+UI::Button.new
+
+# CORRECT: Using component class
+UI::Button::Button.new
 ```
 
-## Error Prevention
-
-### ❌ Wrong: Calling without .new()
+### ✅ Using Splat Operator with asChild
 
 ```ruby
-<%= render UI::Button { "Text" } %>  # ERROR: undefined method 'new' for module
+# When receiving attributes from asChild
+render ComponentName.new(as_child: true) do |attrs|
+  # Use ** to spread hash into keyword arguments
+  button(**attrs) do
+    "Content"
+  end
+end
 ```
 
-### ✅ Correct: Always use .new()
+## See Individual Component Docs
 
-```ruby
-<%= render UI::Button.new { "Text" } %>  # Correct!
-```
-
-### ❌ Wrong: Passing content as parameter
-
-```ruby
-<%= render UI::Button.new(content: "Text") %>  # Won't work
-```
-
-### ✅ Correct: Content via block
-
-```ruby
-<%= render UI::Button.new { "Text" } %>  # Correct!
-```
+Each component has detailed documentation in `docs/llm/phlex/{component}.md`.

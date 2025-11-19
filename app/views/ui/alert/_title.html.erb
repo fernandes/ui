@@ -1,0 +1,13 @@
+<%
+  classes ||= ""
+
+  # Base CSS classes
+  base_classes = "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight"
+
+  # Merge all classes
+  require "tailwind_merge"
+  all_classes = TailwindMerge::Merger.new.merge([base_classes, classes].compact.join(" "))
+%>
+<div class="<%= all_classes %>" data-slot="alert-title">
+  <%= yield %>
+</div>

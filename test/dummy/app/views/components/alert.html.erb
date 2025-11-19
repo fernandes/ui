@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Alert Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Alert Component</h1>
+      <p class="text-muted-foreground text-lg">A callout component for displaying important messages and notifications</p>
+    </header>
+
+    <!-- Phlex Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold border-b pb-2">Phlex Implementation</h2>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Default Variant</h3>
+        <%= render UI::Alert::Alert.new do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <%= render UI::Alert::Title.new { "Success" } %>
+          <%= render UI::Alert::Description.new { "Your changes have been saved successfully." } %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Destructive Variant</h3>
+        <%= render UI::Alert::Alert.new(variant: :destructive) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4"/>
+            <path d="M12 16h.01"/>
+          </svg>
+          <%= render UI::Alert::Title.new { "Error" } %>
+          <%= render UI::Alert::Description.new { "Your session has expired. Please log in again." } %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Without Icon</h3>
+        <%= render UI::Alert::Alert.new do %>
+          <%= render UI::Alert::Title.new { "Heads up!" } %>
+          <%= render UI::Alert::Description.new { "You can add components to your app using the CLI." } %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Without Title</h3>
+        <%= render UI::Alert::Alert.new do %>
+          <%= render UI::Alert::Description.new { "This is a simple notification without a title." } %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Warning</h3>
+        <%= render UI::Alert::Alert.new(variant: :destructive) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <path d="M12 9v4"/>
+            <path d="M12 17h.01"/>
+          </svg>
+          <%= render UI::Alert::Title.new { "Warning" } %>
+          <%= render UI::Alert::Description.new { "This action cannot be undone. Please proceed with caution." } %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Info</h3>
+        <%= render UI::Alert::Alert.new do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4"/>
+            <path d="M12 8h.01"/>
+          </svg>
+          <%= render UI::Alert::Title.new { "Did you know?" } %>
+          <%= render UI::Alert::Description.new { "You can use keyboard shortcuts to navigate faster through the application." } %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ViewComponent Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold border-b pb-2">ViewComponent Implementation</h2>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Default Variant</h3>
+        <%= render(UI::Alert::AlertComponent.new) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <%= render(UI::Alert::TitleComponent.new) { "Success" } %>
+          <%= render(UI::Alert::DescriptionComponent.new) { "Your operation completed successfully." } %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Destructive Variant</h3>
+        <%= render(UI::Alert::AlertComponent.new(variant: :destructive)) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4"/>
+            <path d="M12 16h.01"/>
+          </svg>
+          <%= render(UI::Alert::TitleComponent.new) { "Error" } %>
+          <%= render(UI::Alert::DescriptionComponent.new) { "An error occurred while processing your request." } %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ERB Partial Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold border-b pb-2">ERB Partial Implementation</h2>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Default Variant</h3>
+        <%= render "ui/alert/alert", variant: :default do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <%= render "ui/alert/title" do %>Success<% end %>
+          <%= render "ui/alert/description" do %>Your settings have been updated.<% end %>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-medium">Destructive Variant</h3>
+        <%= render "ui/alert/alert", variant: :destructive do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4"/>
+            <path d="M12 16h.01"/>
+          </svg>
+          <%= render "ui/alert/title" do %>Error<% end %>
+          <%= render "ui/alert/description" do %>Failed to save your changes. Please try again.<% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- All Examples Together -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold border-b pb-2">All Variants Together</h2>
+      <div class="space-y-4">
+        <%= render UI::Alert::Alert.new do %>
+          <%= render UI::Alert::Title.new { "Information" } %>
+          <%= render UI::Alert::Description.new { "This is a default informational alert." } %>
+        <% end %>
+
+        <%= render UI::Alert::Alert.new(variant: :destructive) do %>
+          <%= render UI::Alert::Title.new { "Critical" } %>
+          <%= render UI::Alert::Description.new { "This is a destructive/error alert." } %>
+        <% end %>
+
+        <%= render UI::Alert::Alert.new do %>
+          <%= render UI::Alert::Description.new { "Simple message without title." } %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Custom Styling -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold border-b pb-2">Custom Styling</h2>
+      <div class="space-y-4">
+        <%= render UI::Alert::Alert.new(classes: "border-blue-500 bg-blue-50 dark:bg-blue-950/20") do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info text-blue-600">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4"/>
+            <path d="M12 8h.01"/>
+          </svg>
+          <%= render UI::Alert::Title.new(classes: "text-blue-900 dark:text-blue-100") { "Custom Blue Alert" } %>
+          <%= render UI::Alert::Description.new(classes: "text-blue-700 dark:text-blue-300") { "This alert uses custom Tailwind classes for blue styling." } %>
+        <% end %>
+
+        <%= render UI::Alert::Alert.new(classes: "border-green-500 bg-green-50 dark:bg-green-950/20") do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check text-green-600">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <%= render UI::Alert::Title.new(classes: "text-green-900 dark:text-green-100") { "Custom Green Alert" } %>
+          <%= render UI::Alert::Description.new(classes: "text-green-700 dark:text-green-300") { "This alert uses custom Tailwind classes for success green styling." } %>
+        <% end %>
+      </div>
+    </section>
+
+    <footer class="pt-8 border-t">
+      <p class="text-muted-foreground text-sm">
+        <%= link_to "← Back to Components", "/components", class: "hover:underline" %>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

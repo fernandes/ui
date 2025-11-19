@@ -1,101 +1,93 @@
-# ERB Partials - LLM Reference
+# ERB Components - Overview
 
-This document provides LLM-friendly reference for using ERB partials in the UI Engine.
+## About ERB Components
 
-## General Usage Pattern
+ERB (Embedded Ruby) is the traditional Rails view format. UI Engine components work seamlessly with ERB.
 
-ERB partials are traditional Rails partial files. They are rendered using the `render` helper with a path string.
-
-### Basic Syntax
+## Rendering Pattern
 
 ```erb
-<%= render "ui/component_name/sub_component", param: value, content: "text" %>
-
-<%# With block content %>
-<%= render "ui/component_name/sub_component", param: value do %>
-  Block content here
+<%= render UI::ComponentName::SubComponent.new(**options) do %>
+  <!-- Block content -->
 <% end %>
 ```
 
-### Key Concepts
+## Examples
 
-1. **Path**: Partials use string paths starting with `"ui/"`
-2. **Underscore**: Partial files start with `_` but you don't include it in the path
-3. **Parameters**: Pass as keyword arguments after the path
-4. **Content**: Pass via `content:` parameter OR via block
-5. **Nesting**: Nest partials inside other partials using blocks
-
-### Common Parameters
-
-- `variant:` - Component style variant (`:default`, `:outline`, `:destructive`, etc.)
-- `size:` - Component size (`:default`, `:sm`, `:lg`, `:icon`)
-- `classes:` - Additional CSS classes (String)
-- `attributes:` - Additional HTML attributes (Hash)
-- `content:` - Text content (String) - alternative to block
-
-### Example: Button Component
+### Basic Usage
 
 ```erb
-<%# Simple button with content parameter %>
-<%= render "ui/button/button", content: "Click me" %>
-
-<%# Button with variant and size %>
-<%= render "ui/button/button", variant: :outline, size: :lg, content: "Large Outline Button" %>
-
-<%# Button with block content %>
-<%= render "ui/button/button", variant: :outline do %>
-  <span>Button with HTML</span>
-<% end %>
-```
-
-## Available Components
-
-See individual component documentation in `docs/llm/erb/` directory:
-
-- [Button](erb/button.md) - Interactive button component
-- [Accordion](erb/accordion.md) - Collapsible content sections
-- [Alert Dialog](erb/alert_dialog.md) - Modal confirmation dialogs
-
-## Component Composition
-
-Components can be composed together. Child components are passed to parent via blocks:
-
-```erb
-<%= render "ui/parent/parent" do %>
-  <%= render "ui/child/child", content: "Child content" %>
-<% end %>
-```
-
-## File Location
-
-Partial files are located at:
-- Engine: `app/views/ui/{component_name}/_{sub_component}.html.erb`
-- Your app: After installation, these are copied or accessed via the engine
-
-## Error Prevention
-
-### ❌ Wrong: Using Phlex syntax
-
-```erb
-<%= render UI::Button.new { "Text" } %>  # Wrong - this is Phlex syntax
-```
-
-### ✅ Correct: Use string path
-
-```erb
-<%= render "ui/button/button", content: "Text" %>  # Correct!
-```
-
-### Content: Two Ways
-
-Both approaches work:
-
-```erb
-<%# Approach 1: content parameter %>
-<%= render "ui/button/button", content: "Click me" %>
-
-<%# Approach 2: block %>
-<%= render "ui/button/button" do %>
+<%= render UI::Button::Button.new(variant: :outline) do %>
   Click me
 <% end %>
 ```
+
+### With Parameters
+
+```erb
+<%= render UI::Dialog::Dialog.new(open: false) do %>
+  <%= render UI::Dialog::Trigger.new do %>
+    Open Dialog
+  <% end %>
+
+  <%= render UI::Dialog::Overlay.new(open: false) do %>
+    <%= render UI::Dialog::Content.new do %>
+      <!-- Content here -->
+    <% end %>
+  <% end %>
+<% end %>
+```
+
+### With asChild Composition
+
+```erb
+<%= render UI::Dialog::Trigger.new(as_child: true) do |trigger_attrs| %>
+  <%= render UI::Button::Button.new(**trigger_attrs, variant: :destructive) do %>
+    Delete
+  <% end %>
+<% end %>
+```
+
+## Common Parameters
+
+- `variant:` - Symbol, component variant (`:default`, `:outline`, `:destructive`, etc.)
+- `size:` - Symbol, component size (`:sm`, `:default`, `:lg`, etc.)
+- `classes:` - String, additional Tailwind classes
+- `open:` - Boolean, initial state for dialog/accordion components
+- `as_child:` - Boolean, yields attributes for composition
+
+## Important Notes
+
+### ❌ Common Mistakes
+
+```erb
+<!-- WRONG: String instead of symbol -->
+<%= render UI::Button::Button.new(variant: "outline") %>
+
+<!-- CORRECT: Use symbol -->
+<%= render UI::Button::Button.new(variant: :outline) %>
+```
+
+```erb
+<!-- WRONG: Missing = in render tag -->
+<% render UI::Button::Button.new %>
+
+<!-- CORRECT: Use <%= to output content -->
+<%= render UI::Button::Button.new %>
+```
+
+### ✅ Block Parameter Pattern
+
+```erb
+<!-- When component yields block parameter -->
+<%= render ComponentName.new(as_child: true) do |attrs| %>
+  <!-- Use |attrs| to capture block parameter -->
+  <%= render OtherComponent.new(**attrs) do %>
+    Content
+  <% end %>
+<% end %>
+```
+
+## See Individual Component Docs
+
+Each component has detailed documentation in `docs/llm/erb/{component}.md`.

@@ -424,7 +424,43 @@ setTimeout(() => hide(), 200)
 containerTarget.setAttribute("data-state", "closed")  # That's it!
 ```
 
-### Component Migration Checklist
+### Component Migration Infrastructure
+
+**Complete migration system with automated validation and quality assurance.**
+
+#### Quick Start
+
+```bash
+# Use the slash command
+/migrate tooltip
+```
+
+#### Full Documentation
+
+- **Overview**: `docs/migration/README.md` - Complete guide with workflow, rules, and troubleshooting
+- **Checklist**: `docs/migration/validation_checklist.md` - Detailed validation rules (~400 lines)
+- **Skill**: `.claude/skills/component-migration.md` - 6-phase migration workflow
+- **Validator**: `.claude/agents/code-validator.md` - Automated code quality checks
+- **Summary**: `docs/migration/SUMMARY.md` - Infrastructure overview
+
+#### Critical Rules (Enforced by Validator)
+
+**✅ MUST:**
+- Use ONLY Tailwind utility classes
+- Use tw-animate-css for animations (`animate-in`, `fade-in-*`, etc.)
+- Use `invisible` for animated elements (NOT `hidden`)
+- Use `data-state` for state management
+- Define CSS variables in BOTH `:root` and `@theme`
+- Implement asChild if component has trigger/activator
+- Include all ARIA attributes from Radix UI
+
+**❌ NEVER:**
+- Custom CSS in `<style>` tags or inline `style=""`
+- Animate in JavaScript (setTimeout, manual class toggling)
+- Use `hidden` class for animated elements (kills animations)
+- Missing CSS variables in `@theme` (Tailwind won't generate utilities)
+
+#### Migration Checklist (Quick Reference)
 
 When migrating a component from shadcn/Radix:
 
@@ -441,6 +477,9 @@ When migrating a component from shadcn/Radix:
    - Does it need to consume attributes from a parent using asChild?
    - Example: `Dialog::Trigger` provides asChild, `Button` can receive it
 9. ✅ **Generate LLM documentation** (see below)
+10. ✅ **Run code validator** (`.claude/agents/code-validator.md`)
+
+See `docs/migration/validation_checklist.md` for complete detailed checklist.
 
 ### LLM Documentation
 
