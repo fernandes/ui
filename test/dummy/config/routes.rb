@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get "/components/aspect_ratio", to: "components#aspect_ratio"
   get "/components/avatar", to: "components#avatar"
   get "/components/badge", to: "components#badge"
+  get "/components/breadcrumb", to: "components#breadcrumb"
   get "/components/button", to: "components#button"
   get "/components/dialog", to: "components#dialog"
   get "/components/dropdown_menu", to: "components#dropdown_menu"

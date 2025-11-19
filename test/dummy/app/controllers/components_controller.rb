@@ -25,6 +25,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/badge.html.erb
   end
 
+  def breadcrumb
+    # Renders app/views/components/breadcrumb.html.erb
+  end
+
   def button
     # Renders app/views/components/button.html.erb
   end

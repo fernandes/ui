@@ -1,0 +1,25 @@
+<%# Breadcrumb Separator Component - Visual divider between items %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::Breadcrumb::BreadcrumbSeparatorBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = breadcrumb_separator_html_attributes.deep_merge(@attributes)
+
+  # Capture block content if provided
+  block_content = capture { yield } if block_given?
+  custom_content = content || (block_content if block_content.present?)
+-%>
+<%= content_tag :li, all_attributes do %>
+  <% if custom_content %>
+    <%= custom_content %>
+  <% else %>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  <% end %>
+<% end %>
