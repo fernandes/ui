@@ -1,0 +1,18 @@
+<%
+  ratio ||= 1.0
+  classes ||= ""
+
+  # Calculate padding-bottom percentage
+  percentage = (1.0 / ratio) * 100
+  padding_bottom = "#{percentage}%"
+
+  # Merge classes
+  require "tailwind_merge"
+  all_classes = TailwindMerge::Merger.new.merge([classes].compact.join(" "))
+%>
+<div class="<%= all_classes %>" data-slot="aspect-ratio" style="position: relative; width: 100%;">
+  <div style="padding-bottom: <%= padding_bottom %>;"></div>
+  <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;">
+    <%= yield %>
+  </div>
+</div>

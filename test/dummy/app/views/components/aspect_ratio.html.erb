@@ -1,0 +1,233 @@
+<div class="container mx-auto py-8 space-y-8">
+  <div>
+    <h1 class="text-3xl font-bold mb-2">Aspect Ratio</h1>
+    <p class="text-muted-foreground">Displays content within a desired aspect ratio.</p>
+  </div>
+
+  <!-- Phlex Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Phlex</h2>
+
+    <div class="space-y-6">
+      <!-- 16:9 Image -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Image with 16:9 Ratio</h3>
+        <div class="w-full max-w-md">
+          <%= render UI::AspectRatio::AspectRatio.new(ratio: 16.0/9.0) do %>
+            <%= image_tag "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80",
+                          alt: "Photo by Drew Beamer",
+                          class: "h-full w-full rounded-lg object-cover" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Square Image -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Square Image (1:1)</h3>
+        <div class="w-48">
+          <%= render UI::AspectRatio::AspectRatio.new(ratio: 1.0) do %>
+            <%= image_tag "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&dpr=2&q=80",
+                          alt: "User avatar",
+                          class: "h-full w-full object-cover rounded-full" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Portrait Ratio -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Portrait Ratio (9:16)</h3>
+        <div class="w-64">
+          <%= render UI::AspectRatio::AspectRatio.new(ratio: 9.0/16.0) do %>
+            <%= image_tag "https://images.unsplash.com/photo-1586297135537-94bc9ba060aa?w=400&dpr=2&q=80",
+                          alt: "Mobile screenshot",
+                          class: "h-full w-full object-cover rounded-lg" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Responsive Gallery -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Responsive Image Gallery</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <% (1..6).each do |i| %>
+            <%= render UI::AspectRatio::AspectRatio.new(ratio: 1.0) do %>
+              <%= image_tag "https://images.unsplash.com/photo-#{1500000000000 + i * 1000000}?w=300&dpr=2&q=80",
+                            alt: "Gallery image #{i}",
+                            class: "h-full w-full object-cover rounded-lg" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERB Partials Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ERB Partials</h2>
+
+    <div class="space-y-6">
+      <!-- 16:9 Image -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Image with 16:9 Ratio</h3>
+        <div class="w-full max-w-md">
+          <%= render "ui/aspect_ratio/aspect_ratio", ratio: 16.0/9.0 do %>
+            <%= image_tag "https://images.unsplash.com/photo-1682687982501-1e58ab814714?w=800&dpr=2&q=80",
+                          alt: "Photo by Spacejoy",
+                          class: "h-full w-full rounded-lg object-cover" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Card with Fixed Ratio Image -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Card with Fixed Ratio Image</h3>
+        <div class="w-full max-w-md rounded-lg border bg-card">
+          <%= render "ui/aspect_ratio/aspect_ratio", ratio: 16.0/9.0 do %>
+            <%= image_tag "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800&dpr=2&q=80",
+                          alt: "Card image",
+                          class: "h-full w-full object-cover rounded-t-lg" %>
+          <% end %>
+
+          <div class="p-4">
+            <h3 class="font-semibold">Card Title</h3>
+            <p class="text-sm text-muted-foreground">Card description goes here</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- With Background and Placeholder -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">With Background and Placeholder</h3>
+        <div class="w-full max-w-md">
+          <%= render "ui/aspect_ratio/aspect_ratio", ratio: 16.0/9.0, classes: "bg-muted rounded-lg" do %>
+            <div class="flex items-center justify-center h-full">
+              <p class="text-muted-foreground">Loading...</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ViewComponent Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ViewComponent</h2>
+
+    <div class="space-y-6">
+      <!-- 16:9 Image -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Image with 16:9 Ratio</h3>
+        <div class="w-full max-w-md">
+          <%= render(UI::AspectRatio::AspectRatioComponent.new(ratio: 16.0/9.0)) do %>
+            <%= image_tag "https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=800&dpr=2&q=80",
+                          alt: "Photo by Milad Fakurian",
+                          class: "h-full w-full rounded-lg object-cover" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 4:3 Ratio -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Standard 4:3 Ratio</h3>
+        <div class="w-full max-w-md">
+          <%= render(UI::AspectRatio::AspectRatioComponent.new(ratio: 4.0/3.0, classes: "bg-muted rounded-lg")) do %>
+            <%= image_tag "https://images.unsplash.com/photo-1682687220801-eef408f95d71?w=800&dpr=2&q=80",
+                          alt: "Photo by Shapelined",
+                          class: "h-full w-full rounded-lg object-cover" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 21:9 Ultrawide -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Ultrawide 21:9 Ratio</h3>
+        <div class="w-full max-w-2xl">
+          <%= render(UI::AspectRatio::AspectRatioComponent.new(ratio: 21.0/9.0)) do %>
+            <%= image_tag "https://images.unsplash.com/photo-1682686581854-5e71f58e7e3f?w=1200&dpr=2&q=80",
+                          alt: "Panoramic view",
+                          class: "h-full w-full rounded-lg object-cover" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Common Ratios Reference -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Common Ratios Reference</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b">
+            <th class="text-left p-2">Ratio</th>
+            <th class="text-left p-2">Calculation</th>
+            <th class="text-left p-2">Use Case</th>
+            <th class="text-left p-2">Preview</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b">
+            <td class="p-2">16:9</td>
+            <td class="p-2 font-mono">16.0/9.0</td>
+            <td class="p-2">Widescreen videos, modern displays</td>
+            <td class="p-2">
+              <div class="w-32">
+                <%= render "ui/aspect_ratio/aspect_ratio", ratio: 16.0/9.0, classes: "bg-muted rounded" do %>
+                  <div class="flex items-center justify-center h-full text-xs">16:9</div>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <tr class="border-b">
+            <td class="p-2">4:3</td>
+            <td class="p-2 font-mono">4.0/3.0</td>
+            <td class="p-2">Traditional TV, older content</td>
+            <td class="p-2">
+              <div class="w-32">
+                <%= render "ui/aspect_ratio/aspect_ratio", ratio: 4.0/3.0, classes: "bg-muted rounded" do %>
+                  <div class="flex items-center justify-center h-full text-xs">4:3</div>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <tr class="border-b">
+            <td class="p-2">1:1</td>
+            <td class="p-2 font-mono">1.0</td>
+            <td class="p-2">Square images, avatars</td>
+            <td class="p-2">
+              <div class="w-32">
+                <%= render "ui/aspect_ratio/aspect_ratio", ratio: 1.0, classes: "bg-muted rounded" do %>
+                  <div class="flex items-center justify-center h-full text-xs">1:1</div>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <tr class="border-b">
+            <td class="p-2">21:9</td>
+            <td class="p-2 font-mono">21.0/9.0</td>
+            <td class="p-2">Ultrawide displays, cinematic</td>
+            <td class="p-2">
+              <div class="w-32">
+                <%= render "ui/aspect_ratio/aspect_ratio", ratio: 21.0/9.0, classes: "bg-muted rounded" do %>
+                  <div class="flex items-center justify-center h-full text-xs">21:9</div>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <tr class="border-b">
+            <td class="p-2">9:16</td>
+            <td class="p-2 font-mono">9.0/16.0</td>
+            <td class="p-2">Portrait/mobile, stories</td>
+            <td class="p-2">
+              <div class="w-32">
+                <%= render "ui/aspect_ratio/aspect_ratio", ratio: 9.0/16.0, classes: "bg-muted rounded" do %>
+                  <div class="flex items-center justify-center h-full text-xs">9:16</div>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
