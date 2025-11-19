@@ -31,25 +31,108 @@ The installer will automatically detect your asset pipeline and configure the en
 
 ## Usage
 
-The UI Engine provides CSS variables and components, but **you configure Tailwind CSS in your application**. The installer does this automatically.
+The UI Engine provides CSS variables, Stimulus controllers, and components. You configure Tailwind CSS in your application, and the installer does this automatically.
 
-### Quick Start
+### JavaScript Integration
 
-After installation, the engine provides:
+The engine supports two approaches for JavaScript integration:
 
-1. **CSS Variables** - Import in your Tailwind config:
-   ```css
-   @import "ui/application.css";
-   ```
-   This gives you variables like `--ui-primary`, `--ui-spacing-*`, etc.
+#### **Option 1: Importmaps (Rails 8 Default, Zero-Build)**
 
-2. **JavaScript Modules** - Available via importmaps or bundlers:
-   ```js
-   import UI from "ui"
-   UI.init()
-   ```
+The engine automatically configures importmap pins. Just import and use:
 
-3. **Components** - The engine's views are automatically scanned by Tailwind
+```javascript
+// app/javascript/application.js
+import { Application } from "@hotwired/stimulus"
+import * as UI from "ui"
+
+const application = Application.start()
+
+// Register all UI controllers
+UI.registerControllers(application)
+
+console.log("UI Engine version:", UI.version)
+```
+
+#### **Option 2: JavaScript Bundlers (Bun, esbuild, Webpack)**
+
+Install the engine as an npm package:
+
+```bash
+bun add @ui/engine
+# or
+npm install @ui/engine
+```
+
+Then import in your bundled JavaScript:
+
+```javascript
+// app/javascript/application.js
+import { Application } from "@hotwired/stimulus"
+import * as UI from "@ui/engine"
+
+const application = Application.start()
+
+// Register all UI controllers
+UI.registerControllers(application)
+```
+
+### Selective Controller Import
+
+You can import only the controllers you need for better performance and tree-shaking:
+
+#### **Import Individual Controllers from Main Module**
+
+```javascript
+import { Application } from "@hotwired/stimulus"
+import { HelloController, DropdownController } from "ui"
+
+const application = Application.start()
+application.register("ui--hello", HelloController)
+application.register("ui--dropdown", DropdownController)
+```
+
+#### **Import Directly from Controller Files (Importmap)**
+
+```javascript
+import { Application } from "@hotwired/stimulus"
+import HelloController from "ui/controllers/hello_controller"
+
+const application = Application.start()
+application.register("ui--hello", HelloController)
+```
+
+#### **Selective Registration with Helper**
+
+```javascript
+import { Application } from "@hotwired/stimulus"
+import { HelloController, registerControllersInto } from "ui"
+
+const application = Application.start()
+
+// Register only specific controllers
+registerControllersInto(application, {
+  "ui--hello": HelloController
+  // Don't register DropdownController
+})
+```
+
+### Benefits of Selective Import
+
+✅ **Tree-shaking** - Bundlers eliminate unused code
+✅ **Flexibility** - Choose exactly what to import
+✅ **Performance** - Load only what you need
+✅ **Compatibility** - Works with both importmaps and bundlers
+
+### CSS Variables
+
+Import engine CSS variables in your Tailwind config:
+
+```css
+@import "ui/application.css";
+```
+
+This provides variables like `--ui-primary`, `--ui-spacing-*`, etc.
 
 ### Tailwind Configuration
 

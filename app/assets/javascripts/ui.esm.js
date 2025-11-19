@@ -66,6 +66,8 @@ function registerControllersInto(application, controllers) {
   }
 }
 
+const version = "0.1.0";
+
 function registerControllers(application) {
   return registerControllersInto(application, {
     "ui--hello": HelloController,
@@ -73,4 +75,4 @@ function registerControllers(application) {
   });
 }
 
-export { registerControllers, registerControllersInto };
+export { DropdownController, HelloController, registerControllers, registerControllersInto, version };

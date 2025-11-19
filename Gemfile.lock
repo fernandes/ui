@@ -3,6 +3,7 @@ PATH
   specs:
     ui (0.1.0)
       rails (>= 6.0)
+      tailwind_merge (~> 0.13)
 
 GEM
   remote: https://rubygems.org/
@@ -136,6 +137,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.1.0)
+    method_source (1.1.0)
     mini_mime (1.1.5)
     minitest (5.26.2)
     net-imap (0.5.12)
@@ -168,6 +170,12 @@ GEM
     parser (3.3.10.0)
       ast (~> 2.4.1)
       racc
+    phlex (2.3.1)
+      zeitwerk (~> 2.7)
+    phlex-rails (2.3.1)
+      phlex (~> 2.3.0)
+      railties (>= 7.1, < 9)
+      zeitwerk (~> 2.7)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -262,6 +270,7 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    sin_lru_redux (2.5.2)
     sqlite3 (2.8.0-aarch64-linux-gnu)
     sqlite3 (2.8.0-aarch64-linux-musl)
     sqlite3 (2.8.0-arm-linux-gnu)
@@ -271,6 +280,8 @@ GEM
     sqlite3 (2.8.0-x86_64-linux-gnu)
     sqlite3 (2.8.0-x86_64-linux-musl)
     stringio (3.1.8)
+    tailwind_merge (0.16.0)
+      sin_lru_redux (~> 2.5)
     thor (1.4.0)
     timeout (0.4.4)
     tsort (0.2.0)
@@ -284,6 +295,10 @@ GEM
     unicode-emoji (4.1.0)
     uri (1.1.1)
     useragent (0.16.11)
+    view_component (3.24.0)
+      activesupport (>= 5.2.0, < 8.2)
+      concurrent-ruby (~> 1)
+      method_source (~> 1.0)
     websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
@@ -304,12 +319,14 @@ DEPENDENCIES
   hotwire-spark
   importmap-rails
   jsbundling-rails
+  phlex-rails (~> 2.0)
   propshaft
   puma
   rubocop-rails-omakase
   sqlite3
   turbo-rails
   ui!
+  view_component (~> 3.0)
 
 BUNDLED WITH
    2.7.2

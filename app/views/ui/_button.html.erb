@@ -1,0 +1,16 @@
+<%# Button Component - shadcn/ui inspired button for Rails %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @variant = local_assigns.fetch(:variant, "default")
+  @disabled = local_assigns.fetch(:disabled, nil)
+  @size = local_assigns.fetch(:size, "default")
+  @type = local_assigns.fetch(:type, "button")
+
+  # Extend behavior for shared logic
+  extend ::UI::ButtonBehavior
+%>
+<%= render_button do %>
+  <%= content || yield %>
+<% end %>

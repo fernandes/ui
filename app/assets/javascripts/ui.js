@@ -66,12 +66,16 @@
       }
     }
   }
+  const version = "0.1.0";
   function registerControllers(application) {
     return registerControllersInto(application, {
       "ui--hello": HelloController,
       "ui--dropdown": DropdownController
     });
   }
+  exports.DropdownController = DropdownController;
+  exports.HelloController = HelloController;
   exports.registerControllers = registerControllers;
   exports.registerControllersInto = registerControllersInto;
+  exports.version = version;
 });

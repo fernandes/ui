@@ -14,6 +14,9 @@ import DropdownController from "./controllers/dropdown_controller.js";
 // Import registration function
 import { registerControllersInto } from "./common.js";
 
+// Version
+export const version = "0.1.0";
+
 // Register controllers into a provided Stimulus application
 export function registerControllers(application) {
   return registerControllersInto(application, {
@@ -24,3 +27,6 @@ export function registerControllers(application) {
 
 // Re-export helper
 export { registerControllersInto };
+
+// Export individual controllers for selective import
+export { HelloController, DropdownController };

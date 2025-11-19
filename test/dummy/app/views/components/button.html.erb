@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Button Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Button Component</h1>
+      <p class="text-muted-foreground">Demonstrating all three component formats</p>
+    </header>
+
+    <!-- Phlex Implementation -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
+      <div class="flex flex-wrap gap-4">
+        <%= render UI::Button::Button.new(variant: "default") { "Default" } %>
+        <%= render UI::Button::Button.new(variant: "secondary") { "Secondary" } %>
+        <%= render UI::Button::Button.new(variant: "destructive") { "Destructive" } %>
+        <%= render UI::Button::Button.new(variant: "outline") { "Outline" } %>
+        <%= render UI::Button::Button.new(variant: "ghost") { "Ghost" } %>
+        <%= render UI::Button::Button.new(variant: "link") { "Link" } %>
+      </div>
+    </section>
+
+    <!-- ViewComponent Implementation -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
+      <div class="flex flex-wrap gap-4">
+        <%= render(UI::Button::ButtonComponent.new(variant: "default")) { "Default" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "secondary")) { "Secondary" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "destructive")) { "Destructive" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "outline")) { "Outline" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "ghost")) { "Ghost" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "link")) { "Link" } %>
+      </div>
+    </section>
+
+    <!-- ERB Partial Implementation -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
+      <div class="flex flex-wrap gap-4">
+        <%= render "ui/button", variant: "default", content: "Default" %>
+        <%= render "ui/button", variant: "secondary", content: "Secondary" %>
+        <%= render "ui/button", variant: "destructive", content: "Destructive" %>
+        <%= render "ui/button", variant: "outline", content: "Outline" %>
+        <%= render "ui/button", variant: "ghost", content: "Ghost" %>
+        <%= render "ui/button", variant: "link", content: "Link" %>
+      </div>
+    </section>
+
+    <!-- Size Variants -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Sizes (Phlex)</h2>
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render UI::Button::Button.new(size: "sm") { "Small" } %>
+        <%= render UI::Button::Button.new(size: "default") { "Default" } %>
+        <%= render UI::Button::Button.new(size: "lg") { "Large" } %>
+        <%= render UI::Button::Button.new(size: "icon", variant: "outline") do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Disabled State -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Disabled State (ViewComponent)</h2>
+      <div class="flex flex-wrap gap-4">
+        <%= render(UI::Button::ButtonComponent.new(disabled: true)) { "Disabled Default" } %>
+        <%= render UI::Button::ButtonComponent.new(disabled: true) do %>
+          Disabled Default
+        <% end %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "secondary", disabled: true)) { "Disabled Secondary" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "destructive", disabled: true)) { "Disabled Destructive" } %>
+        <%= render(UI::Button::ButtonComponent.new(variant: "outline", disabled: true)) { "Disabled Outline" } %>
+      </div>
+    </section>
+
+    <!-- Custom Classes -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Custom Classes (ERB)</h2>
+      <div class="flex flex-wrap gap-4">
+        <%= render "ui/button", classes: "rounded-full", content: "Rounded Button" %>
+        <%= render "ui/button", variant: "outline", classes: "border-2 border-blue-500 text-blue-500", content: "Custom Border" %>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Importmap Demo", importmap_path, class: "text-sm text-muted-foreground hover:text-foreground" %>
+    </footer>
+  </div>
+</body>
+</html>

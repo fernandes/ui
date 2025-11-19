@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
 
   # Core dependency - support Rails 6.0 and above
   spec.add_dependency "rails", ">= 6.0"
+  spec.add_dependency "tailwind_merge", "~> 0.13"
 
   # Optional dependencies for different asset pipelines
   # These will be required based on the host application's configuration
@@ -36,4 +37,8 @@ Gem::Specification.new do |spec|
 
   # For importmap support (Rails 7+)
   # Add to your Gemfile: gem 'importmap-rails'
+
+  # Development dependencies for component libraries
+  spec.add_development_dependency "phlex-rails", "~> 2.0"
+  spec.add_development_dependency "view_component", "~> 3.0"
 end
