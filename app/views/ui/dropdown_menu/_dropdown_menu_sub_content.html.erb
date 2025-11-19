@@ -1,0 +1,17 @@
+<%# Dropdown Menu Sub Content Component - Submenu items container %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @side = local_assigns.fetch(:side, "right")
+  @align = local_assigns.fetch(:align, "start")
+
+  # Extend behavior for shared logic
+  extend UI::DropdownMenu::DropdownMenuSubContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dropdown_menu_sub_content_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

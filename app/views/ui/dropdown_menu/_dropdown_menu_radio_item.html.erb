@@ -1,0 +1,27 @@
+<%# Dropdown Menu Radio Item Component - Menu item with radio state %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @disabled = local_assigns.fetch(:disabled, false)
+  @value = local_assigns.fetch(:value, nil)
+  @checked = local_assigns.fetch(:checked, false)
+
+  # Extend behavior for shared logic
+  extend UI::DropdownMenu::DropdownMenuRadioItemBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dropdown_menu_radio_item_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <span class="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+    <% if @checked %>
+      <span data-state="checked">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle size-2 fill-current">
+          <circle cx="12" cy="12" r="10"></circle>
+        </svg>
+      </span>
+    <% end %>
+  </span>
+  <%= content || yield %>
+<% end %>

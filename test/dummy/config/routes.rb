@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get "/components/badge", to: "components#badge"
   get "/components/button", to: "components#button"
   get "/components/dialog", to: "components#dialog"
+  get "/components/dropdown_menu", to: "components#dropdown_menu"
 
   # Mount Hotwire Spark for live reload in development
   mount Hotwire::Spark::Engine => "/spark" if Rails.env.development?

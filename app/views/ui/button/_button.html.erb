@@ -1,0 +1,28 @@
+<%
+  # Button - ERB Partial
+  #
+  # A versatile button component with multiple variants and sizes.
+  # Uses ButtonBehavior module for shared styling logic.
+  #
+  # @param content [String] Button text content (alternative to using block)
+  # @param variant [String] Visual style variant (default, destructive, outline, secondary, ghost, link)
+  # @param size [String] Size variant (default, sm, lg, icon, icon-sm, icon-lg)
+  # @param type [String] Button type attribute (button, submit, reset)
+  # @param disabled [Boolean] Whether the button is disabled
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @variant = local_assigns.fetch(:variant, "default")
+  @size = local_assigns.fetch(:size, "default")
+  @type = local_assigns.fetch(:type, "button")
+  @disabled = local_assigns.fetch(:disabled, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
+
+  extend UI::ButtonBehavior
+  all_attributes = button_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :button, all_attributes do %>
+  <%= content_param || yield %>
+<% end %>

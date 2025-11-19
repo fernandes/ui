@@ -32,4 +32,8 @@ class ComponentsController < ApplicationController
   def dialog
     # Renders app/views/components/dialog.html.erb
   end
+
+  def dropdown_menu
+    # Renders app/views/components/dropdown_menu.html.erb
+  end
 end

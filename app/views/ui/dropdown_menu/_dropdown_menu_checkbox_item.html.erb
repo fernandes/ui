@@ -1,0 +1,26 @@
+<%# Dropdown Menu Checkbox Item Component - Menu item with checkbox state %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @disabled = local_assigns.fetch(:disabled, false)
+  @checked = local_assigns.fetch(:checked, false)
+
+  # Extend behavior for shared logic
+  extend UI::DropdownMenu::DropdownMenuCheckboxItemBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dropdown_menu_checkbox_item_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <span class="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+    <% if @checked %>
+      <span data-state="checked">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4">
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+      </span>
+    <% end %>
+  </span>
+  <%= content || yield %>
+<% end %>

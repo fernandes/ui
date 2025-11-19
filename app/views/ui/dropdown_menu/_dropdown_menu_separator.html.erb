@@ -1,0 +1,12 @@
+<%# Dropdown Menu Separator Component - Visual separator %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::DropdownMenu::DropdownMenuSeparatorBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dropdown_menu_separator_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, "", all_attributes %>

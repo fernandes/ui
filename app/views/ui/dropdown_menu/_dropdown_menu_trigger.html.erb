@@ -1,0 +1,15 @@
+<%# Dropdown Menu Trigger Component - Wrapper that adds toggle action to child element %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::DropdownMenu::DropdownMenuTriggerBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dropdown_menu_trigger_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>
