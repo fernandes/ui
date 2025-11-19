@@ -79,4 +79,5 @@ Rails.application.configure do
   # Watch engine HTML files (views and components)
   # config.hotwire.spark.html_paths << Rails.root.join("../../app/views/ui")
   # config.hotwire.spark.html_paths << Rails.root.join("../../app/components/ui") if Rails.root.join("../../app/components/ui").exist?
+  config.hosts << "carbon:4000"
 end

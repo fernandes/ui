@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get "/bundled", to: "bundled#index"
 
   # Component showcase routes
+  get "/components", to: "components#index"
   get "/components/button", to: "components#button"
   get "/components/accordion", to: "components#accordion"
   get "/components/alert_dialog", to: "components#alert_dialog"

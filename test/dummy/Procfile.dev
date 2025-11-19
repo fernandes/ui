@@ -1,4 +1,4 @@
-web: bin/rails server
+web: bin/rails server -b 0.0.0.0
 css: bun run build:css:watch
 js: bun run build:js:watch
 rollup: cd ../.. && bun run build:watch
