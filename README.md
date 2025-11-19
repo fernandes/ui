@@ -124,6 +124,33 @@ registerControllersInto(application, {
 ✅ **Performance** - Load only what you need
 ✅ **Compatibility** - Works with both importmaps and bundlers
 
+## Available Components
+
+The engine currently provides the following Stimulus controllers and components:
+
+### **Accordion** (`ui--accordion`)
+Collapsible content sections with smooth CSS transitions. Supports single mode (only one item open) and multiple mode (multiple items can be open simultaneously).
+
+**Usage:**
+```erb
+<%= render "ui/accordion/accordion", type: "single" do %>
+  <%= render "ui/accordion/item", value: "item-1", initial_open: true do %>
+    <%= render "ui/accordion/trigger" do %>
+      Getting Started
+    <% end %>
+    <%= render "ui/accordion/content" do %>
+      <p>Follow the installation instructions to get started.</p>
+    <% end %>
+  <% end %>
+<% end %>
+```
+
+### **Dropdown** (`ui--dropdown`)
+Dropdown menu component with toggle functionality.
+
+### **Hello** (`ui--hello`)
+Example component demonstrating Stimulus controller basics.
+
 ### CSS Variables
 
 Import engine CSS variables in your Tailwind config:

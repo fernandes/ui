@@ -10,6 +10,7 @@
 // Import controllers
 import HelloController from "./controllers/hello_controller.js";
 import DropdownController from "./controllers/dropdown_controller.js";
+import AccordionController from "./controllers/accordion_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -21,7 +22,8 @@ export const version = "0.1.0";
 export function registerControllers(application) {
   return registerControllersInto(application, {
     "ui--hello": HelloController,
-    "ui--dropdown": DropdownController
+    "ui--dropdown": DropdownController,
+    "ui--accordion": AccordionController
   });
 }
 
@@ -29,4 +31,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController };
+export { HelloController, DropdownController, AccordionController };

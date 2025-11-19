@@ -182,6 +182,84 @@ mount Hotwire::Spark::Engine => "/spark" if Rails.env.development?
 
 Simply run `bin/dev` and edit any watched file - changes reload automatically!
 
+## Component Development Best Practices
+
+### CSS and Styling Rules
+
+**ALWAYS use Tailwind utility classes. NEVER write custom CSS or inline styles.**
+
+- ❌ **NEVER**: `style="height: 300px"` or custom CSS in `<style>` tags
+- ✅ **ALWAYS**: Use Tailwind classes like `h-[300px]` or arbitrary values `transition-[height]`
+
+### CSS Variables in Tailwind 4
+
+When adding CSS variables that Tailwind needs to use:
+
+1. **Define in `:root`** (for browser access):
+   ```css
+   :root {
+     --duration-accordion: 300ms;
+     --ease-accordion: cubic-bezier(0.87, 0, 0.13, 1);
+   }
+   ```
+
+2. **Define in `@theme`** (for Tailwind class generation):
+   ```css
+   @theme {
+     --duration-accordion: 300ms;
+     --ease-accordion: cubic-bezier(0.87, 0, 0.13, 1);
+   }
+   ```
+
+3. **Use the variable** in component classes to trigger generation:
+   ```ruby
+   "transition-[height] duration-[var(--duration-accordion)] ease-[var(--ease-accordion)]"
+   ```
+
+**Important**: Tailwind 4 only generates utility classes for classes that are **actually used** in scanned files. If a variable exists in `@theme` but isn't used anywhere, no utility class will be generated.
+
+### Testing CSS Variable Generation
+
+After adding new variables, verify they're being generated:
+
+```bash
+# Rebuild CSS
+bun run build:css
+
+# Check if variable is in :root
+grep "your-variable" ./test/dummy/app/assets/builds/application.css
+
+# Check if utility class was generated
+grep "your-utility-class" ./test/dummy/app/assets/builds/application.css
+```
+
+### Reference Implementation
+
+When implementing components, **always reference shadcn/ui and Radix UI**:
+
+1. **Visual Reference**: https://ui.shadcn.com/docs/components/[component]
+2. **Behavior Reference**: https://www.radix-ui.com/primitives/docs/components/[component]
+3. **Source Code**: https://github.com/radix-ui/primitives/tree/main/packages/react/[component]/src
+
+**Use browser dev tools** to inspect shadcn examples and extract:
+- Exact CSS classes used
+- HTML structure and nesting
+- ARIA attributes
+- Data attributes for state management
+- Animation timings and easing functions
+
+### Component Migration Checklist
+
+When migrating a component from shadcn/Radix:
+
+1. ✅ Compare HTML structure with shadcn example
+2. ✅ Extract all CSS classes from browser dev tools
+3. ✅ Verify animations match (duration, easing, properties)
+4. ✅ Check ARIA attributes for accessibility
+5. ✅ Test with Playwright to compare visual appearance
+6. ✅ Ensure all CSS variables are in both `:root` and `@theme`
+7. ✅ Verify Tailwind generates all needed utility classes
+
 ## Generator Usage
 
 ```bash

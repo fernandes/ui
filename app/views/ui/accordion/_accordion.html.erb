@@ -1,0 +1,17 @@
+<%# Accordion Component - Container for collapsible accordion items %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @type = local_assigns.fetch(:type, "single")
+  @collapsible = local_assigns.fetch(:collapsible, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Accordion::AccordionBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = accordion_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

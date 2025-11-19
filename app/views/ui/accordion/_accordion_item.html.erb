@@ -1,0 +1,21 @@
+<%# Accordion Item Component - Individual collapsible item %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @value = local_assigns.fetch(:value, "")
+  @initial_open = local_assigns.fetch(:initial_open, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Store context for child components
+  @_accordion_item_value = @value
+  @_accordion_item_initial_open = @initial_open
+
+  # Extend behavior for shared logic
+  extend ::UI::Accordion::AccordionItemBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = item_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>
