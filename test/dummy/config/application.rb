@@ -26,7 +26,7 @@ module Dummy
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # Configure Propshaft to serve JavaScript files for importmap
-    config.assets.paths << Rails.root.join("app/javascript")
+    # NOTE: We don't add app/javascript because the engine provides
+    # pre-built JavaScript files in app/assets/javascripts via Rollup
   end
 end

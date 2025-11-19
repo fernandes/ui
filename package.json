@@ -7,18 +7,23 @@
     "url": ""
   },
   "type": "module",
-  "main": "app/javascript/ui/bundler.js",
-  "module": "app/javascript/ui/bundler.js",
+  "main": "app/assets/javascripts/ui.js",
+  "module": "app/assets/javascripts/ui.esm.js",
+  "scripts": {
+    "build": "rollup -c",
+    "build:watch": "rollup -c -w"
+  },
   "exports": {
-    ".": "./app/javascript/ui/bundler.js",
-    "./importmap": "./app/javascript/ui/index.js",
-    "./styles": "./app/assets/stylesheets/ui/application.css",
-    "./controllers": "./app/javascript/ui/controllers/index.js",
-    "./application": "./app/javascript/ui/application.js"
+    ".": {
+      "import": "./app/assets/javascripts/ui.esm.js",
+      "require": "./app/assets/javascripts/ui.js"
+    },
+    "./styles": "./app/assets/stylesheets/ui/application.css"
   },
   "description": "UI Engine - Rails component library with Tailwind CSS",
   "files": [
     "app/assets/stylesheets/**/*",
+    "app/assets/javascripts/**/*",
     "app/javascript/**/*",
     "app/views/**/*",
     "app/components/**/*"
@@ -36,6 +41,9 @@
   },
   "devDependencies": {
     "@hotwired/stimulus": "^3.2.0",
-    "@tailwindcss/cli": "^4.1.17"
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@tailwindcss/cli": "^4.1.17",
+    "rollup": "^4.53.2",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }

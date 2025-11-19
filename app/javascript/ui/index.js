@@ -1,35 +1,31 @@
 /**
- * UI Engine - Main JavaScript Entry Point (Importmap)
+ * UI Engine - Main Entry Point
  *
- * This file serves as the main entry point for the UI engine when using importmaps.
- * For importmap usage, import controllers and register them manually.
+ * This file is the single source for both importmap and bundler usage.
+ * Rollup generates two outputs from this file:
+ * - UMD format (ui.js) for importmaps
+ * - ESM format (ui.esm.js) for npm packages/bundlers
  */
 
 console.log("UI Engine JavaScript loaded!");
 
-// Import controllers with absolute paths (for importmap)
-import HelloController from "ui/controllers/hello_controller"
-import DropdownController from "ui/controllers/dropdown_controller"
+// Import controllers
+import HelloController from "./controllers/hello_controller.js";
+import DropdownController from "./controllers/dropdown_controller.js";
 
 // Import registration function
-import { registerControllersInto } from "ui/common"
+import { registerControllersInto } from "./common.js";
 
-// Create UI Engine object (lightweight, no internal Stimulus app)
-const UI = {
-  version: "0.1.0",
+// Version
+export const version = "0.1.0";
 
-  // Register controllers into a provided Stimulus application
-  registerControllers(application) {
-    return registerControllersInto(application, {
-      "ui--hello": HelloController,
-      "ui--dropdown": DropdownController
-    })
-  }
+// Register controllers into a provided Stimulus application
+export function registerControllers(application) {
+  return registerControllersInto(application, {
+    "ui--hello": HelloController,
+    "ui--dropdown": DropdownController
+  });
 }
 
-// Set global
-window.UI = UI
-
-// Export for module usage
-export default UI
-export { registerControllersInto }
+// Re-export helper
+export { registerControllersInto };

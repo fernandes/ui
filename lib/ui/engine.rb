@@ -12,9 +12,11 @@ module UI
     initializer "ui.assets" do |app|
       # Add compiled assets path for Propshaft (Rails 8 default)
       if defined?(Propshaft)
+        # Add generated JavaScript files from Rollup build (MUST come before source)
+        app.config.assets.paths << root.join("app/assets/javascripts")
         app.config.assets.paths << root.join("app/assets/builds")
-        # Add JavaScript path for Propshaft
-        app.config.assets.paths << root.join("app/javascript")
+        # NOTE: We don't add app/javascript to avoid serving source files
+        # Source files are only for building, not for serving
       end
 
       # Add assets paths for Sprockets (Rails 6/7)
@@ -41,8 +43,9 @@ module UI
       end
 
       # Add engine's JavaScript path for cache sweeping in development
-      engine_js_path = root.join("app/javascript")
-      app.config.importmap.cache_sweepers << engine_js_path unless app.config.importmap.cache_sweepers.include?(engine_js_path)
+      # Only watch the generated files, not the source files
+      engine_js_generated_path = root.join("app/assets/javascripts")
+      app.config.importmap.cache_sweepers << engine_js_generated_path unless app.config.importmap.cache_sweepers.include?(engine_js_generated_path)
     end
 
     # Add app/assets/builds to load path for compiled Tailwind CSS

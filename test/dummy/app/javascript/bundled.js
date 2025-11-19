@@ -8,7 +8,7 @@ import "@hotwired/turbo"
 import { Application } from "@hotwired/stimulus"
 
 // Import the UI engine
-import UI from "@ui/engine"
+import * as UI from "@ui/engine"
 
 // Create Stimulus application
 const application = Application.start()
