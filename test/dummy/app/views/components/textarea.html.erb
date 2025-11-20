@@ -1,0 +1,167 @@
+<%
+# Textarea Showcase - shadcn/ui component examples
+# Based on: https://ui.shadcn.com/docs/components/textarea
+-%>
+<div class="container mx-auto max-w-4xl p-8">
+  <div class="mb-8">
+    <h1 class="mb-2 text-3xl font-bold">Textarea</h1>
+    <p class="text-muted-foreground text-lg">
+      Displays a form textarea or a component that looks like a textarea.
+    </p>
+  </div>
+
+  <!-- Format Selector -->
+  <div class="mb-8 flex gap-2">
+    <a href="?format=erb" class="<%= params[:format] == 'erb' || params[:format].blank? ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground' %> inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:opacity-80">
+      ERB
+    </a>
+    <a href="?format=phlex" class="<%= params[:format] == 'phlex' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground' %> inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:opacity-80">
+      Phlex
+    </a>
+    <a href="?format=vc" class="<%= params[:format] == 'vc' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground' %> inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:opacity-80">
+      ViewComponent
+    </a>
+  </div>
+
+  <% format = params[:format].presence || 'erb' %>
+
+  <!-- Example 1: Default -->
+  <section class="mb-12">
+    <h2 class="mb-4 text-2xl font-semibold">Default</h2>
+    <div class="bg-card rounded-lg border p-8">
+      <% if format == 'erb' %>
+        <%= render "ui/textarea/textarea",
+          placeholder: "Type your message here." %>
+      <% elsif format == 'phlex' %>
+        <%= render UI::Textarea::Textarea.new(
+          placeholder: "Type your message here."
+        ) %>
+      <% else # vc %>
+        <%= render UI::Textarea::TextareaComponent.new(
+          placeholder: "Type your message here."
+        ) %>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Example 2: Disabled -->
+  <section class="mb-12">
+    <h2 class="mb-4 text-2xl font-semibold">Disabled</h2>
+    <div class="bg-card rounded-lg border p-8">
+      <% if format == 'erb' %>
+        <%= render "ui/textarea/textarea",
+          placeholder: "Type your message here.",
+          attributes: { disabled: true } %>
+      <% elsif format == 'phlex' %>
+        <%= render UI::Textarea::Textarea.new(
+          placeholder: "Type your message here.",
+          disabled: true
+        ) %>
+      <% else # vc %>
+        <%= render UI::Textarea::TextareaComponent.new(
+          placeholder: "Type your message here.",
+          disabled: true
+        ) %>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Example 3: With Label -->
+  <section class="mb-12">
+    <h2 class="mb-4 text-2xl font-semibold">With Label</h2>
+    <div class="bg-card rounded-lg border p-8">
+      <div class="grid w-full gap-1.5">
+        <% if format == 'erb' %>
+          <%= render "ui/label/label", for: "message" do %>
+            Your message
+          <% end %>
+          <%= render "ui/textarea/textarea",
+            id: "message",
+            placeholder: "Type your message here." %>
+        <% elsif format == 'phlex' %>
+          <%= render UI::Label::Label.new(for: "message") { "Your message" } %>
+          <%= render UI::Textarea::Textarea.new(
+            id: "message",
+            placeholder: "Type your message here."
+          ) %>
+        <% else # vc %>
+          <%= render UI::Label::LabelComponent.new(for: "message") do %>
+            Your message
+          <% end %>
+          <%= render UI::Textarea::TextareaComponent.new(
+            id: "message",
+            placeholder: "Type your message here."
+          ) %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example 4: With Text -->
+  <section class="mb-12">
+    <h2 class="mb-4 text-2xl font-semibold">With Text</h2>
+    <div class="bg-card rounded-lg border p-8">
+      <div class="grid w-full gap-1.5">
+        <% if format == 'erb' %>
+          <%= render "ui/label/label", for: "message-2" do %>
+            Your message
+          <% end %>
+          <%= render "ui/textarea/textarea",
+            id: "message-2",
+            placeholder: "Type your message here." %>
+          <p class="text-muted-foreground text-sm">
+            Your message will be copied to the support team.
+          </p>
+        <% elsif format == 'phlex' %>
+          <%= render UI::Label::Label.new(for: "message-2") { "Your message" } %>
+          <%= render UI::Textarea::Textarea.new(
+            id: "message-2",
+            placeholder: "Type your message here."
+          ) %>
+          <p class="text-muted-foreground text-sm">
+            Your message will be copied to the support team.
+          </p>
+        <% else # vc %>
+          <%= render UI::Label::LabelComponent.new(for: "message-2") do %>
+            Your message
+          <% end %>
+          <%= render UI::Textarea::TextareaComponent.new(
+            id: "message-2",
+            placeholder: "Type your message here."
+          ) %>
+          <p class="text-muted-foreground text-sm">
+            Your message will be copied to the support team.
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example 5: With Button -->
+  <section class="mb-12">
+    <h2 class="mb-4 text-2xl font-semibold">With Button</h2>
+    <div class="bg-card rounded-lg border p-8">
+      <div class="grid w-full gap-2">
+        <% if format == 'erb' %>
+          <%= render "ui/textarea/textarea",
+            placeholder: "Type your message here." %>
+          <%= render "ui/button/button" do %>
+            Send message
+          <% end %>
+        <% elsif format == 'phlex' %>
+          <%= render UI::Textarea::Textarea.new(
+            placeholder: "Type your message here."
+          ) %>
+          <%= render UI::Button::Button.new { "Send message" } %>
+        <% else # vc %>
+          <%= render UI::Textarea::TextareaComponent.new(
+            placeholder: "Type your message here."
+          ) %>
+          <%= render UI::Button::ButtonComponent.new do %>
+            Send message
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>
