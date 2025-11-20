@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Label Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Label Component</h1>
+      <p class="text-muted-foreground">Accessible label for form inputs</p>
+    </header>
+
+    <!-- Phlex Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
+
+      <!-- Basic label with input -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Basic Label with Input</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render UI::Label::Label.new(for_id: "email-phlex") { "Email address" } %>
+          <input type="email" id="email-phlex" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" placeholder="john@example.com">
+        </div>
+      </div>
+
+      <!-- Label with checkbox -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Checkbox</h3>
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="terms-phlex" class="h-4 w-4 rounded border border-primary text-primary shadow focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+          <%= render UI::Label::Label.new(for_id: "terms-phlex", classes: "cursor-pointer") { "Accept terms and conditions" } %>
+        </div>
+      </div>
+
+      <!-- Label with radio button -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Radio Buttons</h3>
+        <div class="space-y-2">
+          <div class="flex items-center space-x-2">
+            <input type="radio" id="option1-phlex" name="options-phlex" class="h-4 w-4 rounded-full border border-primary text-primary shadow focus:ring-2 focus:ring-ring focus:ring-offset-2">
+            <%= render UI::Label::Label.new(for_id: "option1-phlex", classes: "cursor-pointer") { "Option 1" } %>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="radio" id="option2-phlex" name="options-phlex" class="h-4 w-4 rounded-full border border-primary text-primary shadow focus:ring-2 focus:ring-ring focus:ring-offset-2">
+            <%= render UI::Label::Label.new(for_id: "option2-phlex", classes: "cursor-pointer") { "Option 2" } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Label with custom styling -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Custom Styling</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render UI::Label::Label.new(for_id: "password-phlex", classes: "text-destructive font-bold") { "Password (required)" } %>
+          <input type="password" id="password-phlex" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+        </div>
+      </div>
+
+      <!-- Label with disabled input -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Disabled Input</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render UI::Label::Label.new(for_id: "disabled-phlex", classes: "peer-disabled:cursor-not-allowed peer-disabled:opacity-70") { "Disabled field" } %>
+          <input type="text" id="disabled-phlex" disabled class="peer flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" value="Cannot edit">
+        </div>
+      </div>
+    </section>
+
+    <!-- ERB Partial Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
+
+      <!-- Basic label with input -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Basic Label with Input</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render "ui/label/label", for_id: "username-erb", content: "Username" %>
+          <input type="text" id="username-erb" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" placeholder="johndoe">
+        </div>
+      </div>
+
+      <!-- Label with textarea -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Textarea</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render "ui/label/label", for_id: "bio-erb", content: "Biography" %>
+          <textarea id="bio-erb" rows="4" class="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" placeholder="Tell us about yourself..."></textarea>
+        </div>
+      </div>
+
+      <!-- Label with block content -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Required Indicator</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render "ui/label/label", for_id: "email-required-erb" do %>
+            Email <span class="text-destructive">*</span>
+          <% end %>
+          <input type="email" id="email-required-erb" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" placeholder="john@example.com">
+        </div>
+      </div>
+    </section>
+
+    <!-- ViewComponent Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
+
+      <!-- Basic label with input -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Basic Label with Input</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render UI::Label::LabelComponent.new(for_id: "phone-vc") do %>
+            Phone number
+          <% end %>
+          <input type="tel" id="phone-vc" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" placeholder="+1 (555) 000-0000">
+        </div>
+      </div>
+
+      <!-- Label with select -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Select</h3>
+        <div class="space-y-2 max-w-sm">
+          <%= render UI::Label::LabelComponent.new(for_id: "country-vc") do %>
+            Country
+          <% end %>
+          <select id="country-vc" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+            <option>United States</option>
+            <option>Canada</option>
+            <option>Mexico</option>
+            <option>United Kingdom</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Label with helper text -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Label with Helper Text</h3>
+        <div class="space-y-1 max-w-sm">
+          <%= render UI::Label::LabelComponent.new(for_id: "password-vc") do %>
+            Password
+          <% end %>
+          <input type="password" id="password-vc" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+          <p class="text-sm text-muted-foreground">Must be at least 8 characters</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components", components_path, class: "text-sm text-muted-foreground hover:text-foreground" %>
+    </footer>
+  </div>
+</body>
+</html>

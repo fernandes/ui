@@ -40,4 +40,8 @@ class ComponentsController < ApplicationController
   def dropdown_menu
     # Renders app/views/components/dropdown_menu.html.erb
   end
+
+  def label
+    # Renders app/views/components/label.html.erb
+  end
 end

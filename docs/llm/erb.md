@@ -88,6 +88,14 @@ ERB (Embedded Ruby) is the traditional Rails view format. UI Engine components w
 <% end %>
 ```
 
+## Available Components
+
+- [Accordion](erb/accordion.md)
+- [Alert Dialog](erb/alert_dialog.md)
+- [Button](erb/button.md)
+- [Dialog](erb/dialog.md)
+- [Label](erb/label.md)
+
 ## See Individual Component Docs
 
 Each component has detailed documentation in `docs/llm/erb/{component}.md`.

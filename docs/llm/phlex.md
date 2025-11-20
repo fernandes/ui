@@ -73,6 +73,14 @@ render ComponentName.new(as_child: true) do |attrs|
 end
 ```
 
+## Available Components
+
+- [Accordion](phlex/accordion.md)
+- [Alert Dialog](phlex/alert_dialog.md)
+- [Button](phlex/button.md)
+- [Dialog](phlex/dialog.md)
+- [Label](phlex/label.md)
+
 ## See Individual Component Docs
 
 Each component has detailed documentation in `docs/llm/phlex/{component}.md`.

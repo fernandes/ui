@@ -1,0 +1,16 @@
+<%# Label Component - Accessible label for form inputs %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @for_id = local_assigns.fetch(:for_id, nil)
+
+  # Extend behavior for shared logic
+  extend UI::LabelBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = label_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :label, all_attributes do %>
+  <%= content || yield %>
+<% end %>

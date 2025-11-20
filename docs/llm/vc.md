@@ -24,6 +24,14 @@ When ViewComponent support is added, components will follow this naming:
 - Phlex: `UI::Button::Button`
 - ViewComponent: `UI::Button::ButtonComponent`
 
+## Available Components
+
+- [Accordion](vc/accordion.md)
+- [Alert Dialog](vc/alert_dialog.md)
+- [Button](vc/button.md)
+- [Dialog](vc/dialog.md)
+- [Label](vc/label.md)
+
 ## See Also
 
 - Current supported formats: Phlex (primary), ERB (via Phlex rendering)
