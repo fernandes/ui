@@ -56,4 +56,8 @@ class ComponentsController < ApplicationController
   def radio_button
     # Renders app/views/components/radio_button.html.erb
   end
+
+  def tooltip
+    # Renders app/views/components/tooltip.html.erb
+  end
 end

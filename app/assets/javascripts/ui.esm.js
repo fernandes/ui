@@ -2343,6 +2343,120 @@ class CheckboxController extends Controller {
   }
 }
 
+class TooltipController extends Controller {
+  static targets=[ "trigger", "content" ];
+  static values={
+    sideOffset: {
+      type: Number,
+      default: 4
+    },
+    hoverDelay: {
+      type: Number,
+      default: 0
+    }
+  };
+  constructor() {
+    super(...arguments);
+    this.cleanup = null;
+    this.hoverTimeout = null;
+    this.isOpen = false;
+  }
+  connect() {
+    this.boundHandleEscape = this.handleEscape.bind(this);
+    document.addEventListener("keydown", this.boundHandleEscape);
+    if (this.hasContentTarget) {
+      this.content = this.contentTarget;
+      this.originalParent = this.content.parentNode;
+      requestAnimationFrame(() => {
+        if (this.content) {
+          document.body.appendChild(this.content);
+        }
+      });
+    }
+  }
+  disconnect() {
+    if (this.cleanup) {
+      this.cleanup();
+      this.cleanup = null;
+    }
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    if (this.content && this.content.parentNode === document.body) {
+      if (this.originalParent) {
+        this.originalParent.appendChild(this.content);
+      } else {
+        document.body.removeChild(this.content);
+      }
+    }
+    document.removeEventListener("keydown", this.boundHandleEscape);
+  }
+  show() {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    this.hoverTimeout = setTimeout(() => {
+      if (!this.content || !this.hasTriggerTarget) return;
+      this.isOpen = true;
+      this.content.setAttribute("data-state", "open");
+      this.updatePosition();
+    }, this.hoverDelayValue);
+  }
+  hide() {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    if (!this.content) return;
+    this.isOpen = false;
+    this.content.setAttribute("data-state", "closed");
+    if (this.cleanup) {
+      this.cleanup();
+      this.cleanup = null;
+    }
+  }
+  handleEscape(event) {
+    if (event.key === "Escape" && this.isOpen) {
+      this.hide();
+    }
+  }
+  updatePosition() {
+    if (!this.content || !this.hasTriggerTarget) return;
+    if (this.cleanup) {
+      this.cleanup();
+    }
+    const side = this.content.getAttribute("data-side") || "top";
+    const align = this.content.getAttribute("data-align") || "center";
+    const placement = align === "center" ? side : `${side}-${align}`;
+    const middleware = [ offset(this.sideOffsetValue), flip(), shift({
+      padding: 8
+    }) ];
+    this.cleanup = autoUpdate(this.triggerTarget, this.content, () => {
+      computePosition(this.triggerTarget, this.content, {
+        placement: placement,
+        middleware: middleware,
+        strategy: "absolute"
+      }).then(({x: x, y: y, placement: actualPlacement}) => {
+        Object.assign(this.content.style, {
+          position: "absolute",
+          left: `${x}px`,
+          top: `${y}px`
+        });
+        const actualSide = actualPlacement.split("-")[0];
+        this.content.setAttribute("data-side", actualSide);
+      });
+    }, {
+      ancestorScroll: true,
+      ancestorResize: true,
+      elementResize: true,
+      layoutShift: true,
+      animationFrame: true
+    });
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -2364,8 +2478,9 @@ function registerControllers(application) {
     "ui--alert-dialog": AlertDialogController,
     "ui--avatar": AvatarController,
     "ui--dialog": DialogController,
-    "ui--checkbox": CheckboxController
+    "ui--checkbox": CheckboxController,
+    "ui--tooltip": TooltipController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, DialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, DialogController, DropdownController, HelloController, TooltipController, registerControllers, registerControllersInto, version };

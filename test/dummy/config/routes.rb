@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   get "/components/input", to: "components#input"
   get "/components/label", to: "components#label"
   get "/components/radio_button", to: "components#radio_button"
+  get "/components/tooltip", to: "components#tooltip"
 
   # Mount Hotwire Spark for live reload in development
   mount Hotwire::Spark::Engine => "/spark" if Rails.env.development?

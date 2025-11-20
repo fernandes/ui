@@ -15,6 +15,7 @@ import AlertDialogController from "./controllers/alert_dialog_controller.js";
 import AvatarController from "./controllers/avatar_controller.js";
 import DialogController from "./controllers/dialog_controller.js";
 import CheckboxController from "./controllers/checkbox_controller.js";
+import TooltipController from "./controllers/tooltip_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -31,7 +32,8 @@ export function registerControllers(application) {
     "ui--alert-dialog": AlertDialogController,
     "ui--avatar": AvatarController,
     "ui--dialog": DialogController,
-    "ui--checkbox": CheckboxController
+    "ui--checkbox": CheckboxController,
+    "ui--tooltip": TooltipController
   });
 }
 
@@ -39,4 +41,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController, TooltipController };
