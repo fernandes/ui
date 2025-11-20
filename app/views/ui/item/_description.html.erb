@@ -1,0 +1,7 @@
+<% extend UI::Item::ItemDescriptionBehavior -%>
+<% @classes = local_assigns.fetch(:classes, "") -%>
+<% @attributes = local_assigns.except(:classes) -%>
+<% attrs = item_description_html_attributes -%>
+<p class="<%= attrs[:class] %>">
+  <%= yield %>
+</p>

@@ -1,0 +1,5 @@
+<% extend UI::Item::ItemSeparatorBehavior -%>
+<% @classes = local_assigns.fetch(:classes, "") -%>
+<% @attributes = local_assigns.except(:classes) -%>
+<% attrs = item_separator_html_attributes -%>
+<hr class="<%= attrs[:class] %>" data-slot="<%= attrs[:"data-slot"] %>" />

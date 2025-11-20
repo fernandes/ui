@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "/components/dialog", to: "components#dialog"
   get "/components/dropdown_menu", to: "components#dropdown_menu"
   get "/components/input", to: "components#input"
+  get "/components/item", to: "components#item"
   get "/components/label", to: "components#label"
   get "/components/radio_button", to: "components#radio_button"
   get "/components/tooltip", to: "components#tooltip"

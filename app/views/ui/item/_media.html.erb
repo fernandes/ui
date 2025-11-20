@@ -1,0 +1,8 @@
+<% extend UI::Item::ItemMediaBehavior -%>
+<% @variant = local_assigns.fetch(:variant, "default") -%>
+<% @classes = local_assigns.fetch(:classes, "") -%>
+<% @attributes = local_assigns.except(:variant, :classes) -%>
+<% attrs = item_media_html_attributes -%>
+<div class="<%= attrs[:class] %>" data-slot="<%= attrs[:"data-slot"] %>" data-variant="<%= attrs[:"data-variant"] %>">
+  <%= yield %>
+</div>

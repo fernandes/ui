@@ -1,0 +1,7 @@
+<% extend UI::Item::ItemFooterBehavior -%>
+<% @classes = local_assigns.fetch(:classes, "") -%>
+<% @attributes = local_assigns.except(:classes) -%>
+<% attrs = item_footer_html_attributes -%>
+<div class="<%= attrs[:class] %>">
+  <%= yield %>
+</div>

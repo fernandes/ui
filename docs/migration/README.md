@@ -70,6 +70,20 @@ Quick command to start component migration with all checks enforced.
 
 ### ✅ MUST DO
 
+#### API Reference Check
+```
+1. Visit shadcn/ui component page
+2. Find "API Reference" section
+3. Check if "asChild" prop is listed
+4. If YES → MUST implement asChild support
+5. If NO → Skip asChild implementation
+```
+
+**Why This Matters:**
+- shadcn/ui v4 documents `asChild` in API Reference for components that support it
+- Missing `asChild` breaks composition patterns (e.g., Item as link)
+- Prevents invalid HTML nesting (e.g., button inside button)
+
 #### Styling
 ```ruby
 # CORRECT: Tailwind only

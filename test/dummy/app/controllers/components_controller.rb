@@ -49,6 +49,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/input.html.erb
   end
 
+  def item
+    # Renders app/views/components/item.html.erb
+  end
+
   def label
     # Renders app/views/components/label.html.erb
   end

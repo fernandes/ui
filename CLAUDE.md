@@ -323,6 +323,22 @@ When implementing components, **always reference shadcn/ui and Radix UI**:
 2. **Behavior Reference**: https://www.radix-ui.com/primitives/docs/components/[component]
 3. **Source Code**: https://github.com/radix-ui/primitives/tree/main/packages/react/[component]/src
 
+**CRITICAL: Check API Reference for asChild**
+
+Before implementing any component, **ALWAYS check the shadcn/ui API Reference section**:
+
+1. Visit https://ui.shadcn.com/docs/components/[component]
+2. Find the "API Reference" section
+3. Check if `asChild` prop is listed
+4. **If `asChild` is listed → Component MUST implement it**
+5. **If `asChild` is NOT listed → Skip asChild implementation**
+
+**Why this matters:**
+- shadcn/ui v4 documents `asChild` in API Reference for components that support composition
+- Missing `asChild` breaks expected usage patterns (e.g., Item as link, Dialog Trigger as Button)
+- Prevents invalid HTML nesting (e.g., button inside button)
+- The API Reference is the SOURCE OF TRUTH for asChild requirement
+
 **Use browser dev tools** to inspect shadcn examples and extract:
 - Exact CSS classes used
 - HTML structure and nesting

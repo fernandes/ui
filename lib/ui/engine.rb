@@ -56,7 +56,7 @@ module UI
     # Include engine helpers in the host application
     initializer "ui.helpers" do
       ActiveSupport.on_load(:action_view) do
-        include LucideRails::LucideHelper
+        include LucideRails::LucideHelper if defined?(LucideRails::LucideHelper)
       end
     end
   end

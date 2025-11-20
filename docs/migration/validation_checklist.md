@@ -11,6 +11,12 @@ This checklist ensures component migrations maintain quality, consistency, and f
     - [ ] Learn about component anatomy (Anatomy Section)
     - [ ] Learn about each component part parameters on API Reference section
     - [ ] Check `Accessibility` section to learn its keyboard usage, so Usability agent can work on it
+- [ ] **Checked shadcn/ui API Reference section for `asChild` prop**
+    - [ ] If `asChild` is listed in API Reference, component MUST implement it
+    - [ ] Include `UI::Shared::AsChildBehavior` module
+    - [ ] Add `as_child: false` parameter to initialize
+    - [ ] Implement conditional rendering (yield attrs vs render element)
+    - [ ] Add showcase examples demonstrating asChild usage
 - [ ] Inspected live example in browser DevTools
 - [ ] Extracted HTML structure
 - [ ] Extracted all CSS classes
@@ -303,6 +309,79 @@ export { AvatarController };
 
 **⚠️ If you forget this, the controller will NOT load and component will NOT work!**
 
+## asChild Implementation (CRITICAL)
+
+**ALWAYS check shadcn/ui API Reference for `asChild` prop!**
+
+### When to Implement
+
+- [ ] **Checked API Reference section on shadcn/ui component page**
+- [ ] If `asChild` prop is listed → MUST implement it
+- [ ] If `asChild` prop is NOT listed → Skip this section
+
+### Implementation Checklist
+
+If `asChild` is required:
+
+- [ ] Include `UI::Shared::AsChildBehavior` in Phlex component
+- [ ] Include `UI::Shared::AsChildBehavior` in ViewComponent
+- [ ] Add `as_child: false` parameter to `initialize` method
+- [ ] Implement conditional rendering in `view_template` / `call`:
+  ```ruby
+  if @as_child
+    yield(component_attrs) if block_given?
+  else
+    div(**component_attrs, &block)  # or appropriate element
+  end
+  ```
+- [ ] Add `as_child` to `attr_reader` (ViewComponent only)
+- [ ] Add showcase examples demonstrating `asChild` usage
+- [ ] Test with custom element (e.g., `<a>` tag)
+- [ ] Verify attributes merge correctly
+
+### Example Implementation
+
+**Phlex:**
+```ruby
+class Item < Phlex::HTML
+  include UI::Item::ItemBehavior
+  include UI::Shared::AsChildBehavior
+
+  def initialize(variant: "default", as_child: false, **attributes)
+    @variant = variant
+    @as_child = as_child
+    @attributes = attributes
+  end
+
+  def view_template(&block)
+    item_attrs = item_html_attributes.merge(@attributes)
+
+    if @as_child
+      yield(item_attrs) if block_given?
+    else
+      div(**item_attrs, &block)
+    end
+  end
+end
+```
+
+**Usage in Showcase:**
+```erb
+<%= render UI::Item::Item.new(as_child: true) do |item_attrs| %>
+  <%= content_tag(:a, href: "#", **item_attrs) do %>
+    <%= render UI::Item::Content.new do %>
+      <%= render UI::Item::Title.new { "Click me" } %>
+    <% end %>
+  <% end %>
+<% end %>
+```
+
+### Reference Documentation
+
+- Pattern documentation: `docs/patterns/as_child.md`
+- Behavior module: `app/models/ui/shared/as_child_behavior.rb`
+- Live example: Dialog Trigger component
+
 ## Final Verification
 
 - [ ] Component works in isolation
@@ -311,6 +390,7 @@ export { AvatarController };
 - [ ] No visual glitches
 - [ ] Performance is acceptable
 - [ ] Matches shadcn/ui reference exactly
+- [ ] If `asChild` in API Reference → Implementation complete and tested
 
 ## Common Mistakes to Avoid
 
