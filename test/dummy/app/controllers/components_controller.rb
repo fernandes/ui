@@ -57,6 +57,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/label.html.erb
   end
 
+  def popover
+    # Renders app/views/components/popover.html.erb
+  end
+
   def radio_button
     # Renders app/views/components/radio_button.html.erb
   end

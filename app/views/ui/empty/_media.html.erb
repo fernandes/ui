@@ -1,0 +1,14 @@
+<%# EmptyMedia - Displays visual content %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @variant = local_assigns.fetch(:variant, "default")
+
+  extend UI::EmptyMediaBehavior
+
+  all_attributes = empty_media_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield if block_given? %>
+  <%= content if local_assigns[:content] %>
+<% end %>

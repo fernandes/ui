@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spinner Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Spinner Component</h1>
+      <p class="text-muted-foreground">An indicator that can be used to show a loading state</p>
+    </header>
+
+    <!-- Default Spinner -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Default</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="p-6 border rounded-lg">
+            <%= render UI::Spinner::Spinner.new %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="p-6 border rounded-lg">
+            <%= render UI::Spinner::SpinnerComponent.new %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="p-6 border rounded-lg">
+            <%= render "ui/spinner" %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Size Variants -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Sizes</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-6">
+            <%= render UI::Spinner::Spinner.new(size: "sm") %>
+            <%= render UI::Spinner::Spinner.new(size: "default") %>
+            <%= render UI::Spinner::Spinner.new(size: "lg") %>
+            <%= render UI::Spinner::Spinner.new(size: "xl") %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-6">
+            <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+            <%= render UI::Spinner::SpinnerComponent.new(size: "default") %>
+            <%= render UI::Spinner::SpinnerComponent.new(size: "lg") %>
+            <%= render UI::Spinner::SpinnerComponent.new(size: "xl") %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-6">
+            <%= render "ui/spinner", size: "sm" %>
+            <%= render "ui/spinner", size: "default" %>
+            <%= render "ui/spinner", size: "lg" %>
+            <%= render "ui/spinner", size: "xl" %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Color Variants -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Colors</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-6">
+            <%= render UI::Spinner::Spinner.new(classes: "text-primary") %>
+            <%= render UI::Spinner::Spinner.new(classes: "text-blue-500") %>
+            <%= render UI::Spinner::Spinner.new(classes: "text-green-500") %>
+            <%= render UI::Spinner::Spinner.new(classes: "text-red-500") %>
+            <%= render UI::Spinner::Spinner.new(classes: "text-yellow-500") %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-6">
+            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-primary") %>
+            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-blue-500") %>
+            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-green-500") %>
+            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-red-500") %>
+            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-yellow-500") %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-6">
+            <%= render "ui/spinner", classes: "text-primary" %>
+            <%= render "ui/spinner", classes: "text-blue-500" %>
+            <%= render "ui/spinner", classes: "text-green-500" %>
+            <%= render "ui/spinner", classes: "text-red-500" %>
+            <%= render "ui/spinner", classes: "text-yellow-500" %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- In Button -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">In Button (Loading State)</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-4">
+            <%= render UI::Button::Button.new(disabled: true) do %>
+              <%= render UI::Spinner::Spinner.new(size: "sm") %>
+              <span class="ml-2">Loading...</span>
+            <% end %>
+            <%= render UI::Button::Button.new(variant: "secondary", disabled: true) do %>
+              <%= render UI::Spinner::Spinner.new(size: "sm") %>
+              <span class="ml-2">Please wait</span>
+            <% end %>
+            <%= render UI::Button::Button.new(variant: "outline", disabled: true) do %>
+              <%= render UI::Spinner::Spinner.new(size: "sm") %>
+              <span class="ml-2">Processing</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-4">
+            <%= render UI::Button::ButtonComponent.new(disabled: true) do %>
+              <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+              <span class="ml-2">Loading...</span>
+            <% end %>
+            <%= render UI::Button::ButtonComponent.new(variant: "secondary", disabled: true) do %>
+              <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+              <span class="ml-2">Please wait</span>
+            <% end %>
+            <%= render UI::Button::ButtonComponent.new(variant: "outline", disabled: true) do %>
+              <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+              <span class="ml-2">Processing</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="p-6 border rounded-lg flex items-center gap-4">
+            <%= render "ui/button", disabled: true do %>
+              <%= render "ui/spinner", size: "sm" %>
+              <span class="ml-2">Loading...</span>
+            <% end %>
+            <%= render "ui/button", variant: "secondary", disabled: true do %>
+              <%= render "ui/spinner", size: "sm" %>
+              <span class="ml-2">Please wait</span>
+            <% end %>
+            <%= render "ui/button", variant: "outline", disabled: true do %>
+              <%= render "ui/spinner", size: "sm" %>
+              <span class="ml-2">Processing</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Text -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Text</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="p-6 border rounded-lg">
+            <div class="flex items-center gap-3">
+              <%= render UI::Spinner::Spinner.new %>
+              <span>Processing payment...</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="p-6 border rounded-lg">
+            <div class="flex items-center gap-3">
+              <%= render UI::Spinner::SpinnerComponent.new %>
+              <span>Processing payment...</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="p-6 border rounded-lg">
+            <div class="flex items-center gap-3">
+              <%= render "ui/spinner" %>
+              <span>Processing payment...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Centered -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Centered with Message</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="p-6 border rounded-lg">
+            <div class="flex flex-col items-center justify-center gap-4 p-8">
+              <%= render UI::Spinner::Spinner.new(size: "lg") %>
+              <div class="text-center">
+                <div class="font-medium">Processing your request</div>
+                <p class="text-sm text-muted-foreground">Please wait while we process your request.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="p-6 border rounded-lg">
+            <div class="flex flex-col items-center justify-center gap-4 p-8">
+              <%= render UI::Spinner::SpinnerComponent.new(size: "lg") %>
+              <div class="text-center">
+                <div class="font-medium">Processing your request</div>
+                <p class="text-sm text-muted-foreground">Please wait while we process your request.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="p-6 border rounded-lg">
+            <div class="flex flex-col items-center justify-center gap-4 p-8">
+              <%= render "ui/spinner", size: "lg" %>
+              <div class="text-center">
+                <div class="font-medium">Processing your request</div>
+                <p class="text-sm text-muted-foreground">Please wait while we process your request.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="pt-8 border-t">
+      <a href="/components" class="text-sm text-muted-foreground hover:text-foreground">← Back to Components</a>
+    </footer>
+  </div>
+</body>
+</html>

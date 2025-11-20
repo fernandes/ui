@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Empty Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-5xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Empty Component</h1>
+      <p class="text-muted-foreground">Displays empty states in applications with customizable media, titles, descriptions, and actions</p>
+    </header>
+
+    <!-- Basic Empty State -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Empty State</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <%= render UI::Empty::Empty.new do %>
+            <%= render UI::Empty::EmptyHeader.new do %>
+              <%= render UI::Empty::EmptyTitle.new { "No results found" } %>
+              <%= render UI::Empty::EmptyDescription.new { "Try adjusting your search criteria." } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <%= render UI::Empty::EmptyComponent.new do %>
+            <%= render UI::Empty::EmptyHeaderComponent.new do %>
+              <%= render(UI::Empty::EmptyTitleComponent.new) { "No results found" } %>
+              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "Try adjusting your search criteria." } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <%= render "ui/empty" do %>
+            <%= render "ui/empty/header" do %>
+              <%= render "ui/empty/title", content: "No results found" %>
+              <%= render "ui/empty/description", content: "Try adjusting your search criteria." %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Icon Media -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Icon Media</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <%= render UI::Empty::Empty.new do %>
+            <%= render UI::Empty::EmptyHeader.new do %>
+              <%= render UI::Empty::EmptyMedia.new(variant: "icon") do %>
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              <% end %>
+              <%= render UI::Empty::EmptyTitle.new { "No documents" } %>
+              <%= render UI::Empty::EmptyDescription.new { "You haven't created any documents yet." } %>
+            <% end %>
+            <%= render UI::Empty::EmptyContent.new do %>
+              <%= render UI::Button::Button.new { "Create Document" } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <%= render UI::Empty::EmptyComponent.new do %>
+            <%= render UI::Empty::EmptyHeaderComponent.new do %>
+              <%= render UI::Empty::EmptyMediaComponent.new(variant: "icon") do %>
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              <% end %>
+              <%= render(UI::Empty::EmptyTitleComponent.new) { "No documents" } %>
+              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "You haven't created any documents yet." } %>
+            <% end %>
+            <%= render UI::Empty::EmptyContentComponent.new do %>
+              <%= render(UI::Button::ButtonComponent.new) { "Create Document" } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <%= render "ui/empty" do %>
+            <%= render "ui/empty/header" do %>
+              <%= render "ui/empty/media", variant: "icon" do %>
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              <% end %>
+              <%= render "ui/empty/title", content: "No documents" %>
+              <%= render "ui/empty/description", content: "You haven't created any documents yet." %>
+            <% end %>
+            <%= render "ui/empty/content" do %>
+              <%= render "ui/button", content: "Create Document" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Outline Variant (With Border) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Outline Variant (With Border)</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <%= render UI::Empty::Empty.new(classes: "border border-dashed") do %>
+            <%= render UI::Empty::EmptyHeader.new do %>
+              <%= render UI::Empty::EmptyTitle.new { "No projects" } %>
+              <%= render UI::Empty::EmptyDescription.new { "Create a new project to get started." } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <%= render UI::Empty::EmptyComponent.new(classes: "border border-dashed") do %>
+            <%= render UI::Empty::EmptyHeaderComponent.new do %>
+              <%= render(UI::Empty::EmptyTitleComponent.new) { "No projects" } %>
+              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "Create a new project to get started." } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <%= render "ui/empty", classes: "border border-dashed" do %>
+            <%= render "ui/empty/header" do %>
+              <%= render "ui/empty/title", content: "No projects" %>
+              <%= render "ui/empty/description", content: "Create a new project to get started." %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Gradient Background -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Gradient Background</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <%= render UI::Empty::Empty.new(classes: "bg-gradient-to-b from-muted/50") do %>
+            <%= render UI::Empty::EmptyHeader.new do %>
+              <%= render UI::Empty::EmptyMedia.new(variant: "icon") do %>
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              <% end %>
+              <%= render UI::Empty::EmptyTitle.new { "No messages" } %>
+              <%= render UI::Empty::EmptyDescription.new { "Start a conversation to see messages here." } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <%= render UI::Empty::EmptyComponent.new(classes: "bg-gradient-to-b from-muted/50") do %>
+            <%= render UI::Empty::EmptyHeaderComponent.new do %>
+              <%= render UI::Empty::EmptyMediaComponent.new(variant: "icon") do %>
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              <% end %>
+              <%= render(UI::Empty::EmptyTitleComponent.new) { "No messages" } %>
+              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "Start a conversation to see messages here." } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <%= render "ui/empty", classes: "bg-gradient-to-b from-muted/50" do %>
+            <%= render "ui/empty/header" do %>
+              <%= render "ui/empty/media", variant: "icon" do %>
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              <% end %>
+              <%= render "ui/empty/title", content: "No messages" %>
+              <%= render "ui/empty/description", content: "Start a conversation to see messages here." %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Minimal (Title Only) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Minimal (Title Only)</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <%= render UI::Empty::Empty.new do %>
+            <%= render UI::Empty::EmptyHeader.new do %>
+              <%= render UI::Empty::EmptyTitle.new { "Nothing to see here" } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <%= render UI::Empty::EmptyComponent.new do %>
+            <%= render UI::Empty::EmptyHeaderComponent.new do %>
+              <%= render(UI::Empty::EmptyTitleComponent.new) { "Nothing to see here" } %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <%= render "ui/empty" do %>
+            <%= render "ui/empty/header" do %>
+              <%= render "ui/empty/title", content: "Nothing to see here" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <footer class="pt-8 border-t">
+      <a href="/components" class="text-sm text-muted-foreground hover:text-foreground">← Back to Components</a>
+    </footer>
+  </div>
+</body>
+</html>

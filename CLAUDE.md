@@ -591,3 +591,4 @@ This creates:
 - `Procfile.dev` (if not exists)
 - Updates `.gitignore`
 - Configures importmap (if using importmaps)
+- nao precisa dar rebuild no JS, acontece automatico

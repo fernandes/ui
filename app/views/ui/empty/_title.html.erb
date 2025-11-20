@@ -1,0 +1,13 @@
+<%# EmptyTitle - Displays the title %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::EmptyTitleBehavior
+
+  all_attributes = empty_title_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :h3, all_attributes do %>
+  <%= yield if block_given? %>
+  <%= content if local_assigns[:content] %>
+<% end %>

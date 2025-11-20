@@ -2352,6 +2352,177 @@
       });
     }
   }
+  class PopoverController extends stimulus.Controller {
+    static targets=[ "trigger", "content" ];
+    static values={
+      open: {
+        type: Boolean,
+        default: false
+      },
+      placement: {
+        type: String,
+        default: "bottom"
+      },
+      offset: {
+        type: Number,
+        default: 4
+      },
+      trigger: {
+        type: String,
+        default: "click"
+      },
+      hoverDelay: {
+        type: Number,
+        default: 200
+      }
+    };
+    constructor() {
+      super(...arguments);
+      this.cleanup = null;
+      this.hoverTimeout = null;
+    }
+    connect() {
+      console.log("placement", this.placementValue);
+      if (!this.hasTriggerTarget || !this.hasContentTarget) {
+        return;
+      }
+      if (!this.contentTarget.hasAttribute("data-state")) {
+        this.contentTarget.setAttribute("data-state", this.openValue ? "open" : "closed");
+      }
+      if (this.triggerValue === "click") {
+        this.setupClickTrigger();
+      } else if (this.triggerValue === "hover") {
+        this.setupHoverTrigger();
+      }
+      this.boundHandleEscape = this.handleEscape.bind(this);
+      document.addEventListener("keydown", this.boundHandleEscape);
+    }
+    disconnect() {
+      if (this.cleanup) {
+        this.cleanup();
+        this.cleanup = null;
+      }
+      if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = null;
+      }
+      document.removeEventListener("keydown", this.boundHandleEscape);
+      if (this.boundHandleClickOutside) {
+        document.removeEventListener("click", this.boundHandleClickOutside);
+      }
+      if (this.boundHandleTriggerClick) {
+        this.triggerTarget.removeEventListener("click", this.boundHandleTriggerClick);
+      }
+      if (this.boundHandleMouseEnter) {
+        this.triggerTarget.removeEventListener("mouseenter", this.boundHandleMouseEnter);
+        this.element.removeEventListener("mouseleave", this.boundHandleMouseLeave);
+      }
+    }
+    setupClickTrigger() {
+      this.boundHandleTriggerClick = this.toggle.bind(this);
+      this.triggerTarget.addEventListener("click", this.boundHandleTriggerClick);
+      this.boundHandleClickOutside = this.handleClickOutside.bind(this);
+      document.addEventListener("click", this.boundHandleClickOutside);
+    }
+    setupHoverTrigger() {
+      this.boundHandleMouseEnter = this.handleMouseEnter.bind(this);
+      this.boundHandleMouseLeave = this.handleMouseLeave.bind(this);
+      this.triggerTarget.addEventListener("mouseenter", this.boundHandleMouseEnter);
+      this.element.addEventListener("mouseleave", this.boundHandleMouseLeave);
+    }
+    toggle(event) {
+      event.stopPropagation();
+      this.openValue = !this.openValue;
+      if (this.openValue) {
+        this.show();
+      } else {
+        this.hide();
+      }
+    }
+    show() {
+      this.openValue = true;
+      this.contentTarget.setAttribute("data-state", "open");
+      this.updatePosition();
+      this.element.dispatchEvent(new CustomEvent("popover:show", {
+        bubbles: true,
+        detail: {
+          popover: this
+        }
+      }));
+    }
+    hide() {
+      this.openValue = false;
+      this.contentTarget.setAttribute("data-state", "closed");
+      if (this.cleanup) {
+        this.cleanup();
+        this.cleanup = null;
+      }
+      this.element.dispatchEvent(new CustomEvent("popover:hide", {
+        bubbles: true,
+        detail: {
+          popover: this
+        }
+      }));
+    }
+    handleClickOutside(event) {
+      if (!this.element.contains(event.target)) {
+        this.hide();
+      }
+    }
+    handleMouseEnter() {
+      if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+      }
+      this.hoverTimeout = setTimeout(() => {
+        this.show();
+      }, this.hoverDelayValue);
+    }
+    handleMouseLeave() {
+      if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = null;
+      }
+      this.hide();
+    }
+    handleEscape(event) {
+      if (event.key === "Escape" && this.openValue && this.hasContentTarget) {
+        this.hide();
+      }
+    }
+    updatePosition() {
+      if (!this.hasTriggerTarget || !this.hasContentTarget) return;
+      if (this.cleanup) {
+        this.cleanup();
+      }
+      const middleware = [];
+      if (this.offsetValue > 0) {
+        middleware.push(offset(this.offsetValue));
+      }
+      middleware.push(flip());
+      middleware.push(shift({
+        padding: 8
+      }));
+      this.cleanup = autoUpdate(this.triggerTarget, this.contentTarget, () => {
+        computePosition(this.triggerTarget, this.contentTarget, {
+          placement: this.placementValue,
+          middleware: middleware
+        }).then(({x: x, y: y, placement: placement, middlewareData: middlewareData}) => {
+          Object.assign(this.contentTarget.style, {
+            left: `${x}px`,
+            top: `${y}px`
+          });
+          const side = placement.split("-")[0];
+          this.contentTarget.setAttribute("data-side", side);
+        });
+      }, {
+        ancestorScroll: true,
+        ancestorResize: true,
+        elementResize: true,
+        layoutShift: true,
+        animationFrame: true
+      });
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -2372,7 +2543,8 @@
       "ui--avatar": AvatarController,
       "ui--dialog": DialogController,
       "ui--checkbox": CheckboxController,
-      "ui--tooltip": TooltipController
+      "ui--tooltip": TooltipController,
+      "ui--popover": PopoverController
     });
   }
   exports.AccordionController = AccordionController;
@@ -2382,6 +2554,7 @@
   exports.DialogController = DialogController;
   exports.DropdownController = DropdownController;
   exports.HelloController = HelloController;
+  exports.PopoverController = PopoverController;
   exports.TooltipController = TooltipController;
   exports.registerControllers = registerControllers;
   exports.registerControllersInto = registerControllersInto;
