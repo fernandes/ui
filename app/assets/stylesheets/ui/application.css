@@ -69,6 +69,39 @@
       opacity:1
     }
   }
+
+  /* Select viewport scrollbar hiding */
+  [data-radix-select-viewport] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  [data-radix-select-viewport]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ScrollArea viewport scrollbar hiding */
+  [data-ui-scroll-area-viewport] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  [data-ui-scroll-area-viewport]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ScrollArea scrollbar visibility */
+  [data-slot="scroll-area-scrollbar"] {
+    transition: opacity 300ms ease-out;
+  }
+  [data-slot="scroll-area-scrollbar"][data-state="hidden"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  [data-slot="scroll-area-scrollbar"][data-state="visible"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 :root {

@@ -560,6 +560,73 @@ const shift$1 = function(options) {
   };
 };
 
+const size$1 = function(options) {
+  if (options === void 0) {
+    options = {};
+  }
+  return {
+    name: "size",
+    options: options,
+    async fn(state) {
+      var _state$middlewareData, _state$middlewareData2;
+      const {placement: placement, rects: rects, platform: platform, elements: elements} = state;
+      const {apply: apply = () => {}, ...detectOverflowOptions} = evaluate(options, state);
+      const overflow = await detectOverflow(state, detectOverflowOptions);
+      const side = getSide(placement);
+      const alignment = getAlignment(placement);
+      const isYAxis = getSideAxis(placement) === "y";
+      const {width: width, height: height} = rects.floating;
+      let heightSide;
+      let widthSide;
+      if (side === "top" || side === "bottom") {
+        heightSide = side;
+        widthSide = alignment === (await (platform.isRTL == null ? void 0 : platform.isRTL(elements.floating)) ? "start" : "end") ? "left" : "right";
+      } else {
+        widthSide = side;
+        heightSide = alignment === "end" ? "top" : "bottom";
+      }
+      const maximumClippingHeight = height - overflow.top - overflow.bottom;
+      const maximumClippingWidth = width - overflow.left - overflow.right;
+      const overflowAvailableHeight = min(height - overflow[heightSide], maximumClippingHeight);
+      const overflowAvailableWidth = min(width - overflow[widthSide], maximumClippingWidth);
+      const noShift = !state.middlewareData.shift;
+      let availableHeight = overflowAvailableHeight;
+      let availableWidth = overflowAvailableWidth;
+      if ((_state$middlewareData = state.middlewareData.shift) != null && _state$middlewareData.enabled.x) {
+        availableWidth = maximumClippingWidth;
+      }
+      if ((_state$middlewareData2 = state.middlewareData.shift) != null && _state$middlewareData2.enabled.y) {
+        availableHeight = maximumClippingHeight;
+      }
+      if (noShift && !alignment) {
+        const xMin = max(overflow.left, 0);
+        const xMax = max(overflow.right, 0);
+        const yMin = max(overflow.top, 0);
+        const yMax = max(overflow.bottom, 0);
+        if (isYAxis) {
+          availableWidth = width - 2 * (xMin !== 0 || xMax !== 0 ? xMin + xMax : max(overflow.left, overflow.right));
+        } else {
+          availableHeight = height - 2 * (yMin !== 0 || yMax !== 0 ? yMin + yMax : max(overflow.top, overflow.bottom));
+        }
+      }
+      await apply({
+        ...state,
+        availableWidth: availableWidth,
+        availableHeight: availableHeight
+      });
+      const nextDimensions = await platform.getDimensions(elements.floating);
+      if (width !== nextDimensions.width || height !== nextDimensions.height) {
+        return {
+          reset: {
+            rects: true
+          }
+        };
+      }
+      return {};
+    }
+  };
+};
+
 function hasWindow() {
   return typeof window !== "undefined";
 }
@@ -1322,6 +1389,8 @@ const offset = offset$1;
 const shift = shift$1;
 
 const flip = flip$1;
+
+const size = size$1;
 
 const computePosition = (reference, floating, options) => {
   const cache = new Map;
@@ -2629,6 +2698,766 @@ class PopoverController extends Controller {
   }
 }
 
+class ScrollAreaController extends Controller {
+  static targets=[ "viewport", "scrollbar", "thumb" ];
+  static values={
+    type: {
+      type: String,
+      default: "hover"
+    },
+    scrollHideDelay: {
+      type: Number,
+      default: 600
+    }
+  };
+  constructor() {
+    super(...arguments);
+    this.rafId = null;
+    this.isDragging = false;
+    this.dragStartPointer = 0;
+    this.dragStartScroll = 0;
+    this.resizeObserver = null;
+    this.scrollbarStates = new Map;
+    this.hideTimers = new Map;
+    this.scrollEndTimers = new Map;
+  }
+  connect() {
+    this.applyViewportOverflow();
+    this.initializeScrollbarBehavior();
+    this.boundSyncThumbPosition = this.syncThumbPosition.bind(this);
+    this.startScrollSync();
+    this.setupResizeObserver();
+    this.setupScrollbarClickHandlers();
+    this.boundHandlePointerMove = this.handlePointerMove.bind(this);
+    this.boundHandlePointerUp = this.handlePointerUp.bind(this);
+  }
+  applyViewportOverflow() {
+    if (!this.hasViewportTarget) return;
+    const hasVertical = this.scrollbarTargets.some(sb => sb.dataset.orientation === "vertical");
+    const hasHorizontal = this.scrollbarTargets.some(sb => sb.dataset.orientation === "horizontal");
+    this.viewportTarget.style.overflowX = hasHorizontal ? "scroll" : "hidden";
+    this.viewportTarget.style.overflowY = hasVertical ? "scroll" : "hidden";
+  }
+  initializeScrollbarBehavior() {
+    this.scrollbarTargets.forEach(scrollbar => {
+      const orientation = scrollbar.dataset.orientation;
+      switch (this.typeValue) {
+       case "hover":
+        this.initializeHoverScrollbar(scrollbar);
+        break;
+
+       case "scroll":
+        this.initializeScrollScrollbar(scrollbar, orientation);
+        break;
+
+       case "auto":
+        this.initializeAutoScrollbar(scrollbar, orientation);
+        break;
+
+       case "always":
+        this.initializeAlwaysScrollbar(scrollbar, orientation);
+        break;
+      }
+    });
+  }
+  initializeHoverScrollbar(scrollbar) {
+    scrollbar.dataset.state = "hidden";
+    const handlePointerEnter = () => {
+      const timer = this.hideTimers.get(scrollbar);
+      if (timer) {
+        clearTimeout(timer);
+        this.hideTimers.delete(scrollbar);
+      }
+      scrollbar.dataset.state = "visible";
+    };
+    const handlePointerLeave = () => {
+      const timer = setTimeout(() => {
+        scrollbar.dataset.state = "hidden";
+        this.hideTimers.delete(scrollbar);
+      }, this.scrollHideDelayValue);
+      this.hideTimers.set(scrollbar, timer);
+    };
+    this.element.addEventListener("pointerenter", handlePointerEnter);
+    this.element.addEventListener("pointerleave", handlePointerLeave);
+    if (!this.cleanupFunctions) this.cleanupFunctions = [];
+    this.cleanupFunctions.push(() => {
+      this.element.removeEventListener("pointerenter", handlePointerEnter);
+      this.element.removeEventListener("pointerleave", handlePointerLeave);
+    });
+  }
+  initializeScrollScrollbar(scrollbar, orientation) {
+    this.scrollbarStates.set(scrollbar, "hidden");
+    scrollbar.dataset.state = "hidden";
+    const scrollDirection = orientation === "horizontal" ? "scrollLeft" : "scrollTop";
+    let prevScrollPos = this.viewportTarget[scrollDirection];
+    const sendEvent = event => {
+      const state = this.scrollbarStates.get(scrollbar);
+      switch (state) {
+       case "hidden":
+        if (event === "SCROLL") {
+          this.scrollbarStates.set(scrollbar, "scrolling");
+          scrollbar.dataset.state = "visible";
+        }
+        break;
+
+       case "scrolling":
+        if (event === "SCROLL_END") {
+          this.scrollbarStates.set(scrollbar, "idle");
+          const timer = setTimeout(() => {
+            if (this.scrollbarStates.get(scrollbar) === "idle") {
+              this.scrollbarStates.set(scrollbar, "hidden");
+              scrollbar.dataset.state = "hidden";
+            }
+          }, this.scrollHideDelayValue);
+          this.hideTimers.set(scrollbar, timer);
+        } else if (event === "POINTER_ENTER") {
+          this.scrollbarStates.set(scrollbar, "interacting");
+        }
+        break;
+
+       case "interacting":
+        if (event === "POINTER_LEAVE") {
+          this.scrollbarStates.set(scrollbar, "idle");
+          const timer = setTimeout(() => {
+            if (this.scrollbarStates.get(scrollbar) === "idle") {
+              this.scrollbarStates.set(scrollbar, "hidden");
+              scrollbar.dataset.state = "hidden";
+            }
+          }, this.scrollHideDelayValue);
+          this.hideTimers.set(scrollbar, timer);
+        }
+        break;
+
+       case "idle":
+        if (event === "SCROLL") {
+          this.scrollbarStates.set(scrollbar, "scrolling");
+          const timer = this.hideTimers.get(scrollbar);
+          if (timer) {
+            clearTimeout(timer);
+            this.hideTimers.delete(scrollbar);
+          }
+        } else if (event === "POINTER_ENTER") {
+          this.scrollbarStates.set(scrollbar, "interacting");
+          const timer = this.hideTimers.get(scrollbar);
+          if (timer) {
+            clearTimeout(timer);
+            this.hideTimers.delete(scrollbar);
+          }
+        }
+        break;
+      }
+    };
+    const debounceScrollEnd = () => {
+      const timer = this.scrollEndTimers.get(scrollbar);
+      if (timer) clearTimeout(timer);
+      const newTimer = setTimeout(() => {
+        sendEvent("SCROLL_END");
+        this.scrollEndTimers.delete(scrollbar);
+      }, 100);
+      this.scrollEndTimers.set(scrollbar, newTimer);
+    };
+    const handleScroll = () => {
+      const scrollPos = this.viewportTarget[scrollDirection];
+      if (prevScrollPos !== scrollPos) {
+        sendEvent("SCROLL");
+        debounceScrollEnd();
+      }
+      prevScrollPos = scrollPos;
+    };
+    const handlePointerEnter = () => sendEvent("POINTER_ENTER");
+    const handlePointerLeave = () => sendEvent("POINTER_LEAVE");
+    this.viewportTarget.addEventListener("scroll", handleScroll);
+    scrollbar.addEventListener("pointerenter", handlePointerEnter);
+    scrollbar.addEventListener("pointerleave", handlePointerLeave);
+    if (!this.cleanupFunctions) this.cleanupFunctions = [];
+    this.cleanupFunctions.push(() => {
+      this.viewportTarget.removeEventListener("scroll", handleScroll);
+      scrollbar.removeEventListener("pointerenter", handlePointerEnter);
+      scrollbar.removeEventListener("pointerleave", handlePointerLeave);
+      const timer = this.scrollEndTimers.get(scrollbar);
+      if (timer) clearTimeout(timer);
+      const hideTimer = this.hideTimers.get(scrollbar);
+      if (hideTimer) clearTimeout(hideTimer);
+    });
+  }
+  initializeAutoScrollbar(scrollbar, orientation) {
+    this.updateAutoScrollbar(scrollbar, orientation);
+  }
+  updateAutoScrollbar(scrollbar, orientation) {
+    if (!this.hasViewportTarget) return;
+    let hasOverflow = false;
+    if (orientation === "horizontal") {
+      hasOverflow = this.viewportTarget.scrollWidth > this.viewportTarget.clientWidth;
+    } else {
+      hasOverflow = this.viewportTarget.scrollHeight > this.viewportTarget.clientHeight;
+    }
+    scrollbar.dataset.state = hasOverflow ? "visible" : "hidden";
+  }
+  initializeAlwaysScrollbar(scrollbar, orientation) {
+    this.updateAlwaysScrollbar(scrollbar, orientation);
+  }
+  updateAlwaysScrollbar(scrollbar, orientation) {
+    if (!this.hasViewportTarget) return;
+    let hasOverflow = false;
+    if (orientation === "horizontal") {
+      hasOverflow = this.viewportTarget.scrollWidth > this.viewportTarget.clientWidth;
+    } else {
+      hasOverflow = this.viewportTarget.scrollHeight > this.viewportTarget.clientHeight;
+    }
+    scrollbar.dataset.state = hasOverflow ? "visible" : "hidden";
+  }
+  startScrollSync() {
+    const sync = () => {
+      this.syncThumbPosition();
+      this.rafId = requestAnimationFrame(sync);
+    };
+    this.rafId = requestAnimationFrame(sync);
+  }
+  setupResizeObserver() {
+    if (!this.hasViewportTarget) return;
+    this.resizeObserver = new ResizeObserver(() => {
+      this.scrollbarTargets.forEach(scrollbar => {
+        const orientation = scrollbar.dataset.orientation;
+        if (this.typeValue === "auto") {
+          this.updateAutoScrollbar(scrollbar, orientation);
+        } else if (this.typeValue === "always") {
+          this.updateAlwaysScrollbar(scrollbar, orientation);
+        }
+      });
+      this.updateThumbSize();
+    });
+    this.resizeObserver.observe(this.viewportTarget);
+    if (this.viewportTarget.firstElementChild) {
+      this.resizeObserver.observe(this.viewportTarget.firstElementChild);
+    }
+  }
+  setupScrollbarClickHandlers() {
+    this.scrollbarTargets.forEach((scrollbar, index) => {
+      const handleScrollbarClick = event => {
+        if (event.target.closest('[data-ui--scroll-area-target="thumb"]')) {
+          return;
+        }
+        const orientation = scrollbar.dataset.orientation;
+        const thumb = this.thumbTargets[index];
+        if (!thumb) return;
+        const viewport = this.viewportTarget;
+        const rect = scrollbar.getBoundingClientRect();
+        if (orientation === "horizontal") {
+          const clickX = event.clientX - rect.left;
+          const scrollbarWidth = scrollbar.clientWidth;
+          const contentWidth = viewport.scrollWidth;
+          const viewportWidth = viewport.clientWidth;
+          const scrollableWidth = contentWidth - viewportWidth;
+          const ratio = clickX / scrollbarWidth;
+          viewport.scrollLeft = ratio * scrollableWidth;
+        } else {
+          const clickY = event.clientY - rect.top;
+          const scrollbarHeight = scrollbar.clientHeight;
+          const contentHeight = viewport.scrollHeight;
+          const viewportHeight = viewport.clientHeight;
+          const scrollableHeight = contentHeight - viewportHeight;
+          const ratio = clickY / scrollbarHeight;
+          viewport.scrollTop = ratio * scrollableHeight;
+        }
+      };
+      scrollbar.addEventListener("click", handleScrollbarClick);
+      if (!this.cleanupFunctions) this.cleanupFunctions = [];
+      this.cleanupFunctions.push(() => {
+        scrollbar.removeEventListener("click", handleScrollbarClick);
+      });
+    });
+  }
+  syncThumbPosition() {
+    if (!this.hasViewportTarget) return;
+    this.scrollbarTargets.forEach((scrollbar, index) => {
+      const orientation = scrollbar.dataset.orientation;
+      const thumb = this.thumbTargets[index];
+      if (!thumb) return;
+      if (orientation === "horizontal") {
+        this.updateHorizontalThumb(scrollbar, thumb);
+      } else {
+        this.updateVerticalThumb(scrollbar, thumb);
+      }
+    });
+  }
+  updateVerticalThumb(scrollbar, thumb) {
+    const viewport = this.viewportTarget;
+    const contentHeight = viewport.scrollHeight;
+    const viewportHeight = viewport.clientHeight;
+    if (contentHeight <= viewportHeight) {
+      return;
+    }
+    const scrollbarHeight = scrollbar.clientHeight;
+    const scrollbarPadding = 2;
+    const availableHeight = scrollbarHeight - scrollbarPadding;
+    const thumbRatio = viewportHeight / contentHeight;
+    const thumbHeight = Math.max(18, availableHeight * thumbRatio);
+    const scrollableHeight = contentHeight - viewportHeight;
+    const scrollRatio = scrollableHeight > 0 ? viewport.scrollTop / scrollableHeight : 0;
+    const maxThumbTop = availableHeight - thumbHeight;
+    const thumbTop = scrollRatio * maxThumbTop;
+    thumb.style.height = `${thumbHeight}px`;
+    thumb.style.transform = `translate3d(0, ${thumbTop}px, 0)`;
+  }
+  updateHorizontalThumb(scrollbar, thumb) {
+    const viewport = this.viewportTarget;
+    const contentWidth = viewport.scrollWidth;
+    const viewportWidth = viewport.clientWidth;
+    if (contentWidth <= viewportWidth) {
+      return;
+    }
+    const scrollbarWidth = scrollbar.clientWidth;
+    const scrollbarPadding = 2;
+    const availableWidth = scrollbarWidth - scrollbarPadding;
+    const thumbRatio = viewportWidth / contentWidth;
+    const thumbWidth = Math.max(18, availableWidth * thumbRatio);
+    const scrollableWidth = contentWidth - viewportWidth;
+    const scrollRatio = scrollableWidth > 0 ? viewport.scrollLeft / scrollableWidth : 0;
+    const maxThumbLeft = availableWidth - thumbWidth;
+    const thumbLeft = scrollRatio * maxThumbLeft;
+    thumb.style.width = `${thumbWidth}px`;
+    thumb.style.transform = `translate3d(${thumbLeft}px, 0, 0)`;
+  }
+  updateThumbSize() {
+    if (!this.hasViewportTarget) return;
+    this.scrollbarTargets.forEach((scrollbar, index) => {
+      const orientation = scrollbar.dataset.orientation;
+      const thumb = this.thumbTargets[index];
+      if (!thumb) return;
+      if (orientation === "horizontal") {
+        const contentWidth = this.viewportTarget.scrollWidth;
+        const viewportWidth = this.viewportTarget.clientWidth;
+        const scrollbarWidth = scrollbar.clientWidth;
+        const scrollbarPadding = 2;
+        const availableWidth = scrollbarWidth - scrollbarPadding;
+        const thumbRatio = viewportWidth / contentWidth;
+        const thumbWidth = Math.max(18, availableWidth * thumbRatio);
+        thumb.style.width = `${thumbWidth}px`;
+      } else {
+        const contentHeight = this.viewportTarget.scrollHeight;
+        const viewportHeight = this.viewportTarget.clientHeight;
+        const scrollbarHeight = scrollbar.clientHeight;
+        const scrollbarPadding = 2;
+        const availableHeight = scrollbarHeight - scrollbarPadding;
+        const thumbRatio = viewportHeight / contentHeight;
+        const thumbHeight = Math.max(18, availableHeight * thumbRatio);
+        thumb.style.height = `${thumbHeight}px`;
+      }
+    });
+  }
+  startDrag(event) {
+    event.preventDefault();
+    const thumb = event.currentTarget;
+    const index = this.thumbTargets.indexOf(thumb);
+    const scrollbar = this.scrollbarTargets[index];
+    const orientation = scrollbar.dataset.orientation;
+    this.isDragging = true;
+    this.currentScrollbar = scrollbar;
+    this.currentThumb = thumb;
+    this.currentOrientation = orientation;
+    this.prevWebkitUserSelect = document.body.style.webkitUserSelect;
+    document.body.style.webkitUserSelect = "none";
+    if (orientation === "horizontal") {
+      this.dragStartPointer = event.clientX;
+      this.dragStartScroll = this.viewportTarget.scrollLeft;
+    } else {
+      this.dragStartPointer = event.clientY;
+      this.dragStartScroll = this.viewportTarget.scrollTop;
+    }
+    if (this.viewportTarget) {
+      this.viewportTarget.style.scrollBehavior = "auto";
+    }
+    document.addEventListener("pointermove", this.boundHandlePointerMove);
+    document.addEventListener("pointerup", this.boundHandlePointerUp);
+    thumb.setPointerCapture(event.pointerId);
+  }
+  handlePointerMove(event) {
+    if (!this.isDragging) return;
+    const viewport = this.viewportTarget;
+    const scrollbar = this.currentScrollbar;
+    const thumb = this.currentThumb;
+    const orientation = this.currentOrientation;
+    if (orientation === "horizontal") {
+      const deltaX = event.clientX - this.dragStartPointer;
+      const scrollbarWidth = scrollbar.clientWidth;
+      const contentWidth = viewport.scrollWidth;
+      const viewportWidth = viewport.clientWidth;
+      const scrollableWidth = contentWidth - viewportWidth;
+      const thumbWidth = parseFloat(thumb.style.width) || 18;
+      const scrollbarPadding = 2;
+      const maxThumbLeft = scrollbarWidth - scrollbarPadding - thumbWidth;
+      const scrollDelta = maxThumbLeft > 0 ? deltaX / maxThumbLeft * scrollableWidth : 0;
+      viewport.scrollLeft = this.dragStartScroll + scrollDelta;
+    } else {
+      const deltaY = event.clientY - this.dragStartPointer;
+      const scrollbarHeight = scrollbar.clientHeight;
+      const contentHeight = viewport.scrollHeight;
+      const viewportHeight = viewport.clientHeight;
+      const scrollableHeight = contentHeight - viewportHeight;
+      const thumbHeight = parseFloat(thumb.style.height) || 18;
+      const scrollbarPadding = 2;
+      const maxThumbTop = scrollbarHeight - scrollbarPadding - thumbHeight;
+      const scrollDelta = maxThumbTop > 0 ? deltaY / maxThumbTop * scrollableHeight : 0;
+      viewport.scrollTop = this.dragStartScroll + scrollDelta;
+    }
+  }
+  handlePointerUp(event) {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+    document.body.style.webkitUserSelect = this.prevWebkitUserSelect;
+    if (this.viewportTarget) {
+      this.viewportTarget.style.scrollBehavior = "";
+    }
+    this.currentScrollbar = null;
+    this.currentThumb = null;
+    this.currentOrientation = null;
+    document.removeEventListener("pointermove", this.boundHandlePointerMove);
+    document.removeEventListener("pointerup", this.boundHandlePointerUp);
+  }
+  disconnect() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (this.cleanupFunctions) {
+      this.cleanupFunctions.forEach(fn => fn());
+      this.cleanupFunctions = [];
+    }
+    document.removeEventListener("pointermove", this.boundHandlePointerMove);
+    document.removeEventListener("pointerup", this.boundHandlePointerUp);
+    this.hideTimers.forEach(timer => clearTimeout(timer));
+    this.hideTimers.clear();
+    this.scrollEndTimers.forEach(timer => clearTimeout(timer));
+    this.scrollEndTimers.clear();
+  }
+}
+
+class SelectController extends Controller {
+  static targets=[ "trigger", "content", "item", "valueDisplay", "hiddenInput", "scrollUpButton", "scrollDownButton", "viewport", "itemCheck" ];
+  static values={
+    value: String,
+    open: {
+      type: Boolean,
+      default: false
+    }
+  };
+  constructor() {
+    super(...arguments);
+    this.scrollInterval = null;
+    this.boundHandleClickOutside = null;
+  }
+  connect() {
+    if (this.valueValue) {
+      this.updateDisplay(this.valueValue);
+      this.updateSelection(this.valueValue);
+    }
+    this.contentTarget.dataset.state = "closed";
+    this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.boundHandleScroll = this.handleScroll.bind(this);
+    if (this.hasViewportTarget) {
+      this.viewportTarget.addEventListener("scroll", this.boundHandleScroll, {
+        passive: true
+      });
+    }
+  }
+  toggle(event) {
+    event?.preventDefault();
+    if (this.openValue) {
+      this.close();
+    } else {
+      this.open();
+    }
+  }
+  async open() {
+    this.openValue = true;
+    this.contentTarget.dataset.state = "open";
+    this.triggerTarget.setAttribute("aria-expanded", "true");
+    await this.updatePosition();
+    this.boundHandleClickOutside = this.handleClickOutside.bind(this);
+    setTimeout(() => {
+      document.addEventListener("click", this.boundHandleClickOutside);
+      document.addEventListener("keydown", this.boundHandleKeydown);
+    }, 0);
+    setTimeout(() => {
+      this.handleScroll();
+    }, 50);
+    this.focusItem(this.getSelectedItem() || this.getFirstItem());
+  }
+  close() {
+    this.openValue = false;
+    this.contentTarget.dataset.state = "closed";
+    this.triggerTarget.setAttribute("aria-expanded", "false");
+    if (this.boundHandleClickOutside) {
+      document.removeEventListener("click", this.boundHandleClickOutside);
+      document.removeEventListener("keydown", this.boundHandleKeydown);
+      this.boundHandleClickOutside = null;
+    }
+    this.triggerTarget.focus();
+  }
+  async updatePosition() {
+    const maxHeight = 384;
+    const {x: x, y: y, middlewareData: middlewareData, placement: placement} = await computePosition(this.triggerTarget, this.contentTarget, {
+      placement: "bottom-start",
+      middleware: [ offset(4), flip(), shift({
+        padding: 8
+      }), size({
+        apply({availableHeight: availableHeight, availableWidth: availableWidth, elements: elements, rects: rects}) {
+          const contentHeight = Math.min(maxHeight, Math.max(200, availableHeight - 16));
+          elements.floating.style.maxHeight = `${contentHeight}px`;
+          elements.floating.style.setProperty("--ui-select-content-available-width", `${availableWidth}px`);
+          elements.floating.style.setProperty("--ui-select-content-available-height", `${contentHeight}px`);
+          elements.floating.style.setProperty("--ui-select-trigger-width", `${rects.reference.width}px`);
+          elements.floating.style.setProperty("--ui-select-trigger-height", `${rects.reference.height}px`);
+        }
+      }) ]
+    });
+    Object.assign(this.contentTarget.style, {
+      left: `${x}px`,
+      top: `${y}px`,
+      position: "absolute"
+    });
+    const side = placement.split("-")[0];
+    this.contentTarget.dataset.side = side;
+  }
+  selectItem(event) {
+    if (!event || !event.currentTarget) return;
+    const item = event.currentTarget;
+    const value = item.dataset.value;
+    if (item.dataset.disabled === "true") return;
+    this.valueValue = value;
+    this.updateDisplay(value);
+    this.updateSelection(value);
+    if (this.hasHiddenInputTarget) {
+      this.hiddenInputTarget.value = value;
+      this.hiddenInputTarget.dispatchEvent(new Event("change", {
+        bubbles: true
+      }));
+    }
+    this.close();
+  }
+  updateDisplay(value) {
+    const selectedItem = this.itemTargets.find(item => item.dataset.value === value);
+    if (selectedItem && this.hasValueDisplayTarget) {
+      const span = selectedItem.querySelector("span:first-child");
+      this.valueDisplayTarget.textContent = span ? span.textContent.trim() : selectedItem.textContent.trim();
+    }
+  }
+  updateSelection(value) {
+    this.itemTargets.forEach((item, index) => {
+      const isSelected = item.dataset.value === value;
+      item.setAttribute("aria-selected", isSelected);
+      item.dataset.state = isSelected ? "checked" : "unchecked";
+      const checks = item.querySelectorAll('[data-ui--select-target="itemCheck"]');
+      checks.forEach(check => {
+        if (isSelected) {
+          check.classList.remove("opacity-0");
+          check.classList.add("opacity-100");
+        } else {
+          check.classList.remove("opacity-100");
+          check.classList.add("opacity-0");
+        }
+      });
+      item.classList.remove("bg-accent", "text-accent-foreground");
+    });
+  }
+  handleClickOutside(event) {
+    if (!this.element.contains(event.target)) {
+      this.close();
+    }
+  }
+  handleKeydown(event) {
+    if (!this.openValue) return;
+    const currentItem = this.getFocusedItem();
+    switch (event.key) {
+     case "ArrowDown":
+      event.preventDefault();
+      this.focusNextItem(currentItem);
+      break;
+
+     case "ArrowUp":
+      event.preventDefault();
+      this.focusPreviousItem(currentItem);
+      break;
+
+     case "Enter":
+     case " ":
+      event.preventDefault();
+      if (currentItem) {
+        currentItem.click();
+      }
+      break;
+
+     case "Escape":
+      event.preventDefault();
+      this.close();
+      break;
+
+     case "Home":
+      event.preventDefault();
+      this.focusItem(this.getFirstItem());
+      break;
+
+     case "End":
+      event.preventDefault();
+      this.focusItem(this.getLastItem());
+      break;
+    }
+  }
+  getFocusedItem() {
+    return this.itemTargets.find(item => item.classList.contains("bg-accent") || item.classList.contains("text-accent-foreground"));
+  }
+  getSelectedItem() {
+    return this.itemTargets.find(item => item.getAttribute("aria-selected") === "true");
+  }
+  getFirstItem() {
+    return this.getEnabledItems()[0];
+  }
+  getLastItem() {
+    const items = this.getEnabledItems();
+    return items[items.length - 1];
+  }
+  getEnabledItems() {
+    return this.itemTargets.filter(item => item.dataset.disabled !== "true");
+  }
+  focusItem(item, scrollDirection = null) {
+    if (!item) return;
+    this.itemTargets.forEach(i => {
+      i.classList.remove("bg-accent", "text-accent-foreground");
+      delete i.dataset.highlighted;
+    });
+    item.classList.add("bg-accent", "text-accent-foreground");
+    item.dataset.highlighted = "true";
+    const items = this.getEnabledItems();
+    const isFirstItem = item === items[0];
+    const isLastItem = item === items[items.length - 1];
+    if (isFirstItem && this.hasScrollUpButtonTarget) {
+      this.scrollUpButtonTarget.style.display = "none";
+    }
+    if (isLastItem && this.hasScrollDownButtonTarget) {
+      this.scrollDownButtonTarget.style.display = "none";
+    }
+    if (scrollDirection === "down" && !isLastItem) {
+      if (this.hasViewportTarget) {
+        const viewport = this.viewportTarget;
+        const itemRect = item.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+        const targetBottom = viewportRect.bottom - 24;
+        if (itemRect.bottom > targetBottom) {
+          const scrollAmount = itemRect.bottom - targetBottom;
+          viewport.scrollTop += scrollAmount;
+        }
+      }
+    } else if (scrollDirection === "up" && !isFirstItem) {
+      if (this.hasViewportTarget) {
+        const viewport = this.viewportTarget;
+        const itemRect = item.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+        const targetTop = viewportRect.top + 24;
+        if (itemRect.top < targetTop) {
+          const scrollAmount = targetTop - itemRect.top;
+          viewport.scrollTop -= scrollAmount;
+        }
+      }
+    } else {
+      item.scrollIntoView({
+        block: "nearest",
+        behavior: "auto"
+      });
+    }
+  }
+  focusNextItem(currentItem) {
+    const items = this.getEnabledItems();
+    if (items.length === 0) return;
+    if (!currentItem) {
+      this.focusItem(items[0], "down");
+      return;
+    }
+    const currentIndex = items.indexOf(currentItem);
+    if (currentIndex >= items.length - 1) {
+      return;
+    }
+    const nextIndex = currentIndex + 1;
+    this.focusItem(items[nextIndex], "down");
+  }
+  focusPreviousItem(currentItem) {
+    const items = this.getEnabledItems();
+    if (items.length === 0) return;
+    if (!currentItem) {
+      this.focusItem(items[items.length - 1], "up");
+      return;
+    }
+    const currentIndex = items.indexOf(currentItem);
+    if (currentIndex <= 0) {
+      return;
+    }
+    const previousIndex = currentIndex - 1;
+    this.focusItem(items[previousIndex], "up");
+  }
+  scrollUp() {
+    if (!this.scrollInterval) {
+      this.scrollInterval = setInterval(() => {
+        if (this.hasViewportTarget) {
+          this.viewportTarget.scrollTop -= 5;
+        }
+      }, 16);
+    }
+  }
+  scrollDown() {
+    if (!this.scrollInterval) {
+      this.scrollInterval = setInterval(() => {
+        if (this.hasViewportTarget) {
+          this.viewportTarget.scrollTop += 5;
+        }
+      }, 16);
+    }
+  }
+  stopScroll() {
+    if (this.scrollInterval) {
+      clearInterval(this.scrollInterval);
+      this.scrollInterval = null;
+    }
+  }
+  handleScroll() {
+    if (!this.hasViewportTarget) return;
+    const viewport = this.viewportTarget;
+    viewport.scrollTop <= 0;
+    const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+    const isAtBottom = Math.ceil(viewport.scrollTop) >= maxScroll;
+    const focusedItem = this.getFocusedItem();
+    const items = this.getEnabledItems();
+    focusedItem === items[0];
+    const isLastItemFocused = focusedItem === items[items.length - 1];
+    if (this.hasScrollUpButtonTarget) {
+      const canScrollUp = viewport.scrollTop > 0;
+      this.scrollUpButtonTarget.style.display = canScrollUp ? "flex" : "none";
+    }
+    if (this.hasScrollDownButtonTarget) {
+      this.scrollDownButtonTarget.style.display = isAtBottom || isLastItemFocused ? "none" : "flex";
+    }
+  }
+  handleItemMouseEnter(event) {
+    if (!this.openValue) return;
+    const item = event.currentTarget;
+    if (item.dataset.disabled === "true") return;
+    this.focusItem(item);
+  }
+  handleItemMouseLeave(event) {}
+  disconnect() {
+    this.stopScroll();
+    if (this.boundHandleClickOutside) {
+      document.removeEventListener("click", this.boundHandleClickOutside);
+      document.removeEventListener("keydown", this.boundHandleKeydown);
+    }
+    if (this.boundHandleScroll && this.hasViewportTarget) {
+      this.viewportTarget.removeEventListener("scroll", this.boundHandleScroll);
+    }
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -2652,8 +3481,10 @@ function registerControllers(application) {
     "ui--dialog": DialogController,
     "ui--checkbox": CheckboxController,
     "ui--tooltip": TooltipController,
-    "ui--popover": PopoverController
+    "ui--popover": PopoverController,
+    "ui--scroll-area": ScrollAreaController,
+    "ui--select": SelectController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, DialogController, DropdownController, HelloController, PopoverController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, DialogController, DropdownController, HelloController, PopoverController, ScrollAreaController, SelectController, TooltipController, registerControllers, registerControllersInto, version };

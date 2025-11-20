@@ -25,6 +25,8 @@ Rails.application.routes.draw do
   get "/components/label", to: "components#label"
   get "/components/popover", to: "components#popover"
   get "/components/radio_button", to: "components#radio_button"
+  get "/components/scroll_area", to: "components#scroll_area"
+  get "/components/select", to: "components#select"
   get "/components/spinner", to: "components#spinner"
   get "/components/textarea", to: "components#textarea"
   get "/components/tooltip", to: "components#tooltip"

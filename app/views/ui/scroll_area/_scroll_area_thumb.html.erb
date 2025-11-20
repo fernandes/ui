@@ -1,0 +1,44 @@
+<%# ScrollArea Thumb - Draggable scroll indicator %>
+<%
+  @as_child = local_assigns.fetch(:as_child, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::ScrollAreaThumbBehavior
+
+  # Get HTML attributes from behavior
+  thumb_attrs = scroll_area_thumb_html_attributes.deep_merge(@attributes)
+
+  # Add Stimulus target and action for drag
+  thumb_attrs[:data][:"ui--scroll-area-target"] = "thumb"
+  thumb_attrs[:data][:action] = "pointerdown->ui--scroll-area#startDrag"
+-%>
+<% if @as_child %>
+  <%# asChild mode: capture block and inject attributes into first element %>
+  <% captured_content = capture { yield } %>
+  <%= raw captured_content.sub(/(<[a-z][a-z0-9]*)([\s>])/i) { |match|
+    tag_start = $1
+    tag_end = $2
+
+    # Build attributes string manually
+    attrs_array = thumb_attrs.map do |key, value|
+      key_name = key.to_s.gsub('_', '-')
+      if key == :data && value.is_a?(Hash)
+        # Handle data attributes
+        value.map { |k, v| "data-#{k.to_s.gsub('_', '-')}=\"#{ERB::Util.html_escape(v)}\"" }.join(" ")
+      elsif value.is_a?(TrueClass)
+        key_name
+      elsif value.is_a?(FalseClass) || value.nil?
+        nil
+      else
+        "#{key_name}=\"#{ERB::Util.html_escape(value)}\""
+      end
+    end.compact.join(" ")
+
+    "#{tag_start} #{attrs_array}#{tag_end}"
+  } %>
+<% else %>
+  <%# Default mode: render as div %>
+  <%= content_tag :div, "", thumb_attrs %>
+<% end %>

@@ -1,0 +1,212 @@
+<div class="container mx-auto py-8">
+  <div class="space-y-8">
+    <!-- Header -->
+    <div>
+      <h1 class="text-4xl font-bold">Select</h1>
+      <p class="text-muted-foreground mt-2">
+        A custom select component with keyboard navigation, scrollable viewport, and form integration.
+      </p>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Example</h2>
+      <div class="max-w-xs">
+        <%= render "ui/select/select", value: "apple" do %>
+          <%= render "ui/select/select_trigger", placeholder: "Select a fruit..." %>
+          <%= render "ui/select/select_content" do %>
+            <%= render "ui/select/select_item", value: "apple" do %>Apple<% end %>
+            <%= render "ui/select/select_item", value: "banana" do %>Banana<% end %>
+            <%= render "ui/select/select_item", value: "orange" do %>Orange<% end %>
+            <%= render "ui/select/select_item", value: "grape" do %>Grape<% end %>
+            <%= render "ui/select/select_item", value: "mango" do %>Mango<% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Scrollable Example (Critical Test) -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">Scrollable Example - Timezones</h2>
+      <p class="text-muted-foreground text-sm">
+        This example tests the critical viewport height fix with 30+ items. The viewport should:
+      </p>
+      <ul class="text-muted-foreground text-sm list-disc list-inside">
+        <li>Maintain fixed height based on trigger height</li>
+        <li>Hide scrollbar completely</li>
+        <li>Show scroll up/down buttons when appropriate</li>
+        <li>Support smooth keyboard navigation</li>
+      </ul>
+
+      <div class="max-w-xs">
+        <%= render "ui/select/select", value: "america/new_york" do %>
+          <%= render "ui/select/select_trigger", placeholder: "Select timezone..." %>
+          <%= render "ui/select/select_content" do %>
+            <%= render "ui/select/select_group" do %>
+              <%= render "ui/select/select_label" do %>North America<% end %>
+              <%= render "ui/select/select_item", value: "america/new_york" do %>Eastern Time (ET)<% end %>
+              <%= render "ui/select/select_item", value: "america/chicago" do %>Central Time (CT)<% end %>
+              <%= render "ui/select/select_item", value: "america/denver" do %>Mountain Time (MT)<% end %>
+              <%= render "ui/select/select_item", value: "america/phoenix" do %>Mountain Time - Arizona<% end %>
+              <%= render "ui/select/select_item", value: "america/los_angeles" do %>Pacific Time (PT)<% end %>
+              <%= render "ui/select/select_item", value: "america/anchorage" do %>Alaska Time (AKT)<% end %>
+              <%= render "ui/select/select_item", value: "pacific/honolulu" do %>Hawaii Time (HT)<% end %>
+            <% end %>
+
+            <%= render "ui/select/select_group" do %>
+              <%= render "ui/select/select_label" do %>Europe<% end %>
+              <%= render "ui/select/select_item", value: "europe/london" do %>London (GMT)<% end %>
+              <%= render "ui/select/select_item", value: "europe/paris" do %>Paris (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/berlin" do %>Berlin (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/rome" do %>Rome (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/madrid" do %>Madrid (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/amsterdam" do %>Amsterdam (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/brussels" do %>Brussels (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/vienna" do %>Vienna (CET)<% end %>
+              <%= render "ui/select/select_item", value: "europe/warsaw" do %>Warsaw (CET)<% end %>
+            <% end %>
+
+            <%= render "ui/select/select_group" do %>
+              <%= render "ui/select/select_label" do %>Asia<% end %>
+              <%= render "ui/select/select_item", value: "asia/dubai" do %>Dubai (GST)<% end %>
+              <%= render "ui/select/select_item", value: "asia/kolkata" do %>Mumbai (IST)<% end %>
+              <%= render "ui/select/select_item", value: "asia/shanghai" do %>Shanghai (CST)<% end %>
+              <%= render "ui/select/select_item", value: "asia/hong_kong" do %>Hong Kong (HKT)<% end %>
+              <%= render "ui/select/select_item", value: "asia/tokyo" do %>Tokyo (JST)<% end %>
+              <%= render "ui/select/select_item", value: "asia/seoul" do %>Seoul (KST)<% end %>
+              <%= render "ui/select/select_item", value: "asia/singapore" do %>Singapore (SGT)<% end %>
+              <%= render "ui/select/select_item", value: "asia/bangkok" do %>Bangkok (ICT)<% end %>
+              <%= render "ui/select/select_item", value: "asia/jakarta" do %>Jakarta (WIB)<% end %>
+            <% end %>
+
+            <%= render "ui/select/select_group" do %>
+              <%= render "ui/select/select_label" do %>Oceania<% end %>
+              <%= render "ui/select/select_item", value: "australia/sydney" do %>Sydney (AEDT)<% end %>
+              <%= render "ui/select/select_item", value: "australia/melbourne" do %>Melbourne (AEDT)<% end %>
+              <%= render "ui/select/select_item", value: "australia/brisbane" do %>Brisbane (AEST)<% end %>
+              <%= render "ui/select/select_item", value: "australia/perth" do %>Perth (AWST)<% end %>
+              <%= render "ui/select/select_item", value: "pacific/auckland" do %>Auckland (NZDT)<% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- With Disabled Items -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Disabled Items</h2>
+      <div class="max-w-xs">
+        <%= render "ui/select/select", value: "react" do %>
+          <%= render "ui/select/select_trigger", placeholder: "Select framework..." %>
+          <%= render "ui/select/select_content" do %>
+            <%= render "ui/select/select_item", value: "react" do %>React<% end %>
+            <%= render "ui/select/select_item", value: "vue" do %>Vue<% end %>
+            <%= render "ui/select/select_item", value: "angular", disabled: true do %>Angular (Coming Soon)<% end %>
+            <%= render "ui/select/select_item", value: "svelte" do %>Svelte<% end %>
+            <%= render "ui/select/select_item", value: "solid", disabled: true do %>Solid (Coming Soon)<% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- With asChild Pattern -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">With asChild Pattern (Composition)</h2>
+      <p class="text-muted-foreground text-sm">
+        The <code class="px-1 py-0.5 bg-muted border rounded text-xs">as_child</code> parameter enables composition by passing component attributes to a child element.
+      </p>
+
+      <div class="space-y-4">
+        <h3 class="font-medium">asChild with Trigger (Custom Button)</h3>
+        <div class="max-w-xs">
+          <%= render "ui/select/select", value: "pro" do %>
+            <%= render "ui/select/select_trigger", as_child: true, placeholder: "Select plan..." do %>
+              <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span data-ui--select-target="valueDisplay">Select plan...</span>
+              </button>
+            <% end %>
+            <%= render "ui/select/select_content" do %>
+              <%= render "ui/select/select_item", value: "free" do %>Free - $0/mo<% end %>
+              <%= render "ui/select/select_item", value: "pro" do %>Pro - $10/mo<% end %>
+              <%= render "ui/select/select_item", value: "enterprise" do %>Enterprise - $50/mo<% end %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <h3 class="font-medium">asChild with Item (As Link)</h3>
+        <p class="text-muted-foreground text-xs">
+          Note: This is a demo. In production, items as links wouldn't work with the Select's interactive behavior.
+        </p>
+        <div class="max-w-xs">
+          <%= render "ui/select/select", value: "dashboard" do %>
+            <%= render "ui/select/select_trigger", placeholder: "Navigate..." %>
+            <%= render "ui/select/select_content" do %>
+              <%= render "ui/select/select_item", value: "dashboard", as_child: true do %>
+                <a href="#dashboard" class="flex items-center gap-2">
+                  <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect width="7" height="9" x="3" y="3" rx="1"/>
+                    <rect width="7" height="5" x="14" y="3" rx="1"/>
+                    <rect width="7" height="9" x="14" y="12" rx="1"/>
+                    <rect width="7" height="5" x="3" y="16" rx="1"/>
+                  </svg>
+                  <span class="flex-1">Dashboard</span>
+                </a>
+              <% end %>
+              <%= render "ui/select/select_item", value: "settings", as_child: true do %>
+                <a href="#settings" class="flex items-center gap-2">
+                  <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  <span class="flex-1">Settings</span>
+                </a>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Testing Guide -->
+    <div class="mt-12 rounded-lg border border-border bg-muted/50 p-6 space-y-4">
+      <h2 class="text-lg font-semibold">Testing Guide</h2>
+
+      <div class="space-y-2">
+        <h3 class="font-medium">Visual Tests</h3>
+        <ul class="text-sm text-muted-foreground list-disc list-inside space-y-1">
+          <li>✅ Viewport should maintain fixed height (matching trigger height)</li>
+          <li>✅ Scrollbar should be completely hidden</li>
+          <li>✅ Scroll buttons should appear/disappear based on scroll position</li>
+          <li>✅ Scroll buttons should have no absolute positioning (flex layout)</li>
+          <li>✅ Content should animate smoothly (fade + zoom)</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="font-medium">Keyboard Navigation Tests</h3>
+        <ul class="text-sm text-muted-foreground list-disc list-inside space-y-1">
+          <li><kbd class="px-1 py-0.5 bg-muted border rounded text-xs">↓</kbd> / <kbd class="px-1 py-0.5 bg-muted border rounded text-xs">↑</kbd> Navigate through items</li>
+          <li><kbd class="px-1 py-0.5 bg-muted border rounded text-xs">Home</kbd> / <kbd class="px-1 py-0.5 bg-muted border rounded text-xs">End</kbd> Jump to first/last item</li>
+          <li><kbd class="px-1 py-0.5 bg-muted border rounded text-xs">Enter</kbd> / <kbd class="px-1 py-0.5 bg-muted border rounded text-xs">Space</kbd> Select focused item</li>
+          <li><kbd class="px-1 py-0.5 bg-muted border rounded text-xs">Esc</kbd> Close dropdown</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="font-medium">Scroll Button Tests</h3>
+        <ul class="text-sm text-muted-foreground list-disc list-inside space-y-1">
+          <li>Hover over scroll buttons to trigger auto-scroll</li>
+          <li>Scroll up button should hide when at top</li>
+          <li>Scroll down button should hide when at bottom</li>
+          <li>Buttons should hide when first/last item is keyboard-focused</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

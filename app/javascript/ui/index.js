@@ -17,6 +17,8 @@ import DialogController from "./controllers/dialog_controller.js";
 import CheckboxController from "./controllers/checkbox_controller.js";
 import TooltipController from "./controllers/tooltip_controller.js";
 import PopoverController from "./controllers/popover_controller.js";
+import ScrollAreaController from "./controllers/scroll_area_controller.js";
+import SelectController from "./controllers/select_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -35,7 +37,9 @@ export function registerControllers(application) {
     "ui--dialog": DialogController,
     "ui--checkbox": CheckboxController,
     "ui--tooltip": TooltipController,
-    "ui--popover": PopoverController
+    "ui--popover": PopoverController,
+    "ui--scroll-area": ScrollAreaController,
+    "ui--select": SelectController
   });
 }
 
@@ -43,4 +47,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController, TooltipController, PopoverController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController, TooltipController, PopoverController, ScrollAreaController, SelectController };

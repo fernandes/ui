@@ -1,0 +1,25 @@
+<%# Select Content - Dropdown container that holds items and groups %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::SelectContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = select_content_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= render "ui/select/select_scroll_up_button" %>
+
+  <%# Select Viewport - uses native scrollbar (hidden via CSS) like Radix/shadcn %>
+  <div data-radix-select-viewport
+       data-ui--select-target="viewport"
+       data-action="scroll->ui--select#handleScroll"
+       class="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:ring-ring/50 p-1"
+       style="overflow-y: auto; overflow-x: hidden;">
+    <%= yield %>
+  </div>
+
+  <%= render "ui/select/select_scroll_down_button" %>
+<% end %>

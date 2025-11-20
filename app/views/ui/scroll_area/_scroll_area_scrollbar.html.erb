@@ -1,0 +1,50 @@
+<%# ScrollArea Scrollbar - Custom scrollbar track %>
+<%
+  @as_child = local_assigns.fetch(:as_child, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @orientation = local_assigns.fetch(:orientation, "vertical")
+
+  # Extend behavior for shared logic
+  extend ::UI::ScrollAreaScrollbarBehavior
+
+  # Get HTML attributes from behavior
+  scrollbar_attrs = scroll_area_scrollbar_html_attributes.deep_merge(@attributes)
+
+  # Add Stimulus target
+  scrollbar_attrs[:data][:"ui--scroll-area-target"] = "scrollbar"
+  # Note: data-state is managed by Stimulus controller based on type (hover/scroll/auto/always)
+-%>
+<% if @as_child %>
+  <%# asChild mode: capture block and inject attributes into first element %>
+  <% captured_content = capture do %>
+    <%= yield %>
+    <%= render "ui/scroll_area/scroll_area_thumb" unless block_given? %>
+  <% end %>
+  <%= raw captured_content.sub(/(<[a-z][a-z0-9]*)([\s>])/i) { |match|
+    tag_start = $1
+    tag_end = $2
+
+    # Build attributes string manually
+    attrs_array = scrollbar_attrs.map do |key, value|
+      key_name = key.to_s.gsub('_', '-')
+      if key == :data && value.is_a?(Hash)
+        # Handle data attributes
+        value.map { |k, v| "data-#{k.to_s.gsub('_', '-')}=\"#{ERB::Util.html_escape(v)}\"" }.join(" ")
+      elsif value.is_a?(TrueClass)
+        key_name
+      elsif value.is_a?(FalseClass) || value.nil?
+        nil
+      else
+        "#{key_name}=\"#{ERB::Util.html_escape(value)}\""
+      end
+    end.compact.join(" ")
+
+    "#{tag_start} #{attrs_array}#{tag_end}"
+  } %>
+<% else %>
+  <%# Default mode: render as div %>
+  <%= content_tag :div, scrollbar_attrs do %>
+    <%= render "ui/scroll_area/scroll_area_thumb" %>
+  <% end %>
+<% end %>

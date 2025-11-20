@@ -1,0 +1,141 @@
+<div class="container mx-auto py-8">
+  <div class="space-y-8">
+    <!-- Header -->
+    <div>
+      <h1 class="text-4xl font-bold">Scroll Area</h1>
+      <p class="text-muted-foreground mt-2">
+        Augments native scroll functionality for custom, cross-browser styling.
+      </p>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Example</h2>
+      <%= render "ui/scroll_area/scroll_area", classes: "h-[200px] w-[350px] rounded-md border p-4" do %>
+        <div class="space-y-4">
+          <h3 class="text-sm font-semibold">Tags</h3>
+          <div class="space-y-1">
+            <% %w[v1.2.0 v1.1.0 v1.0.0 v0.9.0 v0.8.0 v0.7.0 v0.6.0 v0.5.0 v0.4.0 v0.3.0].each do |tag| %>
+              <div class="text-sm text-muted-foreground"><%= tag %></div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Horizontal Scrolling -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">Horizontal Scrolling</h2>
+      <div class="relative w-96 whitespace-nowrap rounded-md border" data-controller="ui--scroll-area">
+        <div data-ui-scroll-area-viewport data-ui--scroll-area-target="viewport" class="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:ring-ring/50" style="overflow-x: scroll; overflow-y: hidden;">
+          <div style="min-width: 100%; display: table;">
+            <div class="flex w-max space-x-4 p-4">
+              <% 10.times do |i| %>
+                <div class="h-[200px] w-[200px] rounded-md bg-muted flex items-center justify-center shrink-0">
+                  <span class="text-4xl font-semibold text-muted-foreground"><%= i + 1 %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <%= render "ui/scroll_area/scroll_area_scrollbar", orientation: "horizontal" %>
+      </div>
+    </div>
+
+    <!-- With Custom Sizes -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Custom Sizes</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h3 class="text-sm font-medium mb-2">Small (h-24)</h3>
+          <%= render "ui/scroll_area/scroll_area", classes: "h-24 w-full rounded-md border p-4" do %>
+            <div class="space-y-2">
+              <% 10.times do |i| %>
+                <div class="text-sm">Item <%= i + 1 %></div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-2">Large (h-96)</h3>
+          <%= render "ui/scroll_area/scroll_area", classes: "h-96 w-full rounded-md border p-4" do %>
+            <div class="space-y-2">
+              <% 50.times do |i| %>
+                <div class="text-sm">Item <%= i + 1 %></div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Long Content Example -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">Long Content</h2>
+      <%= render "ui/scroll_area/scroll_area", classes: "h-[400px] w-full max-w-2xl rounded-md border p-6" do %>
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold">About Scroll Area</h3>
+          <p class="text-sm text-muted-foreground">
+            The Scroll Area component provides a consistent scrolling experience across different browsers and platforms.
+            It hides the native scrollbar and provides a custom styled scrollbar that maintains accessibility and keyboard navigation.
+          </p>
+
+          <h4 class="text-base font-semibold mt-6">Key Features</h4>
+          <ul class="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+            <li>Cross-browser compatibility with consistent styling</li>
+            <li>Native scrolling behavior for performance</li>
+            <li>Keyboard navigation support</li>
+            <li>Touch-friendly on mobile devices</li>
+            <li>Customizable scrollbar appearance</li>
+            <li>Support for both vertical and horizontal scrolling</li>
+          </ul>
+
+          <h4 class="text-base font-semibold mt-6">Usage</h4>
+          <p class="text-sm text-muted-foreground">
+            Simply wrap your content in a Scroll Area component and specify the dimensions. The scrollbar will
+            automatically appear when the content overflows.
+          </p>
+
+          <h4 class="text-base font-semibold mt-6">Implementation Details</h4>
+          <p class="text-sm text-muted-foreground">
+            The component uses CSS to hide the native scrollbar while maintaining native scroll functionality.
+            This ensures optimal performance and accessibility. The custom scrollbar is rendered separately
+            and positioned to match the scroll position.
+          </p>
+
+          <h4 class="text-base font-semibold mt-6">Browser Support</h4>
+          <p class="text-sm text-muted-foreground">
+            Works in all modern browsers including Chrome, Firefox, Safari, and Edge. The implementation
+            uses standard CSS properties with vendor prefixes for maximum compatibility.
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Testing Guide -->
+    <div class="mt-12 rounded-lg border border-border bg-muted/50 p-6 space-y-4">
+      <h2 class="text-lg font-semibold">Testing Guide</h2>
+
+      <div class="space-y-2">
+        <h3 class="font-medium">Visual Tests</h3>
+        <ul class="text-sm text-muted-foreground list-disc list-inside space-y-1">
+          <li>✅ Native scrollbar should be completely hidden</li>
+          <li>✅ Custom scrollbar should appear on the right (vertical) or bottom (horizontal)</li>
+          <li>✅ Scrollbar should have subtle border and rounded thumb</li>
+          <li>✅ Content should scroll smoothly</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="font-medium">Interaction Tests</h3>
+        <ul class="text-sm text-muted-foreground list-disc list-inside space-y-1">
+          <li>Mouse wheel scrolling should work naturally</li>
+          <li>Click and drag the scrollbar thumb</li>
+          <li>Keyboard navigation (↑↓ or ←→ keys)</li>
+          <li>Touch scrolling on mobile devices</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

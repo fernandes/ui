@@ -1,0 +1,15 @@
+<%# Select Component - Radix-style custom select with trigger and dropdown %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @value = local_assigns.fetch(:value, nil)
+
+  # Extend behavior for shared logic
+  extend ::UI::SelectBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = select_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>
