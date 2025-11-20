@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Input Group Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-5xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Input Group Component</h1>
+      <p class="text-muted-foreground">A wrapper component for grouping inputs with addons, buttons, and text</p>
+    </header>
+
+    <!-- Basic Input -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Input</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Input.new(placeholder: "Enter your email") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(placeholder: "Enter your email") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_input", placeholder: "Enter your email" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Icon Addon -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Icon Addon</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-start") do %>
+                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              <% end %>
+              <%= render UI::InputGroup::Input.new(placeholder: "Search...") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-start") do %>
+                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              <% end %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(placeholder: "Search...") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-start" do %>
+                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              <% end %>
+              <%= render "ui/input_group/input_group_input", placeholder: "Search..." %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Text Addon (Currency) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Text Addon - Currency</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-start") do %>
+                <%= render UI::InputGroup::Text.new { "$" } %>
+              <% end %>
+              <%= render UI::InputGroup::Input.new(type: "number", placeholder: "0.00") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-start") do %>
+                <%= render(UI::InputGroup::InputGroupTextComponent.new) { "$" } %>
+              <% end %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(type: "number", placeholder: "0.00") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-start" do %>
+                <%= render "ui/input_group/input_group_text", content: "$" %>
+              <% end %>
+              <%= render "ui/input_group/input_group_input", type: "number", placeholder: "0.00" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Button Addon -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Button Addon</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Input.new(placeholder: "Enter URL") %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-end") do %>
+                <%= render UI::InputGroup::Button.new(size: "icon-xs") do %>
+                  <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(placeholder: "Enter URL") %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-end") do %>
+                <%= render(UI::InputGroup::InputGroupButtonComponent.new(size: "icon-xs")) do %>
+                  <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_input", placeholder: "Enter URL" %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-end" do %>
+                <%= render "ui/input_group/input_group_button", size: "icon-xs" do %>
+                  <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Both Addons (Prefix + Suffix) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Both Addons (Prefix + Suffix)</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-start") do %>
+                <%= render UI::InputGroup::Text.new { "https://" } %>
+              <% end %>
+              <%= render UI::InputGroup::Input.new(placeholder: "example.com") %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-end") do %>
+                <%= render UI::InputGroup::Text.new { ".com" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-start") do %>
+                <%= render(UI::InputGroup::InputGroupTextComponent.new) { "https://" } %>
+              <% end %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(placeholder: "example.com") %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-end") do %>
+                <%= render(UI::InputGroup::InputGroupTextComponent.new) { ".com" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-start" do %>
+                <%= render "ui/input_group/input_group_text", content: "https://" %>
+              <% end %>
+              <%= render "ui/input_group/input_group_input", placeholder: "example.com" %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-end" do %>
+                <%= render "ui/input_group/input_group_text", content: ".com" %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Username Input (@) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Username Input (@)</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-start") do %>
+                <%= render UI::InputGroup::Text.new { "@" } %>
+              <% end %>
+              <%= render UI::InputGroup::Input.new(type: "email", placeholder: "username") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-start") do %>
+                <%= render(UI::InputGroup::InputGroupTextComponent.new) { "@" } %>
+              <% end %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(type: "email", placeholder: "username") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-start" do %>
+                <%= render "ui/input_group/input_group_text", content: "@" %>
+              <% end %>
+              <%= render "ui/input_group/input_group_input", type: "email", placeholder: "username" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Amount with Currency -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Amount with Currency</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-start") do %>
+                <%= render UI::InputGroup::Text.new { "$" } %>
+              <% end %>
+              <%= render UI::InputGroup::Input.new(type: "number", placeholder: "0.00") %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-end") do %>
+                <%= render UI::InputGroup::Text.new { "USD" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-start") do %>
+                <%= render(UI::InputGroup::InputGroupTextComponent.new) { "$" } %>
+              <% end %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(type: "number", placeholder: "0.00") %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-end") do %>
+                <%= render(UI::InputGroup::InputGroupTextComponent.new) { "USD" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-start" do %>
+                <%= render "ui/input_group/input_group_text", content: "$" %>
+              <% end %>
+              <%= render "ui/input_group/input_group_input", type: "number", placeholder: "0.00" %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-end" do %>
+                <%= render "ui/input_group/input_group_text", content: "USD" %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Textarea with Block Addon -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Textarea with Block Addon</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Textarea.new(placeholder: "Write your message...", rows: 4) %>
+              <%= render UI::InputGroup::Addon.new(align: "block-end") do %>
+                <%= render UI::InputGroup::Button.new { "Send" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupTextareaComponent.new(placeholder: "Write your message...", rows: 4) %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "block-end") do %>
+                <%= render(UI::InputGroup::InputGroupButtonComponent.new) { "Send" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_textarea", placeholder: "Write your message...", attributes: { rows: 4 } %>
+              <%= render "ui/input_group/input_group_addon", align: "block-end" do %>
+                <%= render "ui/input_group/input_group_button", content: "Send" %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Label -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Label</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Addon.new(align: "block-start") do %>
+                <%= render UI::Label::Label.new(for: "email-phlex") { "Email address" } %>
+              <% end %>
+              <%= render UI::InputGroup::Input.new(id: "email-phlex", placeholder: "you@example.com") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "block-start") do %>
+                <%= render(UI::Label::LabelComponent.new(for: "email-vc")) { "Email address" } %>
+              <% end %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(id: "email-vc", placeholder: "you@example.com") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_addon", align: "block-start" do %>
+                <%= render "ui/label/label", for: "email-erb", content: "Email address" %>
+              <% end %>
+              <%= render "ui/input_group/input_group_input", attributes: { id: "email-erb" }, placeholder: "you@example.com" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Spinner (Loading State) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Spinner (Loading State)</h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-3">Phlex</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroup.new do %>
+              <%= render UI::InputGroup::Input.new(placeholder: "Processing...", disabled: true) %>
+              <%= render UI::InputGroup::Addon.new(align: "inline-end") do %>
+                <%= render UI::Spinner::Spinner.new(size: "sm") %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
+          <div class="max-w-md">
+            <%= render UI::InputGroup::InputGroupComponent.new do %>
+              <%= render UI::InputGroup::InputGroupInputComponent.new(placeholder: "Processing...", disabled: true) %>
+              <%= render UI::InputGroup::InputGroupAddonComponent.new(align: "inline-end") do %>
+                <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-3">ERB Partial</h3>
+          <div class="max-w-md">
+            <%= render "ui/input_group/input_group" do %>
+              <%= render "ui/input_group/input_group_input", placeholder: "Processing...", attributes: { disabled: true } %>
+              <%= render "ui/input_group/input_group_addon", align: "inline-end" do %>
+                <%= render "ui/spinner", size: "sm" %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="pt-8 border-t">
+      <a href="/components" class="text-sm text-muted-foreground hover:text-foreground">← Back to Components</a>
+    </footer>
+  </div>
+</body>
+</html>

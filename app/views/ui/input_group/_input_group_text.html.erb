@@ -1,0 +1,15 @@
+<%# InputGroupText - shadcn/ui inspired component for Rails %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::InputGroupTextBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = input_group_text_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :span, all_attributes do %>
+  <%= content || yield %>
+<% end %>

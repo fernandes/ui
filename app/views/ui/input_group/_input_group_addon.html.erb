@@ -1,0 +1,15 @@
+<%# InputGroupAddon - shadcn/ui inspired component for Rails %>
+<%
+  @align = local_assigns.fetch(:align, "inline-start")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::InputGroupAddonBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = input_group_addon_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

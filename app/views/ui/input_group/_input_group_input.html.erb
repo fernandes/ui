@@ -1,0 +1,17 @@
+<%# InputGroupInput - shadcn/ui inspired component for Rails %>
+<%
+  @type = local_assigns.fetch(:type, "text")
+  @placeholder = local_assigns.fetch(:placeholder, nil)
+  @value = local_assigns.fetch(:value, nil)
+  @name = local_assigns.fetch(:name, nil)
+  @id = local_assigns.fetch(:id, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::InputGroupInputBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = input_group_input_html_attributes.deep_merge(@attributes)
+-%>
+<%= render "ui/input/input", **all_attributes %>

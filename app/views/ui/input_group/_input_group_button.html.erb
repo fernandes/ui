@@ -1,0 +1,18 @@
+<%# InputGroupButton - shadcn/ui inspired component for Rails %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @size = local_assigns.fetch(:size, "xs")
+  @variant = local_assigns.fetch(:variant, "ghost")
+  @type = local_assigns.fetch(:type, "button")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::InputGroupButtonBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = input_group_button_html_attributes.deep_merge(@attributes)
+-%>
+<%= render "ui/button", **all_attributes do %>
+  <%= content || yield %>
+<% end %>

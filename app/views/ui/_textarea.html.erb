@@ -1,0 +1,16 @@
+<%# Textarea - shadcn/ui inspired component for Rails %>
+<%
+  @name = local_assigns.fetch(:name, nil)
+  @placeholder = local_assigns.fetch(:placeholder, "")
+  @value = local_assigns.fetch(:value, "")
+  @rows = local_assigns.fetch(:rows, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::TextareaBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = textarea_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :textarea, @value, all_attributes %>

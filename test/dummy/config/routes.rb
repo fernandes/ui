@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   get "/components/dropdown_menu", to: "components#dropdown_menu"
   get "/components/empty", to: "components#empty"
   get "/components/input", to: "components#input"
+  get "/components/input_group", to: "components#input_group"
   get "/components/item", to: "components#item"
   get "/components/label", to: "components#label"
   get "/components/popover", to: "components#popover"
