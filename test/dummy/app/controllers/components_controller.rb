@@ -69,6 +69,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/select.html.erb
   end
 
+  def separator
+    # Renders app/views/components/separator.html.erb
+  end
+
   def tooltip
     # Renders app/views/components/tooltip.html.erb
   end
