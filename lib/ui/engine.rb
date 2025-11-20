@@ -52,5 +52,12 @@ module UI
     initializer "ui.asset_paths" do |app|
       config.paths["app/assets"] << "app/assets/builds"
     end
+
+    # Include engine helpers in the host application
+    initializer "ui.helpers" do
+      ActiveSupport.on_load(:action_view) do
+        include LucideRails::LucideHelper
+      end
+    end
   end
 end
