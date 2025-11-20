@@ -2320,6 +2320,29 @@ class DialogController extends Controller {
   }
 }
 
+class CheckboxController extends Controller {
+  connect() {
+    this.updateState();
+    this.boundHandleChange = this.handleChange.bind(this);
+    this.element.addEventListener("change", this.boundHandleChange);
+  }
+  disconnect() {
+    this.element.removeEventListener("change", this.boundHandleChange);
+  }
+  handleChange() {
+    this.updateState();
+  }
+  updateState() {
+    if (this.element.checked) {
+      this.element.dataset.state = "checked";
+      this.element.setAttribute("aria-checked", "true");
+    } else {
+      this.element.dataset.state = "unchecked";
+      this.element.setAttribute("aria-checked", "false");
+    }
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -2340,8 +2363,9 @@ function registerControllers(application) {
     "ui--accordion": AccordionController,
     "ui--alert-dialog": AlertDialogController,
     "ui--avatar": AvatarController,
-    "ui--dialog": DialogController
+    "ui--dialog": DialogController,
+    "ui--checkbox": CheckboxController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, DialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, DialogController, DropdownController, HelloController, registerControllers, registerControllersInto, version };

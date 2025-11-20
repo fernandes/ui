@@ -33,6 +33,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/button.html.erb
   end
 
+  def checkbox
+    # Renders app/views/components/checkbox.html.erb
+  end
+
   def dialog
     # Renders app/views/components/dialog.html.erb
   end
@@ -41,7 +45,15 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/dropdown_menu.html.erb
   end
 
+  def input
+    # Renders app/views/components/input.html.erb
+  end
+
   def label
     # Renders app/views/components/label.html.erb
+  end
+
+  def radio_button
+    # Renders app/views/components/radio_button.html.erb
   end
 end

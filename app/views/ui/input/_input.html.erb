@@ -1,0 +1,18 @@
+<%# Input - shadcn/ui inspired input component for Rails %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @value = local_assigns.fetch(:value, nil)
+  @type = local_assigns.fetch(:type, "text")
+  @placeholder = local_assigns.fetch(:placeholder, nil)
+  @name = local_assigns.fetch(:name, nil)
+  @id = local_assigns.fetch(:id, nil)
+  @readonly = local_assigns.fetch(:readonly, nil)
+
+  # Extend behavior for shared logic
+  extend UI::InputBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = input_html_attributes.deep_merge(@attributes)
+-%>
+<%= tag :input, all_attributes %>

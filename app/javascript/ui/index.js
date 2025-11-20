@@ -14,6 +14,7 @@ import AccordionController from "./controllers/accordion_controller.js";
 import AlertDialogController from "./controllers/alert_dialog_controller.js";
 import AvatarController from "./controllers/avatar_controller.js";
 import DialogController from "./controllers/dialog_controller.js";
+import CheckboxController from "./controllers/checkbox_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -29,7 +30,8 @@ export function registerControllers(application) {
     "ui--accordion": AccordionController,
     "ui--alert-dialog": AlertDialogController,
     "ui--avatar": AvatarController,
-    "ui--dialog": DialogController
+    "ui--dialog": DialogController,
+    "ui--checkbox": CheckboxController
   });
 }
 
@@ -37,4 +39,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController };

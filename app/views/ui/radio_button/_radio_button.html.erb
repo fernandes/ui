@@ -1,0 +1,34 @@
+<%
+  # RadioButton - shadcn/ui inspired component for Rails
+  #
+  # @param name [String] The name attribute for the radio button
+  # @param id [String] The id attribute (auto-generated if not provided)
+  # @param value [String] The value attribute
+  # @param checked [Boolean] Whether the radio button is checked
+  # @param disabled [Boolean] Whether the radio button is disabled
+  # @param required [Boolean] Whether the radio button is required
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @disabled = local_assigns.fetch(:disabled, false)
+  @value = local_assigns.fetch(:value, nil)
+  @checked = local_assigns.fetch(:checked, false)
+  @name = local_assigns.fetch(:name, nil)
+  @id = local_assigns.fetch(:id, nil)
+  @required = local_assigns.fetch(:required, false)
+
+  # Extend behavior for shared logic
+  extend UI::RadioButtonBehavior
+
+  # Get HTML attributes from behavior (without @attributes merge for input)
+  input_attributes = radio_button_html_attributes
+-%>
+<div class="relative inline-flex items-center justify-center">
+  <%= tag :input, input_attributes %>
+  <%# Indicator dot - shown when checked %>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" data-slot="radio-group-indicator">
+    <circle cx="12" cy="12" r="10"/>
+  </svg>
+</div>

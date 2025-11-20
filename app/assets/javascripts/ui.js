@@ -2217,6 +2217,28 @@
       }
     }
   }
+  class CheckboxController extends stimulus.Controller {
+    connect() {
+      this.updateState();
+      this.boundHandleChange = this.handleChange.bind(this);
+      this.element.addEventListener("change", this.boundHandleChange);
+    }
+    disconnect() {
+      this.element.removeEventListener("change", this.boundHandleChange);
+    }
+    handleChange() {
+      this.updateState();
+    }
+    updateState() {
+      if (this.element.checked) {
+        this.element.dataset.state = "checked";
+        this.element.setAttribute("aria-checked", "true");
+      } else {
+        this.element.dataset.state = "unchecked";
+        this.element.setAttribute("aria-checked", "false");
+      }
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -2235,12 +2257,14 @@
       "ui--accordion": AccordionController,
       "ui--alert-dialog": AlertDialogController,
       "ui--avatar": AvatarController,
-      "ui--dialog": DialogController
+      "ui--dialog": DialogController,
+      "ui--checkbox": CheckboxController
     });
   }
   exports.AccordionController = AccordionController;
   exports.AlertDialogController = AlertDialogController;
   exports.AvatarController = AvatarController;
+  exports.CheckboxController = CheckboxController;
   exports.DialogController = DialogController;
   exports.DropdownController = DropdownController;
   exports.HelloController = HelloController;
