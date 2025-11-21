@@ -1,0 +1,20 @@
+<%
+  # CommandInput - ERB Partial
+  #
+  # Search input for the command palette.
+  #
+  # @param placeholder [String] Input placeholder text
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes
+
+  @placeholder = local_assigns.fetch(:placeholder, "Type a command or search...")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Command::InputBehavior
+  all_attributes = command_input_html_attributes.deep_merge(@attributes)
+%>
+<div class="<%= command_input_wrapper_classes %>">
+  <%= lucide_icon("search", class: "mr-2 h-4 w-4 shrink-0 opacity-50") %>
+  <%= tag.input(**all_attributes) %>
+</div>

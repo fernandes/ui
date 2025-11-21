@@ -1,0 +1,17 @@
+<%
+  # CommandList - ERB Partial
+  #
+  # Scrollable container for command items.
+  #
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Command::ListBehavior
+  all_attributes = command_list_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

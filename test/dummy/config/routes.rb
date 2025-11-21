@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "/components/card", to: "components#card"
   get "/components/checkbox", to: "components#checkbox"
   get "/components/collapsible", to: "components#collapsible"
+  get "/components/command", to: "components#command"
   get "/components/dialog", to: "components#dialog"
   get "/components/dropdown_menu", to: "components#dropdown_menu"
   get "/components/empty", to: "components#empty"

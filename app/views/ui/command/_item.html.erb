@@ -1,0 +1,21 @@
+<%
+  # CommandItem - ERB Partial
+  #
+  # Individual selectable command item.
+  #
+  # @param value [String] Item value for filtering and selection
+  # @param disabled [Boolean] Whether item is disabled
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes
+
+  @value = local_assigns.fetch(:value, nil)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Command::ItemBehavior
+  all_attributes = command_item_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

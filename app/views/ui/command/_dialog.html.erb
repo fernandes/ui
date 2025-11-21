@@ -1,0 +1,17 @@
+<%# locals: (shortcut: "meta+j", classes: "", **attributes) %>
+<%
+  dialog_behavior = Class.new { include UI::Command::DialogBehavior }.new
+  dialog_behavior.instance_variable_set(:@shortcut, shortcut)
+  dialog_behavior.instance_variable_set(:@classes, classes)
+%>
+<div <%= tag.attributes(dialog_behavior.command_dialog_html_attributes.deep_merge(attributes)) %>>
+  <%= render "ui/dialog/dialog", close_on_escape: true, close_on_overlay_click: true do %>
+    <%= render "ui/dialog/overlay" do %>
+      <%= render "ui/dialog/content", classes: dialog_behavior.command_dialog_content_classes do %>
+        <%= render "ui/command/command" do %>
+          <%= yield if block_given? %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

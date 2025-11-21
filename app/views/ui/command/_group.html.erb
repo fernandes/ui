@@ -1,0 +1,23 @@
+<%
+  # CommandGroup - ERB Partial
+  #
+  # Groups related command items with optional heading.
+  #
+  # @param heading [String] Group heading text
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes
+
+  @heading = local_assigns.fetch(:heading, nil)
+  @heading_id = "command-group-#{SecureRandom.hex(4)}" if @heading
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Command::GroupBehavior
+  all_attributes = command_group_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <% if @heading %>
+    <div class="<%= command_group_heading_classes %>" id="<%= @heading_id %>"><%= @heading %></div>
+  <% end %>
+  <%= yield %>
+<% end %>

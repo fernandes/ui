@@ -2360,6 +2360,201 @@
       }
     }
   }
+  class CommandController extends stimulus.Controller {
+    static targets=[ "input", "list", "item", "group", "empty" ];
+    static values={
+      loop: {
+        type: Boolean,
+        default: true
+      }
+    };
+    connect() {
+      this.selectedIndex = -1;
+      this.updateVisibility();
+    }
+    filter() {
+      const query = this.inputTarget.value.toLowerCase().trim();
+      let hasVisibleItems = false;
+      this.itemTargets.forEach(item => {
+        const value = (item.dataset.value || item.textContent).toLowerCase();
+        const matches = query === "" || value.includes(query);
+        item.hidden = !matches;
+        if (matches) hasVisibleItems = true;
+      });
+      this.groupTargets.forEach(group => {
+        const items = group.querySelectorAll('[data-slot="command-item"]');
+        const hasVisible = Array.from(items).some(item => !item.hidden);
+        group.hidden = !hasVisible;
+      });
+      if (this.hasEmptyTarget) {
+        this.emptyTarget.classList.toggle("hidden", hasVisibleItems || query === "");
+      }
+      this.selectedIndex = -1;
+      this.updateSelection();
+    }
+    handleKeydown(event) {
+      const visibleItems = this.visibleItems;
+      switch (event.key) {
+       case "ArrowDown":
+        event.preventDefault();
+        this.selectNext(visibleItems);
+        break;
+
+       case "ArrowUp":
+        event.preventDefault();
+        this.selectPrevious(visibleItems);
+        break;
+
+       case "Enter":
+        event.preventDefault();
+        this.selectCurrent(visibleItems);
+        break;
+
+       case "Home":
+        event.preventDefault();
+        this.selectFirst(visibleItems);
+        break;
+
+       case "End":
+        event.preventDefault();
+        this.selectLast(visibleItems);
+        break;
+      }
+    }
+    selectNext(items) {
+      if (items.length === 0) return;
+      if (this.selectedIndex < items.length - 1) {
+        this.selectedIndex++;
+      } else if (this.loopValue) {
+        this.selectedIndex = 0;
+      }
+      this.updateSelection();
+    }
+    selectPrevious(items) {
+      if (items.length === 0) return;
+      if (this.selectedIndex > 0) {
+        this.selectedIndex--;
+      } else if (this.loopValue) {
+        this.selectedIndex = items.length - 1;
+      } else if (this.selectedIndex === -1) {
+        this.selectedIndex = items.length - 1;
+      }
+      this.updateSelection();
+    }
+    selectFirst(items) {
+      if (items.length === 0) return;
+      this.selectedIndex = 0;
+      this.updateSelection();
+    }
+    selectLast(items) {
+      if (items.length === 0) return;
+      this.selectedIndex = items.length - 1;
+      this.updateSelection();
+    }
+    selectCurrent(items) {
+      if (this.selectedIndex >= 0 && this.selectedIndex < items.length) {
+        const item = items[this.selectedIndex];
+        if (!item.dataset.disabled) {
+          this.triggerSelect(item);
+        }
+      }
+    }
+    select(event) {
+      const item = event.currentTarget;
+      if (!item.dataset.disabled) {
+        this.triggerSelect(item);
+      }
+    }
+    triggerSelect(item) {
+      const value = item.dataset.value || item.textContent.trim();
+      this.element.dispatchEvent(new CustomEvent("command:select", {
+        bubbles: true,
+        detail: {
+          value: value,
+          item: item
+        }
+      }));
+      const onSelect = item.dataset.onSelect;
+      if (onSelect) {
+        eval(onSelect);
+      }
+    }
+    updateSelection() {
+      const items = this.visibleItems;
+      items.forEach((item, index) => {
+        const isSelected = index === this.selectedIndex;
+        item.dataset.selected = isSelected;
+        item.setAttribute("aria-selected", isSelected);
+        if (isSelected) {
+          item.scrollIntoView({
+            block: "nearest"
+          });
+          if (this.hasListTarget) {
+            this.listTarget.setAttribute("aria-activedescendant", item.id || "");
+          }
+        }
+      });
+    }
+    updateVisibility() {
+      this.itemTargets.forEach(item => item.hidden = false);
+      this.groupTargets.forEach(group => group.hidden = false);
+      if (this.hasEmptyTarget) {
+        this.emptyTarget.classList.add("hidden");
+      }
+    }
+    get visibleItems() {
+      return this.itemTargets.filter(item => !item.hidden && !item.dataset.disabled);
+    }
+  }
+  class CommandDialogController extends stimulus.Controller {
+    static values={
+      shortcut: {
+        type: String,
+        default: "meta+j"
+      }
+    };
+    connect() {
+      this.dialogElement = this.element.querySelector("[data-controller*='ui--dialog']");
+      this.element.addEventListener("dialog:close", this.handleDialogClose.bind(this));
+    }
+    disconnect() {
+      this.element.removeEventListener("dialog:close", this.handleDialogClose.bind(this));
+    }
+    handleDialogClose() {
+      this.clearInput();
+    }
+    toggle(event) {
+      event.preventDefault();
+      if (!this.dialogElement) return;
+      const dialogController = this.application.getControllerForElementAndIdentifier(this.dialogElement, "ui--dialog");
+      if (dialogController) {
+        if (dialogController.openValue) {
+          dialogController.close();
+        } else {
+          dialogController.open();
+          this.focusInput();
+        }
+      }
+    }
+    focusInput() {
+      setTimeout(() => {
+        const input = this.element.querySelector("[data-ui--command-target='input']");
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 50);
+    }
+    clearInput() {
+      const input = this.element.querySelector("[data-ui--command-target='input']");
+      if (input) {
+        input.value = "";
+        input.dispatchEvent(new Event("input", {
+          bubbles: true
+        }));
+      }
+    }
+  }
   class TooltipController extends stimulus.Controller {
     static targets=[ "trigger", "content" ];
     static values={
@@ -3423,6 +3618,8 @@
       "ui--dialog": DialogController,
       "ui--checkbox": CheckboxController,
       "ui--collapsible": CollapsibleController,
+      "ui--command": CommandController,
+      "ui--command-dialog": CommandDialogController,
       "ui--tooltip": TooltipController,
       "ui--popover": PopoverController,
       "ui--scroll-area": ScrollAreaController,
@@ -3434,6 +3631,8 @@
   exports.AvatarController = AvatarController;
   exports.CheckboxController = CheckboxController;
   exports.CollapsibleController = CollapsibleController;
+  exports.CommandController = CommandController;
+  exports.CommandDialogController = CommandDialogController;
   exports.DialogController = DialogController;
   exports.DropdownController = DropdownController;
   exports.HelloController = HelloController;

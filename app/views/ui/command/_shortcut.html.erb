@@ -1,0 +1,19 @@
+<%
+  # CommandShortcut - ERB Partial
+  #
+  # Displays keyboard shortcut hint.
+  #
+  # @param content [String] Shortcut text
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
+
+  extend UI::Command::ShortcutBehavior
+  all_attributes = command_shortcut_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :span, all_attributes do %>
+  <%= content_param || yield %>
+<% end %>

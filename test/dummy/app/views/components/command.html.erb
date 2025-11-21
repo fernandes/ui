@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Command Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Command Component</h1>
+      <p class="text-muted-foreground">Fast, composable command palette for searching and selecting items.</p>
+    </header>
+
+    <!-- Basic Command - Phlex -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Command (Phlex)</h2>
+      <%= render UI::Command::Command.new(classes: "rounded-lg border shadow-md md:min-w-[450px]") do %>
+        <%= render UI::Command::Input.new(placeholder: "Type a command or search...") %>
+        <%= render UI::Command::List.new do %>
+          <%= render UI::Command::Empty.new { "No results found." } %>
+          <%= render UI::Command::Group.new(heading: "Suggestions") do %>
+            <%= render UI::Command::Item.new(value: "calendar") do %>
+              <%= lucide_icon("calendar", class: "mr-2 h-4 w-4") %>
+              <span>Calendar</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "search emoji") do %>
+              <%= lucide_icon("smile", class: "mr-2 h-4 w-4") %>
+              <span>Search Emoji</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "calculator") do %>
+              <%= lucide_icon("calculator", class: "mr-2 h-4 w-4") %>
+              <span>Calculator</span>
+            <% end %>
+          <% end %>
+          <%= render UI::Command::Separator.new %>
+          <%= render UI::Command::Group.new(heading: "Settings") do %>
+            <%= render UI::Command::Item.new(value: "profile") do %>
+              <%= lucide_icon("user", class: "mr-2 h-4 w-4") %>
+              <span>Profile</span>
+              <%= render UI::Command::Shortcut.new { "⌘P" } %>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "billing") do %>
+              <%= lucide_icon("credit-card", class: "mr-2 h-4 w-4") %>
+              <span>Billing</span>
+              <%= render UI::Command::Shortcut.new { "⌘B" } %>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "settings") do %>
+              <%= lucide_icon("settings", class: "mr-2 h-4 w-4") %>
+              <span>Settings</span>
+              <%= render UI::Command::Shortcut.new { "⌘S" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Basic Command - ViewComponent -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Command (ViewComponent)</h2>
+      <%= render(UI::Command::CommandComponent.new(classes: "rounded-lg border shadow-md md:min-w-[450px]")) do %>
+        <%= render(UI::Command::InputComponent.new(placeholder: "Type a command or search...")) %>
+        <%= render(UI::Command::ListComponent.new) do %>
+          <%= render(UI::Command::EmptyComponent.new) { "No results found." } %>
+          <%= render(UI::Command::GroupComponent.new(heading: "Suggestions")) do %>
+            <%= render(UI::Command::ItemComponent.new(value: "calendar")) do %>
+              <%= lucide_icon("calendar", class: "mr-2 h-4 w-4") %>
+              <span>Calendar</span>
+            <% end %>
+            <%= render(UI::Command::ItemComponent.new(value: "search emoji")) do %>
+              <%= lucide_icon("smile", class: "mr-2 h-4 w-4") %>
+              <span>Search Emoji</span>
+            <% end %>
+            <%= render(UI::Command::ItemComponent.new(value: "calculator")) do %>
+              <%= lucide_icon("calculator", class: "mr-2 h-4 w-4") %>
+              <span>Calculator</span>
+            <% end %>
+          <% end %>
+          <%= render(UI::Command::SeparatorComponent.new) %>
+          <%= render(UI::Command::GroupComponent.new(heading: "Settings")) do %>
+            <%= render(UI::Command::ItemComponent.new(value: "profile")) do %>
+              <%= lucide_icon("user", class: "mr-2 h-4 w-4") %>
+              <span>Profile</span>
+              <%= render(UI::Command::ShortcutComponent.new) { "⌘P" } %>
+            <% end %>
+            <%= render(UI::Command::ItemComponent.new(value: "settings")) do %>
+              <%= lucide_icon("settings", class: "mr-2 h-4 w-4") %>
+              <span>Settings</span>
+              <%= render(UI::Command::ShortcutComponent.new) { "⌘S" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Basic Command - ERB -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Command (ERB)</h2>
+      <%= render "ui/command/command", classes: "rounded-lg border shadow-md md:min-w-[450px]" do %>
+        <%= render "ui/command/input", placeholder: "Type a command or search..." %>
+        <%= render "ui/command/list" do %>
+          <%= render "ui/command/empty", content: "No results found." %>
+          <%= render "ui/command/group", heading: "Suggestions" do %>
+            <%= render "ui/command/item", value: "calendar" do %>
+              <%= lucide_icon("calendar", class: "mr-2 h-4 w-4") %>
+              <span>Calendar</span>
+            <% end %>
+            <%= render "ui/command/item", value: "search emoji" do %>
+              <%= lucide_icon("smile", class: "mr-2 h-4 w-4") %>
+              <span>Search Emoji</span>
+            <% end %>
+            <%= render "ui/command/item", value: "calculator" do %>
+              <%= lucide_icon("calculator", class: "mr-2 h-4 w-4") %>
+              <span>Calculator</span>
+            <% end %>
+          <% end %>
+          <%= render "ui/command/separator" %>
+          <%= render "ui/command/group", heading: "Settings" do %>
+            <%= render "ui/command/item", value: "profile" do %>
+              <%= lucide_icon("user", class: "mr-2 h-4 w-4") %>
+              <span>Profile</span>
+              <%= render "ui/command/shortcut", content: "⌘P" %>
+            <% end %>
+            <%= render "ui/command/item", value: "settings" do %>
+              <%= lucide_icon("settings", class: "mr-2 h-4 w-4") %>
+              <span>Settings</span>
+              <%= render "ui/command/shortcut", content: "⌘S" %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Disabled Items -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Disabled Items</h2>
+      <%= render UI::Command::Command.new(classes: "rounded-lg border shadow-md md:min-w-[450px]") do %>
+        <%= render UI::Command::Input.new(placeholder: "Search features...") %>
+        <%= render UI::Command::List.new do %>
+          <%= render UI::Command::Empty.new { "No results found." } %>
+          <%= render UI::Command::Group.new(heading: "Features") do %>
+            <%= render UI::Command::Item.new(value: "dashboard") do %>
+              <%= lucide_icon("layout-dashboard", class: "mr-2 h-4 w-4") %>
+              <span>Dashboard</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "analytics", disabled: true) do %>
+              <%= lucide_icon("bar-chart", class: "mr-2 h-4 w-4") %>
+              <span>Analytics</span>
+              <span class="ml-auto text-xs text-muted-foreground">Coming soon</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "reports") do %>
+              <%= lucide_icon("file-text", class: "mr-2 h-4 w-4") %>
+              <span>Reports</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "ai-insights", disabled: true) do %>
+              <%= lucide_icon("brain", class: "mr-2 h-4 w-4") %>
+              <span>AI Insights</span>
+              <span class="ml-auto text-xs text-muted-foreground">Pro only</span>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Command Dialog - Keyboard Shortcut (Phlex) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Command Dialog (Phlex)</h2>
+      <p class="text-sm text-muted-foreground mb-4">
+        Press
+        <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">⌘</kbd>
+        <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">J</kbd>
+        to open the command palette.
+      </p>
+
+      <%= render UI::Command::Dialog.new(shortcut: "meta+j") do %>
+        <%= render UI::Command::Input.new(placeholder: "Type a command or search...") %>
+        <%= render UI::Command::List.new do %>
+          <%= render UI::Command::Empty.new { "No results found." } %>
+          <%= render UI::Command::Group.new(heading: "Suggestions") do %>
+            <%= render UI::Command::Item.new(value: "calendar") do %>
+              <%= lucide_icon("calendar", class: "mr-2 h-4 w-4") %>
+              <span>Calendar</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "search emoji") do %>
+              <%= lucide_icon("smile", class: "mr-2 h-4 w-4") %>
+              <span>Search Emoji</span>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "calculator") do %>
+              <%= lucide_icon("calculator", class: "mr-2 h-4 w-4") %>
+              <span>Calculator</span>
+            <% end %>
+          <% end %>
+          <%= render UI::Command::Separator.new %>
+          <%= render UI::Command::Group.new(heading: "Settings") do %>
+            <%= render UI::Command::Item.new(value: "profile") do %>
+              <%= lucide_icon("user", class: "mr-2 h-4 w-4") %>
+              <span>Profile</span>
+              <%= render UI::Command::Shortcut.new { "⌘P" } %>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "billing") do %>
+              <%= lucide_icon("credit-card", class: "mr-2 h-4 w-4") %>
+              <span>Billing</span>
+              <%= render UI::Command::Shortcut.new { "⌘B" } %>
+            <% end %>
+            <%= render UI::Command::Item.new(value: "settings") do %>
+              <%= lucide_icon("settings", class: "mr-2 h-4 w-4") %>
+              <span>Settings</span>
+              <%= render UI::Command::Shortcut.new { "⌘S" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Command Dialog with Ctrl+K (ViewComponent) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Command Dialog with Ctrl+K (ViewComponent)</h2>
+      <p class="text-sm text-muted-foreground mb-4">
+        Press
+        <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">Ctrl</kbd>
+        <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">K</kbd>
+        to open.
+      </p>
+
+      <%= render(UI::Command::DialogComponent.new(shortcut: "ctrl+k")) do %>
+        <%= render(UI::Command::InputComponent.new(placeholder: "Search...")) %>
+        <%= render(UI::Command::ListComponent.new) do %>
+          <%= render(UI::Command::EmptyComponent.new) { "No results found." } %>
+          <%= render(UI::Command::GroupComponent.new(heading: "Navigation")) do %>
+            <%= render(UI::Command::ItemComponent.new(value: "home")) do %>
+              <%= lucide_icon("home", class: "mr-2 h-4 w-4") %>
+              <span>Home</span>
+            <% end %>
+            <%= render(UI::Command::ItemComponent.new(value: "docs")) do %>
+              <%= lucide_icon("file", class: "mr-2 h-4 w-4") %>
+              <span>Documentation</span>
+            <% end %>
+            <%= render(UI::Command::ItemComponent.new(value: "components")) do %>
+              <%= lucide_icon("layers", class: "mr-2 h-4 w-4") %>
+              <span>Components</span>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+  </div>
+</body>
+</html>
