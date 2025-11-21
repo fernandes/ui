@@ -1,0 +1,20 @@
+<%
+  # CardDescription - ERB Partial
+  #
+  # Description element within a card header.
+  # Uses DescriptionBehavior module for shared styling logic.
+  #
+  # @param content [String] Description text content (alternative to using block)
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
+
+  extend UI::Card::DescriptionBehavior
+  all_attributes = card_description_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= content_param || yield %>
+<% end %>

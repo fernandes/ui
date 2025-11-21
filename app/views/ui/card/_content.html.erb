@@ -1,0 +1,18 @@
+<%
+  # CardContent - ERB Partial
+  #
+  # Content section of a card.
+  # Uses ContentBehavior module for shared styling logic.
+  #
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Card::ContentBehavior
+  all_attributes = card_content_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

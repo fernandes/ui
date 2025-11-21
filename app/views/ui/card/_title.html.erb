@@ -1,0 +1,20 @@
+<%
+  # CardTitle - ERB Partial
+  #
+  # Title element within a card header.
+  # Uses TitleBehavior module for shared styling logic.
+  #
+  # @param content [String] Title text content (alternative to using block)
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
+
+  extend UI::Card::TitleBehavior
+  all_attributes = card_title_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= content_param || yield %>
+<% end %>
