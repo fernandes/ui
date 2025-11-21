@@ -1,0 +1,16 @@
+<%# Context Menu Label Component - Non-interactive label for grouping %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @inset = local_assigns.fetch(:inset, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::ContextMenu::ContextMenuLabelBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = context_menu_label_html_attributes.merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

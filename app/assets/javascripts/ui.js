@@ -2506,6 +2506,219 @@
       return this.itemTargets.filter(item => !item.hidden && !item.dataset.disabled);
     }
   }
+  class ContextMenuController extends stimulus.Controller {
+    static targets=[ "trigger", "content", "item" ];
+    static values={
+      open: {
+        type: Boolean,
+        default: false
+      }
+    };
+    constructor() {
+      super(...arguments);
+      this.lastHoveredItem = null;
+    }
+    connect() {
+      this.boundHandleClickOutside = this.handleClickOutside.bind(this);
+      this.boundHandleKeydown = this.handleKeydown.bind(this);
+      document.addEventListener("click", this.boundHandleClickOutside);
+    }
+    disconnect() {
+      document.removeEventListener("click", this.boundHandleClickOutside);
+      document.removeEventListener("keydown", this.boundHandleKeydown);
+    }
+    open(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.closeAllContextMenus();
+      this.openValue = true;
+      const content = this.contentTarget;
+      content.classList.remove("hidden");
+      content.setAttribute("data-state", "open");
+      this.positionContextMenu(event.clientX, event.clientY);
+      this.setupKeyboardNavigation();
+      setTimeout(() => {
+        this.focusItem(0);
+      }, 100);
+    }
+    close() {
+      this.openValue = false;
+      const content = this.contentTarget;
+      if (content) {
+        content.classList.add("hidden");
+        content.setAttribute("data-state", "closed");
+      }
+      const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+      allMenuItems.forEach(item => {
+        item.setAttribute("tabindex", "-1");
+      });
+      this.lastHoveredItem = null;
+      this.teardownKeyboardNavigation();
+    }
+    closeAllContextMenus() {
+      document.querySelectorAll('[data-ui--context-menu-target="content"][data-state="open"]').forEach(menu => {
+        menu.classList.add("hidden");
+        menu.setAttribute("data-state", "closed");
+      });
+    }
+    handleClickOutside(event) {
+      if (!this.element.contains(event.target)) {
+        this.close();
+      }
+    }
+    setupKeyboardNavigation() {
+      document.addEventListener("keydown", this.boundHandleKeydown);
+    }
+    teardownKeyboardNavigation() {
+      document.removeEventListener("keydown", this.boundHandleKeydown);
+    }
+    handleKeydown(event) {
+      if (!this.openValue) return;
+      const items = this.getFocusableItems();
+      switch (event.key) {
+       case "ArrowDown":
+        event.preventDefault();
+        this.focusNextItem(items);
+        break;
+
+       case "ArrowUp":
+        event.preventDefault();
+        this.focusPreviousItem(items);
+        break;
+
+       case "Home":
+        event.preventDefault();
+        this.focusItem(0, items);
+        break;
+
+       case "End":
+        event.preventDefault();
+        this.focusItem(items.length - 1, items);
+        break;
+
+       case "Escape":
+        event.preventDefault();
+        this.close();
+        break;
+
+       case "Enter":
+       case " ":
+        event.preventDefault();
+        const target = this.getKeyboardFocusedItem();
+        if (target) {
+          target.click();
+          this.close();
+        }
+        break;
+      }
+    }
+    getFocusableItems() {
+      if (!this.hasContentTarget) return [];
+      const content = this.contentTarget;
+      const items = [];
+      Array.from(content.children).forEach(child => {
+        const role = child.getAttribute("role");
+        if (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio") {
+          if (!child.hasAttribute("data-disabled")) {
+            items.push(child);
+          }
+        } else if (role === "group") {
+          const radioItems = child.querySelectorAll('[role="menuitemradio"]');
+          radioItems.forEach(radioItem => {
+            if (!radioItem.hasAttribute("data-disabled")) {
+              items.push(radioItem);
+            }
+          });
+        }
+      });
+      return items;
+    }
+    getKeyboardFocusedItem() {
+      const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+      return Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
+    }
+    focusNextItem(items = null) {
+      items = items || this.getFocusableItems();
+      if (items.length === 0) return;
+      let currentIndex = this.findCurrentItemIndex(items);
+      if (currentIndex === -1 || currentIndex >= items.length - 1) {
+        this.focusItem(0, items);
+      } else {
+        this.focusItem(currentIndex + 1, items);
+      }
+    }
+    focusPreviousItem(items = null) {
+      items = items || this.getFocusableItems();
+      if (items.length === 0) return;
+      let currentIndex = this.findCurrentItemIndex(items);
+      if (currentIndex === -1 || currentIndex === 0) {
+        this.focusItem(items.length - 1, items);
+      } else {
+        this.focusItem(currentIndex - 1, items);
+      }
+    }
+    findCurrentItemIndex(items) {
+      const currentItem = items.find(item => item.getAttribute("tabindex") === "0");
+      return currentItem ? items.indexOf(currentItem) : -1;
+    }
+    focusItem(index, items = null) {
+      items = items || this.getFocusableItems();
+      if (items.length === 0 || index < 0 || index >= items.length) return;
+      const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+      allMenuItems.forEach(item => {
+        item.setAttribute("tabindex", "-1");
+      });
+      const targetItem = items[index];
+      targetItem.setAttribute("tabindex", "0");
+      targetItem.focus();
+      this.lastHoveredItem = targetItem;
+    }
+    trackHoveredItem(event) {
+      const item = event.currentTarget;
+      if (document.activeElement && document.activeElement.hasAttribute("role") && (document.activeElement.getAttribute("role") === "menuitem" || document.activeElement.getAttribute("role") === "menuitemcheckbox" || document.activeElement.getAttribute("role") === "menuitemradio")) {
+        document.activeElement.blur();
+      }
+      const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+      allMenuItems.forEach(menuItem => {
+        menuItem.setAttribute("tabindex", "-1");
+      });
+      item.setAttribute("tabindex", "0");
+      this.lastHoveredItem = item;
+    }
+    positionContextMenu(x, y) {
+      const content = this.contentTarget;
+      if (!content) return;
+      Object.assign(content.style, {
+        position: "fixed",
+        left: `${x}px`,
+        top: `${y}px`
+      });
+      requestAnimationFrame(() => {
+        const rect = content.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        let adjustedX = x;
+        let adjustedY = y;
+        if (rect.right > viewportWidth) {
+          adjustedX = viewportWidth - rect.width - 8;
+        }
+        if (rect.bottom > viewportHeight) {
+          adjustedY = viewportHeight - rect.height - 8;
+        }
+        adjustedX = Math.max(8, adjustedX);
+        adjustedY = Math.max(8, adjustedY);
+        content.style.left = `${adjustedX}px`;
+        content.style.top = `${adjustedY}px`;
+        if (adjustedY < y) {
+          content.setAttribute("data-side", "top");
+        } else if (adjustedX < x) {
+          content.setAttribute("data-side", "left");
+        } else {
+          content.setAttribute("data-side", "bottom");
+        }
+      });
+    }
+  }
   class CommandDialogController extends stimulus.Controller {
     static values={
       shortcut: {
@@ -3620,6 +3833,7 @@
       "ui--collapsible": CollapsibleController,
       "ui--command": CommandController,
       "ui--command-dialog": CommandDialogController,
+      "ui--context-menu": ContextMenuController,
       "ui--tooltip": TooltipController,
       "ui--popover": PopoverController,
       "ui--scroll-area": ScrollAreaController,
@@ -3633,6 +3847,7 @@
   exports.CollapsibleController = CollapsibleController;
   exports.CommandController = CommandController;
   exports.CommandDialogController = CommandDialogController;
+  exports.ContextMenuController = ContextMenuController;
   exports.DialogController = DialogController;
   exports.DropdownController = DropdownController;
   exports.HelloController = HelloController;

@@ -41,6 +41,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/checkbox.html.erb
   end
 
+  def context_menu
+    # Renders app/views/components/context_menu.html.erb
+  end
+
   def dialog
     # Renders app/views/components/dialog.html.erb
   end

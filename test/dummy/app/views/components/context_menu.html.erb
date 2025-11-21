@@ -1,0 +1,185 @@
+<div class="container mx-auto py-8 space-y-8">
+  <div>
+    <h1 class="text-3xl font-bold mb-2">Context Menu</h1>
+    <p class="text-muted-foreground">Displays a menu to the user—such as a set of actions or functions—triggered by a right click.</p>
+  </div>
+
+  <!-- Phlex Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Phlex</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Example -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Basic Context Menu</h3>
+        <%= render UI::ContextMenu::ContextMenu.new do %>
+          <%= render UI::ContextMenu::Trigger.new do %>
+            Right click here
+          <% end %>
+
+          <%= render UI::ContextMenu::Content.new(classes: "w-64") do %>
+            <%= render UI::ContextMenu::Item.new do %>
+              Back
+              <%= render UI::ContextMenu::Shortcut.new { "⌘[" } %>
+            <% end %>
+            <%= render UI::ContextMenu::Item.new(data: { disabled: true }) do %>
+              Forward
+              <%= render UI::ContextMenu::Shortcut.new { "⌘]" } %>
+            <% end %>
+            <%= render UI::ContextMenu::Item.new do %>
+              Reload
+              <%= render UI::ContextMenu::Shortcut.new { "⌘R" } %>
+            <% end %>
+            <%= render UI::ContextMenu::Separator.new %>
+            <%= render UI::ContextMenu::CheckboxItem.new(checked: true) do %>
+              Show Bookmarks Bar
+              <%= render UI::ContextMenu::Shortcut.new { "⌘⇧B" } %>
+            <% end %>
+            <%= render UI::ContextMenu::CheckboxItem.new do %>
+              Show Full URLs
+            <% end %>
+            <%= render UI::ContextMenu::Separator.new %>
+            <%= render UI::ContextMenu::RadioGroup.new do %>
+              <%= render UI::ContextMenu::Label.new(inset: true) { "People" } %>
+              <%= render UI::ContextMenu::Separator.new %>
+              <%= render UI::ContextMenu::RadioItem.new(checked: true) { "Pedro Duarte" } %>
+              <%= render UI::ContextMenu::RadioItem.new { "Colm Tuite" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- With Icons -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">With Icons</h3>
+        <%= render UI::ContextMenu::ContextMenu.new do %>
+          <%= render UI::ContextMenu::Trigger.new do %>
+            Right click for actions
+          <% end %>
+
+          <%= render UI::ContextMenu::Content.new(classes: "w-48") do %>
+            <%= render UI::ContextMenu::Item.new do %>
+              <%= lucide_icon("copy") %>
+              Copy
+            <% end %>
+            <%= render UI::ContextMenu::Item.new do %>
+              <%= lucide_icon("scissors") %>
+              Cut
+            <% end %>
+            <%= render UI::ContextMenu::Item.new do %>
+              <%= lucide_icon("clipboard") %>
+              Paste
+            <% end %>
+            <%= render UI::ContextMenu::Separator.new %>
+            <%= render UI::ContextMenu::Item.new(variant: "destructive") do %>
+              <%= lucide_icon("trash") %>
+              Delete
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERB Partials Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ERB Partials</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Example -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Basic Menu</h3>
+        <%= render "ui/context_menu/context_menu" do %>
+          <%= render "ui/context_menu/context_menu_trigger" do %>
+            Right click this area
+          <% end %>
+
+          <%= render "ui/context_menu/context_menu_content", classes: "w-48" do %>
+            <%= render "ui/context_menu/context_menu_item" do %>
+              Edit
+            <% end %>
+            <%= render "ui/context_menu/context_menu_item" do %>
+              Duplicate
+            <% end %>
+            <%= render "ui/context_menu/context_menu_separator" %>
+            <%= render "ui/context_menu/context_menu_item", variant: "destructive" do %>
+              Delete
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- With Labels and Shortcuts -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">With Labels</h3>
+        <%= render "ui/context_menu/context_menu" do %>
+          <%= render "ui/context_menu/context_menu_trigger" do %>
+            Right click for file options
+          <% end %>
+
+          <%= render "ui/context_menu/context_menu_content", classes: "w-56" do %>
+            <%= render "ui/context_menu/context_menu_label" do %>
+              File
+            <% end %>
+            <%= render "ui/context_menu/context_menu_separator" %>
+            <%= render "ui/context_menu/context_menu_item" do %>
+              New File
+              <%= render "ui/context_menu/context_menu_shortcut" do %>
+                ⌘N
+              <% end %>
+            <% end %>
+            <%= render "ui/context_menu/context_menu_item" do %>
+              Save
+              <%= render "ui/context_menu/context_menu_shortcut" do %>
+                ⌘S
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ViewComponent Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ViewComponent</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Example -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Basic Menu</h3>
+        <%= render(UI::ContextMenu::ContextMenuComponent.new) do %>
+          <%= render(UI::ContextMenu::TriggerComponent.new) do %>
+            Right click this box
+          <% end %>
+
+          <%= render(UI::ContextMenu::ContentComponent.new(classes: "w-48")) do %>
+            <%= render(UI::ContextMenu::ItemComponent.new) { "New Tab" } %>
+            <%= render(UI::ContextMenu::ItemComponent.new) { "New Window" } %>
+            <%= render(UI::ContextMenu::SeparatorComponent.new) %>
+            <%= render(UI::ContextMenu::ItemComponent.new) { "Settings" } %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Complete Example -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Complete Example</h3>
+        <%= render(UI::ContextMenu::ContextMenuComponent.new) do %>
+          <%= render(UI::ContextMenu::TriggerComponent.new) do %>
+            Right click for complete menu
+          <% end %>
+
+          <%= render(UI::ContextMenu::ContentComponent.new(classes: "w-56")) do %>
+            <%= render(UI::ContextMenu::LabelComponent.new) { "My Account" } %>
+            <%= render(UI::ContextMenu::SeparatorComponent.new) %>
+            <%= render(UI::ContextMenu::ItemComponent.new) { "Profile" } %>
+            <%= render(UI::ContextMenu::ItemComponent.new) { "Team" } %>
+            <%= render(UI::ContextMenu::SeparatorComponent.new) %>
+            <%= render(UI::ContextMenu::ItemComponent.new(variant: "destructive")) { "Delete Account" } %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>
