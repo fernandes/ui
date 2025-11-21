@@ -36,6 +36,7 @@ end
 Main container for the dropdown.
 
 **Parameters:**
+- `as_child:` Boolean - When true, yields controller attributes instead of rendering wrapper (default: false)
 - `placement:` String - Floating UI placement ("bottom-start", "bottom-end", "top-start", etc.) (default: "bottom-start")
 - `offset:` Integer - Offset from trigger in pixels (default: 4)
 - `flip:` Boolean - Enable flip middleware (default: true)
@@ -47,6 +48,7 @@ Main container for the dropdown.
 Wrapper for the trigger element (usually a button).
 
 **Parameters:**
+- `as_child:` Boolean - When true, yields trigger attributes instead of rendering wrapper (default: false)
 - `classes:` String - Additional CSS classes
 - `**attributes` Hash - Additional HTML attributes
 
@@ -259,6 +261,38 @@ render UI::DropdownMenu::DropdownMenu.new do
   end
 end
 ```
+
+### With asChild (Split Button Pattern)
+
+Use `as_child: true` to compose DropdownMenu with other components like ButtonGroup without wrapper div interference:
+
+```ruby
+# DropdownMenu yields controller attributes to ButtonGroup
+render UI::DropdownMenu::DropdownMenu.new(as_child: true) do |dropdown_attrs|
+  render UI::ButtonGroup::ButtonGroup.new(**dropdown_attrs) do
+    render UI::Button::Button.new(variant: :outline) { "Follow" }
+
+    # Trigger yields action attributes to Button
+    render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs|
+      render UI::Button::Button.new(**trigger_attrs, variant: :outline, size: :icon) do
+        # chevron icon
+      end
+    end
+
+    # Content must be inside the controller scope (ButtonGroup)
+    render UI::DropdownMenu::Content.new(align: :end) do
+      render UI::DropdownMenu::Item.new { "Option 1" }
+      render UI::DropdownMenu::Item.new { "Option 2" }
+    end
+  end
+end
+```
+
+**Key points for asChild:**
+- `as_child: true` on DropdownMenu yields the Stimulus controller data attributes
+- `as_child: true` on Trigger yields the click action attributes
+- The Content must be rendered inside the element that receives the controller attributes
+- This pattern is useful for ButtonGroup split buttons where the dropdown wrapper would break flex layout
 
 ## Features
 

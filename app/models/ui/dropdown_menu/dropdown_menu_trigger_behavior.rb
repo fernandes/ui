@@ -7,11 +7,17 @@ module UI
     # Shared behavior for DropdownMenuTrigger component across ERB, ViewComponent, and Phlex implementations.
     module DropdownMenuTriggerBehavior
       # Returns HTML attributes for the trigger
+      # When as_child is true, only data attributes are returned to avoid overriding child's classes
       def dropdown_menu_trigger_html_attributes
-        {
-          class: dropdown_menu_trigger_classes,
+        attrs = {
           data: dropdown_menu_trigger_data_attributes
         }
+
+        # Only include class if it's not empty (to avoid overriding child component's classes)
+        trigger_classes = dropdown_menu_trigger_classes
+        attrs[:class] = trigger_classes unless trigger_classes.blank?
+
+        attrs
       end
 
       # Returns combined CSS classes for the trigger

@@ -1,0 +1,16 @@
+<%
+  # ButtonGroupText - ERB implementation
+  #
+  # Displays text within a button group.
+  #
+  # Based on shadcn/ui ButtonGroup: https://ui.shadcn.com/docs/components/button-group
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.except(:classes)
+
+  extend UI::ButtonGroup::TextBehavior
+  all_attributes = text_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

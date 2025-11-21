@@ -8,11 +8,19 @@ module UI
     # This module provides consistent styling and HTML attribute generation.
     module DropdownMenuBehavior
       # Returns HTML attributes for the dropdown menu container
+      # When used with asChild, these attributes will be yielded to the child
       def dropdown_menu_html_attributes
-        {
-          class: dropdown_menu_classes,
+        attrs = {
           data: dropdown_menu_data_attributes
         }
+
+        # Only add container classes if not using asChild
+        # When asChild is true, we don't render a wrapper
+        unless @as_child
+          attrs[:class] = dropdown_menu_classes
+        end
+
+        attrs
       end
 
       # Returns combined CSS classes for the dropdown menu

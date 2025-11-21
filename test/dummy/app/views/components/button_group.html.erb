@@ -1,0 +1,273 @@
+<div class="p-8 space-y-12">
+  <div>
+    <h1 class="text-4xl font-bold mb-2">Button Group</h1>
+    <p class="text-muted-foreground text-lg">A container that groups related buttons together with consistent styling.</p>
+  </div>
+
+  <%# Example 1: Basic Button Group %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Basic Button Group</h2>
+    <p class="text-muted-foreground">Group related buttons with consistent styling.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <%= render UI::ButtonGroup::ButtonGroup.new(classes: "hidden sm:flex") do %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :icon, attributes: { "aria-label": "Go Back" }) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        <% end %>
+      <% end %>
+
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Archive" } %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Report" } %>
+      <% end %>
+
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Snooze" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :icon, attributes: { "aria-label": "More Options" }) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 2: Orientation %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Orientation</h2>
+    <p class="text-muted-foreground">Change the button group layout with the orientation prop.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new(orientation: :vertical, classes: "h-fit", attributes: { "aria-label": "Media controls" }) do %>
+      <%= render UI::Button::Button.new(variant: :outline, size: :icon) do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <% end %>
+      <%= render UI::Button::Button.new(variant: :outline, size: :icon) do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 3: Size %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Size</h2>
+    <p class="text-muted-foreground">Control the size of buttons using the size prop on individual buttons.</p>
+
+    <div class="flex flex-col items-start gap-8">
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Small" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Button" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Group" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :"icon-sm") do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <% end %>
+      <% end %>
+
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Default" } %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Button" } %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Group" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :icon) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <% end %>
+      <% end %>
+
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :lg) { "Large" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :lg) { "Button" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :lg) { "Group" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :"icon-lg") do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Example 4: Nested %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Nested</h2>
+    <p class="text-muted-foreground">Nest button groups to create spacing between groups.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "1" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "2" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "3" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "4" } %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "5" } %>
+      <% end %>
+
+      <%= render UI::ButtonGroup::ButtonGroup.new do %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :"icon-sm", attributes: { "aria-label": "Previous" }) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        <% end %>
+        <%= render UI::Button::Button.new(variant: :outline, size: :"icon-sm", attributes: { "aria-label": "Next" }) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 5: Separator %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Separator</h2>
+    <p class="text-muted-foreground">The separator visually divides buttons. Use for non-outline variants to improve visual hierarchy.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <%= render UI::Button::Button.new(variant: :secondary, size: :sm) { "Copy" } %>
+      <%= render UI::ButtonGroup::Separator.new %>
+      <%= render UI::Button::Button.new(variant: :secondary, size: :sm) { "Paste" } %>
+    <% end %>
+  </div>
+
+  <%# Example 6: Split Button %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Split</h2>
+    <p class="text-muted-foreground">Create a split button group by adding two buttons separated by a separator.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <%= render UI::Button::Button.new(variant: :secondary) { "Button" } %>
+      <%= render UI::ButtonGroup::Separator.new %>
+      <%= render UI::Button::Button.new(size: :icon, variant: :secondary) do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 7: Input %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Input</h2>
+    <p class="text-muted-foreground">Wrap an input component with buttons.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <input type="text" placeholder="Search..." class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive">
+      <%= render UI::Button::Button.new(variant: :outline, attributes: { "aria-label": "Search" }) do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 8: With Text %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">With Text</h2>
+    <p class="text-muted-foreground">Display text within a button group.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <%= render UI::ButtonGroup::Text.new do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        USD
+      <% end %>
+      <%= render UI::Button::Button.new(variant: :outline) { "Button" } %>
+    <% end %>
+  </div>
+
+  <%# Example 9: Text with asChild (as Label) %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Text with asChild</h2>
+    <p class="text-muted-foreground">Use the asChild prop to render custom components like labels.</p>
+
+    <%= render UI::ButtonGroup::ButtonGroup.new do %>
+      <%= render UI::ButtonGroup::Text.new(as_child: true) do |attrs| %>
+        <label <%= attrs.map { |k, v| %(#{k}="#{v}") }.join(" ").html_safe %> for="name">Name</label>
+      <% end %>
+      <input type="text" id="name" placeholder="Type something here..." class="flex-1 px-3 py-2 text-sm rounded-md border border-input bg-background outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+    <% end %>
+  </div>
+
+  <%# Example 10: With Dropdown Menu (Split Button) %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">Dropdown Menu (Split Button)</h2>
+    <p class="text-muted-foreground">Create a split button group with a dropdown menu.</p>
+
+    <%# Use asChild on DropdownMenu to attach controller to ButtonGroup %>
+    <%# Content must be inside the controller scope (ButtonGroup) %>
+    <%= render UI::DropdownMenu::DropdownMenu.new(as_child: true) do |dropdown_attrs| %>
+      <%= render UI::ButtonGroup::ButtonGroup.new(**dropdown_attrs) do %>
+        <%= render UI::Button::Button.new(variant: :outline) { "Follow" } %>
+        <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline, size: :icon) do %>
+            <%= lucide_icon("chevron-down") %>
+          <% end %>
+        <% end %>
+        <%= render UI::DropdownMenu::Content.new(align: :end) do %>
+          <%= render UI::DropdownMenu::Item.new do %>
+            <%= lucide_icon("bell-off") %>
+            Mute Conversation
+          <% end %>
+          <%= render UI::DropdownMenu::Item.new do %>
+            <%= lucide_icon("check") %>
+            Mark as Read
+          <% end %>
+          <%= render UI::DropdownMenu::Separator.new %>
+          <%= render UI::DropdownMenu::Item.new(variant: :destructive) do %>
+            <%= lucide_icon("trash-2") %>
+            Delete Conversation
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 11: ERB Partial Implementation %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
+    <p class="text-muted-foreground">Same examples using ERB partials.</p>
+
+    <div class="space-y-6">
+      <div>
+        <p class="text-sm font-medium mb-2">Basic</p>
+        <%= render "ui/button_group/button_group" do %>
+          <%= render "ui/button/button", variant: :outline do %>Archive<% end %>
+          <%= render "ui/button/button", variant: :outline do %>Report<% end %>
+        <% end %>
+      </div>
+
+      <div>
+        <p class="text-sm font-medium mb-2">With Separator</p>
+        <%= render "ui/button_group/button_group" do %>
+          <%= render "ui/button/button", variant: :secondary, size: :sm do %>Copy<% end %>
+          <%= render "ui/button_group/separator" %>
+          <%= render "ui/button/button", variant: :secondary, size: :sm do %>Paste<% end %>
+        <% end %>
+      </div>
+
+      <div>
+        <p class="text-sm font-medium mb-2">With Text</p>
+        <%= render "ui/button_group/button_group" do %>
+          <%= render "ui/button_group/text" do %>Label<% end %>
+          <%= render "ui/button/button", variant: :outline do %>Button<% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Example 12: ViewComponent Implementation %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
+    <p class="text-muted-foreground">Same examples using ViewComponents.</p>
+
+    <div class="space-y-6">
+      <div>
+        <p class="text-sm font-medium mb-2">Basic</p>
+        <%= render(UI::ButtonGroup::ButtonGroupComponent.new) do %>
+          <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Archive" } %>
+          <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Report" } %>
+        <% end %>
+      </div>
+
+      <div>
+        <p class="text-sm font-medium mb-2">With Separator</p>
+        <%= render(UI::ButtonGroup::ButtonGroupComponent.new) do %>
+          <%= render(UI::Button::ButtonComponent.new(variant: :secondary, size: :sm)) { "Copy" } %>
+          <%= render(UI::ButtonGroup::SeparatorComponent.new) %>
+          <%= render(UI::Button::ButtonComponent.new(variant: :secondary, size: :sm)) { "Paste" } %>
+        <% end %>
+      </div>
+
+      <div>
+        <p class="text-sm font-medium mb-2">With Text</p>
+        <%= render(UI::ButtonGroup::ButtonGroupComponent.new) do %>
+          <%= render(UI::ButtonGroup::TextComponent.new) { "Label" } %>
+          <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Button" } %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
