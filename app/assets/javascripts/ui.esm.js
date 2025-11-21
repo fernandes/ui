@@ -2412,6 +2412,61 @@ class CheckboxController extends Controller {
   }
 }
 
+class CollapsibleController extends Controller {
+  static targets=[ "trigger", "content" ];
+  static values={
+    open: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  };
+  connect() {
+    this.updateState(this.openValue, false);
+  }
+  toggle(event) {
+    if (this.disabledValue) return;
+    event.preventDefault();
+    this.openValue = !this.openValue;
+  }
+  openValueChanged() {
+    this.updateState(this.openValue, true);
+  }
+  updateState(isOpen, animate = true) {
+    const state = isOpen ? "open" : "closed";
+    this.element.dataset.state = state;
+    if (this.hasTriggerTarget) {
+      this.triggerTarget.dataset.state = state;
+      this.triggerTarget.setAttribute("aria-expanded", isOpen);
+    }
+    if (this.hasContentTarget) {
+      const content = this.contentTarget;
+      content.dataset.state = state;
+      if (isOpen) {
+        content.removeAttribute("hidden");
+        content.style.height = `${content.scrollHeight}px`;
+      } else {
+        if (animate) {
+          content.style.height = "0px";
+          content.addEventListener("transitionend", () => {
+            if (content.dataset.state === "closed") {
+              content.setAttribute("hidden", "");
+            }
+          }, {
+            once: true
+          });
+        } else {
+          content.style.height = "0px";
+          content.setAttribute("hidden", "");
+        }
+      }
+    }
+  }
+}
+
 class TooltipController extends Controller {
   static targets=[ "trigger", "content" ];
   static values={
@@ -3480,6 +3535,7 @@ function registerControllers(application) {
     "ui--avatar": AvatarController,
     "ui--dialog": DialogController,
     "ui--checkbox": CheckboxController,
+    "ui--collapsible": CollapsibleController,
     "ui--tooltip": TooltipController,
     "ui--popover": PopoverController,
     "ui--scroll-area": ScrollAreaController,
@@ -3487,4 +3543,4 @@ function registerControllers(application) {
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, DialogController, DropdownController, HelloController, PopoverController, ScrollAreaController, SelectController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, DialogController, DropdownController, HelloController, PopoverController, ScrollAreaController, SelectController, TooltipController, registerControllers, registerControllersInto, version };

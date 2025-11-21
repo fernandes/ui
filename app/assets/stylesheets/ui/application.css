@@ -148,7 +148,9 @@
 
   /* UI Variables */
   --duration-accordion:300ms;
-  --ease-accordion:cubic-bezier(0.87, 0, 0.13, 1)
+  --ease-accordion:cubic-bezier(0.87, 0, 0.13, 1);
+  --duration-collapsible:300ms;
+  --ease-collapsible:cubic-bezier(0.87, 0, 0.13, 1)
 }
 @supports (color:lab(0% 0 0)) {
   :root {

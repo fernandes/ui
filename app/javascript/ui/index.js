@@ -15,6 +15,7 @@ import AlertDialogController from "./controllers/alert_dialog_controller.js";
 import AvatarController from "./controllers/avatar_controller.js";
 import DialogController from "./controllers/dialog_controller.js";
 import CheckboxController from "./controllers/checkbox_controller.js";
+import CollapsibleController from "./controllers/collapsible_controller.js";
 import TooltipController from "./controllers/tooltip_controller.js";
 import PopoverController from "./controllers/popover_controller.js";
 import ScrollAreaController from "./controllers/scroll_area_controller.js";
@@ -36,6 +37,7 @@ export function registerControllers(application) {
     "ui--avatar": AvatarController,
     "ui--dialog": DialogController,
     "ui--checkbox": CheckboxController,
+    "ui--collapsible": CollapsibleController,
     "ui--tooltip": TooltipController,
     "ui--popover": PopoverController,
     "ui--scroll-area": ScrollAreaController,
@@ -47,4 +49,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController, TooltipController, PopoverController, ScrollAreaController, SelectController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController, CollapsibleController, TooltipController, PopoverController, ScrollAreaController, SelectController };

@@ -1,0 +1,23 @@
+<%
+  # Collapsible - ERB Partial
+  #
+  # A collapsible content container with toggle functionality.
+  # Uses CollapsibleBehavior module for shared styling logic.
+  #
+  # @param open [Boolean] Initial open state
+  # @param disabled [Boolean] Whether the collapsible is disabled
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @open = local_assigns.fetch(:open, false)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @as_child = false
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Collapsible::CollapsibleBehavior
+  all_attributes = collapsible_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

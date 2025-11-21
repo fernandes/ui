@@ -1,0 +1,18 @@
+<%
+  # CollapsibleTrigger - ERB Partial
+  #
+  # Button that toggles the collapsible state.
+  # Uses TriggerBehavior module for shared styling logic.
+  #
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Collapsible::TriggerBehavior
+  all_attributes = collapsible_trigger_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :button, type: "button", **all_attributes do %>
+  <%= yield %>
+<% end %>

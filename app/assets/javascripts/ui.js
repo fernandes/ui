@@ -2306,6 +2306,60 @@
       }
     }
   }
+  class CollapsibleController extends stimulus.Controller {
+    static targets=[ "trigger", "content" ];
+    static values={
+      open: {
+        type: Boolean,
+        default: false
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    };
+    connect() {
+      this.updateState(this.openValue, false);
+    }
+    toggle(event) {
+      if (this.disabledValue) return;
+      event.preventDefault();
+      this.openValue = !this.openValue;
+    }
+    openValueChanged() {
+      this.updateState(this.openValue, true);
+    }
+    updateState(isOpen, animate = true) {
+      const state = isOpen ? "open" : "closed";
+      this.element.dataset.state = state;
+      if (this.hasTriggerTarget) {
+        this.triggerTarget.dataset.state = state;
+        this.triggerTarget.setAttribute("aria-expanded", isOpen);
+      }
+      if (this.hasContentTarget) {
+        const content = this.contentTarget;
+        content.dataset.state = state;
+        if (isOpen) {
+          content.removeAttribute("hidden");
+          content.style.height = `${content.scrollHeight}px`;
+        } else {
+          if (animate) {
+            content.style.height = "0px";
+            content.addEventListener("transitionend", () => {
+              if (content.dataset.state === "closed") {
+                content.setAttribute("hidden", "");
+              }
+            }, {
+              once: true
+            });
+          } else {
+            content.style.height = "0px";
+            content.setAttribute("hidden", "");
+          }
+        }
+      }
+    }
+  }
   class TooltipController extends stimulus.Controller {
     static targets=[ "trigger", "content" ];
     static values={
@@ -3368,6 +3422,7 @@
       "ui--avatar": AvatarController,
       "ui--dialog": DialogController,
       "ui--checkbox": CheckboxController,
+      "ui--collapsible": CollapsibleController,
       "ui--tooltip": TooltipController,
       "ui--popover": PopoverController,
       "ui--scroll-area": ScrollAreaController,
@@ -3378,6 +3433,7 @@
   exports.AlertDialogController = AlertDialogController;
   exports.AvatarController = AvatarController;
   exports.CheckboxController = CheckboxController;
+  exports.CollapsibleController = CollapsibleController;
   exports.DialogController = DialogController;
   exports.DropdownController = DropdownController;
   exports.HelloController = HelloController;

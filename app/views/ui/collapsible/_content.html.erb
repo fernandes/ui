@@ -1,0 +1,20 @@
+<%
+  # CollapsibleContent - ERB Partial
+  #
+  # Container for the expandable content.
+  # Uses ContentBehavior module for shared styling logic.
+  #
+  # @param force_mount [Boolean] Always render in DOM even when closed
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @force_mount = local_assigns.fetch(:force_mount, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Collapsible::ContentBehavior
+  all_attributes = collapsible_content_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

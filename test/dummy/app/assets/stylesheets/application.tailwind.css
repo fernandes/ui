@@ -21,5 +21,7 @@
  */
 
 @theme {
+  --duration-collapsible: 300ms;
+  --ease-collapsible: cubic-bezier(0.87, 0, 0.13, 1);
 }
 
