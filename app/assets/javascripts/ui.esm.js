@@ -4796,6 +4796,29 @@ class SelectController extends Controller {
   }
 }
 
+class ToggleController extends Controller {
+  static values={
+    pressed: {
+      type: Boolean,
+      default: false
+    }
+  };
+  connect() {
+    this.updateState();
+  }
+  toggle() {
+    this.pressedValue = !this.pressedValue;
+  }
+  pressedValueChanged() {
+    this.updateState();
+  }
+  updateState() {
+    const state = this.pressedValue ? "on" : "off";
+    this.element.setAttribute("data-state", state);
+    this.element.setAttribute("aria-pressed", this.pressedValue.toString());
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -4827,8 +4850,9 @@ function registerControllers(application) {
     "ui--popover": PopoverController,
     "ui--responsive-dialog": ResponsiveDialogController,
     "ui--scroll-area": ScrollAreaController,
-    "ui--select": SelectController
+    "ui--select": SelectController,
+    "ui--toggle": ToggleController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, ToggleController, TooltipController, registerControllers, registerControllersInto, version };

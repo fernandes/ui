@@ -1,0 +1,27 @@
+<%
+  # Toggle - ERB Partial
+  #
+  # A two-state button that can be either on or off.
+  #
+  # @param variant [String] Visual style variant (default, outline)
+  # @param size [String] Size variant (default, sm, lg)
+  # @param type [String] Button type attribute (button, submit, reset)
+  # @param pressed [Boolean] Whether the toggle is pressed/active
+  # @param disabled [Boolean] Whether the toggle is disabled
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @variant = local_assigns.fetch(:variant, "default")
+  @size = local_assigns.fetch(:size, "default")
+  @type = local_assigns.fetch(:type, "button")
+  @pressed = local_assigns.fetch(:pressed, false)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::ToggleBehavior
+  all_attributes = toggle_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :button, all_attributes do %>
+  <%= yield %>
+<% end %>

@@ -4680,6 +4680,28 @@
       }
     }
   }
+  class ToggleController extends stimulus.Controller {
+    static values={
+      pressed: {
+        type: Boolean,
+        default: false
+      }
+    };
+    connect() {
+      this.updateState();
+    }
+    toggle() {
+      this.pressedValue = !this.pressedValue;
+    }
+    pressedValueChanged() {
+      this.updateState();
+    }
+    updateState() {
+      const state = this.pressedValue ? "on" : "off";
+      this.element.setAttribute("data-state", state);
+      this.element.setAttribute("aria-pressed", this.pressedValue.toString());
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -4709,7 +4731,8 @@
       "ui--popover": PopoverController,
       "ui--responsive-dialog": ResponsiveDialogController,
       "ui--scroll-area": ScrollAreaController,
-      "ui--select": SelectController
+      "ui--select": SelectController,
+      "ui--toggle": ToggleController
     });
   }
   exports.AccordionController = AccordionController;
@@ -4728,6 +4751,7 @@
   exports.ResponsiveDialogController = ResponsiveDialogController;
   exports.ScrollAreaController = ScrollAreaController;
   exports.SelectController = SelectController;
+  exports.ToggleController = ToggleController;
   exports.TooltipController = TooltipController;
   exports.registerControllers = registerControllers;
   exports.registerControllersInto = registerControllersInto;

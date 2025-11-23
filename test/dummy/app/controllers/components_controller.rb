@@ -81,6 +81,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/separator.html.erb
   end
 
+  def toggle
+    # Renders app/views/components/toggle.html.erb
+  end
+
   def tooltip
     # Renders app/views/components/tooltip.html.erb
   end
