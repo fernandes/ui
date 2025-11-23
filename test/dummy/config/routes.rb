@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   get "/components/command", to: "components#command"
   get "/components/context_menu", to: "components#context_menu"
   get "/components/dialog", to: "components#dialog"
+  get "/components/drawer", to: "components#drawer"
   get "/components/dropdown_menu", to: "components#dropdown_menu"
   get "/components/empty", to: "components#empty"
   get "/components/input", to: "components#input"

@@ -102,6 +102,53 @@
     opacity: 1;
     pointer-events: auto;
   }
+
+  /* Drawer background extension - prevents gaps during animation
+   * Creates an extended background area using ::after pseudo-element
+   * Based on Vaul's implementation: https://github.com/emilkowalski/vaul
+   */
+  [data-vaul-drawer]:not([data-vaul-custom-container='true'])::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    background-color: inherit;
+  }
+
+  /* Bottom direction - extends downward */
+  [data-vaul-drawer][data-vaul-drawer-direction='bottom']::after {
+    top: 100%;
+    bottom: initial;
+    left: 0;
+    right: 0;
+    height: 200%;
+  }
+
+  /* Top direction - extends upward */
+  [data-vaul-drawer][data-vaul-drawer-direction='top']::after {
+    bottom: 100%;
+    top: initial;
+    left: 0;
+    right: 0;
+    height: 200%;
+  }
+
+  /* Left direction - extends leftward */
+  [data-vaul-drawer][data-vaul-drawer-direction='left']::after {
+    right: 100%;
+    left: initial;
+    top: 0;
+    bottom: 0;
+    width: 200%;
+  }
+
+  /* Right direction - extends rightward */
+  [data-vaul-drawer][data-vaul-drawer-direction='right']::after {
+    left: 100%;
+    right: initial;
+    top: 0;
+    bottom: 0;
+    width: 200%;
+  }
 }
 
 :root {
@@ -150,7 +197,9 @@
   --duration-accordion:300ms;
   --ease-accordion:cubic-bezier(0.87, 0, 0.13, 1);
   --duration-collapsible:300ms;
-  --ease-collapsible:cubic-bezier(0.87, 0, 0.13, 1)
+  --ease-collapsible:cubic-bezier(0.87, 0, 0.13, 1);
+  --duration-drawer:500ms;
+  --ease-drawer:cubic-bezier(0.32, 0.72, 0, 1)
 }
 @supports (color:lab(0% 0 0)) {
   :root {
@@ -516,4 +565,6 @@
   /* UI Variables */
   --duration-accordion: 300ms;
   --ease-accordion: cubic-bezier(0.87, 0, 0.13, 1);
+  --duration-drawer: 500ms;
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }

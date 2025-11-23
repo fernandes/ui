@@ -2310,6 +2310,16 @@ class DialogController extends Controller {
   connect() {
     if (this.openValue) {
       this.show();
+    } else {
+      if (this.hasContainerTarget) {
+        this.containerTarget.setAttribute("data-state", "closed");
+      }
+      if (this.hasOverlayTarget) {
+        this.overlayTarget.setAttribute("data-state", "closed");
+      }
+      if (this.hasContentTarget) {
+        this.contentTarget.setAttribute("data-state", "closed");
+      }
     }
   }
   open() {
@@ -2878,6 +2888,764 @@ class CommandDialogController extends Controller {
   }
 }
 
+class DrawerController extends Controller {
+  static targets=[ "container", "overlay", "content", "handle" ];
+  static values={
+    open: {
+      type: Boolean,
+      default: false
+    },
+    direction: {
+      type: String,
+      default: "bottom"
+    },
+    dismissible: {
+      type: Boolean,
+      default: true
+    },
+    modal: {
+      type: Boolean,
+      default: true
+    },
+    snapPoints: {
+      type: Array,
+      default: []
+    },
+    activeSnapPoint: {
+      type: Number,
+      default: -1
+    },
+    fadeFromIndex: {
+      type: Number,
+      default: -1
+    },
+    snapToSequentialPoint: {
+      type: Boolean,
+      default: false
+    },
+    handleOnly: {
+      type: Boolean,
+      default: false
+    },
+    repositionInputs: {
+      type: Boolean,
+      default: true
+    }
+  };
+  TRANSITIONS={
+    DURATION: .65,
+    EASE: [ .32, .72, 0, 1 ]
+  };
+  VELOCITY_THRESHOLD=.4;
+  CLOSE_THRESHOLD=.25;
+  DRAG_CLASS="vaul-dragging";
+  SCROLL_LOCK_TIMEOUT=500;
+  connect() {
+    this.isPointerDown = false;
+    this.pointerStart = null;
+    this.dragStartTime = null;
+    this.isDragging = false;
+    this.lastPositions = [];
+    this.lastScrollTime = 0;
+    this.hasBeenOpened = false;
+    this.dragStartY = 0;
+    this.resizeObserver = new ResizeObserver(() => {
+      this.handleResize();
+    });
+    if (this.hasContentTarget) {
+      this.resizeObserver.observe(this.contentTarget);
+    }
+    if (this.openValue) {
+      this.show();
+    } else {
+      if (this.hasContainerTarget) {
+        this.containerTarget.setAttribute("data-state", "closed");
+      }
+      if (this.hasOverlayTarget) {
+        this.overlayTarget.setAttribute("data-state", "closed");
+      }
+      if (this.hasContentTarget) {
+        this.contentTarget.setAttribute("data-state", "closed");
+      }
+    }
+    if (this.repositionInputsValue && typeof visualViewport !== "undefined") {
+      this.viewportResizeHandler = this.handleViewportResize.bind(this);
+      visualViewport.addEventListener("resize", this.viewportResizeHandler);
+    }
+  }
+  disconnect() {
+    document.body.style.overflow = "";
+    document.body.removeAttribute("data-scroll-locked");
+    if (this.escapeHandler) {
+      document.removeEventListener("keydown", this.escapeHandler);
+    }
+    if (this.preventScrollHandler) {
+      document.removeEventListener("touchmove", this.preventScrollHandler);
+    }
+    if (this.viewportResizeHandler && typeof visualViewport !== "undefined") {
+      visualViewport.removeEventListener("resize", this.viewportResizeHandler);
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+  open() {
+    this.openValue = true;
+    this.show();
+  }
+  close() {
+    if (!this.dismissibleValue) return;
+    this.openValue = false;
+    this.hide();
+  }
+  closeOnOverlayClick(event) {
+    if (this.dismissibleValue && this.modalValue) {
+      this.animateToClosedPosition();
+    }
+  }
+  handlePointerDown(event) {
+    if (this.handleOnlyValue && !this.isHandleEvent(event)) {
+      return;
+    }
+    if (this.shouldIgnoreDrag(event)) {
+      return;
+    }
+    this.isPointerDown = true;
+    this.pointerStart = this.getPointerPosition(event);
+    this.dragStartTime = Date.now();
+    this.lastPositions = [ {
+      position: this.pointerStart,
+      time: this.dragStartTime
+    } ];
+    if (this.hasContentTarget) {
+      this.contentTarget.setPointerCapture(event.pointerId);
+    }
+  }
+  handlePointerMove(event) {
+    if (!this.isPointerDown) return;
+    const currentPos = this.getPointerPosition(event);
+    const delta = this.getDelta(this.pointerStart, currentPos);
+    if (!this.isDragging) {
+      const threshold = event.pointerType === "touch" ? 10 : 2;
+      if (Math.abs(delta) > threshold) {
+        this.startDrag();
+      } else {
+        return;
+      }
+    }
+    const now = Date.now();
+    this.lastPositions.push({
+      position: currentPos,
+      time: now
+    });
+    if (this.lastPositions.length > 5) {
+      this.lastPositions.shift();
+    }
+    const dampedDelta = this.applyDamping(delta);
+    this.updateTransform(dampedDelta);
+  }
+  handlePointerUp(event) {
+    if (!this.isPointerDown) return;
+    this.isPointerDown = false;
+    if (this.hasContentTarget) {
+      this.contentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (!this.isDragging) return;
+    const velocity = this.calculateVelocity();
+    const currentPos = this.getPointerPosition(event);
+    const delta = this.getDelta(this.pointerStart, currentPos);
+    const dampedDelta = this.applyDamping(delta);
+    this.endDrag(dampedDelta, velocity);
+  }
+  handlePointerCancel(event) {
+    this.handlePointerUp(event);
+  }
+  startDrag() {
+    this.isDragging = true;
+    this.hasBeenOpened = true;
+    if (this.snapPointsValue && this.snapPointsValue.length > 0 && this.activeSnapPointValue >= 0) {
+      this.dragStartY = this.getSnapPointY(this.activeSnapPointValue);
+    } else {
+      this.dragStartY = 0;
+    }
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.add(this.DRAG_CLASS);
+      this.contentTarget.style.transition = "none";
+    }
+    this.element.dispatchEvent(new CustomEvent("drawer:drag:start", {
+      bubbles: true,
+      detail: {
+        direction: this.directionValue
+      }
+    }));
+  }
+  updateTransform(delta) {
+    if (!this.hasContentTarget) return;
+    let finalDelta = delta;
+    if (this.snapPointsValue && this.snapPointsValue.length > 0) {
+      finalDelta = this.dragStartY + delta;
+    }
+    const transform = this.getTransformForDirection(finalDelta);
+    this.contentTarget.style.transform = transform;
+    this.updateOverlayOpacity(finalDelta);
+  }
+  endDrag(delta, velocity) {
+    this.isDragging = false;
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.remove(this.DRAG_CLASS);
+    }
+    let finalDelta = delta;
+    if (this.snapPointsValue && this.snapPointsValue.length > 0) {
+      finalDelta = this.dragStartY + delta;
+    }
+    if (this.snapPointsValue.length > 0) {
+      this.handleSnapPointRelease(finalDelta, velocity);
+    } else {
+      this.handleRegularRelease(delta, velocity);
+    }
+    this.element.dispatchEvent(new CustomEvent("drawer:drag:end", {
+      bubbles: true,
+      detail: {
+        direction: this.directionValue,
+        velocity: velocity,
+        delta: finalDelta
+      }
+    }));
+  }
+  getSnapPointY(snapIndex) {
+    if (!this.snapPointsValue || snapIndex < 0 || snapIndex >= this.snapPointsValue.length) {
+      return 0;
+    }
+    const snapPoint = this.snapPointsValue[snapIndex];
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const MOBILE_THRESHOLD = 80;
+    console.log("📏 Viewport size:", {
+      height: viewportHeight,
+      width: viewportWidth
+    });
+    let containerSize;
+    if (this.directionValue === "left" || this.directionValue === "right") {
+      containerSize = viewportWidth;
+    } else {
+      if (snapPoint === 1) {
+        containerSize = viewportHeight - MOBILE_THRESHOLD;
+      } else {
+        containerSize = viewportHeight;
+      }
+    }
+    if (containerSize === 0) return 0;
+    let pixels;
+    if (typeof snapPoint === "string" && snapPoint.includes("px")) {
+      pixels = parseInt(snapPoint);
+    } else if (snapPoint > 1) {
+      pixels = snapPoint / 100 * containerSize;
+    } else {
+      pixels = snapPoint * containerSize;
+    }
+    let yPosition;
+    if (this.directionValue === "bottom" || this.directionValue === "right") {
+      yPosition = containerSize - pixels;
+      if (snapPoint === 1) {
+        yPosition = MOBILE_THRESHOLD;
+      }
+    } else {
+      yPosition = pixels;
+    }
+    console.log("📐 Snap point calculation:", {
+      snapIndex: snapIndex,
+      snapPoint: snapPoint,
+      containerSize: containerSize,
+      pixels: pixels,
+      pixelsPercentage: `${(pixels / containerSize * 100).toFixed(1)}%`,
+      yPosition: yPosition,
+      direction: this.directionValue
+    });
+    return yPosition;
+  }
+  handleSnapPointRelease(delta, velocity) {
+    if (!this.snapPointsValue || this.snapPointsValue.length === 0) {
+      this.close();
+      return;
+    }
+    const currentIndex = this.activeSnapPointValue >= 0 ? this.activeSnapPointValue : 0;
+    const currentY = delta;
+    console.log("🎯 handleSnapPointRelease called:", {
+      currentIndex: currentIndex,
+      delta: delta,
+      velocity: velocity,
+      velocityAbs: Math.abs(velocity),
+      threshold: this.VELOCITY_THRESHOLD,
+      isHighVelocity: Math.abs(velocity) > this.VELOCITY_THRESHOLD,
+      isClosingDirection: this.isClosingDirection(delta)
+    });
+    if (currentIndex === 0 && this.isClosingDirection(delta)) {
+      const firstSnapY = this.getSnapPointY(0);
+      const isDraggedBeyondFirstSnap = this.directionValue === "bottom" || this.directionValue === "right" ? currentY > firstSnapY : currentY < firstSnapY;
+      if (isDraggedBeyondFirstSnap) {
+        this.animateToClosedPosition();
+        return;
+      }
+    }
+    let targetIndex;
+    if (Math.abs(velocity) > this.VELOCITY_THRESHOLD && !this.snapToSequentialPointValue) {
+      if (velocity > 0) {
+        targetIndex = Math.max(currentIndex - 1, 0);
+        console.log("⬇️ High velocity CLOSING: currentIndex", currentIndex, "→ targetIndex", targetIndex);
+      } else {
+        targetIndex = Math.min(currentIndex + 1, this.snapPointsValue.length - 1);
+        console.log("⬆️ High velocity OPENING: currentIndex", currentIndex, "→ targetIndex", targetIndex);
+      }
+    } else {
+      targetIndex = this.findClosestSnapPointIndex(currentY);
+      console.log("🐌 Low velocity: using closest snap point, targetIndex", targetIndex);
+    }
+    console.log("✅ Final targetIndex:", targetIndex);
+    this.snapTo(targetIndex);
+  }
+  handleRegularRelease(delta, velocity) {
+    const drawerSize = this.getDrawerSize();
+    const dragPercentage = Math.abs(delta) / drawerSize;
+    if (Math.abs(velocity) > this.VELOCITY_THRESHOLD && this.isClosingDirection(delta)) {
+      this.close();
+      return;
+    }
+    if (dragPercentage > this.CLOSE_THRESHOLD && this.isClosingDirection(delta)) {
+      this.close();
+    } else {
+      this.resetPosition();
+    }
+  }
+  findClosestSnapPointIndex(currentY) {
+    if (!this.snapPointsValue || this.snapPointsValue.length === 0) return 0;
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+    this.snapPointsValue.forEach((_, index) => {
+      const snapY = this.getSnapPointY(index);
+      const distance = Math.abs(currentY - snapY);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+    return closestIndex;
+  }
+  snapTo(snapPointIndex, animated = true) {
+    if (snapPointIndex < 0 || snapPointIndex >= this.snapPointsValue.length) {
+      return;
+    }
+    this.activeSnapPointValue = snapPointIndex;
+    const snapPoint = this.snapPointsValue[snapPointIndex];
+    const snapY = this.getSnapPointY(snapPointIndex);
+    if (this.hasContentTarget) {
+      const currentTransform = this.contentTarget.style.transform;
+      const targetTransform = this.getTransformForSnapPoint(snapY);
+      if (animated) {
+        console.log("📍 snapTo (animated):", {
+          snapPointIndex: snapPointIndex,
+          currentTransform: currentTransform,
+          targetTransform: targetTransform,
+          duration: this.TRANSITIONS.DURATION
+        });
+        this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
+      }
+      this.contentTarget.style.transform = targetTransform;
+      if (animated) {
+        setTimeout(() => {
+          if (this.hasContentTarget) {
+            this.contentTarget.style.transition = "";
+          }
+        }, this.TRANSITIONS.DURATION * 1e3);
+      }
+    }
+    this.updateOverlayOpacityForSnapPoint(snapPointIndex);
+    this.element.dispatchEvent(new CustomEvent("drawer:snap", {
+      bubbles: true,
+      detail: {
+        snapPoint: snapPoint,
+        snapPointIndex: snapPointIndex,
+        y: snapY
+      }
+    }));
+  }
+  snapPointToPercentage(snapPoint) {
+    if (snapPoint === 1) return 1;
+    if (typeof snapPoint === "number" && snapPoint < 1) return snapPoint;
+    const drawerSize = this.getDrawerSize();
+    const pixels = parseInt(snapPoint);
+    return Math.min(pixels / drawerSize, 1);
+  }
+  getTransformForSnapPoint(offset) {
+    switch (this.directionValue) {
+     case "bottom":
+      return `translate3d(0, ${offset}px, 0)`;
+
+     case "top":
+      return `translate3d(0, ${-offset}px, 0)`;
+
+     case "left":
+      return `translate3d(${-offset}px, 0, 0)`;
+
+     case "right":
+      return `translate3d(${offset}px, 0, 0)`;
+
+     default:
+      return `translate3d(0, ${offset}px, 0)`;
+    }
+  }
+  getTransformForDirection(delta) {
+    switch (this.directionValue) {
+     case "bottom":
+      return `translate3d(0, ${delta}px, 0)`;
+
+     case "top":
+      return `translate3d(0, ${-delta}px, 0)`;
+
+     case "left":
+      return `translate3d(${-delta}px, 0, 0)`;
+
+     case "right":
+      return `translate3d(${delta}px, 0, 0)`;
+
+     default:
+      return `translate3d(0, ${delta}px, 0)`;
+    }
+  }
+  getDelta(start, current) {
+    switch (this.directionValue) {
+     case "bottom":
+      return current.y - start.y;
+
+     case "top":
+      return start.y - current.y;
+
+     case "left":
+      return start.x - current.x;
+
+     case "right":
+      return current.x - start.x;
+
+     default:
+      return current.y - start.y;
+    }
+  }
+  isClosingDirection(delta) {
+    return delta > 0;
+  }
+  getDrawerSize() {
+    if (!this.hasContentTarget) return 0;
+    if (this.directionValue === "left" || this.directionValue === "right") {
+      return this.contentTarget.offsetWidth;
+    } else {
+      return this.contentTarget.offsetHeight;
+    }
+  }
+  getClosedPosition() {
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const drawerSize = this.getDrawerSize();
+    switch (this.directionValue) {
+     case "bottom":
+     case "top":
+      return viewportHeight + drawerSize;
+
+     case "right":
+     case "left":
+      return viewportWidth + drawerSize;
+
+     default:
+      return 0;
+    }
+  }
+  calculateVelocity() {
+    if (this.lastPositions.length < 2) return 0;
+    const latest = this.lastPositions[this.lastPositions.length - 1];
+    const earliest = this.lastPositions[0];
+    const timeDelta = latest.time - earliest.time;
+    if (timeDelta === 0) return 0;
+    const positionDelta = this.getDelta(earliest.position, latest.position);
+    return positionDelta / timeDelta;
+  }
+  applyDamping(delta) {
+    if (this.snapPointsValue && this.snapPointsValue.length > 0) {
+      return delta;
+    }
+    if (!this.isClosingDirection(delta)) {
+      return delta * .1;
+    }
+    return delta;
+  }
+  getPointerPosition(event) {
+    return {
+      x: event.clientX,
+      y: event.clientY
+    };
+  }
+  shouldIgnoreDrag(event) {
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return true;
+    }
+    if (event.target.closest("[data-vaul-no-drag]")) {
+      return true;
+    }
+    const scrollableEl = event.target.closest("[data-vaul-scrollable]");
+    if (scrollableEl) {
+      const now = Date.now();
+      if (now - this.lastScrollTime < this.SCROLL_LOCK_TIMEOUT) {
+        return true;
+      }
+      const isVertical = this.directionValue === "bottom" || this.directionValue === "top";
+      if (isVertical) {
+        const canScrollUp = scrollableEl.scrollTop > 0;
+        const canScrollDown = scrollableEl.scrollTop < scrollableEl.scrollHeight - scrollableEl.clientHeight;
+        if (canScrollUp || canScrollDown) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  isHandleEvent(event) {
+    if (!this.hasHandleTarget) return false;
+    return event.target === this.handleTarget || this.handleTarget.contains(event.target);
+  }
+  resetPosition() {
+    if (!this.hasContentTarget) return;
+    this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
+    this.contentTarget.style.transform = "translate3d(0, 0, 0)";
+    setTimeout(() => {
+      if (this.hasContentTarget) {
+        this.contentTarget.style.transition = "";
+        this.contentTarget.style.transform = "";
+      }
+    }, this.TRANSITIONS.DURATION * 1e3);
+    this.updateOverlayOpacity(0);
+  }
+  updateOverlayOpacity(delta) {
+    if (!this.hasOverlayTarget) return;
+    if (!this.snapPointsValue || this.snapPointsValue.length === 0) return;
+    const currentY = delta;
+    let fadeIndex;
+    if (this.fadeFromIndexValue >= 0) {
+      fadeIndex = this.fadeFromIndexValue;
+    } else {
+      fadeIndex = 0;
+    }
+    const fadeStartY = this.getSnapPointY(fadeIndex);
+    const fadeEndIndex = Math.min(fadeIndex + 1, this.snapPointsValue.length - 1);
+    const fadeEndY = this.getSnapPointY(fadeEndIndex);
+    console.log("🔍 updateOverlayOpacity:", {
+      delta: delta,
+      currentY: currentY,
+      fadeIndex: fadeIndex,
+      fadeEndIndex: fadeEndIndex,
+      fadeStartY: fadeStartY,
+      fadeEndY: fadeEndY,
+      "currentY <= fadeEndY?": currentY <= fadeEndY,
+      "fadeEndY < currentY <= fadeStartY?": currentY > fadeEndY && currentY <= fadeStartY
+    });
+    if (currentY < fadeEndY) {
+      console.log("✅ Setting opacity = 1 (more open than fadeEndIndex)");
+      this.overlayTarget.style.opacity = "1";
+      return;
+    }
+    if (currentY >= fadeEndY && currentY <= fadeStartY) {
+      const range = fadeStartY - fadeEndY;
+      const progress = (fadeStartY - currentY) / range;
+      const finalOpacity = Math.min(1, Math.max(0, progress));
+      console.log("📈 Setting opacity =", finalOpacity, "(gradual fade)");
+      this.overlayTarget.style.opacity = finalOpacity;
+      return;
+    }
+    console.log("❌ Setting opacity = 0 (more closed than fadeFromIndex)");
+    this.overlayTarget.style.opacity = "0";
+  }
+  updateOverlayOpacityForSnapPoint(snapPointIndex) {
+    if (!this.hasOverlayTarget) return;
+    if (!this.snapPointsValue || this.snapPointsValue.length === 0) return;
+    const fadeIndex = this.fadeFromIndexValue >= 0 ? this.fadeFromIndexValue : 0;
+    const fadeEndIndex = fadeIndex + 1;
+    if (snapPointIndex < fadeIndex) {
+      this.overlayTarget.style.opacity = "0";
+      return;
+    }
+    if (snapPointIndex >= fadeEndIndex) {
+      this.overlayTarget.style.opacity = "1";
+      return;
+    }
+    const currentY = this.getSnapPointY(snapPointIndex);
+    this.updateOverlayOpacity(currentY);
+  }
+  show() {
+    if (this.hasContainerTarget) {
+      this.containerTarget.setAttribute("data-state", "open");
+    }
+    if (this.hasOverlayTarget) {
+      this.overlayTarget.setAttribute("data-state", "open");
+    }
+    if (this.hasContentTarget) {
+      this.contentTarget.setAttribute("data-state", "open");
+    }
+    if (this.snapPointsValue && this.snapPointsValue.length > 0) {
+      const initialIndex = 0;
+      if (this.hasContentTarget) {
+        this.activeSnapPointValue = initialIndex;
+        const closedPosition = this.getClosedPosition();
+        this.contentTarget.style.transition = "none";
+        this.contentTarget.style.transform = this.getTransformForDirection(closedPosition);
+        this.contentTarget.offsetHeight;
+        this.snapTo(initialIndex, true);
+      }
+      this.hasBeenOpened = true;
+      this.updateOverlayOpacityForSnapPoint(initialIndex);
+    } else {
+      if (this.hasContentTarget) {
+        const closedPosition = this.getClosedPosition();
+        this.contentTarget.style.transition = "none";
+        this.contentTarget.style.transform = this.getTransformForDirection(closedPosition);
+        this.contentTarget.offsetHeight;
+        this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
+        this.contentTarget.style.transform = "translate3d(0, 0, 0)";
+      }
+      this.hasBeenOpened = true;
+    }
+    if (this.modalValue) {
+      document.body.style.overflow = "hidden";
+      document.body.setAttribute("data-scroll-locked", "1");
+      this.preventScrollHandler = this.handlePreventScroll.bind(this);
+      document.addEventListener("touchmove", this.preventScrollHandler, {
+        passive: false
+      });
+    }
+    this.setupFocusTrap();
+    if (this.dismissibleValue) {
+      this.escapeHandler = e => {
+        if (e.key === "Escape") {
+          this.animateToClosedPosition();
+        }
+      };
+      document.addEventListener("keydown", this.escapeHandler);
+    }
+    this.element.dispatchEvent(new CustomEvent("drawer:open", {
+      bubbles: true,
+      detail: {
+        open: true
+      }
+    }));
+  }
+  hide() {
+    console.log("🔒 hide() called - delegating to animateToClosedPosition()");
+    this.animateToClosedPosition();
+  }
+  animateToClosedPosition() {
+    if (this.hasContentTarget) {
+      const closedPosition = this.getClosedPosition();
+      const currentTransform = this.contentTarget.style.transform;
+      console.log("🚪 animateToClosedPosition:", {
+        currentTransform: currentTransform,
+        closedPosition: closedPosition,
+        duration: this.TRANSITIONS.DURATION,
+        targetTransform: this.getTransformForDirection(closedPosition)
+      });
+      this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
+      this.contentTarget.style.transform = this.getTransformForDirection(closedPosition);
+      if (this.hasOverlayTarget) {
+        this.overlayTarget.style.transition = `opacity ${this.TRANSITIONS.DURATION}s`;
+        this.overlayTarget.style.opacity = "0";
+      }
+      setTimeout(() => {
+        if (this.hasContentTarget) {
+          this.contentTarget.style.transition = "none";
+          this.contentTarget.style.transform = "";
+          this.contentTarget.setAttribute("data-state", "closed");
+        }
+        if (this.hasOverlayTarget) {
+          this.overlayTarget.style.transition = "none";
+          this.overlayTarget.style.opacity = "";
+          this.overlayTarget.setAttribute("data-state", "closed");
+        }
+        if (this.hasContainerTarget) {
+          this.containerTarget.setAttribute("data-state", "closed");
+        }
+        this.openValue = false;
+        document.body.style.overflow = "";
+        document.body.removeAttribute("data-scroll-locked");
+        if (this.preventScrollHandler) {
+          document.removeEventListener("touchmove", this.preventScrollHandler);
+          this.preventScrollHandler = null;
+        }
+        if (this.escapeHandler) {
+          document.removeEventListener("keydown", this.escapeHandler);
+          this.escapeHandler = null;
+        }
+        this.element.dispatchEvent(new CustomEvent("drawer:close", {
+          bubbles: true,
+          detail: {
+            open: false
+          }
+        }));
+      }, this.TRANSITIONS.DURATION * 1e3);
+    } else {
+      this.close();
+    }
+  }
+  isMobile() {
+    return /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+  setupFocusTrap() {
+    if (!this.hasContentTarget) return;
+    const focusableElements = this.contentTarget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusableElements.length === 0) return;
+    if (this.isMobile()) {
+      const nonInputElement = Array.from(focusableElements).find(el => el.tagName !== "INPUT" && el.tagName !== "TEXTAREA" && el.tagName !== "SELECT");
+      if (nonInputElement) {
+        nonInputElement.focus({
+          preventScroll: true
+        });
+      }
+    } else {
+      focusableElements[0].focus({
+        preventScroll: true
+      });
+    }
+  }
+  handleResize() {
+    if (this.openValue && this.snapPointsValue && this.snapPointsValue.length > 0 && this.activeSnapPointValue >= 0) {
+      this.snapTo(this.activeSnapPointValue, false);
+    }
+  }
+  handleViewportResize() {
+    if (!this.hasContentTarget || !this.openValue) return;
+    const activeElement = document.activeElement;
+    if (activeElement && (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA")) {
+      setTimeout(() => {
+        activeElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 100);
+    }
+  }
+  handlePreventScroll(event) {
+    if (!this.hasContentTarget) return;
+    const target = event.target;
+    const isInsideDrawer = this.contentTarget.contains(target);
+    if (isInsideDrawer) {
+      let scrollableParent = target;
+      while (scrollableParent && scrollableParent !== this.contentTarget) {
+        const overflowY = window.getComputedStyle(scrollableParent).overflowY;
+        const isScrollable = overflowY === "auto" || overflowY === "scroll";
+        if (isScrollable && scrollableParent.scrollHeight > scrollableParent.clientHeight) {
+          return;
+        }
+        scrollableParent = scrollableParent.parentElement;
+      }
+    }
+    event.preventDefault();
+  }
+}
+
 class TooltipController extends Controller {
   static targets=[ "trigger", "content" ];
   static values={
@@ -3161,6 +3929,110 @@ class PopoverController extends Controller {
       layoutShift: true,
       animationFrame: true
     });
+  }
+}
+
+class ResponsiveDialogController extends Controller {
+  static targets=[ "drawer", "dialog" ];
+  static values={
+    breakpoint: {
+      type: Number,
+      default: 768
+    },
+    open: {
+      type: Boolean,
+      default: false
+    }
+  };
+  connect() {
+    this.mediaQuery = window.matchMedia(`(min-width: ${this.breakpointValue}px)`);
+    this.handleBreakpointChangeHandler = this.handleBreakpointChange.bind(this);
+    this.mediaQuery.addEventListener("change", this.handleBreakpointChangeHandler);
+    this.syncState();
+  }
+  disconnect() {
+    if (this.mediaQuery) {
+      this.mediaQuery.removeEventListener("change", this.handleBreakpointChangeHandler);
+    }
+  }
+  open() {
+    this.openValue = true;
+    this.syncState();
+  }
+  close() {
+    this.openValue = false;
+    this.syncState();
+  }
+  toggle() {
+    this.openValue = !this.openValue;
+    this.syncState();
+  }
+  handleBreakpointChange(event) {
+    this.syncState();
+    if (this.openValue) {
+      this.transferFocus();
+    }
+    this.element.dispatchEvent(new CustomEvent("responsive-dialog:resize", {
+      bubbles: true,
+      detail: {
+        isDesktop: event.matches,
+        breakpoint: this.breakpointValue
+      }
+    }));
+  }
+  syncState() {
+    const isDesktop = this.mediaQuery.matches;
+    const activeComponent = isDesktop ? "dialog" : "drawer";
+    const inactiveComponent = isDesktop ? "drawer" : "dialog";
+    if (this.openValue) {
+      this.openComponent(activeComponent);
+      this.ensureClosedComponent(inactiveComponent);
+    } else {
+      this.ensureClosedComponent("drawer");
+      this.ensureClosedComponent("dialog");
+    }
+  }
+  openComponent(componentType) {
+    const target = componentType === "dialog" ? this.dialogTarget : this.drawerTarget;
+    if (!target) return;
+    const openEvent = new CustomEvent(`${componentType}:open`, {
+      bubbles: true,
+      detail: {
+        open: true
+      }
+    });
+    target.dispatchEvent(openEvent);
+  }
+  ensureClosedComponent(componentType) {
+    const target = componentType === "dialog" ? this.dialogTarget : this.drawerTarget;
+    if (!target) return;
+    const closeEvent = new CustomEvent(`${componentType}:close`, {
+      bubbles: true,
+      detail: {
+        open: false
+      }
+    });
+    target.dispatchEvent(closeEvent);
+  }
+  transferFocus() {
+    const isDesktop = this.mediaQuery.matches;
+    const targetEl = isDesktop ? this.dialogTarget : this.drawerTarget;
+    if (!targetEl) return;
+    const focusableElements = targetEl.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusableElements.length > 0) {
+      setTimeout(() => {
+        focusableElements[0].focus();
+      }, 100);
+    }
+  }
+  get isDesktop() {
+    return this.mediaQuery.matches;
+  }
+  get isMobile() {
+    return !this.mediaQuery.matches;
+  }
+  get activeComponentType() {
+    return this.isDesktop ? "dialog" : "drawer";
   }
 }
 
@@ -3945,6 +4817,7 @@ function registerControllers(application) {
     "ui--alert-dialog": AlertDialogController,
     "ui--avatar": AvatarController,
     "ui--dialog": DialogController,
+    "ui--drawer": DrawerController,
     "ui--checkbox": CheckboxController,
     "ui--collapsible": CollapsibleController,
     "ui--command": CommandController,
@@ -3952,9 +4825,10 @@ function registerControllers(application) {
     "ui--context-menu": ContextMenuController,
     "ui--tooltip": TooltipController,
     "ui--popover": PopoverController,
+    "ui--responsive-dialog": ResponsiveDialogController,
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DropdownController, HelloController, PopoverController, ScrollAreaController, SelectController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, TooltipController, registerControllers, registerControllersInto, version };

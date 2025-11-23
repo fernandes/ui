@@ -64,6 +64,7 @@ module UI
       def dialog_overlay_html_attributes
         {
           class: dialog_overlay_classes,
+          "data-state": @open ? "open" : "closed",
           data: dialog_overlay_data_attributes
         }
       end

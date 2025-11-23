@@ -1,0 +1,17 @@
+<%# Drawer Content Component - Main draggable panel %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @open = local_assigns.fetch(:open, false)
+  @direction = local_assigns.fetch(:direction, "bottom")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = drawer_content_html_attributes.deep_merge(@attributes)
+-%>
+<div class="group/drawer-content" <%= tag.attributes(all_attributes) %>>
+  <%= content || yield %>
+</div>

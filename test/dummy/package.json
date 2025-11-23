@@ -9,10 +9,16 @@
     "build:css:watch": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
     "build:css:prod": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
     "build:js": "bun build ./app/javascript/bundled.js --outdir=./app/assets/builds --target=browser --format=esm",
-    "build:js:watch": "bun build ./app/javascript/bundled.js --outdir=./app/assets/builds --target=browser --format=esm --watch"
+    "build:js:watch": "bun build ./app/javascript/bundled.js --outdir=./app/assets/builds --target=browser --format=esm --watch",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.1.17"
+    "@happy-dom/global-registrator": "^20.0.10",
+    "@tailwindcss/cli": "^4.1.17",
+    "@testing-library/dom": "^10.4.1",
+    "happy-dom": "^20.0.10",
+    "jsdom": "^27.2.0"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",

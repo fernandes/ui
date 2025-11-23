@@ -19,8 +19,10 @@ import CollapsibleController from "./controllers/collapsible_controller.js";
 import CommandController from "./controllers/command_controller.js";
 import ContextMenuController from "./controllers/context_menu_controller.js";
 import CommandDialogController from "./controllers/command_dialog_controller.js";
+import DrawerController from "./controllers/drawer_controller.js";
 import TooltipController from "./controllers/tooltip_controller.js";
 import PopoverController from "./controllers/popover_controller.js";
+import ResponsiveDialogController from "./controllers/responsive_dialog_controller.js";
 import ScrollAreaController from "./controllers/scroll_area_controller.js";
 import SelectController from "./controllers/select_controller.js";
 
@@ -39,6 +41,7 @@ export function registerControllers(application) {
     "ui--alert-dialog": AlertDialogController,
     "ui--avatar": AvatarController,
     "ui--dialog": DialogController,
+    "ui--drawer": DrawerController,
     "ui--checkbox": CheckboxController,
     "ui--collapsible": CollapsibleController,
     "ui--command": CommandController,
@@ -46,6 +49,7 @@ export function registerControllers(application) {
     "ui--context-menu": ContextMenuController,
     "ui--tooltip": TooltipController,
     "ui--popover": PopoverController,
+    "ui--responsive-dialog": ResponsiveDialogController,
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController
   });
@@ -55,4 +59,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, TooltipController, PopoverController, ScrollAreaController, SelectController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController };

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module UI
-  module Dialog
-    class Content < Phlex::HTML
-      include UI::Dialog::DialogContentBehavior
+  module Drawer
+    class Overlay < Phlex::HTML
+      include UI::Drawer::DrawerOverlayBehavior
 
       def initialize(open: false, classes: nil, **attributes)
         @open = open
@@ -11,9 +11,9 @@ module UI
         @attributes = attributes
       end
 
-      def view_template(&block)
-        div(**dialog_content_html_attributes) do
-          yield if block_given?
+      def view_template
+        div(**drawer_overlay_container_html_attributes) do
+          div(**drawer_overlay_html_attributes)
         end
       end
     end

@@ -1,0 +1,16 @@
+<%# Drawer Overlay Component - Backdrop for drawer %>
+<%
+  @open = local_assigns.fetch(:open, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerOverlayBehavior
+
+  # Get HTML attributes from behavior
+  container_attributes = drawer_overlay_container_html_attributes.deep_merge(@attributes.except(:class))
+  overlay_attributes = drawer_overlay_html_attributes
+-%>
+<%= content_tag :div, container_attributes do %>
+  <%= content_tag :div, overlay_attributes %>
+<% end %>

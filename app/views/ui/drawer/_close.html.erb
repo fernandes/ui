@@ -1,0 +1,17 @@
+<%# Drawer Close Component - Close button for drawer %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @variant = local_assigns.fetch(:variant, :outline)
+  @size = local_assigns.fetch(:size, :default)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerCloseBehavior
+
+  # Merge close data attributes with user attributes
+  all_attributes = drawer_close_data_attributes.deep_merge(@attributes)
+-%>
+<%= render "ui/button/button", variant: @variant, size: @size, classes: @classes, attributes: all_attributes do %>
+  <%= content || yield %>
+<% end %>

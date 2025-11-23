@@ -1,0 +1,22 @@
+<%# Drawer Trigger Component - Opens drawer on click %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @as_child = local_assigns.fetch(:as_child, false)
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerTriggerBehavior
+
+  # Get trigger attributes
+  all_attributes = drawer_trigger_html_attributes
+-%>
+<% if @as_child %>
+  <%# asChild pattern: yield attributes to block %>
+  <%= yield(all_attributes) if block_given? %>
+  <%= content&.call(all_attributes) %>
+<% else %>
+  <%# Default: render as button %>
+  <%= content_tag :button, all_attributes do %>
+    <%= content || yield %>
+  <% end %>
+<% end %>

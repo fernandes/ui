@@ -1,1 +1,6 @@
-# No longer needed - @ui/engine is linked via bun link and resolves automatically
+[test]
+# Use happy-dom for faster DOM testing
+preload = ["./test/javascript/setup.js"]
+
+# Test file patterns
+include = ["**/*.test.js", "**/*.spec.js"]

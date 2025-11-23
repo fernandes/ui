@@ -1,0 +1,15 @@
+<%# Drawer Title Component - ARIA heading for drawer %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerTitleBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = drawer_title_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

@@ -1,0 +1,15 @@
+<%# Drawer Header Component - Header section for drawer %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerHeaderBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = drawer_header_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

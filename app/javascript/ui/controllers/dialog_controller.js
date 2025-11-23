@@ -13,6 +13,17 @@ export default class extends Controller {
   connect() {
     if (this.openValue) {
       this.show()
+    } else {
+      // Set initial closed state
+      if (this.hasContainerTarget) {
+        this.containerTarget.setAttribute("data-state", "closed")
+      }
+      if (this.hasOverlayTarget) {
+        this.overlayTarget.setAttribute("data-state", "closed")
+      }
+      if (this.hasContentTarget) {
+        this.contentTarget.setAttribute("data-state", "closed")
+      }
     }
   }
 

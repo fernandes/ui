@@ -1,0 +1,341 @@
+<div class="space-y-12">
+  <div class="space-y-2">
+    <h1 class="text-3xl font-bold">Drawer</h1>
+    <p class="text-muted-foreground">
+      A mobile-first component that slides in from the edge of the screen with gesture-based drag-to-close.
+    </p>
+  </div>
+
+  <!-- Default Drawer (Bottom) -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Default (Bottom)</h2>
+      <p class="text-sm text-muted-foreground">Drawer slides in from the bottom with drag-to-close gesture.</p>
+    </div>
+
+    <%= render UI::Drawer::Drawer.new do %>
+      <%= render UI::Drawer::Trigger.new do %>
+        Open Drawer
+      <% end %>
+
+      <%= render UI::Drawer::Overlay.new %>
+
+      <%= render UI::Drawer::Content.new do %>
+        <%= render UI::Drawer::Handle.new %>
+
+        <%= render UI::Drawer::Header.new do %>
+          <%= render UI::Drawer::Title.new { "Move Goal" } %>
+          <%= render UI::Drawer::Description.new { "Set your daily activity goal." } %>
+        <% end %>
+
+        <div class="p-4">
+          <div class="grid gap-4">
+            <div class="space-y-2">
+              <label class="text-sm font-medium">Goal (minutes)</label>
+              <input type="number" value="350" class="w-full px-3 py-2 border rounded-md">
+            </div>
+            <p class="text-sm text-muted-foreground">
+              Drag the handle or swipe down to close.
+            </p>
+          </div>
+        </div>
+
+        <%= render UI::Drawer::Footer.new do %>
+          <%= render UI::Button::Button.new { "Submit" } %>
+          <%= render UI::Drawer::Close.new { "Cancel" } %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </section>
+
+  <!-- Drawer Directions -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Directions</h2>
+      <p class="text-sm text-muted-foreground">Drawer can slide from any edge: top, bottom, left, or right.</p>
+    </div>
+
+    <div class="flex gap-4">
+      <!-- Top Drawer -->
+      <%= render UI::Drawer::Drawer.new(direction: "top") do %>
+        <%= render UI::Drawer::Trigger.new do %>
+          Top
+        <% end %>
+        <%= render UI::Drawer::Overlay.new %>
+        <%= render UI::Drawer::Content.new(direction: "top") do %>
+          <%= render UI::Drawer::Handle.new %>
+          <%= render UI::Drawer::Header.new do %>
+            <%= render UI::Drawer::Title.new { "From Top" } %>
+            <%= render UI::Drawer::Description.new { "Drawer sliding from the top edge." } %>
+          <% end %>
+          <div class="p-4">Content here</div>
+        <% end %>
+      <% end %>
+
+      <!-- Left Drawer -->
+      <%= render UI::Drawer::Drawer.new(direction: "left") do %>
+        <%= render UI::Drawer::Trigger.new do %>
+          Left
+        <% end %>
+        <%= render UI::Drawer::Overlay.new %>
+        <%= render UI::Drawer::Content.new(direction: "left") do %>
+          <%= render UI::Drawer::Header.new do %>
+            <%= render UI::Drawer::Title.new { "From Left" } %>
+            <%= render UI::Drawer::Description.new { "Drawer sliding from the left edge." } %>
+          <% end %>
+          <div class="p-4">Content here</div>
+        <% end %>
+      <% end %>
+
+      <!-- Right Drawer -->
+      <%= render UI::Drawer::Drawer.new(direction: "right") do %>
+        <%= render UI::Drawer::Trigger.new do %>
+          Right
+        <% end %>
+        <%= render UI::Drawer::Overlay.new %>
+        <%= render UI::Drawer::Content.new(direction: "right") do %>
+          <%= render UI::Drawer::Header.new do %>
+            <%= render UI::Drawer::Title.new { "From Right" } %>
+            <%= render UI::Drawer::Description.new { "Drawer sliding from the right edge." } %>
+          <% end %>
+          <div class="p-4">Content here</div>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Snap Points -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Snap Points</h2>
+      <p class="text-sm text-muted-foreground">Drawer with snap points for tiered content reveal.</p>
+    </div>
+
+    <%= render UI::Drawer::Drawer.new(
+      modal: false,
+      snap_points: [0.25, 0.5, 1],
+      fade_from_index: 0
+    ) do %>
+      <%= render UI::Drawer::Trigger.new do %>
+        Open with Snap Points
+      <% end %>
+
+      <%= render UI::Drawer::Overlay.new %>
+
+      <%= render UI::Drawer::Content.new(classes: "min-h-screen") do %>
+        <%= render UI::Drawer::Handle.new %>
+        <%= render UI::Drawer::Header.new do %>
+          <%= render UI::Drawer::Title.new { "Snap Points" } %>
+          <%= render UI::Drawer::Description.new { "Drag to different heights." } %>
+        <% end %>
+
+        <div class="p-4 space-y-4">
+          <p class="text-sm">First snap point: 25% - Drawer occupies 25% of viewport height</p>
+          <p class="text-sm">Second snap point: 50% - Drawer occupies 50% of viewport height</p>
+          <p class="text-sm">Third snap point: 100% - Drawer occupies 100% of viewport height</p>
+          <p class="text-sm text-muted-foreground">
+            With fade_from_index: 0, overlay appears gradually from snap 0 to snap 1, then stays at opacity 1.
+          </p>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <!-- Responsive Dialog (CRITICAL FEATURE) -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Responsive Dialog</h2>
+      <p class="text-sm text-muted-foreground">
+        Shows Dialog on desktop (≥768px) and Drawer on mobile (&lt;768px). Resize browser to see it switch!
+      </p>
+    </div>
+
+    <div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
+      <%# Mobile: Drawer (hidden on md and up) %>
+      <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
+        <%= render UI::Drawer::Drawer.new do %>
+          <%= render UI::Drawer::Trigger.new do %>
+            Edit Profile (Mobile)
+          <% end %>
+
+          <%= render UI::Drawer::Overlay.new %>
+
+          <%= render UI::Drawer::Content.new do %>
+            <%= render UI::Drawer::Handle.new %>
+            <%= render UI::Drawer::Header.new(classes: "text-left") do %>
+              <%= render UI::Drawer::Title.new { "Edit profile" } %>
+              <%= render UI::Drawer::Description.new do %>
+                Make changes to your profile here. Tap save when you're done.
+              <% end %>
+            <% end %>
+
+            <div class="grid gap-4 px-4">
+              <div class="space-y-2">
+                <%= render UI::Label::Label.new(for: "name-drawer") { "Name" } %>
+                <%= render UI::Input::Input.new(id: "name-drawer", value: "Pedro Duarte") %>
+              </div>
+              <div class="space-y-2">
+                <%= render UI::Label::Label.new(for: "username-drawer") { "Username" } %>
+                <%= render UI::Input::Input.new(id: "username-drawer", value: "@peduarte") %>
+              </div>
+            </div>
+
+            <%= render UI::Drawer::Footer.new(classes: "pt-2") do %>
+              <%= render UI::Button::Button.new { "Save changes" } %>
+              <%= render UI::Drawer::Close.new do %>
+                Cancel
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <%# Desktop: Dialog (hidden below md) %>
+      <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
+        <%= render UI::Dialog::Dialog.new do %>
+          <%= render UI::Dialog::Trigger.new do %>
+            Edit Profile (Desktop)
+          <% end %>
+
+          <%= render UI::Dialog::Overlay.new %>
+
+          <%= render UI::Dialog::Content.new do %>
+            <%= render UI::Dialog::Header.new do %>
+              <%= render UI::Dialog::Title.new { "Edit profile" } %>
+              <%= render UI::Dialog::Description.new do %>
+                Make changes to your profile here. Click save when you're done.
+              <% end %>
+            <% end %>
+
+            <div class="grid gap-4 py-4">
+              <div class="grid grid-cols-4 items-center gap-4">
+                <%= render UI::Label::Label.new(for: "name", classes: "text-right") { "Name" } %>
+                <%= render UI::Input::Input.new(
+                  id: "name",
+                  value: "Pedro Duarte",
+                  classes: "col-span-3"
+                ) %>
+              </div>
+              <div class="grid grid-cols-4 items-center gap-4">
+                <%= render UI::Label::Label.new(for: "username", classes: "text-right") { "Username" } %>
+                <%= render UI::Input::Input.new(
+                  id: "username",
+                  value: "@peduarte",
+                  classes: "col-span-3"
+                ) %>
+              </div>
+            </div>
+
+            <%= render UI::Dialog::Footer.new do %>
+              <%= render UI::Button::Button.new { "Save changes" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Handle-Only Dragging -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Handle-Only Dragging</h2>
+      <p class="text-sm text-muted-foreground">
+        Restrict dragging to the handle only - useful when drawer contains scrollable content.
+      </p>
+    </div>
+
+    <%= render UI::Drawer::Drawer.new(handle_only: true) do %>
+      <%= render UI::Drawer::Trigger.new do %>
+        Handle-Only Drawer
+      <% end %>
+
+      <%= render UI::Drawer::Overlay.new %>
+
+      <%= render UI::Drawer::Content.new do %>
+        <%= render UI::Drawer::Handle.new %>
+        <%= render UI::Drawer::Header.new do %>
+          <%= render UI::Drawer::Title.new { "Handle-Only Mode" } %>
+          <%= render UI::Drawer::Description.new { "Only the handle is draggable." } %>
+        <% end %>
+
+        <div class="p-4 space-y-2" data-vaul-scrollable>
+          <p class="text-sm">Try dragging the content below - it won't close the drawer.</p>
+          <p class="text-sm">Only dragging the handle (gray bar at top) will close it.</p>
+          <% 10.times do |i| %>
+            <p class="text-sm text-muted-foreground">Scrollable content item <%= i + 1 %></p>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <!-- Non-Modal Mode -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Non-Modal Mode</h2>
+      <p class="text-sm text-muted-foreground">
+        Background remains interactive when drawer is open.
+      </p>
+    </div>
+
+    <%= render UI::Drawer::Drawer.new(modal: false) do %>
+      <%= render UI::Drawer::Trigger.new do %>
+        Non-Modal Drawer
+      <% end %>
+
+      <%= render UI::Drawer::Overlay.new %>
+
+      <%= render UI::Drawer::Content.new do %>
+        <%= render UI::Drawer::Handle.new %>
+        <%= render UI::Drawer::Header.new do %>
+          <%= render UI::Drawer::Title.new { "Non-Modal Drawer" } %>
+          <%= render UI::Drawer::Description.new { "Page remains interactive." } %>
+        <% end %>
+
+        <div class="p-4">
+          <p class="text-sm">Try clicking or interacting with the page behind this drawer.</p>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <!-- Implementation Notes -->
+  <section class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Implementation Notes</h2>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <h3 class="font-semibold mb-2">Features</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+          <li>Drag-to-close gesture with velocity detection</li>
+          <li>Four directions: bottom, top, left, right</li>
+          <li>Snap points for tiered content reveal</li>
+          <li>Modal and non-modal modes</li>
+          <li>Handle-only dragging mode</li>
+          <li>Input repositioning for mobile keyboards</li>
+          <li>Responsive dialog pattern (Dialog on desktop, Drawer on mobile)</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-2">Accessibility</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+          <li>ARIA attributes (role="dialog", aria-modal)</li>
+          <li>Focus trap in modal mode</li>
+          <li>Escape key to close (when dismissible)</li>
+          <li>Keyboard navigation</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-2">Based on Vaul</h3>
+        <p class="text-sm text-muted-foreground">
+          This implementation is based on <a href="https://vaul.emilkowal.ski" target="_blank" class="underline">Vaul</a>,
+          a mobile-first drawer component for React, ported to Rails with Stimulus.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>

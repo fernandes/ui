@@ -1,0 +1,15 @@
+<%# Drawer Description Component - ARIA description for drawer %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Drawer::DrawerDescriptionBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = drawer_description_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :p, all_attributes do %>
+  <%= content || yield %>
+<% end %>
