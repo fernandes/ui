@@ -9,11 +9,16 @@ module UI
     module DialogBehavior
       # Generate data attributes for Stimulus controller
       def dialog_data_attributes
-        {
+        attrs = {
           controller: "ui--dialog",
-          ui__dialog_open_value: @open,
-          ui__dialog_close_on_escape_value: @close_on_escape
+          ui__dialog_open_value: @open.to_s
         }
+
+        # Only add optional values if they are explicitly set (not nil)
+        attrs[:ui__dialog_close_on_escape_value] = @close_on_escape.to_s unless @close_on_escape.nil?
+        attrs[:ui__dialog_close_on_overlay_click_value] = @close_on_overlay_click.to_s unless @close_on_overlay_click.nil?
+
+        attrs
       end
 
       # Merge user-provided data attributes
