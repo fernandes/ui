@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tabs Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Tabs Component</h1>
+      <p class="text-muted-foreground">Demonstrating all three component formats with keyboard navigation and ARIA support</p>
+    </header>
+
+    <!-- ERB Partial Implementation -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
+      <div class="max-w-2xl">
+        <%= render "ui/tabs/tabs", default_value: "account" do %>
+          <%= render "ui/tabs/tabs_list" do %>
+            <%= render "ui/tabs/tabs_trigger", value: "account", content: "Account" %>
+            <%= render "ui/tabs/tabs_trigger", value: "password", content: "Password" %>
+          <% end %>
+          <%= render "ui/tabs/tabs_content", value: "account" do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Account</h3>
+              <p class="text-sm text-muted-foreground">
+                Make changes to your account here. Click save when you're done.
+              </p>
+            </div>
+          <% end %>
+          <%= render "ui/tabs/tabs_content", value: "password" do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Password</h3>
+              <p class="text-sm text-muted-foreground">
+                Change your password here. After saving, you'll be logged out.
+              </p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Phlex Implementation -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
+      <div class="max-w-2xl">
+        <%= render UI::Tabs::Tabs.new(default_value: "general") do %>
+          <%= render UI::Tabs::List.new do %>
+            <%= render UI::Tabs::Trigger.new(value: "general", default_value: "general") { "General" } %>
+            <%= render UI::Tabs::Trigger.new(value: "security", default_value: "general") { "Security" } %>
+            <%= render UI::Tabs::Trigger.new(value: "integrations", default_value: "general") { "Integrations" } %>
+          <% end %>
+          <%= render UI::Tabs::Content.new(value: "general", default_value: "general") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">General Settings</h3>
+              <p class="text-sm text-muted-foreground">
+                Manage your general account settings and preferences.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::Content.new(value: "security", default_value: "general") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Security Settings</h3>
+              <p class="text-sm text-muted-foreground">
+                Update your security settings and manage two-factor authentication.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::Content.new(value: "integrations", default_value: "general") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Integrations</h3>
+              <p class="text-sm text-muted-foreground">
+                Connect and manage third-party integrations.
+              </p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ViewComponent Implementation -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
+      <div class="max-w-2xl">
+        <%= render UI::Tabs::TabsComponent.new(default_value: "overview") do %>
+          <%= render UI::Tabs::TabsListComponent.new do %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "overview", default_value: "overview") do %>
+              Overview
+            <% end %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "analytics", default_value: "overview") do %>
+              Analytics
+            <% end %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "reports", default_value: "overview") do %>
+              Reports
+            <% end %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "notifications", default_value: "overview") do %>
+              Notifications
+            <% end %>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "overview", default_value: "overview") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Overview</h3>
+              <p class="text-sm text-muted-foreground">
+                View your account overview and recent activity.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "analytics", default_value: "overview") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Analytics</h3>
+              <p class="text-sm text-muted-foreground">
+                Track your usage metrics and performance data.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "reports", default_value: "overview") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Reports</h3>
+              <p class="text-sm text-muted-foreground">
+                Generate and download custom reports.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "notifications", default_value: "overview") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Notifications</h3>
+              <p class="text-sm text-muted-foreground">
+                Manage your notification preferences and alerts.
+              </p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Disabled Tab (ERB) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Disabled Tab</h2>
+      <p class="text-sm text-muted-foreground">Demonstrating disabled state for tabs that are not available.</p>
+      <div class="max-w-2xl">
+        <%= render "ui/tabs/tabs", default_value: "available" do %>
+          <%= render "ui/tabs/tabs_list" do %>
+            <%= render "ui/tabs/tabs_trigger", value: "available", content: "Available" %>
+            <%= render "ui/tabs/tabs_trigger", value: "disabled", disabled: true, content: "Disabled" %>
+            <%= render "ui/tabs/tabs_trigger", value: "coming-soon", disabled: true, content: "Coming Soon" %>
+          <% end %>
+          <%= render "ui/tabs/tabs_content", value: "available" do %>
+            <div class="space-y-4 p-4">
+              <p class="text-sm text-muted-foreground">
+                This tab is available and can be selected.
+              </p>
+            </div>
+          <% end %>
+          <%= render "ui/tabs/tabs_content", value: "disabled" do %>
+            <div class="space-y-4 p-4">
+              <p class="text-sm text-muted-foreground">
+                This content is not accessible because the tab is disabled.
+              </p>
+            </div>
+          <% end %>
+          <%= render "ui/tabs/tabs_content", value: "coming-soon" do %>
+            <div class="space-y-4 p-4">
+              <p class="text-sm text-muted-foreground">
+                This feature is coming soon.
+              </p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Manual Activation Mode (Phlex) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Manual Activation Mode</h2>
+      <p class="text-sm text-muted-foreground">In manual mode, arrow keys only move focus. Press Enter or Space to activate.</p>
+      <div class="max-w-2xl">
+        <%= render UI::Tabs::Tabs.new(default_value: "tab1", activation_mode: "manual") do %>
+          <%= render UI::Tabs::List.new do %>
+            <%= render UI::Tabs::Trigger.new(value: "tab1", default_value: "tab1") { "Tab 1" } %>
+            <%= render UI::Tabs::Trigger.new(value: "tab2", default_value: "tab1") { "Tab 2" } %>
+            <%= render UI::Tabs::Trigger.new(value: "tab3", default_value: "tab1") { "Tab 3" } %>
+          <% end %>
+          <%= render UI::Tabs::Content.new(value: "tab1", default_value: "tab1") do %>
+            <div class="space-y-4 p-4">
+              <p class="text-sm text-muted-foreground">
+                Content for tab 1. Try using arrow keys to focus tabs, then press Enter to activate.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::Content.new(value: "tab2", default_value: "tab1") do %>
+            <div class="space-y-4 p-4">
+              <p class="text-sm text-muted-foreground">
+                Content for tab 2. Notice how arrow keys don't automatically switch tabs in manual mode.
+              </p>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::Content.new(value: "tab3", default_value: "tab1") do %>
+            <div class="space-y-4 p-4">
+              <p class="text-sm text-muted-foreground">
+                Content for tab 3. This gives users more control over navigation.
+              </p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Rich Content (ViewComponent) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Rich Content</h2>
+      <div class="max-w-2xl">
+        <%= render UI::Tabs::TabsComponent.new(default_value: "features") do %>
+          <%= render UI::Tabs::TabsListComponent.new do %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "features", default_value: "features") do %>
+              Features
+            <% end %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "keyboard", default_value: "features") do %>
+              Keyboard Nav
+            <% end %>
+            <%= render UI::Tabs::TabsTriggerComponent.new(value: "accessibility", default_value: "features") do %>
+              Accessibility
+            <% end %>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "features", default_value: "features") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Features</h3>
+              <ul class="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                <li>Full keyboard navigation support</li>
+                <li>ARIA attributes for accessibility</li>
+                <li>Horizontal and vertical orientation</li>
+                <li>Automatic and manual activation modes</li>
+                <li>Disabled state support</li>
+                <li>Works with ERB, Phlex, and ViewComponent</li>
+              </ul>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "keyboard", default_value: "features") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Keyboard Navigation</h3>
+              <div class="space-y-2">
+                <p class="text-sm font-medium">Horizontal Tabs:</p>
+                <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li><kbd class="px-2 py-1 bg-muted rounded text-xs">→</kbd> Next tab</li>
+                  <li><kbd class="px-2 py-1 bg-muted rounded text-xs">←</kbd> Previous tab</li>
+                  <li><kbd class="px-2 py-1 bg-muted rounded text-xs">Home</kbd> First tab</li>
+                  <li><kbd class="px-2 py-1 bg-muted rounded text-xs">End</kbd> Last tab</li>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+          <%= render UI::Tabs::TabsContentComponent.new(value: "accessibility", default_value: "features") do %>
+            <div class="space-y-4 p-4">
+              <h3 class="text-lg font-medium">Accessibility</h3>
+              <div class="space-y-2">
+                <p class="text-sm text-muted-foreground">
+                  The component follows WAI-ARIA Tabs pattern with proper roles and attributes:
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li><code class="text-xs bg-muted px-1 py-0.5 rounded">role="tablist"</code> on list</li>
+                  <li><code class="text-xs bg-muted px-1 py-0.5 rounded">role="tab"</code> on triggers</li>
+                  <li><code class="text-xs bg-muted px-1 py-0.5 rounded">role="tabpanel"</code> on content</li>
+                  <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-selected</code> for active state</li>
+                  <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-controls</code> linking tabs to panels</li>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components Index", components_path, class: "text-sm text-muted-foreground hover:text-foreground" %>
+    </footer>
+  </div>
+</body>
+</html>
