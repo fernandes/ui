@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   get "/components/spinner", to: "components#spinner"
   get "/components/textarea", to: "components#textarea"
   get "/components/toggle", to: "components#toggle"
+  get "/components/toggle_group", to: "components#toggle_group"
   get "/components/tooltip", to: "components#tooltip"
 
   # Mount Hotwire Spark for live reload in development

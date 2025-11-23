@@ -1,0 +1,38 @@
+<%
+  # ToggleGroup - ERB Partial
+  #
+  # A container for a set of toggle items that can be toggled on or off.
+  #
+  # @param type [String] Selection mode: "single" or "multiple"
+  # @param variant [String] Visual style variant (default, outline)
+  # @param size [String] Size variant (default, sm, lg)
+  # @param value [String, Array] Current selected value(s)
+  # @param spacing [Integer] Gap between items (0 means items touch)
+  # @param orientation [String] Layout direction (horizontal, vertical)
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @type = local_assigns.fetch(:type, "single")
+  @variant = local_assigns.fetch(:variant, "default")
+  @size = local_assigns.fetch(:size, "default")
+  @value = local_assigns.fetch(:value, nil)
+  @spacing = local_assigns.fetch(:spacing, 0)
+  @orientation = local_assigns.fetch(:orientation, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Store context for child items
+  @toggle_group_context = {
+    variant: @variant,
+    size: @size,
+    type: @type,
+    spacing: @spacing,
+    value: @value
+  }
+
+  extend UI::ToggleGroupBehavior
+  all_attributes = toggle_group_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

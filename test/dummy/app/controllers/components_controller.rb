@@ -85,6 +85,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/toggle.html.erb
   end
 
+  def toggle_group
+    # Renders app/views/components/toggle_group.html.erb
+  end
+
   def tooltip
     # Renders app/views/components/tooltip.html.erb
   end

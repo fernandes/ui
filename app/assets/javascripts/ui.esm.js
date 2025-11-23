@@ -4819,6 +4819,93 @@ class ToggleController extends Controller {
   }
 }
 
+class ToggleGroupController extends Controller {
+  static targets=[ "item" ];
+  static values={
+    type: {
+      type: String,
+      default: "single"
+    },
+    value: {
+      type: String,
+      default: "[]"
+    }
+  };
+  connect() {
+    try {
+      this.selectedValues = JSON.parse(this.valueValue || "[]");
+      if (!Array.isArray(this.selectedValues)) {
+        this.selectedValues = this.selectedValues ? [ this.selectedValues ] : [];
+      }
+    } catch {
+      this.selectedValues = [];
+    }
+    this.updateAllItems();
+  }
+  toggle(event) {
+    const item = event.currentTarget;
+    const value = item.dataset.value;
+    if (!value) return;
+    if (this.typeValue === "single") {
+      this.toggleSingle(value, item);
+    } else {
+      this.toggleMultiple(value, item);
+    }
+    this.dispatch("change", {
+      detail: {
+        value: this.typeValue === "single" ? this.selectedValues[0] || null : this.selectedValues,
+        type: this.typeValue
+      }
+    });
+  }
+  toggleSingle(value, item) {
+    const currentValue = this.selectedValues[0];
+    if (currentValue === value) {
+      this.selectedValues = [];
+    } else {
+      this.selectedValues = [ value ];
+    }
+    this.updateAllItems();
+  }
+  toggleMultiple(value, item) {
+    const index = this.selectedValues.indexOf(value);
+    if (index > -1) {
+      this.selectedValues.splice(index, 1);
+    } else {
+      this.selectedValues.push(value);
+    }
+    this.updateAllItems();
+  }
+  updateAllItems() {
+    this.itemTargets.forEach(item => {
+      const value = item.dataset.value;
+      const isSelected = this.selectedValues.includes(value);
+      item.dataset.state = isSelected ? "on" : "off";
+      item.setAttribute("data-state", isSelected ? "on" : "off");
+      if (this.typeValue === "single") {
+        item.setAttribute("aria-checked", isSelected ? "true" : "false");
+      } else {
+        item.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      }
+    });
+    this.valueValue = JSON.stringify(this.selectedValues);
+  }
+  getValue() {
+    if (this.typeValue === "single") {
+      return this.selectedValues[0] || null;
+    }
+    return this.selectedValues;
+  }
+  setValue(newValue) {
+    if (this.typeValue === "single") {
+      this.selectedValues = newValue ? [ newValue ] : [];
+    } else {
+      this.selectedValues = Array.isArray(newValue) ? newValue : [];
+    }
+    this.updateAllItems();
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -4851,8 +4938,9 @@ function registerControllers(application) {
     "ui--responsive-dialog": ResponsiveDialogController,
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController,
-    "ui--toggle": ToggleController
+    "ui--toggle": ToggleController,
+    "ui--toggle-group": ToggleGroupController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, ToggleController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };

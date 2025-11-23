@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Toggle Group Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Toggle Group Component</h1>
+      <p class="text-muted-foreground">A set of two-state buttons that can be toggled on or off</p>
+    </header>
+
+    <!-- ERB Implementation - Single Selection -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB - Single Selection (Default)</h2>
+      <p class="text-sm text-muted-foreground">Only one item can be selected at a time</p>
+      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "default" do %>
+        <%= render "ui/toggle_group/item", value: "left" do %>
+          <%= lucide_icon("align-left") %>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "center" do %>
+          <%= lucide_icon("align-center") %>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "right" do %>
+          <%= lucide_icon("align-right") %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- ERB Implementation - Outline Variant -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB - Outline Variant</h2>
+      <p class="text-sm text-muted-foreground">Formatting toolbar style</p>
+      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", value: "italic" do %>
+        <%= render "ui/toggle_group/item", value: "bold" do %>
+          <%= lucide_icon("bold") %>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "italic" do %>
+          <%= lucide_icon("italic") %>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "underline" do %>
+          <%= lucide_icon("underline") %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- ERB Implementation - Multiple Selection -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB - Multiple Selection</h2>
+      <p class="text-sm text-muted-foreground">Multiple items can be selected simultaneously</p>
+      <%= render "ui/toggle_group/toggle_group", type: "multiple", variant: "outline", value: ["bold", "italic"] do %>
+        <%= render "ui/toggle_group/item", value: "bold" do %>
+          <%= lucide_icon("bold") %>
+          <span>Bold</span>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "italic" do %>
+          <%= lucide_icon("italic") %>
+          <span>Italic</span>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "underline" do %>
+          <%= lucide_icon("underline") %>
+          <span>Underline</span>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "strikethrough" do %>
+          <%= lucide_icon("strikethrough") %>
+          <span>Strike</span>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Size Variants -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Size Variants (ERB)</h2>
+      <div class="space-y-4">
+        <div>
+          <p class="text-sm text-muted-foreground mb-2">Small</p>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "sm" do %>
+            <%= render "ui/toggle_group/item", value: "left" do %>
+              <%= lucide_icon("align-left", class: "h-3 w-3") %>
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "center" do %>
+              <%= lucide_icon("align-center", class: "h-3 w-3") %>
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "right" do %>
+              <%= lucide_icon("align-right", class: "h-3 w-3") %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <p class="text-sm text-muted-foreground mb-2">Default</p>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "default" do %>
+            <%= render "ui/toggle_group/item", value: "left" do %>
+              <%= lucide_icon("align-left") %>
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "center" do %>
+              <%= lucide_icon("align-center") %>
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "right" do %>
+              <%= lucide_icon("align-right") %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <p class="text-sm text-muted-foreground mb-2">Large</p>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "lg" do %>
+            <%= render "ui/toggle_group/item", value: "left" do %>
+              <%= lucide_icon("align-left", class: "h-5 w-5") %>
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "center" do %>
+              <%= lucide_icon("align-center", class: "h-5 w-5") %>
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "right" do %>
+              <%= lucide_icon("align-right", class: "h-5 w-5") %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Spacing -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">With Spacing (ERB)</h2>
+      <p class="text-sm text-muted-foreground">Gap between items using spacing parameter</p>
+      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", spacing: 2 do %>
+        <%= render "ui/toggle_group/item", value: "left" do %>
+          <%= lucide_icon("align-left") %>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "center" do %>
+          <%= lucide_icon("align-center") %>
+        <% end %>
+        <%= render "ui/toggle_group/item", value: "right" do %>
+          <%= lucide_icon("align-right") %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Interactive Example -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Interactive Example</h2>
+      <p class="text-sm text-muted-foreground">Click items to see state changes</p>
+
+      <div class="space-y-4">
+        <div>
+          <p class="text-xs font-medium mb-2">Single Selection:</p>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline" do %>
+            <%= render "ui/toggle_group/item", value: "1" do %>
+              Option 1
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "2" do %>
+              Option 2
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "3" do %>
+              Option 3
+            <% end %>
+          <% end %>
+        </div>
+
+        <div>
+          <p class="text-xs font-medium mb-2">Multiple Selection:</p>
+          <%= render "ui/toggle_group/toggle_group", type: "multiple", variant: "outline" do %>
+            <%= render "ui/toggle_group/item", value: "feature-a" do %>
+              <%= lucide_icon("check-circle") %>
+              Feature A
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "feature-b" do %>
+              <%= lucide_icon("check-circle") %>
+              Feature B
+            <% end %>
+            <%= render "ui/toggle_group/item", value: "feature-c" do %>
+              <%= lucide_icon("check-circle") %>
+              Feature C
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components", components_path, class: "text-sm text-muted-foreground hover:text-foreground" %>
+    </footer>
+  </div>
+</body>
+</html>

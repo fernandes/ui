@@ -1,0 +1,51 @@
+<%
+  # ToggleGroup Item - ERB Partial
+  #
+  # An individual toggle button within a Toggle Group.
+  #
+  # @param value [String] Unique identifier for this item (required)
+  # @param variant [String] Visual style variant (inherits from parent if not specified)
+  # @param size [String] Size variant (inherits from parent if not specified)
+  # @param pressed [Boolean] Whether the item is pressed/active
+  # @param disabled [Boolean] Whether the item is disabled
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @value = local_assigns.fetch(:value)
+  @variant = local_assigns.fetch(:variant, nil)
+  @size = local_assigns.fetch(:size, nil)
+  @pressed = local_assigns.fetch(:pressed, false)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Try to inherit from parent context
+  if defined?(@toggle_group_context) && @toggle_group_context
+    @variant ||= @toggle_group_context[:variant]
+    @size ||= @toggle_group_context[:size]
+    @group_type = @toggle_group_context[:type]
+    @spacing = @toggle_group_context[:spacing]
+
+    # Check if this item should be pressed based on parent value
+    parent_value = @toggle_group_context[:value]
+    if parent_value
+      @pressed = if @group_type == "multiple"
+        Array(parent_value).include?(@value)
+      else
+        parent_value.to_s == @value.to_s
+      end
+    end
+  end
+
+  # Fallback defaults
+  @variant ||= "default"
+  @size ||= "default"
+  @group_type ||= "single"
+  @spacing ||= 0
+
+  extend UI::ToggleGroupItemBehavior
+  all_attributes = toggle_group_item_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :button, all_attributes do %>
+  <%= yield %>
+<% end %>
