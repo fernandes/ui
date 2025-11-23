@@ -39,7 +39,7 @@ module UI
       end
 
       def call
-        render partial: "ui/textarea", locals: input_group_textarea_attributes
+        render partial: "ui/textarea/textarea", locals: input_group_textarea_attributes
       end
     end
   end
