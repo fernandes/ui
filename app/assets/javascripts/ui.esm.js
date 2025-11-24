@@ -5042,6 +5042,286 @@ class TabsController extends Controller {
   }
 }
 
+class SliderController extends Controller {
+  static targets=[ "track", "range", "thumb" ];
+  static values={
+    min: {
+      type: Number,
+      default: 0
+    },
+    max: {
+      type: Number,
+      default: 100
+    },
+    step: {
+      type: Number,
+      default: 1
+    },
+    value: {
+      type: Array,
+      default: [ 0 ]
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    orientation: {
+      type: String,
+      default: "horizontal"
+    },
+    inverted: {
+      type: Boolean,
+      default: false
+    },
+    name: {
+      type: String,
+      default: ""
+    },
+    centerPoint: {
+      type: Number,
+      default: null
+    }
+  };
+  connect() {
+    this.isDragging = false;
+    this.currentThumbIndex = -1;
+    const orientation = this.element.getAttribute("data-orientation");
+    if (this.hasTrackTarget) {
+      this.trackTarget.setAttribute("data-orientation", orientation);
+    }
+    if (this.hasRangeTarget) {
+      this.rangeTarget.setAttribute("data-orientation", orientation);
+    }
+    this.updateUI();
+    this.thumbTargets.forEach((thumb, index) => {
+      thumb.addEventListener("keydown", this.handleKeyDown.bind(this, index));
+    });
+  }
+  disconnect() {
+    this.thumbTargets.forEach((thumb, index) => {
+      thumb.removeEventListener("keydown", this.handleKeyDown.bind(this, index));
+    });
+  }
+  startDrag(event) {
+    if (this.disabledValue) return;
+    event.preventDefault();
+    const thumbIndex = this.thumbTargets.indexOf(event.currentTarget);
+    this.currentThumbIndex = thumbIndex;
+    this.isDragging = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    document.addEventListener("pointermove", this.handleMove.bind(this));
+    document.addEventListener("pointerup", this.endDrag.bind(this));
+  }
+  handleMove(event) {
+    if (!this.isDragging || this.currentThumbIndex === -1) return;
+    event.preventDefault();
+    const newValue = this.getValueFromPointer(event);
+    const newValues = [ ...this.valueValue ];
+    newValues[this.currentThumbIndex] = newValue;
+    newValues.sort((a, b) => a - b);
+    this.valueValue = newValues;
+    this.updateUI();
+    this.dispatchChangeEvent();
+  }
+  endDrag(event) {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+    this.currentThumbIndex = -1;
+    document.removeEventListener("pointermove", this.handleMove.bind(this));
+    document.removeEventListener("pointerup", this.endDrag.bind(this));
+    this.dispatchCommitEvent();
+  }
+  clickTrack(event) {
+    if (this.disabledValue) return;
+    if (this.thumbTargets.some(thumb => thumb.contains(event.target))) return;
+    event.preventDefault();
+    const clickValue = this.getValueFromPointer(event);
+    const closestIndex = this.getClosestThumbIndex(clickValue);
+    const newValues = [ ...this.valueValue ];
+    newValues[closestIndex] = clickValue;
+    newValues.sort((a, b) => a - b);
+    this.valueValue = newValues;
+    this.updateUI();
+    this.dispatchChangeEvent();
+    this.dispatchCommitEvent();
+  }
+  getValueFromPointer(event) {
+    if (!this.hasTrackTarget) return this.minValue;
+    const rect = this.trackTarget.getBoundingClientRect();
+    let percentage;
+    if (this.orientationValue === "horizontal") {
+      const x = event.clientX - rect.left;
+      percentage = x / rect.width;
+      if (this.invertedValue) percentage = 1 - percentage;
+    } else {
+      const y = event.clientY - rect.top;
+      percentage = 1 - y / rect.height;
+      if (this.invertedValue) percentage = 1 - percentage;
+    }
+    percentage = Math.max(0, Math.min(1, percentage));
+    const rawValue = this.minValue + percentage * (this.maxValue - this.minValue);
+    const steppedValue = Math.round((rawValue - this.minValue) / this.stepValue) * this.stepValue + this.minValue;
+    return Math.max(this.minValue, Math.min(this.maxValue, steppedValue));
+  }
+  getClosestThumbIndex(value) {
+    let closestIndex = 0;
+    let closestDistance = Math.abs(this.valueValue[0] - value);
+    for (let i = 1; i < this.valueValue.length; i++) {
+      const distance = Math.abs(this.valueValue[i] - value);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = i;
+      }
+    }
+    return closestIndex;
+  }
+  handleKeyDown(thumbIndex, event) {
+    if (this.disabledValue) return;
+    let newValue = this.valueValue[thumbIndex];
+    const largeStep = (this.maxValue - this.minValue) / 10;
+    switch (event.key) {
+     case "ArrowRight":
+     case "ArrowUp":
+      newValue += this.stepValue;
+      event.preventDefault();
+      break;
+
+     case "ArrowLeft":
+     case "ArrowDown":
+      newValue -= this.stepValue;
+      event.preventDefault();
+      break;
+
+     case "PageUp":
+      newValue += largeStep;
+      event.preventDefault();
+      break;
+
+     case "PageDown":
+      newValue -= largeStep;
+      event.preventDefault();
+      break;
+
+     case "Home":
+      newValue = this.minValue;
+      event.preventDefault();
+      break;
+
+     case "End":
+      newValue = this.maxValue;
+      event.preventDefault();
+      break;
+
+     default:
+      return;
+    }
+    newValue = Math.max(this.minValue, Math.min(this.maxValue, newValue));
+    const newValues = [ ...this.valueValue ];
+    newValues[thumbIndex] = newValue;
+    newValues.sort((a, b) => a - b);
+    this.valueValue = newValues;
+    this.updateUI();
+    this.dispatchChangeEvent();
+    this.dispatchCommitEvent();
+  }
+  updateUI() {
+    if (!this.hasTrackTarget) return;
+    if (this.hasRangeTarget) {
+      let startValue, endValue;
+      if (this.valueValue.length === 1) {
+        const currentValue = this.valueValue[0];
+        if (this.hasCenterPointValue && this.centerPointValue !== null) {
+          if (currentValue >= this.centerPointValue) {
+            startValue = this.centerPointValue;
+            endValue = currentValue;
+          } else {
+            startValue = currentValue;
+            endValue = this.centerPointValue;
+          }
+        } else {
+          startValue = this.minValue;
+          endValue = currentValue;
+        }
+      } else {
+        startValue = Math.min(...this.valueValue);
+        endValue = Math.max(...this.valueValue);
+      }
+      const startPercent = (startValue - this.minValue) / (this.maxValue - this.minValue) * 100;
+      const endPercent = (endValue - this.minValue) / (this.maxValue - this.minValue) * 100;
+      if (this.orientationValue === "horizontal") {
+        this.rangeTarget.style.left = `${startPercent}%`;
+        this.rangeTarget.style.width = `${endPercent - startPercent}%`;
+        this.rangeTarget.style.top = "0";
+        this.rangeTarget.style.height = "100%";
+      } else {
+        this.rangeTarget.style.bottom = `${startPercent}%`;
+        this.rangeTarget.style.height = `${endPercent - startPercent}%`;
+        this.rangeTarget.style.left = "0";
+        this.rangeTarget.style.width = "100%";
+      }
+    }
+    this.thumbTargets.forEach((thumb, index) => {
+      const value = this.valueValue[index] ?? this.minValue;
+      const percent = (value - this.minValue) / (this.maxValue - this.minValue) * 100;
+      if (this.orientationValue === "horizontal") {
+        thumb.style.left = `${percent}%`;
+        thumb.style.top = "50%";
+        thumb.style.transform = "translate(-50%, -50%)";
+      } else {
+        thumb.style.bottom = `${percent}%`;
+        thumb.style.left = "50%";
+        thumb.style.transform = "translate(-50%, 50%)";
+      }
+      thumb.setAttribute("aria-valuenow", value);
+      thumb.setAttribute("aria-valuemin", this.minValue);
+      thumb.setAttribute("aria-valuemax", this.maxValue);
+      thumb.setAttribute("aria-orientation", this.orientationValue);
+      if (this.disabledValue) {
+        thumb.setAttribute("aria-disabled", "true");
+      } else {
+        thumb.removeAttribute("aria-disabled");
+      }
+    });
+  }
+  dispatchChangeEvent() {
+    this.element.dispatchEvent(new CustomEvent("slider:change", {
+      bubbles: true,
+      detail: {
+        value: this.valueValue
+      }
+    }));
+  }
+  dispatchCommitEvent() {
+    this.element.dispatchEvent(new CustomEvent("slider:commit", {
+      bubbles: true,
+      detail: {
+        value: this.valueValue
+      }
+    }));
+  }
+  valueValueChanged() {
+    this.updateUI();
+  }
+  disabledValueChanged() {
+    if (this.disabledValue) {
+      this.element.setAttribute("data-disabled", "");
+    } else {
+      this.element.removeAttribute("data-disabled");
+    }
+    this.updateUI();
+  }
+  orientationValueChanged() {
+    this.element.setAttribute("data-orientation", this.orientationValue);
+    if (this.hasTrackTarget) {
+      this.trackTarget.setAttribute("data-orientation", this.orientationValue);
+    }
+    if (this.hasRangeTarget) {
+      this.rangeTarget.setAttribute("data-orientation", this.orientationValue);
+    }
+    this.updateUI();
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -5074,10 +5354,11 @@ function registerControllers(application) {
     "ui--responsive-dialog": ResponsiveDialogController,
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController,
+    "ui--slider": SliderController,
     "ui--tabs": TabsController,
     "ui--toggle": ToggleController,
     "ui--toggle-group": ToggleGroupController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };

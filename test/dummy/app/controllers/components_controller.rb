@@ -83,6 +83,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/separator.html.erb
   end
 
+  def slider
+    # Renders app/views/components/slider.html.erb
+  end
+
   def tabs
     # Renders app/views/components/tabs.html.erb
   end

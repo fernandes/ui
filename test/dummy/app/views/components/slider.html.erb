@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Slider Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Slider Component</h1>
+      <p class="text-muted-foreground">Range slider with draggable thumbs, keyboard navigation, and ARIA support</p>
+    </header>
+
+    <!-- ERB Partial - Basic Single Value -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial - Basic Single Value</h2>
+      <p class="text-sm text-muted-foreground">A simple slider with one thumb for selecting a single value.</p>
+      <div class="max-w-md space-y-2">
+        <label class="text-sm font-medium">Volume: <span id="volume-value">33</span>%</label>
+        <%= render "ui/slider/slider",
+          default_value: [33],
+          max: 100,
+          step: 1,
+          attributes: {
+            id: "volume-slider"
+          } do %>
+          <%= render "ui/slider/slider_track" do %>
+            <%= render "ui/slider/slider_range" %>
+          <% end %>
+          <%= render "ui/slider/slider_thumb" %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ERB Partial - Range Slider (Two Thumbs) -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial - Range Slider</h2>
+      <p class="text-sm text-muted-foreground">Two thumbs for selecting a range of values (e.g., price range).</p>
+      <div class="max-w-md space-y-2">
+        <div class="flex justify-between text-sm">
+          <span>Min: $<span id="price-min">25</span></span>
+          <span>Max: $<span id="price-max">75</span></span>
+        </div>
+        <%= render "ui/slider/slider", default_value: [25, 75], max: 100, attributes: { id: "price-slider" } do %>
+          <%= render "ui/slider/slider_track" do %>
+            <%= render "ui/slider/slider_range" %>
+          <% end %>
+          <%= render "ui/slider/slider_thumb" %>
+          <%= render "ui/slider/slider_thumb" %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ViewComponent - Custom Step Increments -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ViewComponent - Custom Step Increments</h2>
+      <p class="text-sm text-muted-foreground">Slider with step=10 for coarse control.</p>
+      <div class="max-w-md space-y-2">
+        <label class="text-sm font-medium">Brightness: <span id="brightness-value">50</span>%</label>
+        <%= render UI::Slider::SliderComponent.new(default_value: [50], max: 100, step: 10, attributes: { id: "brightness-slider" }) do %>
+          <%= render UI::Slider::SliderTrackComponent.new do %>
+            <%= render UI::Slider::SliderRangeComponent.new %>
+          <% end %>
+          <%= render UI::Slider::SliderThumbComponent.new %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ViewComponent - Custom Min/Max Range -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ViewComponent - Custom Min/Max Range</h2>
+      <p class="text-sm text-muted-foreground">Slider with range from -50 to 50, starting at 0.</p>
+      <div class="max-w-md space-y-2">
+        <label class="text-sm font-medium">Balance: <span id="balance-value">0</span></label>
+        <%= render UI::Slider::SliderComponent.new(default_value: [0], min: -50, max: 50, step: 5, center_point: 0, attributes: { id: "balance-slider" }) do %>
+          <%= render UI::Slider::SliderTrackComponent.new do %>
+            <%= render UI::Slider::SliderRangeComponent.new %>
+          <% end %>
+          <%= render UI::Slider::SliderThumbComponent.new %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ERB Partial - Disabled State -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial - Disabled State</h2>
+      <p class="text-sm text-muted-foreground">A disabled slider that cannot be interacted with.</p>
+      <div class="max-w-md space-y-2">
+        <label class="text-sm font-medium text-muted-foreground">Locked Setting: 50%</label>
+        <%= render "ui/slider/slider", default_value: [50], disabled: true do %>
+          <%= render "ui/slider/slider_track" do %>
+            <%= render "ui/slider/slider_range" %>
+          <% end %>
+          <%= render "ui/slider/slider_thumb", disabled: true %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ViewComponent - Custom Width -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ViewComponent - Custom Width</h2>
+      <p class="text-sm text-muted-foreground">Sliders with different widths using classes parameter.</p>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Small (w-[200px])</label>
+          <%= render UI::Slider::SliderComponent.new(default_value: [33], classes: "w-[200px]") do %>
+            <%= render UI::Slider::SliderTrackComponent.new do %>
+              <%= render UI::Slider::SliderRangeComponent.new %>
+            <% end %>
+            <%= render UI::Slider::SliderThumbComponent.new %>
+          <% end %>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Medium (w-[400px])</label>
+          <%= render UI::Slider::SliderComponent.new(default_value: [50], classes: "w-[400px]") do %>
+            <%= render UI::Slider::SliderTrackComponent.new do %>
+              <%= render UI::Slider::SliderRangeComponent.new %>
+            <% end %>
+            <%= render UI::Slider::SliderThumbComponent.new %>
+          <% end %>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Large (w-[600px])</label>
+          <%= render UI::Slider::SliderComponent.new(default_value: [67], classes: "w-[600px]") do %>
+            <%= render UI::Slider::SliderTrackComponent.new do %>
+              <%= render UI::Slider::SliderRangeComponent.new %>
+            <% end %>
+            <%= render UI::Slider::SliderThumbComponent.new %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- ERB Partial - Vertical Slider -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial - Vertical Slider</h2>
+      <p class="text-sm text-muted-foreground">Slider with vertical orientation for vertical controls.</p>
+      <div class="flex gap-8">
+        <div class="h-64 flex flex-col items-center gap-2">
+          <label class="text-sm font-medium">Left</label>
+          <%= render "ui/slider/slider", default_value: [33], orientation: "vertical" do %>
+            <%= render "ui/slider/slider_track" do %>
+              <%= render "ui/slider/slider_range" %>
+            <% end %>
+            <%= render "ui/slider/slider_thumb" %>
+          <% end %>
+        </div>
+        <div class="h-64 flex flex-col items-center gap-2">
+          <label class="text-sm font-medium">Center</label>
+          <%= render "ui/slider/slider", default_value: [67], orientation: "vertical" do %>
+            <%= render "ui/slider/slider_track" do %>
+              <%= render "ui/slider/slider_range" %>
+            <% end %>
+            <%= render "ui/slider/slider_thumb" %>
+          <% end %>
+        </div>
+        <div class="h-64 flex flex-col items-center gap-2">
+          <label class="text-sm font-medium">Right</label>
+          <%= render "ui/slider/slider", default_value: [100], orientation: "vertical" do %>
+            <%= render "ui/slider/slider_track" do %>
+              <%= render "ui/slider/slider_range" %>
+            <% end %>
+            <%= render "ui/slider/slider_thumb" %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Reference -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Features</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Keyboard Navigation</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">→</kbd> / <kbd class="px-2 py-1 bg-muted rounded text-xs">↑</kbd> Increase value</li>
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">←</kbd> / <kbd class="px-2 py-1 bg-muted rounded text-xs">↓</kbd> Decrease value</li>
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">PageUp</kbd> / <kbd class="px-2 py-1 bg-muted rounded text-xs">PageDown</kbd> Large steps</li>
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">Home</kbd> / <kbd class="px-2 py-1 bg-muted rounded text-xs">End</kbd> Min/Max value</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Mouse/Touch Interaction</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li>Click track to jump to position</li>
+            <li>Drag thumb to adjust value smoothly</li>
+            <li>Hover thumb to show focus ring</li>
+            <li>Touch-friendly 16px thumb size</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Accessibility</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">role="slider"</code> on thumbs</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-valuenow</code> for current value</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-valuemin/max</code> for range</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-orientation</code> for vertical</li>
+            <li>Full keyboard navigation support</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Events</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">slider:change</code> - During drag/keyboard</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">slider:commit</code> - After interaction ends</li>
+            <li>Event detail contains value array</li>
+            <li>Integrates with Stimulus controllers</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components Index", components_path, class: "text-sm text-muted-foreground hover:text-foreground" %>
+    </footer>
+  </div>
+
+  <script>
+    // Simple demo script to update displayed values
+    document.addEventListener('slider:change', (event) => {
+      const slider = event.target
+      const value = event.detail.value
+
+      // Update volume display
+      if (slider.id === 'volume-slider') {
+        document.getElementById('volume-value').textContent = value[0]
+      }
+
+      // Update price range display
+      if (slider.id === 'price-slider') {
+        document.getElementById('price-min').textContent = value[0]
+        document.getElementById('price-max').textContent = value[1]
+      }
+
+      // Update brightness display
+      if (slider.id === 'brightness-slider') {
+        document.getElementById('brightness-value').textContent = value[0]
+      }
+
+      // Update balance display
+      if (slider.id === 'balance-slider') {
+        document.getElementById('balance-value').textContent = value[0]
+      }
+    })
+  </script>
+</body>
+</html>

@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   get "/components/scroll_area", to: "components#scroll_area"
   get "/components/select", to: "components#select"
   get "/components/separator", to: "components#separator"
+  get "/components/slider", to: "components#slider"
   get "/components/spinner", to: "components#spinner"
   get "/components/tabs", to: "components#tabs"
   get "/components/textarea", to: "components#textarea"
