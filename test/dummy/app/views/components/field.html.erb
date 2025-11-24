@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Field Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-6xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Field Component</h1>
+      <p class="text-muted-foreground">Combine labels, controls, and help text to compose accessible form fields</p>
+    </header>
+
+    <%# Example 1: Input Fields (Simplest) - Phlex %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">1. Input Fields (Phlex)</h2>
+      <div class="w-full max-w-md">
+        <%= render UI::Field::Set.new do %>
+          <%= render UI::Field::Group.new do %>
+            <%= render UI::Field::Field.new do %>
+              <%= render UI::Label::Label.new(for: "username-phlex", data: { slot: "field-label" }) { "Username" } %>
+              <%= render UI::Input::Input.new(id: "username-phlex", type: "text", placeholder: "Max Leiter") %>
+              <%= render UI::Field::Description.new { "Choose a unique username for your account." } %>
+            <% end %>
+            <%= render UI::Field::Field.new do %>
+              <%= render UI::Label::Label.new(for: "password-phlex", data: { slot: "field-label" }) { "Password" } %>
+              <%= render UI::Field::Description.new { "Must be at least 8 characters long." } %>
+              <%= render UI::Input::Input.new(id: "password-phlex", type: "password", placeholder: "••••••••") %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 2: Textarea - ViewComponent %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">2. Textarea (ViewComponent)</h2>
+      <div class="w-full max-w-md">
+        <%= render UI::Field::FieldSetComponent.new do %>
+          <%= render UI::Field::FieldGroupComponent.new do %>
+            <%= render UI::Field::FieldComponent.new do %>
+              <%= render UI::Label::LabelComponent.new(for: "feedback-vc", data: { slot: "field-label" }) { "Feedback" } %>
+              <textarea id="feedback-vc" placeholder="Your feedback helps us improve..." rows="4" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+              <%= render UI::Field::FieldDescriptionComponent.new { "Share your thoughts about our service." } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 3: Switch Toggle - ERB %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">3. Switch Toggle (ERB)</h2>
+      <div class="w-full max-w-md">
+        <%= render "ui/field/field", orientation: "horizontal" do %>
+          <%= render "ui/field/field_content" do %>
+            <%= render "ui/label/label", for_id: "2fa-erb", content: "Multi-factor authentication", attributes: { data: { slot: "field-label" } } %>
+            <%= render "ui/field/field_description" do %>
+              Enable MFA. Use a two-factor device or one-time code sent to email.
+            <% end %>
+          <% end %>
+          <%= render "ui/switch/switch", id: "2fa-erb" %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 4: Select Dropdown - ERB %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">4. Select Dropdown (ERB)</h2>
+      <div class="w-full max-w-md">
+        <%= render "ui/field/field" do %>
+          <%= render "ui/label/label", for_id: "department-erb", content: "Department", attributes: { data: { slot: "field-label" } } %>
+          <%= render "ui/select/select", value: "engineering" do %>
+            <%= render "ui/select/select_trigger", id: "department-erb", placeholder: "Choose department" %>
+            <%= render "ui/select/select_content" do %>
+              <%= render "ui/select/select_item", value: "engineering" do %>Engineering<% end %>
+              <%= render "ui/select/select_item", value: "design" do %>Design<% end %>
+              <%= render "ui/select/select_item", value: "marketing" do %>Marketing<% end %>
+              <%= render "ui/select/select_item", value: "sales" do %>Sales<% end %>
+            <% end %>
+          <% end %>
+          <%= render "ui/field/field_description" do %>
+            Select your department or area of work.
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 5: Radio Group - ERB %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">5. Radio Group (ERB)</h2>
+      <div class="w-full max-w-md">
+        <%= render "ui/field/field_set" do %>
+          <%= render "ui/label/label", content: "Subscription Plan", attributes: { data: { slot: "field-label" } } %>
+          <%= render "ui/field/field_description" do %>
+            Yearly and lifetime plans offer significant savings.
+          <% end %>
+          <div data-controller="ui--radio-group" data-ui--radio-group-value-value="monthly">
+            <%= render "ui/field/field", orientation: "horizontal" do %>
+              <%= render "ui/radio_button/radio_button", value: "monthly", id: "plan-monthly-erb" %>
+              <%= render "ui/label/label", for_id: "plan-monthly-erb", content: "Monthly ($9.99/month)", classes: "font-normal", attributes: { data: { slot: "field-label" } } %>
+            <% end %>
+            <%= render "ui/field/field", orientation: "horizontal" do %>
+              <%= render "ui/radio_button/radio_button", value: "yearly", id: "plan-yearly-erb" %>
+              <%= render "ui/label/label", for_id: "plan-yearly-erb", content: "Yearly ($99.99/year)", classes: "font-normal", attributes: { data: { slot: "field-label" } } %>
+            <% end %>
+            <%= render "ui/field/field", orientation: "horizontal" do %>
+              <%= render "ui/radio_button/radio_button", value: "lifetime", id: "plan-lifetime-erb" %>
+              <%= render "ui/label/label", for_id: "plan-lifetime-erb", content: "Lifetime ($299.99)", classes: "font-normal", attributes: { data: { slot: "field-label" } } %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 7: Field Group with Separator - ViewComponent %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">6. Field Group with Separator (ViewComponent)</h2>
+      <div class="w-full max-w-md">
+        <%= render UI::Field::FieldGroupComponent.new do %>
+          <%= render UI::Field::FieldSetComponent.new do %>
+            <%= render UI::Label::LabelComponent.new(data: { slot: "field-label" }) { "Responses" } %>
+            <%= render UI::Field::FieldDescriptionComponent.new { "Get notified when ChatGPT responds to requests that take time." } %>
+            <%= render UI::Field::FieldGroupComponent.new(data: { slot: "checkbox-group" }) do %>
+              <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::CheckboxComponent.new(id: "push-responses", checked: true, disabled: true) %>
+                <%= render UI::Label::LabelComponent.new(for: "push-responses", classes: "font-normal", data: { slot: "field-label" }) { "Push notifications" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+          <%= render UI::Field::FieldSeparatorComponent.new %>
+          <%= render UI::Field::FieldSetComponent.new do %>
+            <%= render UI::Label::LabelComponent.new(data: { slot: "field-label" }) { "Tasks" } %>
+            <%= render UI::Field::FieldDescriptionComponent.new { "Get notified when tasks you've created have updates." } %>
+            <%= render UI::Field::FieldGroupComponent.new(data: { slot: "checkbox-group" }) do %>
+              <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::CheckboxComponent.new(id: "push-tasks") %>
+                <%= render UI::Label::LabelComponent.new(for: "push-tasks", classes: "font-normal", data: { slot: "field-label" }) { "Push notifications" } %>
+              <% end %>
+              <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::CheckboxComponent.new(id: "email-tasks") %>
+                <%= render UI::Label::LabelComponent.new(for: "email-tasks", classes: "font-normal", data: { slot: "field-label" }) { "Email notifications" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 8: Checkbox Group - Phlex %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">7. Checkbox Group (Phlex)</h2>
+      <div class="w-full max-w-md">
+        <%= render UI::Field::Group.new do %>
+          <%= render UI::Field::Set.new do %>
+            <%= render UI::Field::Legend.new(variant: "label") { "Show these items on the desktop" } %>
+            <%= render UI::Field::Description.new { "Select the items you want to show on the desktop." } %>
+            <%= render UI::Field::Group.new(classes: "gap-3") do %>
+              <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::Checkbox.new(id: "finder-hard-disks", checked: true) %>
+                <%= render UI::Label::Label.new(for: "finder-hard-disks", classes: "font-normal", data: { slot: "field-label" }) { "Hard disks" } %>
+              <% end %>
+              <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::Checkbox.new(id: "finder-external-disks") %>
+                <%= render UI::Label::Label.new(for: "finder-external-disks", classes: "font-normal", data: { slot: "field-label" }) { "External disks" } %>
+              <% end %>
+              <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::Checkbox.new(id: "finder-cds-dvds") %>
+                <%= render UI::Label::Label.new(for: "finder-cds-dvds", classes: "font-normal", data: { slot: "field-label" }) { "CDs, DVDs, and iPods" } %>
+              <% end %>
+              <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::Checkbox.new(id: "finder-servers") %>
+                <%= render UI::Label::Label.new(for: "finder-servers", classes: "font-normal", data: { slot: "field-label" }) { "Connected servers" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+          <%= render UI::Field::Separator.new %>
+          <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+            <%= render UI::Checkbox::Checkbox.new(id: "finder-sync-folders", checked: true) %>
+            <%= render UI::Field::Content.new do %>
+              <%= render UI::Label::Label.new(for: "finder-sync-folders", data: { slot: "field-label" }) { "Sync Desktop & Documents folders" } %>
+              <%= render UI::Field::Description.new { "Your Desktop & Documents folders are being synced with iCloud Drive." } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 9: Fieldset with Address - ERB %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">8. Address Information (ERB)</h2>
+      <div class="w-full max-w-md space-y-6">
+        <%= render "ui/field/field_set" do %>
+          <%= render "ui/field/field_legend" do %>
+            Address Information
+          <% end %>
+          <%= render "ui/field/field_description" do %>
+            We need your address to deliver your order.
+          <% end %>
+          <%= render "ui/field/field_group" do %>
+            <%= render "ui/field/field" do %>
+              <%= render "ui/label/label", for_id: "street-erb", content: "Street Address", attributes: { data: { slot: "field-label" } } %>
+              <%= render "ui/input/input", id: "street-erb", type: "text", placeholder: "123 Main St" %>
+            <% end %>
+            <div class="grid grid-cols-2 gap-4">
+              <%= render "ui/field/field" do %>
+                <%= render "ui/label/label", for_id: "city-erb", content: "City", attributes: { data: { slot: "field-label" } } %>
+                <%= render "ui/input/input", id: "city-erb", type: "text", placeholder: "New York" %>
+              <% end %>
+              <%= render "ui/field/field" do %>
+                <%= render "ui/label/label", for_id: "zip-erb", content: "Postal Code", attributes: { data: { slot: "field-label" } } %>
+                <%= render "ui/input/input", id: "zip-erb", type: "text", placeholder: "90502" %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 10: Choice Card - ViewComponent %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">9. Choice Card (ViewComponent)</h2>
+      <div class="w-full max-w-md">
+        <%= render UI::Field::FieldGroupComponent.new do %>
+          <%= render UI::Field::FieldSetComponent.new do %>
+            <%= render UI::Label::LabelComponent.new(for: "compute-environment-vc") { "Compute Environment" } %>
+            <%= render UI::Field::FieldDescriptionComponent.new { "Select the compute environment for your cluster." } %>
+            <div data-controller="ui--radio-group" data-ui--radio-group-value-value="kubernetes">
+              <%= render UI::Label::LabelComponent.new(for: "kubernetes-vc-r2h", data: { slot: "field-label" }) do %>
+                <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
+                  <%= render UI::Field::FieldContentComponent.new do %>
+                    <%= render UI::Field::FieldTitleComponent.new { "Kubernetes" } %>
+                    <%= render UI::Field::FieldDescriptionComponent.new { "Run GPU workloads on a K8s configured cluster." } %>
+                  <% end %>
+                  <%= render UI::RadioButton::RadioButtonComponent.new(value: "kubernetes", id: "kubernetes-vc-r2h") %>
+                <% end %>
+              <% end %>
+              <%= render UI::Label::LabelComponent.new(for: "vm-vc-z4k", data: { slot: "field-label" }) do %>
+                <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
+                  <%= render UI::Field::FieldContentComponent.new do %>
+                    <%= render UI::Field::FieldTitleComponent.new { "Virtual Machine" } %>
+                    <%= render UI::Field::FieldDescriptionComponent.new { "Access a VM configured cluster to run GPU workloads." } %>
+                  <% end %>
+                  <%= render UI::RadioButton::RadioButtonComponent.new(value: "vm", id: "vm-vc-z4k") %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Example 11: Payment Method (Most Complex) - Mixed %>
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">10. Payment Method (Most Complex - Mixed)</h2>
+      <div class="w-full max-w-md">
+        <%= render UI::Field::Group.new do %>
+          <%= render UI::Field::Set.new do %>
+            <%= render UI::Field::Legend.new { "Payment Method" } %>
+            <%= render UI::Field::Description.new { "All transactions are secure and encrypted" } %>
+            <%= render UI::Field::Group.new do %>
+              <%= render UI::Field::Field.new do %>
+                <%= render UI::Label::Label.new(for: "checkout-card-name", data: { slot: "field-label" }) { "Name on Card" } %>
+                <%= render UI::Input::Input.new(id: "checkout-card-name", placeholder: "Evil Rabbit", required: true) %>
+              <% end %>
+              <%= render UI::Field::Field.new do %>
+                <%= render UI::Label::Label.new(for: "checkout-card-number", data: { slot: "field-label" }) { "Card Number" } %>
+                <%= render UI::Input::Input.new(id: "checkout-card-number", placeholder: "1234 5678 9012 3456", required: true) %>
+                <%= render UI::Field::Description.new { "Enter your 16-digit card number" } %>
+              <% end %>
+              <div class="grid grid-cols-3 gap-4">
+                <%= render UI::Field::Field.new do %>
+                  <%= render UI::Label::Label.new(for: "checkout-exp-month", data: { slot: "field-label" }) { "Month" } %>
+                  <%= render UI::Input::Input.new(id: "checkout-exp-month", placeholder: "MM", required: true) %>
+                <% end %>
+                <%= render UI::Field::Field.new do %>
+                  <%= render UI::Label::Label.new(for: "checkout-exp-year", data: { slot: "field-label" }) { "Year" } %>
+                  <%= render UI::Input::Input.new(id: "checkout-exp-year", placeholder: "YYYY", required: true) %>
+                <% end %>
+                <%= render UI::Field::Field.new do %>
+                  <%= render UI::Label::Label.new(for: "checkout-cvv", data: { slot: "field-label" }) { "CVV" } %>
+                  <%= render UI::Input::Input.new(id: "checkout-cvv", placeholder: "123", required: true) %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+          <%= render UI::Field::Separator.new %>
+          <%= render UI::Field::Set.new do %>
+            <%= render UI::Field::Legend.new { "Billing Address" } %>
+            <%= render UI::Field::Description.new { "The billing address associated with your payment method" } %>
+            <%= render UI::Field::Group.new do %>
+              <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+                <%= render UI::Checkbox::Checkbox.new(id: "checkout-same-shipping", checked: true) %>
+                <%= render UI::Label::Label.new(for: "checkout-same-shipping", classes: "font-normal", data: { slot: "field-label" }) { "Same as shipping address" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+          <%= render UI::Field::Set.new do %>
+            <%= render UI::Field::Group.new do %>
+              <%= render UI::Field::Field.new do %>
+                <%= render UI::Label::Label.new(for: "checkout-comments", data: { slot: "field-label" }) { "Comments" } %>
+                <textarea id="checkout-comments" placeholder="Add any additional comments" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"></textarea>
+              <% end %>
+            <% end %>
+          <% end %>
+          <%= render UI::Field::Field.new(orientation: "horizontal") do %>
+            <%= render UI::Button::Button.new(type: "submit") { "Submit" } %>
+            <%= render UI::Button::Button.new(variant: "outline", type: "button") { "Cancel" } %>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components", components_path, class: "text-primary hover:underline" %>
+    </footer>
+  </div>
+</body>
+</html>

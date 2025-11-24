@@ -53,6 +53,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/dropdown_menu.html.erb
   end
 
+  def field
+    # Renders app/views/components/field.html.erb
+  end
+
   def input
     # Renders app/views/components/input.html.erb
   end

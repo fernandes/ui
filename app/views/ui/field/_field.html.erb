@@ -1,0 +1,15 @@
+<%# Field Component - Core wrapper for a single form field %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @orientation = local_assigns.fetch(:orientation, nil)
+
+  # Extend behavior for shared logic
+  extend UI::FieldBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = field_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

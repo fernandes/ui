@@ -1,0 +1,15 @@
+<%# FieldError Component - Error message display for form fields %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::FieldErrorBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = field_error_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

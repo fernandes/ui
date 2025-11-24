@@ -1,0 +1,15 @@
+<%# FieldDescription Component - Helper text for form fields %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::FieldDescriptionBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = field_description_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

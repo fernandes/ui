@@ -1,0 +1,16 @@
+<%# FieldLegend Component - Legend element for FieldSet %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @variant = local_assigns.fetch(:variant, nil)
+
+  # Extend behavior for shared logic
+  extend UI::FieldLegendBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = field_legend_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

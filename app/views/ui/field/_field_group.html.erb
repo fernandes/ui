@@ -1,0 +1,14 @@
+<%# FieldGroup Component - Layout wrapper that stacks Field components %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::FieldGroupBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = field_group_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>
