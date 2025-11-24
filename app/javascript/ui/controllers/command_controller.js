@@ -11,6 +11,29 @@ export default class extends Controller {
   connect() {
     this.selectedIndex = -1
     this.updateVisibility()
+
+    // Listen for popover/drawer show events to focus input and select first item
+    this.element.addEventListener('popover:show', this.handleShow.bind(this))
+    this.element.addEventListener('drawer:show', this.handleShow.bind(this))
+  }
+
+  disconnect() {
+    this.element.removeEventListener('popover:show', this.handleShow.bind(this))
+    this.element.removeEventListener('drawer:show', this.handleShow.bind(this))
+  }
+
+  handleShow() {
+    // Focus the input when popover/drawer opens
+    if (this.hasInputTarget) {
+      this.inputTarget.focus()
+    }
+
+    // Select first visible item
+    const visibleItems = this.visibleItems
+    if (visibleItems.length > 0) {
+      this.selectedIndex = 0
+      this.updateSelection()
+    }
   }
 
   filter() {

@@ -10,8 +10,22 @@
   extend ::UI::Drawer::DrawerContentBehavior
 
   # Get HTML attributes from behavior
-  all_attributes = drawer_content_html_attributes.deep_merge(@attributes)
+  all_attributes = drawer_content_html_attributes
+
+  # Merge user-provided attributes
+  if @attributes.present?
+    all_attributes = all_attributes.deep_merge(@attributes)
+  end
+
+  # Add group class for handle visibility (matching Phlex implementation)
+  all_attributes[:class] = TailwindMerge::Merger.new.merge(["group/drawer-content", all_attributes[:class]].compact.join(" "))
 -%>
-<div class="group/drawer-content" <%= tag.attributes(all_attributes) %>>
+<div class="<%= all_attributes[:class] %>"
+     role="<%= all_attributes[:role] %>"
+     aria-modal="<%= all_attributes[:"aria-modal"] %>"
+     data-state="<%= all_attributes[:"data-state"] %>"
+     data-vaul-drawer="<%= all_attributes[:"data-vaul-drawer"] %>"
+     data-vaul-drawer-direction="<%= all_attributes[:"data-vaul-drawer-direction"] %>"
+     <%= all_attributes[:data]&.map { |k, v| "data-#{k.to_s.dasherize}=\"#{v}\"" }&.join(" ")&.html_safe %>>
   <%= content || yield %>
 </div>

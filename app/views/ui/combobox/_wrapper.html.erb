@@ -1,0 +1,43 @@
+<%
+# Combobox Wrapper - ERB implementation
+#
+# Wrapper partial that yields combobox attributes to be spread into a container component.
+# Used to wrap Popover/Drawer/DropdownMenu with combobox selection functionality.
+# Uses ComboboxBehavior concern for shared attribute generation logic.
+#
+# @param value [String] Initial selected value (empty string for no selection)
+# @param attributes [Hash] Additional HTML attributes to merge
+#
+# @example With Popover
+#   <%= render "ui/combobox/wrapper", value: "" do |combobox_attrs| %>
+#     <%= render "ui/popover/popover", **combobox_attrs, placement: "bottom-start" do %>
+#       <%= render "ui/popover/popover_trigger", as_child: true do |trigger_attrs| %>
+#         <%= render "ui/button/button", **trigger_attrs do %>
+#           <span data-ui--combobox-target="text">Select framework...</span>
+#         <% end %>
+#       <% end %>
+#
+#       <%= render "ui/popover/popover_content" do %>
+#         <%= render "ui/command/command" do %>
+#           <%= render "ui/command/command_item", value: "next", data: { ui__combobox_target: "item" } do %>
+#             <span>Next.js</span>
+#             <svg class="ml-auto h-4 w-4 opacity-0">
+#               <path d="M20 6 9 17l-5-5"/>
+#             </svg>
+#           <% end %>
+#         <% end %>
+#       <% end %>
+#     <% end %>
+#   <% end %>
+
+value = local_assigns.fetch(:value, "")
+extra_attributes = local_assigns.fetch(:attributes, {})
+
+# Include ComboboxBehavior to access helper methods
+helper = Object.new.extend(ComboboxBehavior)
+helper.instance_variable_set(:@value, value)
+
+combobox_attrs = helper.combobox_html_attributes.deep_merge(extra_attributes)
+%>
+
+<%= yield(combobox_attrs) if block_given? %>

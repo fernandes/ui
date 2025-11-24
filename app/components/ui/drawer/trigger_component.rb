@@ -9,13 +9,13 @@ module UI
     #   <%= render UI::Drawer::TriggerComponent.new { "Open Drawer" } %>
     #
     # @example As child (composition pattern)
-    #   <%= render UI::Drawer::TriggerComponent.new(as_child: true) do |attrs| %>
-    #     <%= render UI::Button::ButtonComponent.new(**attrs) { "Open" } %>
+    #   <%= render UI::Drawer::TriggerComponent.new(as_child: true) do %>
+    #     <%= render UI::Button::ButtonComponent.new { "Open" } %>
     #   <% end %>
     class TriggerComponent < ViewComponent::Base
       include UI::Drawer::DrawerTriggerBehavior
 
-      # @param as_child [Boolean] yield attributes to block instead of rendering button
+      # @param as_child [Boolean] merge attributes into child element
       # @param attributes [Hash] additional HTML attributes
       def initialize(as_child: false, attributes: {})
         @as_child = as_child
@@ -23,11 +23,37 @@ module UI
       end
 
       def call
-        trigger_attrs = drawer_trigger_html_attributes
+        trigger_attrs = drawer_trigger_html_attributes.deep_merge(@attributes)
 
         if @as_child
-          # Yield attributes to block - child must accept and use them
-          content.call(trigger_attrs) if content.respond_to?(:call)
+          # asChild mode: merge attributes into child element
+          rendered = content.to_s
+          doc = Nokogiri::HTML::DocumentFragment.parse(rendered)
+          first_element = doc.children.find { |node| node.element? }
+
+          if first_element
+            # Merge data attributes (convert Rails naming to HTML)
+            trigger_attrs.fetch(:data, {}).each do |key, value|
+              html_key = key.to_s.gsub("__", "--").gsub("_", "-")
+              first_element["data-#{html_key}"] = value
+            end
+
+            # Merge CSS classes with TailwindMerge
+            if trigger_attrs[:class]
+              existing_classes = first_element["class"] || ""
+              merged_classes = TailwindMerge::Merger.new.merge([existing_classes, trigger_attrs[:class]].join(" "))
+              first_element["class"] = merged_classes
+            end
+
+            # Merge other attributes (except data and class)
+            trigger_attrs.except(:data, :class).each do |key, value|
+              first_element[key.to_s] = value
+            end
+
+            doc.to_html.html_safe
+          else
+            content
+          end
         else
           # Default: render as button
           content_tag :button, content, **trigger_attrs

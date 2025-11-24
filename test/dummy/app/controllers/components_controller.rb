@@ -41,12 +41,20 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/checkbox.html.erb
   end
 
+  def combobox
+    # Renders app/views/components/combobox.html.erb
+  end
+
   def context_menu
     # Renders app/views/components/context_menu.html.erb
   end
 
   def dialog
     # Renders app/views/components/dialog.html.erb
+  end
+
+  def drawer
+    # Renders app/views/components/drawer.html.erb
   end
 
   def dropdown_menu

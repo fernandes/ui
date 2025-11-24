@@ -70,28 +70,36 @@ UI::Drawer::Drawer          # Root container
 ## Basic Usage
 
 ```erb
-<%= render UI::Drawer::Drawer.new do %>
-  <%= render UI::Drawer::Trigger.new do %>
+<%= render "ui/drawer/drawer" do %>
+  <%= render "ui/drawer/trigger" do %>
     Open Drawer
   <% end %>
 
-  <%= render UI::Drawer::Overlay.new %>
+  <%= render "ui/drawer/overlay" %>
 
-  <%= render UI::Drawer::Content.new do %>
-    <%= render UI::Drawer::Handle.new %>
+  <%= render "ui/drawer/content" do %>
+    <%= render "ui/drawer/handle" %>
 
-    <%= render UI::Drawer::Header.new do %>
-      <%= render UI::Drawer::Title.new { "Drawer Title" } %>
-      <%= render UI::Drawer::Description.new { "Drawer description text." } %>
+    <%= render "ui/drawer/header" do %>
+      <%= render "ui/drawer/title" do %>
+        Drawer Title
+      <% end %>
+      <%= render "ui/drawer/description" do %>
+        Drawer description text.
+      <% end %>
     <% end %>
 
     <div class="p-4">
       <!-- Your content here -->
     </div>
 
-    <%= render UI::Drawer::Footer.new do %>
-      <%= render UI::Button::Button.new { "Submit" } %>
-      <%= render UI::Drawer::Close.new { "Cancel" } %>
+    <%= render "ui/drawer/footer" do %>
+      <%= render "ui/button/button", variant: :default do %>
+        Submit
+      <% end %>
+      <%= render "ui/drawer/close" do %>
+        Cancel
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
@@ -101,39 +109,47 @@ UI::Drawer::Drawer          # Root container
 
 ```erb
 <!-- Bottom (default) -->
-<%= render UI::Drawer::Drawer.new(direction: "bottom") do %>
-  <%= render UI::Drawer::Trigger.new { "Bottom" } %>
-  <%= render UI::Drawer::Overlay.new %>
-  <%= render UI::Drawer::Content.new(direction: "bottom") do %>
-    <%= render UI::Drawer::Handle.new %>
+<%= render "ui/drawer/drawer", direction: "bottom" do %>
+  <%= render "ui/drawer/trigger" do %>
+    Bottom
+  <% end %>
+  <%= render "ui/drawer/overlay" %>
+  <%= render "ui/drawer/content", direction: "bottom" do %>
+    <%= render "ui/drawer/handle" %>
     <div class="p-4">Content</div>
   <% end %>
 <% end %>
 
 <!-- Top -->
-<%= render UI::Drawer::Drawer.new(direction: "top") do %>
-  <%= render UI::Drawer::Trigger.new { "Top" } %>
-  <%= render UI::Drawer::Overlay.new %>
-  <%= render UI::Drawer::Content.new(direction: "top") do %>
-    <%= render UI::Drawer::Handle.new %>
+<%= render "ui/drawer/drawer", direction: "top" do %>
+  <%= render "ui/drawer/trigger" do %>
+    Top
+  <% end %>
+  <%= render "ui/drawer/overlay" %>
+  <%= render "ui/drawer/content", direction: "top" do %>
+    <%= render "ui/drawer/handle" %>
     <div class="p-4">Content</div>
   <% end %>
 <% end %>
 
 <!-- Left -->
-<%= render UI::Drawer::Drawer.new(direction: "left") do %>
-  <%= render UI::Drawer::Trigger.new { "Left" } %>
-  <%= render UI::Drawer::Overlay.new %>
-  <%= render UI::Drawer::Content.new(direction: "left") do %>
+<%= render "ui/drawer/drawer", direction: "left" do %>
+  <%= render "ui/drawer/trigger" do %>
+    Left
+  <% end %>
+  <%= render "ui/drawer/overlay" %>
+  <%= render "ui/drawer/content", direction: "left" do %>
     <div class="p-4">Content</div>
   <% end %>
 <% end %>
 
 <!-- Right -->
-<%= render UI::Drawer::Drawer.new(direction: "right") do %>
-  <%= render UI::Drawer::Trigger.new { "Right" } %>
-  <%= render UI::Drawer::Overlay.new %>
-  <%= render UI::Drawer::Content.new(direction: "right") do %>
+<%= render "ui/drawer/drawer", direction: "right" do %>
+  <%= render "ui/drawer/trigger" do %>
+    Right
+  <% end %>
+  <%= render "ui/drawer/overlay" %>
+  <%= render "ui/drawer/content", direction: "right" do %>
     <div class="p-4">Content</div>
   <% end %>
 <% end %>
@@ -144,22 +160,25 @@ UI::Drawer::Drawer          # Root container
 Snap points allow the drawer to stop at specific positions when dragged:
 
 ```erb
-<%= render UI::Drawer::Drawer.new(
+<%= render "ui/drawer/drawer",
   modal: false,
   snap_points: [0.25, 0.5, 1],
-  fade_from_index: 0
-) do %>
-  <%= render UI::Drawer::Trigger.new do %>
+  fade_from_index: 0 do %>
+  <%= render "ui/drawer/trigger" do %>
     Open with Snap Points
   <% end %>
 
-  <%= render UI::Drawer::Overlay.new %>
+  <%= render "ui/drawer/overlay" %>
 
-  <%= render UI::Drawer::Content.new(classes: "min-h-screen") do %>
-    <%= render UI::Drawer::Handle.new %>
-    <%= render UI::Drawer::Header.new do %>
-      <%= render UI::Drawer::Title.new { "Snap Points" } %>
-      <%= render UI::Drawer::Description.new { "Drag to different heights." } %>
+  <%= render "ui/drawer/content", classes: "min-h-screen" do %>
+    <%= render "ui/drawer/handle" %>
+    <%= render "ui/drawer/header" do %>
+      <%= render "ui/drawer/title" do %>
+        Snap Points
+      <% end %>
+      <%= render "ui/drawer/description" do %>
+        Drag to different heights.
+      <% end %>
     <% end %>
 
     <div class="p-4">
@@ -182,16 +201,22 @@ Snap points allow the drawer to stop at specific positions when dragged:
 Restrict dragging to the handle only - useful when drawer contains scrollable content:
 
 ```erb
-<%= render UI::Drawer::Drawer.new(handle_only: true) do %>
-  <%= render UI::Drawer::Trigger.new { "Handle-Only Drawer" } %>
-  <%= render UI::Drawer::Overlay.new %>
+<%= render "ui/drawer/drawer", handle_only: true do %>
+  <%= render "ui/drawer/trigger" do %>
+    Handle-Only Drawer
+  <% end %>
+  <%= render "ui/drawer/overlay" %>
 
-  <%= render UI::Drawer::Content.new do %>
-    <%= render UI::Drawer::Handle.new %>
+  <%= render "ui/drawer/content" do %>
+    <%= render "ui/drawer/handle" %>
 
-    <%= render UI::Drawer::Header.new do %>
-      <%= render UI::Drawer::Title.new { "Handle-Only Mode" } %>
-      <%= render UI::Drawer::Description.new { "Only the handle is draggable." } %>
+    <%= render "ui/drawer/header" do %>
+      <%= render "ui/drawer/title" do %>
+        Handle-Only Mode
+      <% end %>
+      <%= render "ui/drawer/description" do %>
+        Only the handle is draggable.
+      <% end %>
     <% end %>
 
     <div class="p-4 space-y-2" data-vaul-scrollable>
@@ -212,15 +237,21 @@ Restrict dragging to the handle only - useful when drawer contains scrollable co
 Background remains interactive when drawer is open:
 
 ```erb
-<%= render UI::Drawer::Drawer.new(modal: false) do %>
-  <%= render UI::Drawer::Trigger.new { "Non-Modal Drawer" } %>
-  <%= render UI::Drawer::Overlay.new %>
+<%= render "ui/drawer/drawer", modal: false do %>
+  <%= render "ui/drawer/trigger" do %>
+    Non-Modal Drawer
+  <% end %>
+  <%= render "ui/drawer/overlay" %>
 
-  <%= render UI::Drawer::Content.new do %>
-    <%= render UI::Drawer::Handle.new %>
-    <%= render UI::Drawer::Header.new do %>
-      <%= render UI::Drawer::Title.new { "Non-Modal" } %>
-      <%= render UI::Drawer::Description.new { "Page remains interactive." } %>
+  <%= render "ui/drawer/content" do %>
+    <%= render "ui/drawer/handle" %>
+    <%= render "ui/drawer/header" do %>
+      <%= render "ui/drawer/title" do %>
+        Non-Modal
+      <% end %>
+      <%= render "ui/drawer/description" do %>
+        Page remains interactive.
+      <% end %>
     <% end %>
     <div class="p-4">
       <p>Try clicking the page behind this drawer.</p>
@@ -237,22 +268,34 @@ Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
 <div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
   <!-- Mobile: Drawer -->
   <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-    <%= render UI::Drawer::Drawer.new do %>
-      <%= render UI::Drawer::Trigger.new { "Edit Profile (Mobile)" } %>
-      <%= render UI::Drawer::Overlay.new %>
-      <%= render UI::Drawer::Content.new do %>
-        <%= render UI::Drawer::Handle.new %>
-        <%= render UI::Drawer::Header.new(classes: "text-left") do %>
-          <%= render UI::Drawer::Title.new { "Edit profile" } %>
-          <%= render UI::Drawer::Description.new { "Make changes to your profile." } %>
+    <%= render "ui/drawer/drawer" do %>
+      <%= render "ui/drawer/trigger" do %>
+        Edit Profile (Mobile)
+      <% end %>
+      <%= render "ui/drawer/overlay" %>
+      <%= render "ui/drawer/content" do %>
+        <%= render "ui/drawer/handle" %>
+        <%= render "ui/drawer/header", classes: "text-left" do %>
+          <%= render "ui/drawer/title" do %>
+            Edit profile
+          <% end %>
+          <%= render "ui/drawer/description" do %>
+            Make changes to your profile.
+          <% end %>
         <% end %>
         <div class="grid gap-4 px-4">
-          <%= render UI::Label::Label.new(for: "name-drawer") { "Name" } %>
-          <%= render UI::Input::Input.new(id: "name-drawer", value: "Pedro Duarte") %>
+          <%= render "ui/label/label", for: "name-drawer" do %>
+            Name
+          <% end %>
+          <%= render "ui/input/input", id: "name-drawer", value: "Pedro Duarte" %>
         </div>
-        <%= render UI::Drawer::Footer.new(classes: "pt-2") do %>
-          <%= render UI::Button::Button.new { "Save changes" } %>
-          <%= render UI::Drawer::Close.new { "Cancel" } %>
+        <%= render "ui/drawer/footer", classes: "pt-2" do %>
+          <%= render "ui/button/button", variant: :default do %>
+            Save changes
+          <% end %>
+          <%= render "ui/drawer/close" do %>
+            Cancel
+          <% end %>
         <% end %>
       <% end %>
     <% end %>
@@ -260,20 +303,30 @@ Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
 
   <!-- Desktop: Dialog -->
   <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-    <%= render UI::Dialog::Dialog.new do %>
-      <%= render UI::Dialog::Trigger.new { "Edit Profile (Desktop)" } %>
-      <%= render UI::Dialog::Overlay.new %>
-      <%= render UI::Dialog::Content.new do %>
-        <%= render UI::Dialog::Header.new do %>
-          <%= render UI::Dialog::Title.new { "Edit profile" } %>
-          <%= render UI::Dialog::Description.new { "Make changes to your profile." } %>
+    <%= render "ui/dialog/dialog" do %>
+      <%= render "ui/dialog/trigger" do %>
+        Edit Profile (Desktop)
+      <% end %>
+      <%= render "ui/dialog/overlay" %>
+      <%= render "ui/dialog/content" do %>
+        <%= render "ui/dialog/header" do %>
+          <%= render "ui/dialog/title" do %>
+            Edit profile
+          <% end %>
+          <%= render "ui/dialog/description" do %>
+            Make changes to your profile.
+          <% end %>
         <% end %>
         <div class="grid gap-4 py-4">
-          <%= render UI::Label::Label.new(for: "name") { "Name" } %>
-          <%= render UI::Input::Input.new(id: "name", value: "Pedro Duarte") %>
+          <%= render "ui/label/label", for: "name" do %>
+            Name
+          <% end %>
+          <%= render "ui/input/input", id: "name", value: "Pedro Duarte" %>
         </div>
-        <%= render UI::Dialog::Footer.new do %>
-          <%= render UI::Button::Button.new { "Save changes" } %>
+        <%= render "ui/dialog/footer" do %>
+          <%= render "ui/button/button", variant: :default do %>
+            Save changes
+          <% end %>
         <% end %>
       <% end %>
     <% end %>
@@ -287,20 +340,24 @@ The `Trigger` component supports the `as_child` pattern for composition:
 
 ```erb
 <!-- ❌ WRONG: Creates button inside button (invalid HTML) -->
-<%= render UI::Drawer::Trigger.new do %>
-  <%= render UI::Button::Button.new { "Open" } %>
+<%= render "ui/drawer/trigger" do %>
+  <%= render "ui/button/button" do %>
+    Open
+  <% end %>
 <% end %>
 
 <!-- ✅ CORRECT: asChild merges trigger behavior with Button -->
-<%= render UI::Drawer::Trigger.new(as_child: true) do |attrs| %>
-  <%= render UI::Button::Button.new(**attrs) { "Open" } %>
+<%= render "ui/drawer/trigger", as_child: true do |attrs| %>
+  <%= render "ui/button/button", **attrs do %>
+    Open
+  <% end %>
 <% end %>
 
 <!-- ✅ CORRECT: Can also be used with custom elements -->
-<%= render UI::Drawer::Trigger.new(as_child: true) do |attrs| %>
-  <a href="#" **attrs>
+<%= render "ui/drawer/trigger", as_child: true do |attrs| %>
+  <%= content_tag :a, href: "#", **attrs do %>
     <span class="font-semibold">Open Drawer</span>
-  </a>
+  <% end %>
 <% end %>
 ```
 
@@ -308,8 +365,8 @@ The `Trigger` component supports the `as_child` pattern for composition:
 
 ### ❌ Wrong: Missing direction prop on Content
 ```erb
-<%= render UI::Drawer::Drawer.new(direction: "right") do %>
-  <%= render UI::Drawer::Content.new do %>  <!-- Missing direction! -->
+<%= render "ui/drawer/drawer", direction: "right" do %>
+  <%= render "ui/drawer/content" do %>  <!-- Missing direction! -->
     Content
   <% end %>
 <% end %>
@@ -317,8 +374,8 @@ The `Trigger` component supports the `as_child` pattern for composition:
 
 ### ✅ Correct: Content direction matches Drawer
 ```erb
-<%= render UI::Drawer::Drawer.new(direction: "right") do %>
-  <%= render UI::Drawer::Content.new(direction: "right") do %>
+<%= render "ui/drawer/drawer", direction: "right" do %>
+  <%= render "ui/drawer/content", direction: "right" do %>
     Content
   <% end %>
 <% end %>
@@ -326,28 +383,32 @@ The `Trigger` component supports the `as_child` pattern for composition:
 
 ### ❌ Wrong: Nested buttons without asChild
 ```erb
-<%= render UI::Drawer::Trigger.new do %>
-  <%= render UI::Button::Button.new { "Open" } %>
+<%= render "ui/drawer/trigger" do %>
+  <%= render "ui/button/button" do %>
+    Open
+  <% end %>
 <% end %>
 ```
 
 ### ✅ Correct: Use asChild for composition
 ```erb
-<%= render UI::Drawer::Trigger.new(as_child: true) do |attrs| %>
-  <%= render UI::Button::Button.new(**attrs) { "Open" } %>
+<%= render "ui/drawer/trigger", as_child: true do |attrs| %>
+  <%= render "ui/button/button", **attrs do %>
+    Open
+  <% end %>
 <% end %>
 ```
 
 ### ❌ Wrong: Using `hidden` class for animated containers
 ```erb
-<%= render UI::Drawer::Content.new(classes: "hidden") do %>
+<%= render "ui/drawer/content", classes: "hidden" do %>
   <!-- Animations won't work! -->
 <% end %>
 ```
 
 ### ✅ Correct: Let controller manage visibility
 ```erb
-<%= render UI::Drawer::Content.new do %>
+<%= render "ui/drawer/content" do %>
   <!-- Controller handles visibility via data-state -->
 <% end %>
 ```

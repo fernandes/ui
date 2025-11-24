@@ -48,8 +48,15 @@ module UI
               first_element["data-#{html_key}"] = value
             end
 
-            # Merge other attributes
-            trigger_attrs.except(:data).each do |key, value|
+            # Merge CSS classes with TailwindMerge
+            if trigger_attrs[:class]
+              existing_classes = first_element["class"] || ""
+              merged_classes = TailwindMerge::Merger.new.merge([existing_classes, trigger_attrs[:class]].join(" "))
+              first_element["class"] = merged_classes
+            end
+
+            # Merge other attributes (except data and class)
+            trigger_attrs.except(:data, :class).each do |key, value|
               first_element[key.to_s] = value
             end
 

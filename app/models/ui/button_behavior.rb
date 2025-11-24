@@ -13,7 +13,19 @@ module UI
     # @param content_block [Proc] Block that returns the button content
     # @return [String] HTML string for the button
     def render_button(&content_block)
-      all_attributes = button_html_attributes.deep_merge(@attributes)
+      all_attributes = button_html_attributes
+
+      # Merge classes with TailwindMerge before deep_merge
+      if @attributes&.key?(:class)
+        button_class = all_attributes[:class] || ""
+        attr_class = @attributes[:class] || ""
+        merged_class = TailwindMerge::Merger.new.merge([button_class, attr_class].join(" "))
+        all_attributes = all_attributes.merge(class: merged_class)
+      end
+
+      # Deep merge other attributes (excluding class which we already handled)
+      all_attributes = all_attributes.deep_merge(@attributes&.except(:class) || {})
+
       content_tag(:button, **all_attributes, &content_block)
     end
 

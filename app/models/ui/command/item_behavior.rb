@@ -42,6 +42,7 @@ module UI
 
       def command_item_base_classes
         "relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none " \
+        "hover:bg-accent hover:text-accent-foreground " \
         "data-[disabled]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground " \
         "data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
       end

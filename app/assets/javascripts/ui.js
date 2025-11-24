@@ -2370,6 +2370,69 @@
       }
     }
   }
+  class ComboboxController extends stimulus.Controller {
+    static targets=[ "text", "item" ];
+    static values={
+      value: String
+    };
+    connect() {
+      this.boundHandleSelect = this.handleSelect.bind(this);
+      this.element.addEventListener("command:select", this.boundHandleSelect);
+      if (this.valueValue) {
+        this.updateCheckIcons();
+      }
+    }
+    disconnect() {
+      this.element.removeEventListener("command:select", this.boundHandleSelect);
+    }
+    handleSelect(event) {
+      const {value: value, item: item} = event.detail;
+      this.valueValue = value;
+      if (this.hasTextTarget) {
+        const label = item.querySelector("span")?.textContent || value;
+        this.textTarget.textContent = label;
+      }
+      this.updateCheckIcons();
+      this.closeContainer();
+    }
+    updateCheckIcons() {
+      this.itemTargets.forEach(item => {
+        const itemValue = item.dataset.value;
+        const checkIcon = item.querySelector("svg.ml-auto");
+        if (checkIcon) {
+          if (itemValue === this.valueValue) {
+            checkIcon.classList.remove("opacity-0");
+            checkIcon.classList.add("opacity-100");
+          } else {
+            checkIcon.classList.remove("opacity-100");
+            checkIcon.classList.add("opacity-0");
+          }
+        }
+      });
+    }
+    closeContainer() {
+      const popoverController = this.application.getControllerForElementAndIdentifier(this.element, "ui--popover");
+      if (popoverController) {
+        popoverController.hide();
+        return;
+      }
+      let drawerController = this.application.getControllerForElementAndIdentifier(this.element, "ui--drawer");
+      if (!drawerController) {
+        const drawerElement = this.element.querySelector('[data-controller~="ui--drawer"]');
+        if (drawerElement) {
+          drawerController = this.application.getControllerForElementAndIdentifier(drawerElement, "ui--drawer");
+        }
+      }
+      if (drawerController) {
+        drawerController.hide();
+        return;
+      }
+      const dropdownController = this.application.getControllerForElementAndIdentifier(this.element, "ui--dropdown");
+      if (dropdownController) {
+        dropdownController.close();
+      }
+    }
+  }
   class CommandController extends stimulus.Controller {
     static targets=[ "input", "list", "item", "group", "empty" ];
     static values={
@@ -2381,6 +2444,22 @@
     connect() {
       this.selectedIndex = -1;
       this.updateVisibility();
+      this.element.addEventListener("popover:show", this.handleShow.bind(this));
+      this.element.addEventListener("drawer:show", this.handleShow.bind(this));
+    }
+    disconnect() {
+      this.element.removeEventListener("popover:show", this.handleShow.bind(this));
+      this.element.removeEventListener("drawer:show", this.handleShow.bind(this));
+    }
+    handleShow() {
+      if (this.hasInputTarget) {
+        this.inputTarget.focus();
+      }
+      const visibleItems = this.visibleItems;
+      if (visibleItems.length > 0) {
+        this.selectedIndex = 0;
+        this.updateSelection();
+      }
     }
     filter() {
       const query = this.inputTarget.value.toLowerCase().trim();
@@ -5485,6 +5564,7 @@
       "ui--drawer": DrawerController,
       "ui--checkbox": CheckboxController,
       "ui--collapsible": CollapsibleController,
+      "ui--combobox": ComboboxController,
       "ui--command": CommandController,
       "ui--command-dialog": CommandDialogController,
       "ui--context-menu": ContextMenuController,
@@ -5507,6 +5587,7 @@
   exports.AvatarController = AvatarController;
   exports.CheckboxController = CheckboxController;
   exports.CollapsibleController = CollapsibleController;
+  exports.ComboboxController = ComboboxController;
   exports.CommandController = CommandController;
   exports.CommandDialogController = CommandDialogController;
   exports.ContextMenuController = ContextMenuController;

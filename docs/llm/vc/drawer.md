@@ -123,7 +123,9 @@ UI::Drawer::DrawerComponent          # Root container
 ```erb
 <!-- Bottom (default) -->
 <%= render UI::Drawer::DrawerComponent.new(direction: "bottom") do %>
-  <%= render UI::Drawer::TriggerComponent.new { "Bottom" } %>
+  <%= render UI::Drawer::TriggerComponent.new do %>
+    Bottom
+  <% end %>
   <%= render UI::Drawer::OverlayComponent.new %>
   <%= render UI::Drawer::ContentComponent.new(direction: "bottom") do %>
     <%= render UI::Drawer::HandleComponent.new %>
@@ -133,7 +135,9 @@ UI::Drawer::DrawerComponent          # Root container
 
 <!-- Top -->
 <%= render UI::Drawer::DrawerComponent.new(direction: "top") do %>
-  <%= render UI::Drawer::TriggerComponent.new { "Top" } %>
+  <%= render UI::Drawer::TriggerComponent.new do %>
+    Top
+  <% end %>
   <%= render UI::Drawer::OverlayComponent.new %>
   <%= render UI::Drawer::ContentComponent.new(direction: "top") do %>
     <%= render UI::Drawer::HandleComponent.new %>
@@ -143,7 +147,9 @@ UI::Drawer::DrawerComponent          # Root container
 
 <!-- Left -->
 <%= render UI::Drawer::DrawerComponent.new(direction: "left") do %>
-  <%= render UI::Drawer::TriggerComponent.new { "Left" } %>
+  <%= render UI::Drawer::TriggerComponent.new do %>
+    Left
+  <% end %>
   <%= render UI::Drawer::OverlayComponent.new %>
   <%= render UI::Drawer::ContentComponent.new(direction: "left") do %>
     <div class="p-4">Content</div>
@@ -152,7 +158,9 @@ UI::Drawer::DrawerComponent          # Root container
 
 <!-- Right -->
 <%= render UI::Drawer::DrawerComponent.new(direction: "right") do %>
-  <%= render UI::Drawer::TriggerComponent.new { "Right" } %>
+  <%= render UI::Drawer::TriggerComponent.new do %>
+    Right
+  <% end %>
   <%= render UI::Drawer::OverlayComponent.new %>
   <%= render UI::Drawer::ContentComponent.new(direction: "right") do %>
     <div class="p-4">Content</div>
@@ -180,8 +188,12 @@ Snap points allow the drawer to stop at specific positions when dragged:
     <%= render UI::Drawer::HandleComponent.new %>
 
     <%= render UI::Drawer::HeaderComponent.new do %>
-      <%= render UI::Drawer::TitleComponent.new { "Snap Points" } %>
-      <%= render UI::Drawer::DescriptionComponent.new { "Drag to different heights." } %>
+      <%= render UI::Drawer::TitleComponent.new do %>
+        Snap Points
+      <% end %>
+      <%= render UI::Drawer::DescriptionComponent.new do %>
+        Drag to different heights.
+      <% end %>
     <% end %>
 
     <div class="p-4">
@@ -205,15 +217,21 @@ Restrict dragging to the handle only - useful when drawer contains scrollable co
 
 ```erb
 <%= render UI::Drawer::DrawerComponent.new(handle_only: true) do %>
-  <%= render UI::Drawer::TriggerComponent.new { "Handle-Only Drawer" } %>
+  <%= render UI::Drawer::TriggerComponent.new do %>
+    Handle-Only Drawer
+  <% end %>
   <%= render UI::Drawer::OverlayComponent.new %>
 
   <%= render UI::Drawer::ContentComponent.new do %>
     <%= render UI::Drawer::HandleComponent.new %>
 
     <%= render UI::Drawer::HeaderComponent.new do %>
-      <%= render UI::Drawer::TitleComponent.new { "Handle-Only Mode" } %>
-      <%= render UI::Drawer::DescriptionComponent.new { "Only the handle is draggable." } %>
+      <%= render UI::Drawer::TitleComponent.new do %>
+        Handle-Only Mode
+      <% end %>
+      <%= render UI::Drawer::DescriptionComponent.new do %>
+        Only the handle is draggable.
+      <% end %>
     <% end %>
 
     <div class="p-4 space-y-2" data-vaul-scrollable>
@@ -235,15 +253,21 @@ Background remains interactive when drawer is open:
 
 ```erb
 <%= render UI::Drawer::DrawerComponent.new(modal: false) do %>
-  <%= render UI::Drawer::TriggerComponent.new { "Non-Modal Drawer" } %>
+  <%= render UI::Drawer::TriggerComponent.new do %>
+    Non-Modal Drawer
+  <% end %>
   <%= render UI::Drawer::OverlayComponent.new %>
 
   <%= render UI::Drawer::ContentComponent.new do %>
     <%= render UI::Drawer::HandleComponent.new %>
 
     <%= render UI::Drawer::HeaderComponent.new do %>
-      <%= render UI::Drawer::TitleComponent.new { "Non-Modal" } %>
-      <%= render UI::Drawer::DescriptionComponent.new { "Page remains interactive." } %>
+      <%= render UI::Drawer::TitleComponent.new do %>
+        Non-Modal
+      <% end %>
+      <%= render UI::Drawer::DescriptionComponent.new do %>
+        Page remains interactive.
+      <% end %>
     <% end %>
 
     <div class="p-4">
@@ -262,23 +286,33 @@ Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
   <!-- Mobile: Drawer -->
   <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
     <%= render UI::Drawer::DrawerComponent.new do %>
-      <%= render UI::Drawer::TriggerComponent.new { "Edit Profile (Mobile)" } %>
+      <%= render UI::Drawer::TriggerComponent.new do %>
+        Edit Profile (Mobile)
+      <% end %>
       <%= render UI::Drawer::OverlayComponent.new %>
       <%= render UI::Drawer::ContentComponent.new do %>
         <%= render UI::Drawer::HandleComponent.new %>
         <%= render UI::Drawer::HeaderComponent.new(classes: "text-left") do %>
-          <%= render UI::Drawer::TitleComponent.new { "Edit profile" } %>
+          <%= render UI::Drawer::TitleComponent.new do %>
+            Edit profile
+          <% end %>
           <%= render UI::Drawer::DescriptionComponent.new do %>
             Make changes to your profile.
           <% end %>
         <% end %>
         <div class="grid gap-4 px-4">
-          <%= render UI::Label::LabelComponent.new(for: "name-drawer") { "Name" } %>
+          <%= render UI::Label::LabelComponent.new(for: "name-drawer") do %>
+            Name
+          <% end %>
           <%= render UI::Input::InputComponent.new(id: "name-drawer", value: "Pedro Duarte") %>
         </div>
         <%= render UI::Drawer::FooterComponent.new(classes: "pt-2") do %>
-          <%= render UI::Button::ButtonComponent.new { "Save changes" } %>
-          <%= render UI::Drawer::CloseComponent.new { "Cancel" } %>
+          <%= render UI::Button::ButtonComponent.new do %>
+            Save changes
+          <% end %>
+          <%= render UI::Drawer::CloseComponent.new do %>
+            Cancel
+          <% end %>
         <% end %>
       <% end %>
     <% end %>
@@ -287,21 +321,29 @@ Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
   <!-- Desktop: Dialog -->
   <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
     <%= render UI::Dialog::DialogComponent.new do %>
-      <%= render UI::Dialog::TriggerComponent.new { "Edit Profile (Desktop)" } %>
+      <%= render UI::Dialog::TriggerComponent.new do %>
+        Edit Profile (Desktop)
+      <% end %>
       <%= render UI::Dialog::OverlayComponent.new %>
       <%= render UI::Dialog::ContentComponent.new do %>
         <%= render UI::Dialog::HeaderComponent.new do %>
-          <%= render UI::Dialog::TitleComponent.new { "Edit profile" } %>
+          <%= render UI::Dialog::TitleComponent.new do %>
+            Edit profile
+          <% end %>
           <%= render UI::Dialog::DescriptionComponent.new do %>
             Make changes to your profile.
           <% end %>
         <% end %>
         <div class="grid gap-4 py-4">
-          <%= render UI::Label::LabelComponent.new(for: "name") { "Name" } %>
+          <%= render UI::Label::LabelComponent.new(for: "name") do %>
+            Name
+          <% end %>
           <%= render UI::Input::InputComponent.new(id: "name", value: "Pedro Duarte") %>
         </div>
         <%= render UI::Dialog::FooterComponent.new do %>
-          <%= render UI::Button::ButtonComponent.new { "Save changes" } %>
+          <%= render UI::Button::ButtonComponent.new do %>
+            Save changes
+          <% end %>
         <% end %>
       <% end %>
     <% end %>
@@ -316,12 +358,16 @@ The `TriggerComponent` supports the `as_child` pattern for composition:
 ```erb
 <!-- ❌ WRONG: Creates button inside button (invalid HTML) -->
 <%= render UI::Drawer::TriggerComponent.new do %>
-  <%= render UI::Button::ButtonComponent.new { "Open" } %>
+  <%= render UI::Button::ButtonComponent.new do %>
+    Open
+  <% end %>
 <% end %>
 
 <!-- ✅ CORRECT: asChild merges trigger behavior with Button -->
 <%= render UI::Drawer::TriggerComponent.new(as_child: true) do |attrs| %>
-  <%= render UI::Button::ButtonComponent.new(**attrs) { "Open" } %>
+  <%= render UI::Button::ButtonComponent.new(**attrs) do %>
+    Open
+  <% end %>
 <% end %>
 
 <!-- ✅ CORRECT: Can also be used with custom elements -->
@@ -383,14 +429,18 @@ The `TriggerComponent` supports the `as_child` pattern for composition:
 ### ❌ Wrong: Nested buttons without asChild
 ```erb
 <%= render UI::Drawer::TriggerComponent.new do %>
-  <%= render UI::Button::ButtonComponent.new { "Open" } %>
+  <%= render UI::Button::ButtonComponent.new do %>
+    Open
+  <% end %>
 <% end %>
 ```
 
 ### ✅ Correct: Use asChild for composition
 ```erb
 <%= render UI::Drawer::TriggerComponent.new(as_child: true) do |attrs| %>
-  <%= render UI::Button::ButtonComponent.new(**attrs) { "Open" } %>
+  <%= render UI::Button::ButtonComponent.new(**attrs) do %>
+    Open
+  <% end %>
 <% end %>
 ```
 

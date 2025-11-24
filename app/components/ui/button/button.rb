@@ -34,7 +34,20 @@ module UI
       end
 
       def view_template(&block)
-        button(**button_html_attributes.deep_merge(@attributes)) do
+        all_attributes = button_html_attributes
+
+        # Merge classes with TailwindMerge before deep_merge
+        if @attributes.key?(:class)
+          button_class = all_attributes[:class] || ""
+          attr_class = @attributes[:class] || ""
+          merged_class = TailwindMerge::Merger.new.merge([button_class, attr_class].join(" "))
+          all_attributes = all_attributes.merge(class: merged_class)
+        end
+
+        # Deep merge other attributes (excluding class which we already handled)
+        all_attributes = all_attributes.deep_merge(@attributes.except(:class))
+
+        button(**all_attributes) do
           yield if block_given?
         end
       end
