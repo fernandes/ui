@@ -1,0 +1,22 @@
+<%# HoverCard Trigger - shadcn/ui inspired component for Rails %>
+<%
+  @as_child = local_assigns.fetch(:as_child, false)
+  @tag = local_assigns.fetch(:tag, :span)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::HoverCard::HoverCardTriggerBehavior
+
+  # Get HTML attributes from behavior
+  trigger_attrs = trigger_html_attributes.deep_merge(@attributes)
+-%>
+<% if @as_child %>
+  <%# Yield attributes to block - child must accept and apply them %>
+  <%= yield(trigger_attrs) if block_given? %>
+<% else %>
+  <%# Default: render as specified tag %>
+  <%= content_tag @tag, trigger_attrs do %>
+    <%= yield %>
+  <% end %>
+<% end %>

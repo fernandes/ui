@@ -1,0 +1,333 @@
+<div class="container mx-auto max-w-4xl space-y-12 py-12">
+  <div class="space-y-4">
+    <h1 class="text-4xl font-bold">Hover Card</h1>
+    <p class="text-lg text-muted-foreground">
+      For sighted users to preview content available behind a link.
+    </p>
+  </div>
+
+  <%# Example 1: Basic with asChild + Button (like shadcn) - Phlex %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">With asChild + Button (Phlex)</h2>
+      <p class="text-sm text-muted-foreground">
+        Hover card trigger composed with a Button component using the asChild pattern.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm">Hover over</span>
+      <%= render UI::HoverCard::HoverCard.new do %>
+        <%# Trigger with asChild - composes with Button %>
+        <%= render UI::HoverCard::Trigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button::Button.new(**trigger_attrs, variant: :link, classes: "px-0") do %>
+            @nextjs
+          <% end %>
+        <% end %>
+
+        <%= render UI::HoverCard::Content.new(classes: "w-80") do %>
+          <div class="flex gap-4">
+            <%= render UI::Avatar::Avatar.new do %>
+              <%= render UI::Avatar::Image.new(src: "https://github.com/vercel.png", alt: "@vercel") %>
+              <%= render UI::Avatar::Fallback.new { "VC" } %>
+            <% end %>
+            <div class="space-y-1">
+              <h4 class="text-sm font-semibold">@nextjs</h4>
+              <p class="text-sm">
+                The React Framework – created and maintained by @vercel.
+              </p>
+              <div class="flex items-center pt-2">
+                <svg class="mr-2 size-4 opacity-70" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-xs text-muted-foreground">
+                  Joined December 2021
+                </span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+      <span class="text-sm">to see more information.</span>
+    </div>
+  </div>
+
+  <%# Example 2: With asChild + Custom Link - ViewComponent %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">With asChild + Link (ViewComponent)</h2>
+      <p class="text-sm text-muted-foreground">
+        Using asChild to compose with a custom styled link element.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm">Read more about</span>
+      <%= render(UI::HoverCard::HoverCardComponent.new) do %>
+        <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
+          <%= link_to "shadcn/ui", "https://ui.shadcn.com", class: "font-medium underline underline-offset-4" %>
+        <% end %>
+
+        <%= render(UI::HoverCard::ContentComponent.new(align: "start")) do %>
+          <div class="space-y-2">
+            <h4 class="text-sm font-semibold">shadcn/ui</h4>
+            <p class="text-sm text-muted-foreground">
+              Beautifully designed components that you can copy and paste into your apps.
+              Accessible. Customizable. Open Source.
+            </p>
+            <div class="flex items-center gap-2 pt-2">
+              <span class="rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground">React</span>
+              <span class="rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground">Tailwind</span>
+              <span class="rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground">Radix UI</span>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+      <span class="text-sm">in their documentation.</span>
+    </div>
+  </div>
+
+  <%# Example 3: Without asChild - Default Behavior (ERB) %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Without asChild (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        Default trigger without composition - renders as a span element.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm">Hover over</span>
+      <%= render "ui/hover_card/hover_card" do %>
+        <%= render "ui/hover_card/trigger", classes: "cursor-pointer font-medium underline underline-offset-4" do %>
+          this trigger
+        <% end %>
+
+        <%= render "ui/hover_card/content" do %>
+          <div class="space-y-2">
+            <h4 class="text-sm font-semibold">Default Trigger</h4>
+            <p class="text-sm text-muted-foreground">
+              This trigger doesn't use asChild, so it renders as a simple span element
+              with hover card functionality.
+            </p>
+          </div>
+        <% end %>
+      <% end %>
+      <span class="text-sm">for basic example.</span>
+    </div>
+  </div>
+
+  <%# Example 4: Different Alignments - Phlex %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Content Alignment (Phlex)</h2>
+      <p class="text-sm text-muted-foreground">
+        Demonstrating different alignment options: start, center, and end.
+      </p>
+    </div>
+    <div class="flex items-center justify-between gap-8">
+      <%# Start aligned %>
+      <%= render UI::HoverCard::HoverCard.new do %>
+        <%= render UI::HoverCard::Trigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) do %>
+            Align Start
+          <% end %>
+        <% end %>
+
+        <%= render UI::HoverCard::Content.new(align: "start") do %>
+          <div class="space-y-1">
+            <p class="text-sm font-semibold">Start Aligned</p>
+            <p class="text-xs text-muted-foreground">
+              Content aligns to the start edge of the trigger.
+            </p>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%# Center aligned (default) %>
+      <%= render UI::HoverCard::HoverCard.new do %>
+        <%= render UI::HoverCard::Trigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) do %>
+            Align Center
+          <% end %>
+        <% end %>
+
+        <%= render UI::HoverCard::Content.new(align: "center") do %>
+          <div class="space-y-1">
+            <p class="text-sm font-semibold">Center Aligned</p>
+            <p class="text-xs text-muted-foreground">
+              Content centers relative to the trigger.
+            </p>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%# End aligned %>
+      <%= render UI::HoverCard::HoverCard.new do %>
+        <%= render UI::HoverCard::Trigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) do %>
+            Align End
+          <% end %>
+        <% end %>
+
+        <%= render UI::HoverCard::Content.new(align: "end") do %>
+          <div class="space-y-1">
+            <p class="text-sm font-semibold">End Aligned</p>
+            <p class="text-xs text-muted-foreground">
+              Content aligns to the end edge of the trigger.
+            </p>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Example 5: User Profile Cards - ViewComponent %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">User Profile Cards (ViewComponent)</h2>
+      <p class="text-sm text-muted-foreground">
+        Practical example showing user profiles on hover with asChild pattern.
+      </p>
+    </div>
+    <div class="space-y-4">
+      <div class="flex flex-wrap gap-4">
+        <%# User 1 %>
+        <%= render(UI::HoverCard::HoverCardComponent.new) do %>
+          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
+            <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0")) do %>
+              @shadcn
+            <% end %>
+          <% end %>
+
+          <%= render(UI::HoverCard::ContentComponent.new(classes: "w-80")) do %>
+            <div class="flex gap-4">
+              <%= render(UI::Avatar::AvatarComponent.new) do %>
+                <%= render(UI::Avatar::ImageComponent.new(src: "https://github.com/shadcn.png", alt: "@shadcn")) %>
+                <%= render(UI::Avatar::FallbackComponent.new) { "SC" } %>
+              <% end %>
+              <div class="space-y-1">
+                <h4 class="text-sm font-semibold">shadcn</h4>
+                <p class="text-sm text-muted-foreground">
+                  Creator of shadcn/ui. Building beautiful, accessible components.
+                </p>
+                <div class="flex items-center gap-2 pt-2 text-xs text-muted-foreground">
+                  <div class="flex items-center gap-1">
+                    <span class="font-medium">2.3k</span> followers
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="font-medium">45</span> following
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%# User 2 %>
+        <%= render(UI::HoverCard::HoverCardComponent.new) do %>
+          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
+            <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0")) do %>
+              @vercel
+            <% end %>
+          <% end %>
+
+          <%= render(UI::HoverCard::ContentComponent.new(classes: "w-80")) do %>
+            <div class="flex gap-4">
+              <%= render(UI::Avatar::AvatarComponent.new) do %>
+                <%= render(UI::Avatar::ImageComponent.new(src: "https://github.com/vercel.png", alt: "@vercel")) %>
+                <%= render(UI::Avatar::FallbackComponent.new) { "VC" } %>
+              <% end %>
+              <div class="space-y-1">
+                <h4 class="text-sm font-semibold">Vercel</h4>
+                <p class="text-sm text-muted-foreground">
+                  Develop. Preview. Ship. The platform for frontend developers.
+                </p>
+                <div class="flex items-center gap-2 pt-2 text-xs text-muted-foreground">
+                  <div class="flex items-center gap-1">
+                    <span class="font-medium">128k</span> followers
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="font-medium">12</span> following
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%# User 3 %>
+        <%= render(UI::HoverCard::HoverCardComponent.new) do %>
+          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
+            <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0")) do %>
+              @github
+            <% end %>
+          <% end %>
+
+          <%= render(UI::HoverCard::ContentComponent.new(classes: "w-80")) do %>
+            <div class="flex gap-4">
+              <%= render(UI::Avatar::AvatarComponent.new) do %>
+                <%= render(UI::Avatar::ImageComponent.new(src: "https://github.com/github.png", alt: "@github")) %>
+                <%= render(UI::Avatar::FallbackComponent.new) { "GH" } %>
+              <% end %>
+              <div class="space-y-1">
+                <h4 class="text-sm font-semibold">GitHub</h4>
+                <p class="text-sm text-muted-foreground">
+                  The world's leading AI-powered developer platform.
+                </p>
+                <div class="flex items-center gap-2 pt-2 text-xs text-muted-foreground">
+                  <div class="flex items-center gap-1">
+                    <span class="font-medium">452k</span> followers
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="font-medium">89</span> following
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Example 6: asChild Pattern Benefits - ERB %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">asChild Pattern Benefits (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        Demonstrating why asChild is important for composition.
+      </p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <p class="mb-2 text-sm font-medium">❌ Without asChild (creates nested elements):</p>
+        <code class="block rounded bg-muted p-2 text-xs">
+          &lt;span&gt;&lt;button&gt;Click me&lt;/button&gt;&lt;/span&gt;
+        </code>
+      </div>
+      <div>
+        <p class="mb-2 text-sm font-medium">✅ With asChild (single element):</p>
+        <code class="block rounded bg-muted p-2 text-xs">
+          &lt;button&gt;Click me&lt;/button&gt;
+        </code>
+      </div>
+      <div class="mt-4 flex items-center gap-4">
+        <%= render "ui/hover_card/hover_card" do %>
+          <%= render "ui/hover_card/trigger", as_child: true do |attrs| %>
+            <%= render "ui/button/button", **attrs, variant: :default do %>
+              Hover with asChild
+            <% end %>
+          <% end %>
+
+          <%= render "ui/hover_card/content" do %>
+            <div class="space-y-2">
+              <p class="text-sm font-semibold">Clean Markup</p>
+              <p class="text-xs text-muted-foreground">
+                This creates a single button element with hover card functionality,
+                avoiding invalid nested HTML.
+              </p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

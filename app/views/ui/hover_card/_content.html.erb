@@ -1,0 +1,16 @@
+<%# HoverCard Content - shadcn/ui inspired component for Rails %>
+<%
+  @align = local_assigns.fetch(:align, "center")
+  @side_offset = local_assigns.fetch(:side_offset, 4)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::HoverCard::HoverCardContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = content_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

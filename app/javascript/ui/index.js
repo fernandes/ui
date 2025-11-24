@@ -20,6 +20,7 @@ import CommandController from "./controllers/command_controller.js";
 import ContextMenuController from "./controllers/context_menu_controller.js";
 import CommandDialogController from "./controllers/command_dialog_controller.js";
 import DrawerController from "./controllers/drawer_controller.js";
+import HoverCardController from "./controllers/hover_card_controller.js";
 import TooltipController from "./controllers/tooltip_controller.js";
 import PopoverController from "./controllers/popover_controller.js";
 import ResponsiveDialogController from "./controllers/responsive_dialog_controller.js";
@@ -52,6 +53,7 @@ export function registerControllers(application) {
     "ui--command": CommandController,
     "ui--command-dialog": CommandDialogController,
     "ui--context-menu": ContextMenuController,
+    "ui--hover-card": HoverCardController,
     "ui--tooltip": TooltipController,
     "ui--popover": PopoverController,
     "ui--responsive-dialog": ResponsiveDialogController,
@@ -69,4 +71,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController };

@@ -57,6 +57,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/field.html.erb
   end
 
+  def hover_card
+    # Renders app/views/components/hover_card.html.erb
+  end
+
   def input
     # Renders app/views/components/input.html.erb
   end
