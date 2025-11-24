@@ -1,0 +1,19 @@
+<%
+# frozen_string_literal: true
+
+# UI::Skeleton - Loading placeholder component
+#
+# A simple skeleton component that shows a pulsing placeholder while content is loading.
+# This component is CSS-only with no JavaScript behavior.
+#
+# @param class [String] Additional CSS classes to apply
+# @param attributes [Hash] Additional HTML attributes
+#
+html_class = local_assigns.fetch(:class, "")
+attributes = local_assigns.except(:class)
+
+default_classes = "bg-accent animate-pulse rounded-md"
+merged_classes = [default_classes, html_class].compact_blank.join(" ")
+%>
+
+<div data-slot="skeleton" class="<%= merged_classes %>" <%= attributes.map { |k, v| "#{k}=\"#{v}\"" }.join(" ").html_safe %>></div>
