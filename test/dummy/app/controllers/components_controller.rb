@@ -73,6 +73,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/label.html.erb
   end
 
+  def pagination
+    # Renders app/views/components/pagination.html.erb
+  end
+
   def popover
     # Renders app/views/components/popover.html.erb
   end

@@ -1,0 +1,18 @@
+<%# PaginationLink - shadcn/ui inspired component for Rails %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @active = local_assigns.fetch(:active, false)
+  @href = local_assigns.fetch(:href, "#")
+  @size = local_assigns.fetch(:size, "icon")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::Pagination::PaginationLinkBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = link_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>
