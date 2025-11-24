@@ -592,3 +592,6 @@ This creates:
 - Updates `.gitignore`
 - Configures importmap (if using importmaps)
 - nao precisa dar rebuild no JS, acontece automatico
+- use sempre content_tag para ERB
+- faca merge de classes CSS com o Tailwind Merge
+- faca o merge de hashes com deep_merge

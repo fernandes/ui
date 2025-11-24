@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ComponentsController < ApplicationController
-  layout false
-
   def accordion
     # Renders app/views/components/accordion.html.erb
   end
@@ -85,6 +83,10 @@ class ComponentsController < ApplicationController
 
   def slider
     # Renders app/views/components/slider.html.erb
+  end
+
+  def switch
+    # Renders app/views/components/switch.html.erb
   end
 
   def tabs

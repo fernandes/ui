@@ -1,0 +1,44 @@
+<%
+  # Switch - ERB Partial
+  #
+  # A toggle control that allows the user to switch between checked and unchecked states.
+  # Based on Radix UI Switch primitive.
+  #
+  # @param checked [Boolean] Whether the switch is checked (default: false)
+  # @param disabled [Boolean] Whether the switch is disabled (default: false)
+  # @param name [String] Name for form submission (creates hidden input)
+  # @param id [String] ID attribute
+  # @param value [String] Value when checked (default: "1")
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @checked = local_assigns.fetch(:checked, false)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @name = local_assigns[:name]
+  @id = local_assigns[:id]
+  @value = local_assigns.fetch(:value, "1")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::SwitchBehavior
+  all_attributes = switch_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :button, all_attributes do %>
+  <%= content_tag :span,
+    "",
+    data: {
+      ui__switch_target: "thumb",
+      slot: "switch-thumb",
+      state: switch_state
+    },
+    class: switch_thumb_classes
+  %>
+  <% if @name.present? %>
+    <%= tag :input,
+      type: "hidden",
+      name: @name,
+      value: @checked ? @value : "0",
+      id: @id
+    %>
+  <% end %>
+<% end %>

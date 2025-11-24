@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Switch Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Switch Component</h1>
+      <p class="text-muted-foreground">A toggle control for binary states</p>
+    </header>
+
+    <!-- Basic Switches - Phlex -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Switches (Phlex)</h2>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center space-x-2">
+          <%= render UI::Switch::Switch.new(id: "phlex-airplane-mode") %>
+          <label for="phlex-airplane-mode" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Airplane Mode
+          </label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <%= render UI::Switch::Switch.new(checked: true, id: "phlex-notifications") %>
+          <label for="phlex-notifications" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Notifications (checked by default)
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disabled States - ViewComponent -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Disabled States (ViewComponent)</h2>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center space-x-2">
+          <%= render UI::Switch::SwitchComponent.new(disabled: true, id: "vc-disabled-off") %>
+          <label for="vc-disabled-off" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Disabled (off)
+          </label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <%= render UI::Switch::SwitchComponent.new(checked: true, disabled: true, id: "vc-disabled-on") %>
+          <label for="vc-disabled-on" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Disabled (on)
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form Integration - ERB -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Form Integration (ERB)</h2>
+      <%= form_with url: "#", method: :post, class: "space-y-4" do |f| %>
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center space-x-2">
+            <%= render "ui/switch/switch",
+              name: "settings[marketing]",
+              id: "marketing",
+              checked: true
+            %>
+            <label for="marketing" class="text-sm font-medium leading-none">
+              Marketing emails
+            </label>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <%= render "ui/switch/switch",
+              name: "settings[security]",
+              id: "security",
+              checked: false
+            %>
+            <label for="security" class="text-sm font-medium leading-none">
+              Security updates
+            </label>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <%= render "ui/switch/switch",
+              name: "settings[social]",
+              id: "social",
+              checked: true
+            %>
+            <label for="social" class="text-sm font-medium leading-none">
+              Social notifications
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+          Save preferences
+        </button>
+      <% end %>
+    </section>
+
+    <!-- Settings Panel - Mixed -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Settings Panel (Mixed Formats)</h2>
+      <div class="rounded-lg border bg-card p-6">
+        <div class="space-y-6">
+          <div class="flex flex-row items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="text-base font-medium">Notifications</div>
+              <div class="text-sm text-muted-foreground">
+                Receive notifications about your account activity
+              </div>
+            </div>
+            <%= render UI::Switch::Switch.new(checked: true, id: "panel-notifications") %>
+          </div>
+
+          <div class="flex flex-row items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="text-base font-medium">Two-factor authentication</div>
+              <div class="text-sm text-muted-foreground">
+                Add an extra layer of security to your account
+              </div>
+            </div>
+            <%= render UI::Switch::SwitchComponent.new(id: "panel-2fa") %>
+          </div>
+
+          <div class="flex flex-row items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="text-base font-medium">Dark mode</div>
+              <div class="text-sm text-muted-foreground">
+                Use dark theme across the application
+              </div>
+            </div>
+            <%= render "ui/switch/switch", id: "panel-dark-mode", checked: false %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Custom Styling -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Custom Styling (Phlex)</h2>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center space-x-2">
+          <%= render UI::Switch::Switch.new(id: "scaled", classes: "scale-125") %>
+          <label for="scaled" class="text-sm font-medium">Scaled (125%)</label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <%= render UI::Switch::Switch.new(id: "small-scaled", classes: "scale-75") %>
+          <label for="small-scaled" class="text-sm font-medium">Small scaled (75%)</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Keyboard Interactions -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Keyboard Interactions</h2>
+      <div class="rounded-lg border bg-muted/50 p-6">
+        <h3 class="text-lg font-semibold mb-4">Try these keyboard shortcuts:</h3>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2 px-4 font-semibold">Key</th>
+              <th class="text-left py-2 px-4 font-semibold">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="py-2 px-4"><code class="bg-muted px-2 py-1 rounded">Space</code></td>
+              <td class="py-2 px-4">Toggle switch when focused</td>
+            </tr>
+            <tr>
+              <td class="py-2 px-4"><code class="bg-muted px-2 py-1 rounded">Enter</code></td>
+              <td class="py-2 px-4">Toggle switch when focused</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mt-4 flex items-center space-x-2">
+          <%= render UI::Switch::Switch.new(id: "keyboard-test") %>
+          <label for="keyboard-test" class="text-sm font-medium">
+            Focus me and press Space or Enter
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components", components_path, class: "text-primary hover:underline" %>
+    </footer>
+  </div>
+</body>
+</html>

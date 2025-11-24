@@ -5202,6 +5202,51 @@
       this.updateUI();
     }
   }
+  class SwitchController extends stimulus.Controller {
+    static targets=[ "thumb" ];
+    static values={
+      checked: {
+        type: Boolean,
+        default: false
+      }
+    };
+    connect() {
+      this.updateState(this.checkedValue, false);
+    }
+    toggle(event) {
+      if (event) {
+        event.preventDefault();
+      }
+      if (this.element.hasAttribute("disabled")) {
+        return;
+      }
+      this.checkedValue = !this.checkedValue;
+      this.updateState(this.checkedValue, true);
+      this.element.dispatchEvent(new Event("change", {
+        bubbles: true
+      }));
+    }
+    handleKeydown(event) {
+      if (event.key === " " || event.key === "Enter") {
+        event.preventDefault();
+        this.toggle();
+      }
+    }
+    updateState(isChecked, animate = true) {
+      this.element.setAttribute("data-state", isChecked ? "checked" : "unchecked");
+      this.element.setAttribute("aria-checked", isChecked);
+      if (this.hasThumbTarget) {
+        this.thumbTarget.setAttribute("data-state", isChecked ? "checked" : "unchecked");
+      }
+      const hiddenInput = this.element.querySelector('input[type="hidden"]');
+      if (hiddenInput) {
+        hiddenInput.value = isChecked ? "1" : "0";
+      }
+    }
+    checkedValueChanged(value) {
+      this.updateState(value, true);
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -5233,6 +5278,7 @@
       "ui--scroll-area": ScrollAreaController,
       "ui--select": SelectController,
       "ui--slider": SliderController,
+      "ui--switch": SwitchController,
       "ui--tabs": TabsController,
       "ui--toggle": ToggleController,
       "ui--toggle-group": ToggleGroupController
@@ -5255,6 +5301,7 @@
   exports.ScrollAreaController = ScrollAreaController;
   exports.SelectController = SelectController;
   exports.SliderController = SliderController;
+  exports.SwitchController = SwitchController;
   exports.TabsController = TabsController;
   exports.ToggleController = ToggleController;
   exports.ToggleGroupController = ToggleGroupController;

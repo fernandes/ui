@@ -5322,6 +5322,52 @@ class SliderController extends Controller {
   }
 }
 
+class SwitchController extends Controller {
+  static targets=[ "thumb" ];
+  static values={
+    checked: {
+      type: Boolean,
+      default: false
+    }
+  };
+  connect() {
+    this.updateState(this.checkedValue, false);
+  }
+  toggle(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    if (this.element.hasAttribute("disabled")) {
+      return;
+    }
+    this.checkedValue = !this.checkedValue;
+    this.updateState(this.checkedValue, true);
+    this.element.dispatchEvent(new Event("change", {
+      bubbles: true
+    }));
+  }
+  handleKeydown(event) {
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      this.toggle();
+    }
+  }
+  updateState(isChecked, animate = true) {
+    this.element.setAttribute("data-state", isChecked ? "checked" : "unchecked");
+    this.element.setAttribute("aria-checked", isChecked);
+    if (this.hasThumbTarget) {
+      this.thumbTarget.setAttribute("data-state", isChecked ? "checked" : "unchecked");
+    }
+    const hiddenInput = this.element.querySelector('input[type="hidden"]');
+    if (hiddenInput) {
+      hiddenInput.value = isChecked ? "1" : "0";
+    }
+  }
+  checkedValueChanged(value) {
+    this.updateState(value, true);
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -5355,10 +5401,11 @@ function registerControllers(application) {
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController,
     "ui--slider": SliderController,
+    "ui--switch": SwitchController,
     "ui--tabs": TabsController,
     "ui--toggle": ToggleController,
     "ui--toggle-group": ToggleGroupController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };
