@@ -1,0 +1,19 @@
+<%
+  # InlineCode - ERB Partial
+  #
+  # An inline code component with shadcn/ui styling.
+  #
+  # @param classes [String] Additional CSS classes to merge
+  # @param content [String] Text content (alternative to using block)
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
+
+  extend UI::Typography::InlineCodeBehavior
+  all_attributes = inline_code_html_attributes.merge(@attributes)
+%>
+<%= content_tag :code, all_attributes do %>
+  <%= content_param || yield %>
+<% end %>

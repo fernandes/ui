@@ -136,4 +136,8 @@ class ComponentsController < ApplicationController
   def tooltip
     # Renders app/views/components/tooltip.html.erb
   end
+
+  def typography
+    # Renders app/views/components/typography.html.erb
+  end
 end

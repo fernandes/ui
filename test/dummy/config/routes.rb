@@ -50,6 +50,7 @@ Rails.application.routes.draw do
   get "/components/toggle", to: "components#toggle"
   get "/components/toggle_group", to: "components#toggle_group"
   get "/components/tooltip", to: "components#tooltip"
+  get "/components/typography", to: "components#typography"
 
   # Mount Hotwire Spark for live reload in development
   mount Hotwire::Spark::Engine => "/spark" if Rails.env.development?
