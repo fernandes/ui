@@ -65,6 +65,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/input.html.erb
   end
 
+  def input_otp
+    # Renders app/views/components/input_otp.html.erb
+  end
+
   def item
     # Renders app/views/components/item.html.erb
   end

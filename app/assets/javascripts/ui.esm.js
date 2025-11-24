@@ -3753,6 +3753,117 @@ class HoverCardController extends Controller {
   }
 }
 
+class InputOtpController extends Controller {
+  static targets=[ "input" ];
+  static values={
+    length: {
+      type: Number,
+      default: 6
+    },
+    pattern: {
+      type: String,
+      default: "\\d"
+    },
+    complete: {
+      type: Boolean,
+      default: false
+    }
+  };
+  connect() {
+    if (this.hasInputTarget) {
+      this.inputTargets[0]?.focus();
+    }
+  }
+  input(event) {
+    const input = event.target;
+    const value = input.value;
+    const index = this.inputTargets.indexOf(input);
+    const regex = new RegExp(`^${this.patternValue}$`);
+    if (value && !regex.test(value)) {
+      input.value = "";
+      return;
+    }
+    if (value && index < this.inputTargets.length - 1) {
+      this.inputTargets[index + 1].focus();
+    }
+    this.checkComplete();
+  }
+  keydown(event) {
+    const input = event.target;
+    const index = this.inputTargets.indexOf(input);
+    if (event.key === "Backspace") {
+      if (!input.value && index > 0) {
+        event.preventDefault();
+        this.inputTargets[index - 1].focus();
+        this.inputTargets[index - 1].value = "";
+      }
+    }
+    if (event.key === "ArrowLeft" && index > 0) {
+      event.preventDefault();
+      this.inputTargets[index - 1].focus();
+    }
+    if (event.key === "ArrowRight" && index < this.inputTargets.length - 1) {
+      event.preventDefault();
+      this.inputTargets[index + 1].focus();
+    }
+    if (event.key === "Home") {
+      event.preventDefault();
+      this.inputTargets[0].focus();
+    }
+    if (event.key === "End") {
+      event.preventDefault();
+      this.inputTargets[this.inputTargets.length - 1].focus();
+    }
+  }
+  paste(event) {
+    event.preventDefault();
+    const pastedData = event.clipboardData.getData("text").trim();
+    const regex = new RegExp(`^${this.patternValue}+$`);
+    if (!regex.test(pastedData)) {
+      return;
+    }
+    const chars = pastedData.split("");
+    chars.forEach((char, index) => {
+      if (index < this.inputTargets.length) {
+        this.inputTargets[index].value = char;
+      }
+    });
+    const nextEmptyIndex = this.inputTargets.findIndex(input => !input.value);
+    if (nextEmptyIndex >= 0) {
+      this.inputTargets[nextEmptyIndex].focus();
+    } else {
+      this.inputTargets[this.inputTargets.length - 1].focus();
+    }
+    this.checkComplete();
+  }
+  checkComplete() {
+    const allFilled = this.inputTargets.every(input => input.value);
+    const wasComplete = this.completeValue;
+    this.completeValue = allFilled;
+    if (allFilled && !wasComplete) {
+      const value = this.inputTargets.map(input => input.value).join("");
+      this.element.dispatchEvent(new CustomEvent("inputotp:complete", {
+        bubbles: true,
+        detail: {
+          value: value
+        }
+      }));
+    }
+  }
+  getValue() {
+    return this.inputTargets.map(input => input.value).join("");
+  }
+  clear() {
+    this.inputTargets.forEach(input => {
+      input.value = "";
+    });
+    this.completeValue = false;
+    if (this.hasInputTarget) {
+      this.inputTargets[0].focus();
+    }
+  }
+}
+
 class TooltipController extends Controller {
   static targets=[ "trigger", "content" ];
   static values={
@@ -5503,6 +5614,7 @@ function registerControllers(application) {
     "ui--command-dialog": CommandDialogController,
     "ui--context-menu": ContextMenuController,
     "ui--hover-card": HoverCardController,
+    "ui--input-otp": InputOtpController,
     "ui--tooltip": TooltipController,
     "ui--popover": PopoverController,
     "ui--responsive-dialog": ResponsiveDialogController,
@@ -5516,4 +5628,4 @@ function registerControllers(application) {
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, HoverCardController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CheckboxController, CollapsibleController, CommandController, CommandDialogController, ContextMenuController, DialogController, DrawerController, DropdownController, HelloController, HoverCardController, InputOtpController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };

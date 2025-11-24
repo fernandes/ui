@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   get "/components/hover_card", to: "components#hover_card"
   get "/components/input", to: "components#input"
   get "/components/input_group", to: "components#input_group"
+  get "/components/input_otp", to: "components#input_otp"
   get "/components/item", to: "components#item"
   get "/components/kbd", to: "components#kbd"
   get "/components/label", to: "components#label"

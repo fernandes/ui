@@ -1,0 +1,273 @@
+<div class="container mx-auto max-w-4xl space-y-12 py-12">
+  <div class="space-y-4">
+    <h1 class="text-4xl font-bold">Input OTP</h1>
+    <p class="text-lg text-muted-foreground">
+      Accessible one-time password component with auto-advance and copy-paste functionality.
+    </p>
+  </div>
+
+  <%# Example 1: Default (6 digits with separator) - ERB %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Default (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        Six-digit OTP input with separator. Auto-advances on input.
+      </p>
+    </div>
+    <div class="flex flex-col items-start gap-4">
+      <%= render "ui/input_otp/input_otp", length: 6 do %>
+        <%= render "ui/input_otp/group" do %>
+          <%= render "ui/input_otp/slot", index: 0 %>
+          <%= render "ui/input_otp/slot", index: 1 %>
+          <%= render "ui/input_otp/slot", index: 2 %>
+        <% end %>
+        <%= render "ui/input_otp/separator" %>
+        <%= render "ui/input_otp/group" do %>
+          <%= render "ui/input_otp/slot", index: 3 %>
+          <%= render "ui/input_otp/slot", index: 4 %>
+          <%= render "ui/input_otp/slot", index: 5 %>
+        <% end %>
+      <% end %>
+      <p class="text-xs text-muted-foreground">
+        Hint: Try pasting a 6-digit code like "123456"
+      </p>
+    </div>
+  </div>
+
+  <%# Example 2: Pre-filled Value - Phlex %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">With Pre-filled Value (Phlex)</h2>
+      <p class="text-sm text-muted-foreground">
+        OTP input with initial values set.
+      </p>
+    </div>
+    <%= render UI::InputOtp::InputOtp.new(length: 6) do %>
+      <%= render UI::InputOtp::Group.new do %>
+        <%= render UI::InputOtp::Slot.new(index: 0, value: "1") %>
+        <%= render UI::InputOtp::Slot.new(index: 1, value: "2") %>
+        <%= render UI::InputOtp::Slot.new(index: 2, value: "3") %>
+      <% end %>
+      <%= render UI::InputOtp::Separator.new %>
+      <%= render UI::InputOtp::Group.new do %>
+        <%= render UI::InputOtp::Slot.new(index: 3, value: "4") %>
+        <%= render UI::InputOtp::Slot.new(index: 4, value: "5") %>
+        <%= render UI::InputOtp::Slot.new(index: 5, value: "6") %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 3: Four Digits - ViewComponent %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Four Digits (ViewComponent)</h2>
+      <p class="text-sm text-muted-foreground">
+        Shorter PIN-style input without separator.
+      </p>
+    </div>
+    <%= render UI::InputOtp::InputOtpComponent.new(length: 4) do %>
+      <%= render UI::InputOtp::GroupComponent.new do %>
+        <%= render UI::InputOtp::SlotComponent.new(index: 0) %>
+        <%= render UI::InputOtp::SlotComponent.new(index: 1) %>
+        <%= render UI::InputOtp::SlotComponent.new(index: 2) %>
+        <%= render UI::InputOtp::SlotComponent.new(index: 3) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 4: Three Groups - ERB %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Three Groups (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        Nine-digit OTP with three separate groups.
+      </p>
+    </div>
+    <%= render "ui/input_otp/input_otp", length: 9 do %>
+      <%= render "ui/input_otp/group" do %>
+        <%= render "ui/input_otp/slot", index: 0 %>
+        <%= render "ui/input_otp/slot", index: 1 %>
+        <%= render "ui/input_otp/slot", index: 2 %>
+      <% end %>
+      <%= render "ui/input_otp/separator" %>
+      <%= render "ui/input_otp/group" do %>
+        <%= render "ui/input_otp/slot", index: 3 %>
+        <%= render "ui/input_otp/slot", index: 4 %>
+        <%= render "ui/input_otp/slot", index: 5 %>
+      <% end %>
+      <%= render "ui/input_otp/separator" %>
+      <%= render "ui/input_otp/group" do %>
+        <%= render "ui/input_otp/slot", index: 6 %>
+        <%= render "ui/input_otp/slot", index: 7 %>
+        <%= render "ui/input_otp/slot", index: 8 %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 5: Without Separator - Phlex %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Without Separator (Phlex)</h2>
+      <p class="text-sm text-muted-foreground">
+        All slots in a single continuous group.
+      </p>
+    </div>
+    <%= render UI::InputOtp::InputOtp.new(length: 6) do %>
+      <%= render UI::InputOtp::Group.new do %>
+        <%= render UI::InputOtp::Slot.new(index: 0) %>
+        <%= render UI::InputOtp::Slot.new(index: 1) %>
+        <%= render UI::InputOtp::Slot.new(index: 2) %>
+        <%= render UI::InputOtp::Slot.new(index: 3) %>
+        <%= render UI::InputOtp::Slot.new(index: 4) %>
+        <%= render UI::InputOtp::Slot.new(index: 5) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 6: With Label and Helper Text - ViewComponent %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">With Label and Helper (ViewComponent)</h2>
+      <p class="text-sm text-muted-foreground">
+        Complete form field with label and description.
+      </p>
+    </div>
+    <div class="flex flex-col gap-2">
+      <%= render UI::Label::LabelComponent.new(content: "Verification Code", attributes: { for: "otp-input" }) %>
+      <div id="otp-input">
+        <%= render UI::InputOtp::InputOtpComponent.new(length: 6) do %>
+          <%= render UI::InputOtp::GroupComponent.new do %>
+            <%= render UI::InputOtp::SlotComponent.new(index: 0) %>
+            <%= render UI::InputOtp::SlotComponent.new(index: 1) %>
+            <%= render UI::InputOtp::SlotComponent.new(index: 2) %>
+          <% end %>
+          <%= render UI::InputOtp::SeparatorComponent.new %>
+          <%= render UI::InputOtp::GroupComponent.new do %>
+            <%= render UI::InputOtp::SlotComponent.new(index: 3) %>
+            <%= render UI::InputOtp::SlotComponent.new(index: 4) %>
+            <%= render UI::InputOtp::SlotComponent.new(index: 5) %>
+          <% end %>
+        <% end %>
+      </div>
+      <p class="text-sm text-muted-foreground">
+        Enter the 6-digit code sent to your email
+      </p>
+    </div>
+  </div>
+
+  <%# Example 7: Alphanumeric Pattern - ERB %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Alphanumeric Pattern (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        Accepts both letters and numbers. Pattern: [A-Za-z0-9]
+      </p>
+    </div>
+    <div class="flex flex-col items-start gap-4">
+      <%= render "ui/input_otp/input_otp", length: 6, pattern: "[A-Za-z0-9]" do %>
+        <%= render "ui/input_otp/group" do %>
+          <%= render "ui/input_otp/slot", index: 0 %>
+          <%= render "ui/input_otp/slot", index: 1 %>
+          <%= render "ui/input_otp/slot", index: 2 %>
+        <% end %>
+        <%= render "ui/input_otp/separator" %>
+        <%= render "ui/input_otp/group" do %>
+          <%= render "ui/input_otp/slot", index: 3 %>
+          <%= render "ui/input_otp/slot", index: 4 %>
+          <%= render "ui/input_otp/slot", index: 5 %>
+        <% end %>
+      <% end %>
+      <p class="text-xs text-muted-foreground">
+        Try typing letters like "A1B2C3" or numbers like "123456"
+      </p>
+    </div>
+  </div>
+
+  <%# Example 8: Disabled State - Phlex %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Disabled State (Phlex)</h2>
+      <p class="text-sm text-muted-foreground">
+        Shows how the component looks when disabled.
+      </p>
+    </div>
+    <%= render UI::InputOtp::InputOtp.new(length: 6) do %>
+      <%= render UI::InputOtp::Group.new do %>
+        <%= render UI::InputOtp::Slot.new(index: 0, value: "1", disabled: true) %>
+        <%= render UI::InputOtp::Slot.new(index: 1, value: "2", disabled: true) %>
+        <%= render UI::InputOtp::Slot.new(index: 2, value: "3", disabled: true) %>
+      <% end %>
+      <%= render UI::InputOtp::Separator.new %>
+      <%= render UI::InputOtp::Group.new do %>
+        <%= render UI::InputOtp::Slot.new(index: 3, value: "4", disabled: true) %>
+        <%= render UI::InputOtp::Slot.new(index: 4, value: "5", disabled: true) %>
+        <%= render UI::InputOtp::Slot.new(index: 5, value: "6", disabled: true) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Example 9: Auto-Generated (No Composition) - ViewComponent %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Auto-Generated (ViewComponent)</h2>
+      <p class="text-sm text-muted-foreground">
+        Simple usage without manual slot composition. Automatically generates 6 input fields in a group.
+      </p>
+    </div>
+    <%= render UI::InputOtp::InputOtpComponent.new(length: 6) %>
+    <p class="text-xs text-muted-foreground">
+      When no block is provided, the component auto-generates slots wrapped in a group
+    </p>
+  </div>
+
+  <%# Example 10: Event Handling Demo - ERB %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Event Handling Demo (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        Demonstrates the custom "inputotp:complete" event.
+      </p>
+    </div>
+    <div class="flex flex-col gap-4">
+      <div data-controller="otp-demo" data-action="inputotp:complete->otp-demo#handleComplete">
+        <%= render "ui/input_otp/input_otp", length: 6 do %>
+          <%= render "ui/input_otp/group" do %>
+            <%= render "ui/input_otp/slot", index: 0 %>
+            <%= render "ui/input_otp/slot", index: 1 %>
+            <%= render "ui/input_otp/slot", index: 2 %>
+          <% end %>
+          <%= render "ui/input_otp/separator" %>
+          <%= render "ui/input_otp/group" do %>
+            <%= render "ui/input_otp/slot", index: 3 %>
+            <%= render "ui/input_otp/slot", index: 4 %>
+            <%= render "ui/input_otp/slot", index: 5 %>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="rounded-md bg-muted p-4">
+        <p class="text-sm font-medium">Result:</p>
+        <p class="font-mono text-sm" data-otp-demo-target="result">
+          Enter all 6 digits to see the complete value...
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Demo controller for event handling example
+class OtpDemoController extends window.Stimulus.Controller {
+  static targets = ["result"]
+
+  handleComplete(event) {
+    const value = event.detail.value
+    this.resultTarget.textContent = `✓ Complete! Value: ${value}`
+    this.resultTarget.classList.add("text-green-600")
+  }
+}
+
+// Register the demo controller
+if (window.Stimulus) {
+  window.Stimulus.register("otp-demo", OtpDemoController)
+}
+</script>

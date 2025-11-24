@@ -1,0 +1,20 @@
+<%# InputOtp Group - ERB partial
+
+  Container for grouping OTP input slots together visually.
+
+  @param classes [String] Additional CSS classes
+  @param attributes [Hash] Additional HTML attributes
+%>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::InputOtp::InputOtpGroupBehavior
+
+  # Get HTML attributes from behavior
+  group_attrs = input_otp_group_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, **group_attrs do %>
+  <%= yield %>
+<% end %>

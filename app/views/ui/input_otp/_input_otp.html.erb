@@ -1,0 +1,44 @@
+<%# InputOtp - ERB partial
+
+  Accessible one-time password container component.
+  Supports both composition (with group/slot/separator) and auto-generation.
+
+  @param length [Integer] Maximum number of OTP characters (default: 6)
+  @param pattern [String] Regex pattern for valid characters (default: "\d")
+  @param name [String] Form input name
+  @param id [String] HTML id attribute
+  @param disabled [Boolean] Whether inputs are disabled
+  @param classes [String] Additional CSS classes
+  @param attributes [Hash] Additional HTML attributes
+%>
+<%
+  @length = local_assigns.fetch(:length, 6)
+  @pattern = local_assigns.fetch(:pattern, "\\d")
+  @name = local_assigns.fetch(:name, nil)
+  @id = local_assigns.fetch(:id, nil)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::InputOtp::InputOtpBehavior
+
+  # Get HTML attributes from behavior
+  input_otp_attrs = input_otp_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, **input_otp_attrs do %>
+  <% if block_given? %>
+    <%= yield %>
+  <% else %>
+    <%# Auto-generate inputs wrapped in group %>
+    <%= render "ui/input_otp/group" do %>
+      <% @length.times do |i| %>
+        <%= render "ui/input_otp/slot",
+          index: i,
+          name: @name ? "#{@name}[#{i}]" : nil,
+          id: @id ? "#{@id}_#{i}" : nil,
+          disabled: @disabled %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
