@@ -65,6 +65,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/item.html.erb
   end
 
+  def kbd
+    # Renders app/views/components/kbd.html.erb
+  end
+
   def label
     # Renders app/views/components/label.html.erb
   end

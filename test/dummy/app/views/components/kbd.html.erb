@@ -1,0 +1,277 @@
+<div class="space-y-12 p-8">
+  <div class="space-y-4">
+    <h1 class="text-4xl font-bold">Kbd</h1>
+    <p class="text-muted-foreground text-lg">
+      Display textual user input from keyboard, helping users understand keyboard shortcuts and interactions within applications.
+    </p>
+  </div>
+
+  <!-- Example 1: Basic Keys (Phlex) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Basic Keys</h2>
+      <p class="text-muted-foreground text-sm">Individual keyboard key display.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+        <%= render UI::Kbd::Kbd.new { "Shift" } %>
+        <%= render UI::Kbd::Kbd.new { "Alt" } %>
+        <%= render UI::Kbd::Kbd.new { "Esc" } %>
+        <%= render UI::Kbd::Kbd.new { "Enter" } %>
+        <%= render UI::Kbd::Kbd.new { "Tab" } %>
+        <%= render UI::Kbd::Kbd.new { "Space" } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2: Modifier Symbols (ViewComponent) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Modifier Symbols</h2>
+      <p class="text-muted-foreground text-sm">Mac-style keyboard symbols.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render(UI::Kbd::KbdComponent.new) { "⌘" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⌃" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⌥" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⇧" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⏎" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⌫" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⎋" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "⇥" } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 3: Key Combinations (ERB) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Key Combinations</h2>
+      <p class="text-muted-foreground text-sm">Grouped keyboard shortcuts.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render "ui/kbd/group" do %>
+          <%= render "ui/kbd/kbd", content: "Ctrl" %>
+          +
+          <%= render "ui/kbd/kbd", content: "C" %>
+        <% end %>
+
+        <%= render "ui/kbd/group" do %>
+          <%= render "ui/kbd/kbd", content: "⌘" %>
+          <%= render "ui/kbd/kbd", content: "K" %>
+        <% end %>
+
+        <%= render "ui/kbd/group" do %>
+          <%= render "ui/kbd/kbd", content: "⇧" %>
+          <%= render "ui/kbd/kbd", content: "⌘" %>
+          <%= render "ui/kbd/kbd", content: "P" %>
+        <% end %>
+
+        <%= render "ui/kbd/group" do %>
+          <%= render "ui/kbd/kbd", content: "Ctrl" %>
+          +
+          <%= render "ui/kbd/kbd", content: "Alt" %>
+          +
+          <%= render "ui/kbd/kbd", content: "Del" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 4: With Buttons (Phlex) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">With Buttons</h2>
+      <p class="text-muted-foreground text-sm">Keyboard shortcuts integrated with button actions.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm, classes: "pr-2") do %>
+          Accept <%= render UI::Kbd::Kbd.new { "⏎" } %>
+        <% end %>
+
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) do %>
+          <%= render UI::Kbd::Kbd.new { "Esc" } %>
+          Cancel
+        <% end %>
+
+        <%= render UI::Button::Button.new(variant: :outline, size: :sm) do %>
+          Save
+          <%= render UI::Kbd::Group.new do %>
+            <%= render UI::Kbd::Kbd.new { "⌘" } %>
+            <%= render UI::Kbd::Kbd.new { "S" } %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 5: Navigation Shortcuts (ViewComponent) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Navigation Shortcuts</h2>
+      <p class="text-muted-foreground text-sm">Common navigation patterns with keyboard shortcuts.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Next page</span>
+          <%= render(UI::Kbd::KbdComponent.new) { "→" } %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Previous page</span>
+          <%= render(UI::Kbd::KbdComponent.new) { "←" } %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Go to top</span>
+          <%= render(UI::Kbd::GroupComponent.new) do %>
+            <%= render(UI::Kbd::KbdComponent.new) { "Ctrl" } %>
+            +
+            <%= render(UI::Kbd::KbdComponent.new) { "Home" } %>
+          <% end %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Go to bottom</span>
+          <%= render(UI::Kbd::GroupComponent.new) do %>
+            <%= render(UI::Kbd::KbdComponent.new) { "Ctrl" } %>
+            +
+            <%= render(UI::Kbd::KbdComponent.new) { "End" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 6: Command Palette (ERB) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Command Palette</h2>
+      <p class="text-muted-foreground text-sm">Common application shortcuts.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Open command palette</span>
+          <%= render "ui/kbd/group" do %>
+            <%= render "ui/kbd/kbd", content: "⌘" %>
+            <%= render "ui/kbd/kbd", content: "K" %>
+          <% end %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Search</span>
+          <%= render "ui/kbd/group" do %>
+            <%= render "ui/kbd/kbd", content: "Ctrl" %>
+            +
+            <%= render "ui/kbd/kbd", content: "F" %>
+          <% end %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm">New file</span>
+          <%= render "ui/kbd/group" do %>
+            <%= render "ui/kbd/kbd", content: "Ctrl" %>
+            +
+            <%= render "ui/kbd/kbd", content: "N" %>
+          <% end %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Save</span>
+          <%= render "ui/kbd/group" do %>
+            <%= render "ui/kbd/kbd", content: "Ctrl" %>
+            +
+            <%= render "ui/kbd/kbd", content: "S" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 7: Text Formatting (Phlex) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Text Formatting</h2>
+      <p class="text-muted-foreground text-sm">Common text formatting shortcuts.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold">Bold</span>
+          <%= render UI::Kbd::Group.new do %>
+            <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+            +
+            <%= render UI::Kbd::Kbd.new { "B" } %>
+          <% end %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm italic">Italic</span>
+          <%= render UI::Kbd::Group.new do %>
+            <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+            +
+            <%= render UI::Kbd::Kbd.new { "I" } %>
+          <% end %>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm underline">Underline</span>
+          <%= render UI::Kbd::Group.new do %>
+            <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+            +
+            <%= render UI::Kbd::Kbd.new { "U" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 8: Size Variants (ViewComponent) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Size Variants</h2>
+      <p class="text-muted-foreground text-sm">Custom sizing with classes.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex items-center gap-4">
+        <%= render(UI::Kbd::KbdComponent.new(classes: "text-[10px] h-4 min-w-4")) { "Sm" } %>
+        <%= render(UI::Kbd::KbdComponent.new) { "Md" } %>
+        <%= render(UI::Kbd::KbdComponent.new(classes: "text-sm h-6 min-w-6")) { "Lg" } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 9: Color Variants (ERB) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Color Variants</h2>
+      <p class="text-muted-foreground text-sm">Custom color schemes.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render "ui/kbd/kbd", content: "Default" %>
+        <%= render "ui/kbd/kbd", classes: "bg-accent text-accent-foreground", content: "Accent" %>
+        <%= render "ui/kbd/kbd", classes: "bg-primary text-primary-foreground", content: "Primary" %>
+        <%= render "ui/kbd/kbd", classes: "bg-destructive/10 text-destructive", content: "Destructive" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 10: Arrow Keys (Mixed) -->
+  <div class="space-y-4">
+    <div>
+      <h2 class="text-2xl font-semibold">Arrow Keys</h2>
+      <p class="text-muted-foreground text-sm">Directional navigation.</p>
+    </div>
+    <div class="rounded-lg border bg-card p-6">
+      <div class="flex flex-col items-center gap-2">
+        <div>
+          <%= render UI::Kbd::Kbd.new { "↑" } %>
+        </div>
+        <div class="flex items-center gap-2">
+          <%= render "ui/kbd/kbd", content: "←" %>
+          <%= render(UI::Kbd::KbdComponent.new) { "↓" } %>
+          <%= render "ui/kbd/kbd", content: "→" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

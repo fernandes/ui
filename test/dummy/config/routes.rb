@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   get "/components/input", to: "components#input"
   get "/components/input_group", to: "components#input_group"
   get "/components/item", to: "components#item"
+  get "/components/kbd", to: "components#kbd"
   get "/components/label", to: "components#label"
   get "/components/popover", to: "components#popover"
   get "/components/radio_button", to: "components#radio_button"
