@@ -5,8 +5,8 @@ Displays rich content in a floating panel, triggered by a button.
 ## Component Paths
 
 - **Root**: `UI::Popover::PopoverComponent`
-- **Trigger**: `UI::Popover::PopoverTriggerComponent`
-- **Content**: `UI::Popover::PopoverContentComponent`
+- **Trigger**: `UI::Popover::TriggerComponent`
+- **Content**: `UI::Popover::ContentComponent`
 
 ## Installation
 
@@ -24,12 +24,12 @@ The Popover component requires `@floating-ui/dom` for positioning:
 
 ```erb
 <%= render UI::Popover::PopoverComponent.new do %>
-  <%= render UI::Popover::PopoverTriggerComponent.new do %>
+  <%= render UI::Popover::TriggerComponent.new do %>
     <%= render UI::Button::ButtonComponent.new(variant: "outline") do %>
       Open popover
     <% end %>
   <% end %>
-  <%= render UI::Popover::PopoverContentComponent.new do %>
+  <%= render UI::Popover::ContentComponent.new do %>
     <div class="grid gap-4">
       <div class="space-y-2">
         <h4 class="font-medium leading-none">Dimensions</h4>
@@ -77,7 +77,7 @@ Container component that provides context for the popover.
 <% end %>
 ```
 
-### PopoverTriggerComponent
+### TriggerComponent
 
 Button or element that triggers the popover.
 
@@ -90,7 +90,7 @@ Button or element that triggers the popover.
 **Example with asChild:**
 
 ```erb
-<%= render UI::Popover::PopoverTriggerComponent.new(as_child: true) do %>
+<%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
   <%= render UI::Button::ButtonComponent.new(variant: "outline") do %>
     Open
   <% end %>
@@ -100,12 +100,12 @@ Button or element that triggers the popover.
 **Example without asChild (wraps content):**
 
 ```erb
-<%= render UI::Popover::PopoverTriggerComponent.new do %>
+<%= render UI::Popover::TriggerComponent.new do %>
   <button class="custom-button">Open</button>
 <% end %>
 ```
 
-### PopoverContentComponent
+### ContentComponent
 
 The floating content panel.
 
@@ -125,7 +125,7 @@ The floating content panel.
 **Example with custom width:**
 
 ```erb
-<%= render UI::Popover::PopoverContentComponent.new(classes: "w-80") do %>
+<%= render UI::Popover::ContentComponent.new(classes: "w-80") do %>
   <%# Content %>
 <% end %>
 ```
@@ -133,7 +133,7 @@ The floating content panel.
 **Example with side and alignment:**
 
 ```erb
-<%= render UI::Popover::PopoverContentComponent.new(side: "top", align: "start") do %>
+<%= render UI::Popover::ContentComponent.new(side: "top", align: "start") do %>
   <%# Content %>
 <% end %>
 ```
@@ -144,12 +144,12 @@ The floating content panel.
 
 ```erb
 <%= render UI::Popover::PopoverComponent.new do %>
-  <%= render UI::Popover::PopoverTriggerComponent.new(as_child: true) do %>
+  <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
     <%= render UI::Button::ButtonComponent.new(variant: "outline") do %>
       Settings
     <% end %>
   <% end %>
-  <%= render UI::Popover::PopoverContentComponent.new(classes: "w-80") do %>
+  <%= render UI::Popover::ContentComponent.new(classes: "w-80") do %>
     <div class="grid gap-4">
       <div class="space-y-2">
         <h4 class="font-medium leading-none">Settings</h4>
@@ -167,10 +167,10 @@ The floating content panel.
 
 ```erb
 <%= render UI::Popover::PopoverComponent.new(trigger: "hover", hover_delay: 300) do %>
-  <%= render UI::Popover::PopoverTriggerComponent.new do %>
+  <%= render UI::Popover::TriggerComponent.new do %>
     Hover over me
   <% end %>
-  <%= render UI::Popover::PopoverContentComponent.new do %>
+  <%= render UI::Popover::ContentComponent.new do %>
     This appears on hover
   <% end %>
 <% end %>
@@ -181,10 +181,10 @@ The floating content panel.
 ```erb
 <%# Trigger popover programmatically from JavaScript %>
 <%= render UI::Popover::PopoverComponent.new(trigger: "manual", data: { popover_open_value: "false" }) do %>
-  <%= render UI::Popover::PopoverTriggerComponent.new do %>
+  <%= render UI::Popover::TriggerComponent.new do %>
     <button data-action="click->my-controller#openPopover">Manual trigger</button>
   <% end %>
-  <%= render UI::Popover::PopoverContentComponent.new do %>
+  <%= render UI::Popover::ContentComponent.new do %>
     Manually controlled content
   <% end %>
 <% end %>
@@ -194,12 +194,12 @@ The floating content panel.
 
 ```erb
 <%= render UI::Popover::PopoverComponent.new do %>
-  <%= render UI::Popover::PopoverTriggerComponent.new(as_child: true) do %>
+  <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
     <%= render UI::Button::ButtonComponent.new(variant: "ghost", size: "icon") do %>
       <svg class="w-4 h-4">...</svg>
     <% end %>
   <% end %>
-  <%= render UI::Popover::PopoverContentComponent.new do %>
+  <%= render UI::Popover::ContentComponent.new do %>
     Content here
   <% end %>
 <% end %>
@@ -257,8 +257,8 @@ Animation is controlled via `data-state` attribute (managed by Stimulus controll
 ✅ **CORRECT - Include both trigger and content:**
 ```erb
 <%= render UI::Popover::PopoverComponent.new do %>
-  <%= render UI::Popover::PopoverTriggerComponent.new do %>...<% end %>
-  <%= render UI::Popover::PopoverContentComponent.new do %>...<% end %>
+  <%= render UI::Popover::TriggerComponent.new do %>...<% end %>
+  <%= render UI::Popover::ContentComponent.new do %>...<% end %>
 <% end %>
 ```
 

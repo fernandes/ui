@@ -2,21 +2,21 @@
 
 module UI
   module Popover
-    # PopoverContentComponent - ViewComponent implementation
+    # ContentComponent - ViewComponent implementation
     #
     # The floating content panel.
     # Uses PopoverContentBehavior concern for shared styling logic.
     #
     # @example Basic usage
-    #   <%= render UI::Popover::PopoverContentComponent.new do %>
+    #   <%= render UI::Popover::ContentComponent.new do %>
     #     Popover content here
     #   <% end %>
     #
     # @example With custom styling
-    #   <%= render UI::Popover::PopoverContentComponent.new(classes: "w-80 p-6") do %>
+    #   <%= render UI::Popover::ContentComponent.new(classes: "w-80 p-6") do %>
     #     Content
     #   <% end %>
-    class PopoverContentComponent < ViewComponent::Base
+    class ContentComponent < ViewComponent::Base
       include PopoverContentBehavior
 
       # @param side [String] Side of the trigger to show the content ("top", "bottom", "left", "right")
@@ -31,7 +31,14 @@ module UI
       end
 
       def call
-        content_tag :div, **popover_content_html_attributes do
+        content_attrs = popover_content_html_attributes
+
+        # Merge data attributes properly
+        if @attributes[:data]
+          content_attrs[:data] = content_attrs[:data].merge(@attributes[:data])
+        end
+
+        content_tag :div, **content_attrs.deep_merge(@attributes.except(:data)) do
           content
         end
       end

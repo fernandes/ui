@@ -9,10 +9,10 @@ module UI
     #
     # @example Basic usage
     #   <%= render UI::Popover::PopoverComponent.new do %>
-    #     <%= render UI::Popover::PopoverTriggerComponent.new do %>
+    #     <%= render UI::Popover::TriggerComponent.new do %>
     #       <button>Click me</button>
     #     <% end %>
-    #     <%= render UI::Popover::PopoverContentComponent.new do %>
+    #     <%= render UI::Popover::ContentComponent.new do %>
     #       Popover content
     #     <% end %>
     #   <% end %>

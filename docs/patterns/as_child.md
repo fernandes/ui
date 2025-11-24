@@ -364,33 +364,114 @@ end
 
 **Helper methods** (`ui_attributes`, `merge_ui_attributes`) required for attribute conversion.
 
-### ViewComponent (Future)
+### ViewComponent (Current Implementation)
+
+**Important:** ViewComponent processes blocks differently than Phlex. Blocks are evaluated BEFORE the `call` method runs, so you cannot yield attributes to them directly.
+
+**Solution:** Use Nokogiri to parse rendered HTML and inject attributes into the first child element.
+
+#### Implementation Pattern
 
 ```ruby
-render UI::Dialog::TriggerComponent.new(as_child: true) do |attrs|
-  tag.button(**attrs) { "Open" }
+class TriggerComponent < ViewComponent::Base
+  def initialize(as_child: false, **attributes)
+    @as_child = as_child
+    @attributes = attributes
+  end
+
+  def call
+    trigger_attrs = trigger_html_attributes.deep_merge(@attributes)
+
+    if @as_child
+      # Parse rendered content and inject attributes into first element
+      rendered = content.to_s
+      doc = Nokogiri::HTML::DocumentFragment.parse(rendered)
+      first_element = doc.children.find { |node| node.element? }
+
+      if first_element
+        # Merge data attributes
+        trigger_attrs.fetch(:data, {}).each do |key, value|
+          first_element[:"data-#{key}"] = value
+        end
+
+        # Merge other attributes
+        trigger_attrs.except(:data).each do |key, value|
+          first_element[key] = value
+        end
+
+        doc.to_html.html_safe
+      else
+        content
+      end
+    else
+      # Default: render as button
+      content_tag :button, content, **trigger_attrs
+    end
+  end
 end
 ```
 
-**`tag` helper** converts hash to HTML attributes.
+#### Usage (Different from Phlex!)
+
+```erb
+<%# ❌ WRONG - Don't use block parameters with ViewComponent %>
+<%= render UI::Popover::TriggerComponent.new(as_child: true) do |attrs| %>
+  <%= render UI::Button::ButtonComponent.new(**attrs) { "Open" } %>
+<% end %>
+
+<%# ✅ CORRECT - No block parameters needed %>
+<%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
+  <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+    Open
+  <% end %>
+<% end %>
+```
+
+**How it works:**
+1. ViewComponent renders the Button first → `<button class="...">Open</button>`
+2. TriggerComponent's `call` method parses this HTML with Nokogiri
+3. Injects `data-ui__popover-target="trigger"` and other attributes into the `<button>`
+4. Result: `<button class="..." data-ui__popover-target="trigger">Open</button>`
+
+**Key differences from Phlex:**
+- ❌ No `|attrs|` parameter in the block
+- ❌ No `**attrs` spreading in child component
+- ✅ Attributes injected automatically by parent component
+- ✅ Works with any child component or HTML element
 
 ## Common Pitfalls
 
-### 1. Forgetting to Accept Block Parameter
+### 1. Using Phlex Syntax with ViewComponent
+
+```erb
+<%# ❌ Wrong - ViewComponent doesn't support block parameters %>
+<%= render UI::Popover::TriggerComponent.new(as_child: true) do |attrs| %>
+  <%= render UI::Button::ButtonComponent.new(**attrs) { "Open" } %>
+<% end %>
+
+<%# ✅ Correct - ViewComponent auto-injects attributes %>
+<%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
+  <%= render UI::Button::ButtonComponent.new { "Open" } %>
+<% end %>
+```
+
+**Why:** ViewComponent processes blocks before `call()` runs, so you can't yield attributes to them. The component uses Nokogiri to inject attributes after rendering.
+
+### 2. Forgetting to Accept Block Parameter (Phlex Only)
 
 ```ruby
-# ❌ Wrong - attrs not captured
+# ❌ Wrong - attrs not captured (Phlex)
 render UI::Dialog::Trigger.new(as_child: true) do
   button { "Open" }  # No data-action!
 end
 
-# ✅ Correct - attrs captured and used
+# ✅ Correct - attrs captured and used (Phlex)
 render UI::Dialog::Trigger.new(as_child: true) do |attrs|
   button(**attrs) { "Open" }
 end
 ```
 
-### 2. Not Using Splat Operator
+### 3. Not Using Splat Operator (Phlex Only)
 
 ```ruby
 # ❌ Wrong - attrs passed as single hash argument
@@ -400,7 +481,7 @@ render UI::Button::Button.new(attrs) { "Open" }
 render UI::Button::Button.new(**attrs) { "Open" }
 ```
 
-### 3. Overriding Critical Attributes
+### 4. Overriding Critical Attributes
 
 ```ruby
 # ⚠️ Be careful - child can override parent completely
@@ -417,7 +498,7 @@ render UI::Dialog::Trigger.new(as_child: true) do |attrs|
 end
 ```
 
-### 4. Invalid HTML Nesting
+### 5. Invalid HTML Nesting
 
 ```ruby
 # ❌ Wrong - button inside button (without asChild)
@@ -435,14 +516,16 @@ end
 
 ## Differences from Radix UI
 
-| Feature | Radix (React) | Our Implementation (Ruby) |
-|---------|---------------|---------------------------|
-| Mechanism | `React.cloneElement` | `yield` with hash |
-| Event Composition | Automatic | Manual (Stimulus actions concat) |
-| Type Safety | TypeScript | Documentation |
-| Ref Composition | Yes | N/A (server-side) |
-| Child Enforcement | Single child only | Developer responsibility |
-| Performance | Runtime cloning | Zero runtime overhead |
+| Feature | Radix (React) | Phlex | ViewComponent |
+|---------|---------------|-------|---------------|
+| Mechanism | `React.cloneElement` | `yield` with hash | Nokogiri HTML parsing |
+| Event Composition | Automatic | Manual (Stimulus actions concat) | Manual (Stimulus actions concat) |
+| Type Safety | TypeScript | Documentation | Documentation |
+| Ref Composition | Yes | N/A (server-side) | N/A (server-side) |
+| Child Enforcement | Single child only | Developer responsibility | Developer responsibility |
+| Performance | Runtime cloning | Zero runtime overhead | HTML parsing overhead |
+| Block Parameters | N/A | Yes (`\|attrs\|`) | No (auto-injection) |
+| Attribute Merging | Automatic | Manual via `**attrs` | Automatic via Nokogiri |
 
 ## See Also
 
