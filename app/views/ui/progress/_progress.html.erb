@@ -1,0 +1,15 @@
+<%# Progress - shadcn/ui inspired component for Rails %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @value = local_assigns.fetch(:value, 0)
+
+  # Extend behavior for shared logic
+  extend UI::Progress::ProgressBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = progress_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content_tag :div, nil, class: progress_indicator_classes, style: progress_indicator_style, data: { slot: "progress-indicator" } %>
+<% end %>

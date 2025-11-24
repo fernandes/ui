@@ -1,0 +1,161 @@
+<div class="container mx-auto max-w-4xl space-y-12 py-12">
+  <div class="space-y-4">
+    <h1 class="text-4xl font-bold">Progress</h1>
+    <p class="text-lg text-muted-foreground">
+      Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.
+    </p>
+  </div>
+
+  <%# Example 1: Default Progress (Phlex) %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Default</h2>
+      <p class="text-sm text-muted-foreground">A standard progress bar at 60% completion.</p>
+    </div>
+    <%= render UI::Progress::Progress.new(value: 60) %>
+  </div>
+
+  <%# Example 2: Different Values (ViewComponent) %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Different Values</h2>
+      <p class="text-sm text-muted-foreground">Progress bars showing different completion percentages.</p>
+    </div>
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-muted-foreground">Starting</span>
+          <span class="font-medium">0%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 0) %>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-muted-foreground">In Progress</span>
+          <span class="font-medium">33%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 33) %>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-muted-foreground">Half Way</span>
+          <span class="font-medium">50%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 50) %>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-muted-foreground">Almost Done</span>
+          <span class="font-medium">85%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 85) %>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-muted-foreground">Complete</span>
+          <span class="font-medium">100%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 100) %>
+      </div>
+    </div>
+  </div>
+
+  <%# Example 3: Custom Sizes (ERB) %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Custom Sizes</h2>
+      <p class="text-sm text-muted-foreground">Progress bars with different heights.</p>
+    </div>
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">Small (h-1)</p>
+        <%= render "ui/progress/progress", value: 60, classes: "h-1" %>
+      </div>
+
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">Default (h-2)</p>
+        <%= render "ui/progress/progress", value: 60 %>
+      </div>
+
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">Medium (h-3)</p>
+        <%= render "ui/progress/progress", value: 60, classes: "h-3" %>
+      </div>
+
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">Large (h-4)</p>
+        <%= render "ui/progress/progress", value: 60, classes: "h-4" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Example 4: Custom Width (Phlex) %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Custom Width</h2>
+      <p class="text-sm text-muted-foreground">Progress bars with custom widths.</p>
+    </div>
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">25% width container</p>
+        <%= render UI::Progress::Progress.new(value: 60, classes: "w-1/4") %>
+      </div>
+
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">50% width container</p>
+        <%= render UI::Progress::Progress.new(value: 60, classes: "w-1/2") %>
+      </div>
+
+      <div class="space-y-2">
+        <p class="text-sm text-muted-foreground">75% width container</p>
+        <%= render UI::Progress::Progress.new(value: 60, classes: "w-3/4") %>
+      </div>
+    </div>
+  </div>
+
+  <%# Example 5: Real-world Usage (ViewComponent) %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">Real-world Example</h2>
+      <p class="text-sm text-muted-foreground">File upload progress indicator.</p>
+    </div>
+    <div class="space-y-6">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <p class="text-sm font-medium">document.pdf</p>
+            <p class="text-xs text-muted-foreground">2.4 MB of 8.0 MB</p>
+          </div>
+          <span class="text-sm font-medium">30%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 30) %>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <p class="text-sm font-medium">image.png</p>
+            <p class="text-xs text-muted-foreground">4.2 MB of 5.5 MB</p>
+          </div>
+          <span class="text-sm font-medium">76%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 76) %>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <p class="text-sm font-medium">video.mp4</p>
+            <p class="text-xs text-muted-foreground">12.0 MB of 12.0 MB</p>
+          </div>
+          <span class="text-sm font-medium text-green-600">100%</span>
+        </div>
+        <%= render UI::Progress::ProgressComponent.new(value: 100) %>
+      </div>
+    </div>
+  </div>
+</div>

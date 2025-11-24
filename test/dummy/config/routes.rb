@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   get "/components/label", to: "components#label"
   get "/components/pagination", to: "components#pagination"
   get "/components/popover", to: "components#popover"
+  get "/components/progress", to: "components#progress"
   get "/components/radio_button", to: "components#radio_button"
   get "/components/scroll_area", to: "components#scroll_area"
   get "/components/select", to: "components#select"

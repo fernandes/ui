@@ -81,6 +81,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/popover.html.erb
   end
 
+  def progress
+    # Renders app/views/components/progress.html.erb
+  end
+
   def radio_button
     # Renders app/views/components/radio_button.html.erb
   end
