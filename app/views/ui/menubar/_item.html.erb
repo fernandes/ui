@@ -1,0 +1,24 @@
+<%# Menubar Item Component - Individual menu item %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @variant = local_assigns.fetch(:variant, "default")
+  @href = local_assigns.fetch(:href, nil)
+  @inset = local_assigns.fetch(:inset, false)
+
+  # Extend behavior for shared logic
+  extend UI::Menubar::MenubarItemBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = menubar_item_html_attributes.deep_merge(@attributes)
+-%>
+<% if @href %>
+  <%= content_tag :a, all_attributes.merge(href: @href) do %>
+    <%= content || yield %>
+  <% end %>
+<% else %>
+  <%= content_tag :div, all_attributes do %>
+    <%= content || yield %>
+  <% end %>
+<% end %>

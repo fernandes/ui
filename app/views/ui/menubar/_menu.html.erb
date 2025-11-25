@@ -1,0 +1,14 @@
+<%# Menubar Menu Component - Container for a single menu with trigger and content %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::Menubar::MenubarMenuBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = menubar_menu_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

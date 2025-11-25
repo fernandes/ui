@@ -1,5 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 import { computePosition, flip, offset, shift, autoUpdate } from "@floating-ui/dom"
+import {
+  getFocusableItems,
+  findCurrentItemIndex,
+  focusItem as focusItemUtil,
+  focusNextItem as focusNextItemUtil,
+  focusPreviousItem as focusPreviousItemUtil,
+  hasSubmenu,
+  openSubmenu,
+  closeSubmenu,
+  closeAllSubmenus,
+  positionSubmenu,
+  clearAllTabindexes,
+  getKeyboardFocusedItem
+} from "../utils/menu_utils.js"
 
 // Dropdown Menu controller with keyboard navigation support
 export default class extends Controller {
@@ -42,7 +56,7 @@ export default class extends Controller {
   }
 
   // Submenu hover handlers
-  openSubmenu(event) {
+  openSubmenuHandler(event) {
     const trigger = event.currentTarget
     const submenu = trigger.nextElementSibling
 
@@ -53,10 +67,7 @@ export default class extends Controller {
     }
 
     // Remove keyboard focus from all items, except this one
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"]')
-    allMenuItems.forEach(menuItem => {
-      menuItem.setAttribute('tabindex', '-1')
-    })
+    clearAllTabindexes(this.element)
 
     // Set tabindex="0" on the hovered trigger
     trigger.setAttribute('tabindex', '0')
@@ -74,45 +85,17 @@ export default class extends Controller {
       // Close sibling submenus (not parent or child submenus)
       this.closeSiblingSubmenus(trigger)
 
-      // Open this submenu
-      submenu.classList.remove('hidden')
-      submenu.setAttribute('data-state', 'open')
-      trigger.setAttribute('data-state', 'open')
-
-      // Position submenu using Floating UI
-      this.positionSubmenu(trigger, submenu)
+      // Open this submenu using utility
+      openSubmenu(trigger, submenu)
 
       // If submenu contains a command controller, focus first item
       this.focusFirstCommandItem(submenu)
     }
   }
 
-  // Position submenu with Floating UI
-  positionSubmenu(trigger, submenu) {
-    // Get placement from submenu's data attributes
-    const side = submenu.getAttribute('data-side') || 'right'
-    const align = submenu.getAttribute('data-align') || 'start'
-    const placement = `${side}-${align}`
-
-    computePosition(trigger, submenu, {
-      placement: placement,
-      middleware: [
-        offset(8),
-        flip(),
-        shift({ padding: 8 })
-      ],
-      strategy: 'absolute'
-    }).then(({ x, y, placement: finalPlacement }) => {
-      Object.assign(submenu.style, {
-        left: `${x}px`,
-        top: `${y}px`,
-      })
-
-      // Update data-side and data-align based on final placement
-      const [finalSide, finalAlign] = finalPlacement.split('-')
-      submenu.setAttribute('data-side', finalSide)
-      submenu.setAttribute('data-align', finalAlign || 'center')
-    })
+  // Backwards compatibility alias
+  openSubmenu(event) {
+    return this.openSubmenuHandler(event)
   }
 
   // Focus first item in command menu if present in submenu
@@ -149,10 +132,7 @@ export default class extends Controller {
     }
 
     // Remove keyboard focus from all items, except this one
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"]')
-    allMenuItems.forEach(menuItem => {
-      menuItem.setAttribute('tabindex', '-1')
-    })
+    clearAllTabindexes(this.element)
 
     // Set tabindex="0" on the hovered item
     item.setAttribute('tabindex', '0')
@@ -246,7 +226,7 @@ export default class extends Controller {
     }
   }
 
-  closeSubmenu(event) {
+  closeSubmenuHandler(event) {
     const trigger = event.currentTarget
     const submenu = trigger.nextElementSibling
     const relatedTarget = event.relatedTarget
@@ -259,8 +239,8 @@ export default class extends Controller {
     // Add delay before closing to allow navigation to nested submenus
     const timeoutId = setTimeout(() => {
       if (submenu && submenu.hasAttribute('role') && submenu.getAttribute('role') === 'menu') {
-        // Close this submenu and all its children
-        this.closeSubmenuAndChildren(submenu, trigger)
+        // Close this submenu and all its children using utility
+        closeSubmenu(submenu, trigger)
       }
       this.closeSubmenuTimeouts.delete(trigger)
     }, 300) // 300ms delay allows smooth navigation
@@ -268,23 +248,9 @@ export default class extends Controller {
     this.closeSubmenuTimeouts.set(trigger, timeoutId)
   }
 
-  closeSubmenuAndChildren(submenu, trigger) {
-    // Close all nested submenus first
-    const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]')
-    nestedSubmenus.forEach(nested => {
-      nested.classList.add('hidden')
-      nested.setAttribute('data-state', 'closed')
-      // Find and close the trigger
-      const nestedTrigger = nested.previousElementSibling
-      if (nestedTrigger) {
-        nestedTrigger.setAttribute('data-state', 'closed')
-      }
-    })
-
-    // Close the submenu itself
-    submenu.classList.add('hidden')
-    submenu.setAttribute('data-state', 'closed')
-    trigger.setAttribute('data-state', 'closed')
+  // Backwards compatibility alias - closeSubmenu is used in HTML with data-action
+  closeSubmenu(event) {
+    return this.closeSubmenuHandler(event)
   }
 
   closeSiblingSubmenus(currentTrigger) {
@@ -293,6 +259,7 @@ export default class extends Controller {
     if (!parentMenu) return
 
     // Close all submenus that are siblings (same level)
+    // Note: We filter by data-dropdown-target for backwards compatibility with existing HTML
     const siblingTriggers = Array.from(parentMenu.children).filter(child => {
       return child !== currentTrigger && child.hasAttribute('data-dropdown-target') && child.getAttribute('data-dropdown-target').includes('item')
     })
@@ -300,22 +267,18 @@ export default class extends Controller {
     siblingTriggers.forEach(sibling => {
       const siblingSubmenu = sibling.nextElementSibling
       if (siblingSubmenu && siblingSubmenu.hasAttribute('role') && siblingSubmenu.getAttribute('role') === 'menu') {
-        this.closeSubmenuAndChildren(siblingSubmenu, sibling)
+        closeSubmenu(siblingSubmenu, sibling)
       }
     })
   }
 
-  closeAllSubmenus() {
-    const submenus = this.element.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]')
-    submenus.forEach(submenu => {
-      submenu.classList.add('hidden')
-      submenu.setAttribute('data-state', 'closed')
+  closeAllSubmenusHandler() {
+    closeAllSubmenus(this.element)
+  }
 
-      const trigger = submenu.previousElementSibling
-      if (trigger) {
-        trigger.setAttribute('data-state', 'closed')
-      }
-    })
+  // Backwards compatibility alias
+  closeAllSubmenus() {
+    return this.closeAllSubmenusHandler()
   }
 
   toggle(event) {
@@ -350,13 +313,10 @@ export default class extends Controller {
     const target = this.hasMenuTarget ? this.menuTarget : this.contentTarget
 
     // Close all submenus before closing main menu
-    this.closeAllSubmenus()
+    closeAllSubmenus(this.element)
 
     // Clear keyboard/hover focus from all items (including checkboxes and radios)
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    allMenuItems.forEach(item => {
-      item.setAttribute('tabindex', '-1')
-    })
+    clearAllTabindexes(this.element)
 
     // Clear last hovered item
     this.lastHoveredItem = null
@@ -437,7 +397,7 @@ export default class extends Controller {
       case 'ArrowRight':
         event.preventDefault()
         // If focused item has a submenu, open it
-        if (focusedElement && this.hasSubmenu(focusedElement)) {
+        if (focusedElement && hasSubmenu(focusedElement)) {
           this.openSubmenuWithKeyboard(focusedElement)
         }
         break
@@ -478,13 +438,13 @@ export default class extends Controller {
       case 'Enter':
         event.preventDefault()
         // Find the item with keyboard focus (tabindex="0") or DOM focus
-        const enterTarget = this.getKeyboardFocusedItem() || focusedElement
+        const enterTarget = getKeyboardFocusedItem(this.element) || focusedElement
         if (enterTarget && enterTarget.hasAttribute('role')) {
           const role = enterTarget.getAttribute('role')
 
           if (role === 'menuitem') {
             // Regular menu item: open submenu or activate and close
-            if (this.hasSubmenu(enterTarget)) {
+            if (hasSubmenu(enterTarget)) {
               this.openSubmenuWithKeyboard(enterTarget)
             } else {
               enterTarget.click()
@@ -503,13 +463,13 @@ export default class extends Controller {
       case ' ':
         event.preventDefault()
         // Find the item with keyboard focus (tabindex="0") or DOM focus
-        const spaceTarget = this.getKeyboardFocusedItem() || focusedElement
+        const spaceTarget = getKeyboardFocusedItem(this.element) || focusedElement
         if (spaceTarget && spaceTarget.hasAttribute('role')) {
           const role = spaceTarget.getAttribute('role')
 
           if (role === 'menuitem') {
             // Regular menu item: open submenu or activate and close
-            if (this.hasSubmenu(spaceTarget)) {
+            if (hasSubmenu(spaceTarget)) {
               this.openSubmenuWithKeyboard(spaceTarget)
             } else {
               spaceTarget.click()
@@ -526,78 +486,30 @@ export default class extends Controller {
   }
 
   getFocusableItems() {
-    // Find the item with tabindex="0" to determine which menu level we're in
+    // Determine the current menu based on the item with tabindex="0"
+    const currentMenu = this.getCurrentMenu()
+    return getFocusableItems(this.element, currentMenu)
+  }
+
+  getCurrentMenu() {
     const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
     const currentItem = Array.from(allItems).find(item => item.getAttribute('tabindex') === '0')
-    console.log('[getFocusableItems] currentItem with tabindex="0":', currentItem?.textContent.trim())
-    let currentMenu = null
 
     if (currentItem) {
-      // Find the menu that contains the current item (with tabindex="0")
-      currentMenu = currentItem.closest('[role="menu"]')
-      console.log('[getFocusableItems] found currentMenu from currentItem, data-side:', currentMenu?.getAttribute('data-side'))
-    } else {
-      // Default to the main menu if no item has tabindex="0"
-      currentMenu = this.hasMenuTarget ? this.menuTarget : this.contentTarget
-      console.log('[getFocusableItems] no currentItem, defaulting to main menu. hasMenuTarget:', this.hasMenuTarget, 'hasContentTarget:', this.hasContentTarget, 'currentMenu children count:', currentMenu?.children.length)
+      return currentItem.closest('[role="menu"]')
     }
 
-    if (!currentMenu) {
-      console.log('[getFocusableItems] no currentMenu found, returning empty array')
-      return []
-    }
-
-    // Get menuitems - they can be direct children OR children of submenu containers
-    const items = []
-    Array.from(currentMenu.children).forEach((child, index) => {
-      const role = child.getAttribute('role')
-      console.log(`[getFocusableItems] child ${index}: role="${role}", hasDataDisabled=${child.hasAttribute('data-disabled')}`)
-
-      // Check for menuitem, menuitemcheckbox, or menuitemradio
-      if (child.hasAttribute('role') && (role === 'menuitem' || role === 'menuitemcheckbox' || role === 'menuitemradio')) {
-        // Direct menu item child
-        if (!child.hasAttribute('data-disabled')) {
-          console.log(`[getFocusableItems] Adding child ${index} to items (role=${role})`)
-          items.push(child)
-        }
-      } else if (child.getAttribute('role') === 'group') {
-        // Radio group container - get all radio items inside
-        const radioItems = child.querySelectorAll('[role="menuitemradio"]')
-        console.log(`[getFocusableItems] Found radio group with ${radioItems.length} radio items`)
-        radioItems.forEach(radioItem => {
-          if (!radioItem.hasAttribute('data-disabled')) {
-            items.push(radioItem)
-          }
-        })
-      } else if (child.classList && child.classList.contains('relative')) {
-        // Submenu container - get the trigger (first child with role="menuitem"]')
-        const trigger = child.querySelector(':scope > [role="menuitem"]')
-        if (trigger && !trigger.hasAttribute('data-disabled')) {
-          items.push(trigger)
-        }
-      }
-    })
-
-    console.log('[getFocusableItems] returning items:', items.map(i => i.textContent.trim()))
-    return items
+    // Default to the main menu if no item has tabindex="0"
+    return this.hasMenuTarget ? this.menuTarget : this.contentTarget
   }
 
   focusNextItem(items = null) {
     items = items || this.getFocusableItems()
-    console.log('[focusNextItem] items:', items.map(i => i.textContent.trim()))
     if (items.length === 0) return
 
-    // Try to find currently focused item, or item with hover
-    let currentIndex = this.findCurrentItemIndex(items)
-    console.log('[focusNextItem] currentIndex:', currentIndex, 'item:', items[currentIndex]?.textContent.trim())
-
-    // Move to next item
-    if (currentIndex === -1 || currentIndex >= items.length - 1) {
-      console.log('[focusNextItem] wrapping to 0 or starting at 0')
-      this.focusItem(0, items)
-    } else {
-      console.log('[focusNextItem] moving to index:', currentIndex + 1, 'item:', items[currentIndex + 1]?.textContent.trim())
-      this.focusItem(currentIndex + 1, items)
+    const result = focusNextItemUtil(items, this.element, true)
+    if (result) {
+      this.lastHoveredItem = result
     }
   }
 
@@ -605,36 +517,16 @@ export default class extends Controller {
     items = items || this.getFocusableItems()
     if (items.length === 0) return
 
-    // Try to find currently focused item, or item with hover
-    let currentIndex = this.findCurrentItemIndex(items)
-
-    // Move to previous item
-    if (currentIndex === -1 || currentIndex === 0) {
-      this.focusItem(items.length - 1, items)
-    } else {
-      this.focusItem(currentIndex - 1, items)
+    const result = focusPreviousItemUtil(items, this.element, true)
+    if (result) {
+      this.lastHoveredItem = result
     }
-  }
-
-  // Find the current item index - look for item with tabindex="0"
-  findCurrentItemIndex(items) {
-    // Find the item with tabindex="0" (either keyboard focused or mouse hovered)
-    const currentItem = items.find(item => item.getAttribute('tabindex') === '0')
-
-    if (currentItem) {
-      return items.indexOf(currentItem)
-    }
-
-    return -1
   }
 
   focusItem(index, items = null) {
-    console.log('[focusItem] called with index:', index, 'items passed:', items?.map(i => i.textContent.trim()))
     // Always recalculate items to ensure we have the current menu items after any DOM changes
     items = this.getFocusableItems()
-    console.log('[focusItem] after recalculating, items:', items.map(i => i.textContent.trim()))
     if (items.length === 0 || index < 0 || index >= items.length) {
-      console.log('[focusItem] early return - items.length:', items.length, 'index:', index)
       return
     }
 
@@ -654,48 +546,16 @@ export default class extends Controller {
         const trigger = container.querySelector(':scope > [role="menuitem"]')
         const submenu = trigger?.nextElementSibling
         if (submenu && submenu.getAttribute('data-state') === 'open') {
-          this.closeSubmenuAndChildren(submenu, trigger)
+          closeSubmenu(submenu, trigger)
         }
       })
     }
 
-    // Remove tabindex from ALL menuitems in the entire dropdown (not just current menu)
-    // This ensures only ONE item has tabindex="0" at any time, preventing stale tabindex
-    // values in closed submenus from interfering with getFocusableItems()
-    console.log('[focusItem] setting ALL menuitems in dropdown to tabindex="-1"')
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    allMenuItems.forEach(item => {
-      item.setAttribute('tabindex', '-1')
-    })
-
-    // Focus the target item
-    const targetItem = items[index]
-    if (!targetItem) {
-      console.error('[focusItem] ERROR: targetItem is undefined at index', index, 'items:', items)
-      return
+    // Focus the target item using utility
+    const targetItem = focusItemUtil(items, index, this.element)
+    if (targetItem) {
+      this.lastHoveredItem = targetItem
     }
-
-    console.log('[focusItem] setting focus on item at index', index, ':', targetItem.textContent.trim())
-    targetItem.setAttribute('tabindex', '0')
-    targetItem.focus()
-
-    // Clear last hovered item since we're now using keyboard
-    // this.lastHoveredItem = null
-    this.lastHoveredItem = targetItem
-    console.log('[focusItem] done, lastHoveredItem:', this.lastHoveredItem?.textContent.trim())
-  }
-
-  // Check if a menu item has a submenu
-  // Get the menu item that currently has keyboard focus (tabindex="0")
-  getKeyboardFocusedItem() {
-    const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    return Array.from(allItems).find(item => item.getAttribute('tabindex') === '0')
-  }
-
-  hasSubmenu(menuItem) {
-    if (!menuItem) return false
-    const nextSibling = menuItem.nextElementSibling
-    return nextSibling && nextSibling.hasAttribute('role') && nextSibling.getAttribute('role') === 'menu'
   }
 
   // Open submenu with keyboard and focus first item
@@ -706,13 +566,8 @@ export default class extends Controller {
       // Close sibling submenus
       this.closeSiblingSubmenus(trigger)
 
-      // Open this submenu
-      submenu.classList.remove('hidden')
-      submenu.setAttribute('data-state', 'open')
-      trigger.setAttribute('data-state', 'open')
-
-      // Position submenu using Floating UI
-      this.positionSubmenu(trigger, submenu)
+      // Open this submenu using utility
+      openSubmenu(trigger, submenu)
 
       // Check if submenu contains a command controller
       const commandElement = submenu.querySelector('[data-controller~="command"]')
@@ -738,10 +593,7 @@ export default class extends Controller {
       })
 
       // Remove tabindex from ALL menuitems in the dropdown to ensure clean state
-      const allMenuItems = this.element.querySelectorAll('[role="menuitem"]')
-      allMenuItems.forEach(item => {
-        item.setAttribute('tabindex', '-1')
-      })
+      clearAllTabindexes(this.element)
 
       // Focus first item in submenu
       if (submenuItems.length > 0) {
@@ -772,8 +624,8 @@ export default class extends Controller {
       // Find the trigger that opened this submenu
       const trigger = parentMenu.previousElementSibling
 
-      // Close this submenu and all its children
-      this.closeSubmenuAndChildren(parentMenu, trigger)
+      // Close this submenu and all its children using utility
+      closeSubmenu(parentMenu, trigger)
 
       // Return focus to the trigger
       if (trigger) {
@@ -854,10 +706,8 @@ export default class extends Controller {
       option.classList.remove('bg-accent', 'text-accent-foreground')
     })
 
-    // Close the submenu
-    submenu.classList.add('hidden')
-    submenu.setAttribute('data-state', 'closed')
-    trigger.setAttribute('data-state', 'closed')
+    // Close the submenu using utility
+    closeSubmenu(submenu, trigger)
 
     // Find parent menu and its items
     const parentMenu = trigger.closest('[role="menu"]')

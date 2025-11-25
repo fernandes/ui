@@ -1,10 +1,5 @@
-Sonner
 Chart
-Calendar
-  - Date Picker
-Table
-  - Data Table
-Menubar
+- Data Table
 Navigation Menu
 Sidebar
 Resizable (outra lib react, vou realmente usar o resizable?!)

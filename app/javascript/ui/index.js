@@ -37,6 +37,7 @@ import SwitchController from "./controllers/switch_controller.js";
 import CalendarController from "./controllers/calendar_controller.js";
 import CarouselController from "./controllers/carousel_controller.js";
 import DatepickerController from "./controllers/datepicker_controller.js";
+import MenubarController from "./controllers/menubar_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -75,7 +76,8 @@ export function registerControllers(application) {
     "ui--toggle-group": ToggleGroupController,
     "ui--calendar": CalendarController,
     "ui--carousel": CarouselController,
-    "ui--datepicker": DatepickerController
+    "ui--datepicker": DatepickerController,
+    "ui--menubar": MenubarController
   });
 }
 
@@ -83,4 +85,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, CalendarController, CarouselController, DatepickerController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, CalendarController, CarouselController, DatepickerController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, MenubarController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController };

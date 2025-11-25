@@ -1,0 +1,339 @@
+<div class="container mx-auto py-8 space-y-8">
+  <div>
+    <h1 class="text-3xl font-bold mb-2">Menubar</h1>
+    <p class="text-muted-foreground">A visually persistent menu common in desktop applications that provides quick access to a consistent set of commands.</p>
+  </div>
+
+  <!-- Phlex Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Phlex</h2>
+
+    <div class="space-y-6">
+      <!-- Basic Example (shadcn reference) -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Complete Example</h3>
+        <%= render UI::Menubar::Menubar.new do %>
+          <!-- File Menu -->
+          <%= render UI::Menubar::Menu.new do %>
+            <%= render UI::Menubar::Trigger.new { "File" } %>
+            <%= render UI::Menubar::Content.new do %>
+              <%= render UI::Menubar::Item.new do %>
+                New Tab
+                <%= render UI::Menubar::Shortcut.new { "⌘T" } %>
+              <% end %>
+              <%= render UI::Menubar::Item.new do %>
+                New Window
+                <%= render UI::Menubar::Shortcut.new { "⌘N" } %>
+              <% end %>
+              <%= render UI::Menubar::Item.new(disabled: true) { "New Incognito Window" } %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Sub.new do %>
+                <%= render UI::Menubar::SubTrigger.new { "Share" } %>
+                <%= render UI::Menubar::SubContent.new do %>
+                  <%= render UI::Menubar::Item.new { "Email link" } %>
+                  <%= render UI::Menubar::Item.new { "Messages" } %>
+                  <%= render UI::Menubar::Item.new { "Notes" } %>
+                <% end %>
+              <% end %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new do %>
+                Print...
+                <%= render UI::Menubar::Shortcut.new { "⌘P" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <!-- Edit Menu -->
+          <%= render UI::Menubar::Menu.new do %>
+            <%= render UI::Menubar::Trigger.new { "Edit" } %>
+            <%= render UI::Menubar::Content.new do %>
+              <%= render UI::Menubar::Item.new do %>
+                Undo
+                <%= render UI::Menubar::Shortcut.new { "⌘Z" } %>
+              <% end %>
+              <%= render UI::Menubar::Item.new do %>
+                Redo
+                <%= render UI::Menubar::Shortcut.new { "⇧⌘Z" } %>
+              <% end %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Sub.new do %>
+                <%= render UI::Menubar::SubTrigger.new { "Find" } %>
+                <%= render UI::Menubar::SubContent.new do %>
+                  <%= render UI::Menubar::Item.new { "Search the web" } %>
+                  <%= render UI::Menubar::Separator.new %>
+                  <%= render UI::Menubar::Item.new { "Find..." } %>
+                  <%= render UI::Menubar::Item.new { "Find Next" } %>
+                  <%= render UI::Menubar::Item.new { "Find Previous" } %>
+                <% end %>
+              <% end %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new { "Cut" } %>
+              <%= render UI::Menubar::Item.new { "Copy" } %>
+              <%= render UI::Menubar::Item.new { "Paste" } %>
+            <% end %>
+          <% end %>
+
+          <!-- View Menu -->
+          <%= render UI::Menubar::Menu.new do %>
+            <%= render UI::Menubar::Trigger.new { "View" } %>
+            <%= render UI::Menubar::Content.new do %>
+              <%= render UI::Menubar::CheckboxItem.new(checked: true) { "Always Show Bookmarks Bar" } %>
+              <%= render UI::Menubar::CheckboxItem.new { "Always Show Full URLs" } %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new(inset: true) do %>
+                Reload
+                <%= render UI::Menubar::Shortcut.new { "⌘R" } %>
+              <% end %>
+              <%= render UI::Menubar::Item.new(inset: true, disabled: true) do %>
+                Force Reload
+                <%= render UI::Menubar::Shortcut.new { "⇧⌘R" } %>
+              <% end %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new(inset: true) { "Toggle Fullscreen" } %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new(inset: true) { "Hide Sidebar" } %>
+            <% end %>
+          <% end %>
+
+          <!-- Profiles Menu -->
+          <%= render UI::Menubar::Menu.new do %>
+            <%= render UI::Menubar::Trigger.new { "Profiles" } %>
+            <%= render UI::Menubar::Content.new do %>
+              <%= render UI::Menubar::RadioGroup.new(value: "benoit") do %>
+                <%= render UI::Menubar::RadioItem.new(value: "andy") { "Andy" } %>
+                <%= render UI::Menubar::RadioItem.new(value: "benoit", checked: true) { "Benoit" } %>
+                <%= render UI::Menubar::RadioItem.new(value: "luis") { "Luis" } %>
+              <% end %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new(inset: true) { "Edit..." } %>
+              <%= render UI::Menubar::Separator.new %>
+              <%= render UI::Menubar::Item.new(inset: true) { "Add Profile..." } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERB Partials Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ERB Partials</h2>
+
+    <div class="space-y-6">
+      <!-- Complete Example -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Complete Example</h3>
+        <%= render "ui/menubar/menubar" do %>
+          <%# File Menu %>
+          <%= render "ui/menubar/menu" do %>
+            <%= render "ui/menubar/trigger" do %>File<% end %>
+            <%= render "ui/menubar/content" do %>
+              <%= render "ui/menubar/item" do %>
+                New Tab
+                <%= render "ui/menubar/shortcut" do %>⌘T<% end %>
+              <% end %>
+              <%= render "ui/menubar/item" do %>
+                New Window
+                <%= render "ui/menubar/shortcut" do %>⌘N<% end %>
+              <% end %>
+              <%= render "ui/menubar/item", disabled: true do %>New Incognito Window<% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/sub" do %>
+                <%= render "ui/menubar/sub_trigger" do %>Share<% end %>
+                <%= render "ui/menubar/sub_content" do %>
+                  <%= render "ui/menubar/item" do %>Email link<% end %>
+                  <%= render "ui/menubar/item" do %>Messages<% end %>
+                  <%= render "ui/menubar/item" do %>Notes<% end %>
+                <% end %>
+              <% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item" do %>
+                Print...
+                <%= render "ui/menubar/shortcut" do %>⌘P<% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <%# Edit Menu %>
+          <%= render "ui/menubar/menu" do %>
+            <%= render "ui/menubar/trigger" do %>Edit<% end %>
+            <%= render "ui/menubar/content" do %>
+              <%= render "ui/menubar/item" do %>
+                Undo
+                <%= render "ui/menubar/shortcut" do %>⌘Z<% end %>
+              <% end %>
+              <%= render "ui/menubar/item" do %>
+                Redo
+                <%= render "ui/menubar/shortcut" do %>⇧⌘Z<% end %>
+              <% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/sub" do %>
+                <%= render "ui/menubar/sub_trigger" do %>Find<% end %>
+                <%= render "ui/menubar/sub_content" do %>
+                  <%= render "ui/menubar/item" do %>Search the web<% end %>
+                  <%= render "ui/menubar/separator" %>
+                  <%= render "ui/menubar/item" do %>Find...<% end %>
+                  <%= render "ui/menubar/item" do %>Find Next<% end %>
+                  <%= render "ui/menubar/item" do %>Find Previous<% end %>
+                <% end %>
+              <% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item" do %>Cut<% end %>
+              <%= render "ui/menubar/item" do %>Copy<% end %>
+              <%= render "ui/menubar/item" do %>Paste<% end %>
+            <% end %>
+          <% end %>
+
+          <%# View Menu %>
+          <%= render "ui/menubar/menu" do %>
+            <%= render "ui/menubar/trigger" do %>View<% end %>
+            <%= render "ui/menubar/content" do %>
+              <%= render "ui/menubar/checkbox_item", checked: true do %>Always Show Bookmarks Bar<% end %>
+              <%= render "ui/menubar/checkbox_item" do %>Always Show Full URLs<% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item", inset: true do %>
+                Reload
+                <%= render "ui/menubar/shortcut" do %>⌘R<% end %>
+              <% end %>
+              <%= render "ui/menubar/item", inset: true, disabled: true do %>
+                Force Reload
+                <%= render "ui/menubar/shortcut" do %>⇧⌘R<% end %>
+              <% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item", inset: true do %>Toggle Fullscreen<% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item", inset: true do %>Hide Sidebar<% end %>
+            <% end %>
+          <% end %>
+
+          <%# Profiles Menu %>
+          <%= render "ui/menubar/menu" do %>
+            <%= render "ui/menubar/trigger" do %>Profiles<% end %>
+            <%= render "ui/menubar/content" do %>
+              <%= render "ui/menubar/radio_group" do %>
+                <%= render "ui/menubar/radio_item", value: "andy" do %>Andy<% end %>
+                <%= render "ui/menubar/radio_item", value: "benoit", checked: true do %>Benoit<% end %>
+                <%= render "ui/menubar/radio_item", value: "luis" do %>Luis<% end %>
+              <% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item", inset: true do %>Edit...<% end %>
+              <%= render "ui/menubar/separator" %>
+              <%= render "ui/menubar/item", inset: true do %>Add Profile...<% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ViewComponent Examples -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">ViewComponent</h2>
+
+    <div class="space-y-6">
+      <!-- Complete Example -->
+      <div class="space-y-2">
+        <h3 class="text-lg font-medium">Complete Example</h3>
+        <%= render UI::Menubar::MenubarComponent.new do |menubar| %>
+          <%# File Menu %>
+          <%= render UI::Menubar::MenuComponent.new do %>
+            <%= render(UI::Menubar::TriggerComponent.new) { "File" } %>
+            <%= render UI::Menubar::ContentComponent.new do %>
+              <%= render UI::Menubar::ItemComponent.new do %>
+                New Tab
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⌘T" } %>
+              <% end %>
+              <%= render UI::Menubar::ItemComponent.new do %>
+                New Window
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⌘N" } %>
+              <% end %>
+              <%= render UI::Menubar::ItemComponent.new(disabled: true) { "New Incognito Window" } %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::SubComponent.new do %>
+                <%= render(UI::Menubar::SubTriggerComponent.new) { "Share" } %>
+                <%= render UI::Menubar::SubContentComponent.new do %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Email link" } %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Messages" } %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Notes" } %>
+                <% end %>
+              <% end %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::ItemComponent.new do %>
+                Print...
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⌘P" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <%# Edit Menu %>
+          <%= render UI::Menubar::MenuComponent.new do %>
+            <%= render(UI::Menubar::TriggerComponent.new) { "Edit" } %>
+            <%= render UI::Menubar::ContentComponent.new do %>
+              <%= render UI::Menubar::ItemComponent.new do %>
+                Undo
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⌘Z" } %>
+              <% end %>
+              <%= render UI::Menubar::ItemComponent.new do %>
+                Redo
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⇧⌘Z" } %>
+              <% end %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::SubComponent.new do %>
+                <%= render(UI::Menubar::SubTriggerComponent.new) { "Find" } %>
+                <%= render UI::Menubar::SubContentComponent.new do %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Search the web" } %>
+                  <%= render UI::Menubar::SeparatorComponent.new %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Find..." } %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Find Next" } %>
+                  <%= render(UI::Menubar::ItemComponent.new) { "Find Previous" } %>
+                <% end %>
+              <% end %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render(UI::Menubar::ItemComponent.new) { "Cut" } %>
+              <%= render(UI::Menubar::ItemComponent.new) { "Copy" } %>
+              <%= render(UI::Menubar::ItemComponent.new) { "Paste" } %>
+            <% end %>
+          <% end %>
+
+          <%# View Menu %>
+          <%= render UI::Menubar::MenuComponent.new do %>
+            <%= render(UI::Menubar::TriggerComponent.new) { "View" } %>
+            <%= render UI::Menubar::ContentComponent.new do %>
+              <%= render UI::Menubar::CheckboxItemComponent.new(checked: true) { "Always Show Bookmarks Bar" } %>
+              <%= render(UI::Menubar::CheckboxItemComponent.new) { "Always Show Full URLs" } %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::ItemComponent.new(inset: true) do %>
+                Reload
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⌘R" } %>
+              <% end %>
+              <%= render UI::Menubar::ItemComponent.new(inset: true, disabled: true) do %>
+                Force Reload
+                <%= render(UI::Menubar::ShortcutComponent.new) { "⇧⌘R" } %>
+              <% end %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::ItemComponent.new(inset: true) { "Toggle Fullscreen" } %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::ItemComponent.new(inset: true) { "Hide Sidebar" } %>
+            <% end %>
+          <% end %>
+
+          <%# Profiles Menu %>
+          <%= render UI::Menubar::MenuComponent.new do %>
+            <%= render(UI::Menubar::TriggerComponent.new) { "Profiles" } %>
+            <%= render UI::Menubar::ContentComponent.new do %>
+              <%= render UI::Menubar::RadioGroupComponent.new do %>
+                <%= render UI::Menubar::RadioItemComponent.new(value: "andy") { "Andy" } %>
+                <%= render UI::Menubar::RadioItemComponent.new(value: "benoit", checked: true) { "Benoit" } %>
+                <%= render UI::Menubar::RadioItemComponent.new(value: "luis") { "Luis" } %>
+              <% end %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::ItemComponent.new(inset: true) { "Edit..." } %>
+              <%= render UI::Menubar::SeparatorComponent.new %>
+              <%= render UI::Menubar::ItemComponent.new(inset: true) { "Add Profile..." } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>

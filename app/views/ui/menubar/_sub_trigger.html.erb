@@ -1,0 +1,20 @@
+<%# Menubar Sub Trigger Component - Menu item that opens a submenu %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @inset = local_assigns.fetch(:inset, false)
+  @disabled = local_assigns.fetch(:disabled, false)
+
+  # Extend behavior for shared logic
+  extend UI::Menubar::MenubarSubTriggerBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = menubar_sub_trigger_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto size-4">
+    <path d="m9 18 6-6-6-6"></path>
+  </svg>
+<% end %>

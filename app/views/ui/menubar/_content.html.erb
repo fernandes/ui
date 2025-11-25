@@ -1,0 +1,18 @@
+<%# Menubar Content Component - Dropdown menu container %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @align = local_assigns.fetch(:align, "start")
+  @side_offset = local_assigns.fetch(:side_offset, 8)
+  @align_offset = local_assigns.fetch(:align_offset, -4)
+
+  # Extend behavior for shared logic
+  extend UI::Menubar::MenubarContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = menubar_content_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

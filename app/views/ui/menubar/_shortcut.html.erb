@@ -1,0 +1,15 @@
+<%# Menubar Shortcut Component - Keyboard shortcut hint %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::Menubar::MenubarShortcutBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = menubar_shortcut_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :span, all_attributes do %>
+  <%= content || yield %>
+<% end %>

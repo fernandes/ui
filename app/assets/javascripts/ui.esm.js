@@ -1408,6 +1408,184 @@ const computePosition = (reference, floating, options) => {
   });
 };
 
+function getFocusableItems(container, currentMenu = null) {
+  if (!currentMenu) {
+    const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+    const currentItem = Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
+    if (currentItem) {
+      currentMenu = currentItem.closest('[role="menu"]');
+    }
+  }
+  if (!currentMenu) return [];
+  const items = [];
+  Array.from(currentMenu.children).forEach(child => {
+    const role = child.getAttribute("role");
+    if (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio") {
+      if (!child.hasAttribute("data-disabled")) {
+        items.push(child);
+      }
+    } else if (role === "group") {
+      const radioItems = child.querySelectorAll('[role="menuitemradio"]');
+      radioItems.forEach(radioItem => {
+        if (!radioItem.hasAttribute("data-disabled")) {
+          items.push(radioItem);
+        }
+      });
+    } else if (child.classList && child.classList.contains("relative")) {
+      const trigger = child.querySelector(':scope > [role="menuitem"]');
+      if (trigger && !trigger.hasAttribute("data-disabled")) {
+        items.push(trigger);
+      }
+    }
+  });
+  return items;
+}
+
+function findCurrentItemIndex(items) {
+  const currentItem = items.find(item => item.getAttribute("tabindex") === "0");
+  return currentItem ? items.indexOf(currentItem) : -1;
+}
+
+function focusItem(items, index, container) {
+  if (items.length === 0 || index < 0 || index >= items.length) return;
+  const allMenuItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+  allMenuItems.forEach(item => {
+    item.setAttribute("tabindex", "-1");
+  });
+  const targetItem = items[index];
+  targetItem.setAttribute("tabindex", "0");
+  targetItem.focus();
+  return targetItem;
+}
+
+function focusNextItem(items, container, loop = true) {
+  if (items.length === 0) return null;
+  let currentIndex = findCurrentItemIndex(items);
+  if (currentIndex === -1 || currentIndex >= items.length - 1) {
+    if (loop) {
+      return focusItem(items, 0, container);
+    }
+    return null;
+  }
+  return focusItem(items, currentIndex + 1, container);
+}
+
+function focusPreviousItem(items, container, loop = true) {
+  if (items.length === 0) return null;
+  let currentIndex = findCurrentItemIndex(items);
+  if (currentIndex === -1 || currentIndex === 0) {
+    if (loop) {
+      return focusItem(items, items.length - 1, container);
+    }
+    return null;
+  }
+  return focusItem(items, currentIndex - 1, container);
+}
+
+function hasSubmenu(menuItem) {
+  if (!menuItem) return false;
+  const nextSibling = menuItem.nextElementSibling;
+  return nextSibling && nextSibling.getAttribute("role") === "menu";
+}
+
+function openSubmenu(trigger, submenu) {
+  if (!submenu || submenu.getAttribute("role") !== "menu") return;
+  submenu.classList.remove("hidden");
+  submenu.setAttribute("data-state", "open");
+  trigger.setAttribute("data-state", "open");
+  positionSubmenu(trigger, submenu);
+}
+
+function closeSubmenu(submenu, trigger) {
+  if (!submenu) return;
+  const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
+  nestedSubmenus.forEach(nested => {
+    nested.classList.add("hidden");
+    nested.setAttribute("data-state", "closed");
+    const nestedTrigger = nested.previousElementSibling;
+    if (nestedTrigger) {
+      nestedTrigger.setAttribute("data-state", "closed");
+    }
+  });
+  submenu.classList.add("hidden");
+  submenu.setAttribute("data-state", "closed");
+  if (trigger) {
+    trigger.setAttribute("data-state", "closed");
+  }
+}
+
+function closeAllSubmenus(container) {
+  const submenus = container.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
+  submenus.forEach(submenu => {
+    submenu.classList.add("hidden");
+    submenu.setAttribute("data-state", "closed");
+    const trigger = submenu.previousElementSibling;
+    if (trigger) {
+      trigger.setAttribute("data-state", "closed");
+    }
+  });
+}
+
+function positionDropdown(trigger, content, options = {}) {
+  const {placement: placement = "bottom-start", offsetValue: offsetValue = 4, flipEnabled: flipEnabled = true} = options;
+  const middleware = [];
+  if (offsetValue > 0) {
+    middleware.push(offset(offsetValue));
+  }
+  if (flipEnabled) {
+    middleware.push(flip());
+  }
+  middleware.push(shift({
+    padding: 8
+  }));
+  return computePosition(trigger, content, {
+    placement: placement,
+    middleware: middleware,
+    strategy: "absolute"
+  }).then(({x: x, y: y, placement: finalPlacement}) => {
+    Object.assign(content.style, {
+      left: `${x}px`,
+      top: `${y}px`
+    });
+    const [side, align] = finalPlacement.split("-");
+    content.setAttribute("data-side", side);
+    content.setAttribute("data-align", align || "center");
+  });
+}
+
+function positionSubmenu(trigger, submenu) {
+  const side = submenu.getAttribute("data-side") || "right";
+  const align = submenu.getAttribute("data-align") || "start";
+  const placement = `${side}-${align}`;
+  computePosition(trigger, submenu, {
+    placement: placement,
+    middleware: [ offset(8), flip(), shift({
+      padding: 8
+    }) ],
+    strategy: "absolute"
+  }).then(({x: x, y: y, placement: finalPlacement}) => {
+    Object.assign(submenu.style, {
+      left: `${x}px`,
+      top: `${y}px`
+    });
+    const [finalSide, finalAlign] = finalPlacement.split("-");
+    submenu.setAttribute("data-side", finalSide);
+    submenu.setAttribute("data-align", finalAlign || "center");
+  });
+}
+
+function clearAllTabindexes(container) {
+  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+  allItems.forEach(item => {
+    item.setAttribute("tabindex", "-1");
+  });
+}
+
+function getKeyboardFocusedItem(container) {
+  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
+  return Array.from(allItems).find(item => item.getAttribute("tabindex") === "0") || null;
+}
+
 class DropdownController extends Controller {
   static targets=[ "trigger", "menu", "content", "item" ];
   static values={
@@ -1450,16 +1628,13 @@ class DropdownController extends Controller {
     document.removeEventListener("click", this.boundHandleClickOutside);
     document.removeEventListener("keydown", this.boundHandleKeydown);
   }
-  openSubmenu(event) {
+  openSubmenuHandler(event) {
     const trigger = event.currentTarget;
     const submenu = trigger.nextElementSibling;
     if (document.activeElement && document.activeElement.hasAttribute("role") && document.activeElement.getAttribute("role") === "menuitem") {
       document.activeElement.blur();
     }
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"]');
-    allMenuItems.forEach(menuItem => {
-      menuItem.setAttribute("tabindex", "-1");
-    });
+    clearAllTabindexes(this.element);
     trigger.setAttribute("tabindex", "0");
     this.lastHoveredItem = trigger;
     if (this.closeSubmenuTimeouts.has(trigger)) {
@@ -1468,32 +1643,12 @@ class DropdownController extends Controller {
     }
     if (submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu") {
       this.closeSiblingSubmenus(trigger);
-      submenu.classList.remove("hidden");
-      submenu.setAttribute("data-state", "open");
-      trigger.setAttribute("data-state", "open");
-      this.positionSubmenu(trigger, submenu);
+      openSubmenu(trigger, submenu);
       this.focusFirstCommandItem(submenu);
     }
   }
-  positionSubmenu(trigger, submenu) {
-    const side = submenu.getAttribute("data-side") || "right";
-    const align = submenu.getAttribute("data-align") || "start";
-    const placement = `${side}-${align}`;
-    computePosition(trigger, submenu, {
-      placement: placement,
-      middleware: [ offset(8), flip(), shift({
-        padding: 8
-      }) ],
-      strategy: "absolute"
-    }).then(({x: x, y: y, placement: finalPlacement}) => {
-      Object.assign(submenu.style, {
-        left: `${x}px`,
-        top: `${y}px`
-      });
-      const [finalSide, finalAlign] = finalPlacement.split("-");
-      submenu.setAttribute("data-side", finalSide);
-      submenu.setAttribute("data-align", finalAlign || "center");
-    });
+  openSubmenu(event) {
+    return this.openSubmenuHandler(event);
   }
   focusFirstCommandItem(submenu) {
     const commandElement = submenu.querySelector('[data-controller~="command"]');
@@ -1516,10 +1671,7 @@ class DropdownController extends Controller {
     if (document.activeElement && document.activeElement.hasAttribute("role") && document.activeElement.getAttribute("role") === "menuitem") {
       document.activeElement.blur();
     }
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"]');
-    allMenuItems.forEach(menuItem => {
-      menuItem.setAttribute("tabindex", "-1");
-    });
+    clearAllTabindexes(this.element);
     item.setAttribute("tabindex", "0");
     this.lastHoveredItem = item;
   }
@@ -1564,7 +1716,7 @@ class DropdownController extends Controller {
       iconContainer.innerHTML = `\n        <span data-state="checked">\n          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle size-2 fill-current">\n            <circle cx="12" cy="12" r="10"></circle>\n          </svg>\n        </span>\n      `;
     }
   }
-  closeSubmenu(event) {
+  closeSubmenuHandler(event) {
     const trigger = event.currentTarget;
     const submenu = trigger.nextElementSibling;
     const relatedTarget = event.relatedTarget;
@@ -1573,25 +1725,14 @@ class DropdownController extends Controller {
     }
     const timeoutId = setTimeout(() => {
       if (submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu") {
-        this.closeSubmenuAndChildren(submenu, trigger);
+        closeSubmenu(submenu, trigger);
       }
       this.closeSubmenuTimeouts.delete(trigger);
     }, 300);
     this.closeSubmenuTimeouts.set(trigger, timeoutId);
   }
-  closeSubmenuAndChildren(submenu, trigger) {
-    const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
-    nestedSubmenus.forEach(nested => {
-      nested.classList.add("hidden");
-      nested.setAttribute("data-state", "closed");
-      const nestedTrigger = nested.previousElementSibling;
-      if (nestedTrigger) {
-        nestedTrigger.setAttribute("data-state", "closed");
-      }
-    });
-    submenu.classList.add("hidden");
-    submenu.setAttribute("data-state", "closed");
-    trigger.setAttribute("data-state", "closed");
+  closeSubmenu(event) {
+    return this.closeSubmenuHandler(event);
   }
   closeSiblingSubmenus(currentTrigger) {
     const parentMenu = currentTrigger.closest('[role="menu"]');
@@ -1600,20 +1741,15 @@ class DropdownController extends Controller {
     siblingTriggers.forEach(sibling => {
       const siblingSubmenu = sibling.nextElementSibling;
       if (siblingSubmenu && siblingSubmenu.hasAttribute("role") && siblingSubmenu.getAttribute("role") === "menu") {
-        this.closeSubmenuAndChildren(siblingSubmenu, sibling);
+        closeSubmenu(siblingSubmenu, sibling);
       }
     });
   }
+  closeAllSubmenusHandler() {
+    closeAllSubmenus(this.element);
+  }
   closeAllSubmenus() {
-    const submenus = this.element.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
-    submenus.forEach(submenu => {
-      submenu.classList.add("hidden");
-      submenu.setAttribute("data-state", "closed");
-      const trigger = submenu.previousElementSibling;
-      if (trigger) {
-        trigger.setAttribute("data-state", "closed");
-      }
-    });
+    return this.closeAllSubmenusHandler();
   }
   toggle(event) {
     this.openValue = !this.openValue;
@@ -1635,11 +1771,8 @@ class DropdownController extends Controller {
     const {returnFocus: returnFocus = this.shouldReturnFocusToTrigger} = options;
     this.openValue = false;
     const target = this.hasMenuTarget ? this.menuTarget : this.contentTarget;
-    this.closeAllSubmenus();
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    allMenuItems.forEach(item => {
-      item.setAttribute("tabindex", "-1");
-    });
+    closeAllSubmenus(this.element);
+    clearAllTabindexes(this.element);
     this.lastHoveredItem = null;
     if (target) {
       target.classList.add("hidden");
@@ -1697,7 +1830,7 @@ class DropdownController extends Controller {
 
      case "ArrowRight":
       event.preventDefault();
-      if (focusedElement && this.hasSubmenu(focusedElement)) {
+      if (focusedElement && hasSubmenu(focusedElement)) {
         this.openSubmenuWithKeyboard(focusedElement);
       }
       break;
@@ -1734,11 +1867,11 @@ class DropdownController extends Controller {
 
      case "Enter":
       event.preventDefault();
-      const enterTarget = this.getKeyboardFocusedItem() || focusedElement;
+      const enterTarget = getKeyboardFocusedItem(this.element) || focusedElement;
       if (enterTarget && enterTarget.hasAttribute("role")) {
         const role = enterTarget.getAttribute("role");
         if (role === "menuitem") {
-          if (this.hasSubmenu(enterTarget)) {
+          if (hasSubmenu(enterTarget)) {
             this.openSubmenuWithKeyboard(enterTarget);
           } else {
             enterTarget.click();
@@ -1754,11 +1887,11 @@ class DropdownController extends Controller {
 
      case " ":
       event.preventDefault();
-      const spaceTarget = this.getKeyboardFocusedItem() || focusedElement;
+      const spaceTarget = getKeyboardFocusedItem(this.element) || focusedElement;
       if (spaceTarget && spaceTarget.hasAttribute("role")) {
         const role = spaceTarget.getAttribute("role");
         if (role === "menuitem") {
-          if (this.hasSubmenu(spaceTarget)) {
+          if (hasSubmenu(spaceTarget)) {
             this.openSubmenuWithKeyboard(spaceTarget);
           } else {
             spaceTarget.click();
@@ -1772,85 +1905,36 @@ class DropdownController extends Controller {
     }
   }
   getFocusableItems() {
+    const currentMenu = this.getCurrentMenu();
+    return getFocusableItems(this.element, currentMenu);
+  }
+  getCurrentMenu() {
     const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
     const currentItem = Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
-    console.log('[getFocusableItems] currentItem with tabindex="0":', currentItem?.textContent.trim());
-    let currentMenu = null;
     if (currentItem) {
-      currentMenu = currentItem.closest('[role="menu"]');
-      console.log("[getFocusableItems] found currentMenu from currentItem, data-side:", currentMenu?.getAttribute("data-side"));
-    } else {
-      currentMenu = this.hasMenuTarget ? this.menuTarget : this.contentTarget;
-      console.log("[getFocusableItems] no currentItem, defaulting to main menu. hasMenuTarget:", this.hasMenuTarget, "hasContentTarget:", this.hasContentTarget, "currentMenu children count:", currentMenu?.children.length);
+      return currentItem.closest('[role="menu"]');
     }
-    if (!currentMenu) {
-      console.log("[getFocusableItems] no currentMenu found, returning empty array");
-      return [];
-    }
-    const items = [];
-    Array.from(currentMenu.children).forEach((child, index) => {
-      const role = child.getAttribute("role");
-      console.log(`[getFocusableItems] child ${index}: role="${role}", hasDataDisabled=${child.hasAttribute("data-disabled")}`);
-      if (child.hasAttribute("role") && (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio")) {
-        if (!child.hasAttribute("data-disabled")) {
-          console.log(`[getFocusableItems] Adding child ${index} to items (role=${role})`);
-          items.push(child);
-        }
-      } else if (child.getAttribute("role") === "group") {
-        const radioItems = child.querySelectorAll('[role="menuitemradio"]');
-        console.log(`[getFocusableItems] Found radio group with ${radioItems.length} radio items`);
-        radioItems.forEach(radioItem => {
-          if (!radioItem.hasAttribute("data-disabled")) {
-            items.push(radioItem);
-          }
-        });
-      } else if (child.classList && child.classList.contains("relative")) {
-        const trigger = child.querySelector(':scope > [role="menuitem"]');
-        if (trigger && !trigger.hasAttribute("data-disabled")) {
-          items.push(trigger);
-        }
-      }
-    });
-    console.log("[getFocusableItems] returning items:", items.map(i => i.textContent.trim()));
-    return items;
+    return this.hasMenuTarget ? this.menuTarget : this.contentTarget;
   }
   focusNextItem(items = null) {
     items = items || this.getFocusableItems();
-    console.log("[focusNextItem] items:", items.map(i => i.textContent.trim()));
     if (items.length === 0) return;
-    let currentIndex = this.findCurrentItemIndex(items);
-    console.log("[focusNextItem] currentIndex:", currentIndex, "item:", items[currentIndex]?.textContent.trim());
-    if (currentIndex === -1 || currentIndex >= items.length - 1) {
-      console.log("[focusNextItem] wrapping to 0 or starting at 0");
-      this.focusItem(0, items);
-    } else {
-      console.log("[focusNextItem] moving to index:", currentIndex + 1, "item:", items[currentIndex + 1]?.textContent.trim());
-      this.focusItem(currentIndex + 1, items);
+    const result = focusNextItem(items, this.element, true);
+    if (result) {
+      this.lastHoveredItem = result;
     }
   }
   focusPreviousItem(items = null) {
     items = items || this.getFocusableItems();
     if (items.length === 0) return;
-    let currentIndex = this.findCurrentItemIndex(items);
-    if (currentIndex === -1 || currentIndex === 0) {
-      this.focusItem(items.length - 1, items);
-    } else {
-      this.focusItem(currentIndex - 1, items);
+    const result = focusPreviousItem(items, this.element, true);
+    if (result) {
+      this.lastHoveredItem = result;
     }
-  }
-  findCurrentItemIndex(items) {
-    const currentItem = items.find(item => item.getAttribute("tabindex") === "0");
-    if (currentItem) {
-      return items.indexOf(currentItem);
-    }
-    return -1;
   }
   focusItem(index, items = null) {
-    console.log("[focusItem] called with index:", index, "items passed:", items?.map(i => i.textContent.trim()));
     items = this.getFocusableItems();
-    console.log("[focusItem] after recalculating, items:", items.map(i => i.textContent.trim()));
     if (items.length === 0 || index < 0 || index >= items.length) {
-      console.log("[focusItem] early return - items.length:", items.length, "index:", index);
       return;
     }
     const currentMenu = items[0] ? items[0].closest('[role="menu"]') : null;
@@ -1867,43 +1951,20 @@ class DropdownController extends Controller {
         const trigger = container.querySelector(':scope > [role="menuitem"]');
         const submenu = trigger?.nextElementSibling;
         if (submenu && submenu.getAttribute("data-state") === "open") {
-          this.closeSubmenuAndChildren(submenu, trigger);
+          closeSubmenu(submenu, trigger);
         }
       });
     }
-    console.log('[focusItem] setting ALL menuitems in dropdown to tabindex="-1"');
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    allMenuItems.forEach(item => {
-      item.setAttribute("tabindex", "-1");
-    });
-    const targetItem = items[index];
-    if (!targetItem) {
-      console.error("[focusItem] ERROR: targetItem is undefined at index", index, "items:", items);
-      return;
+    const targetItem = focusItem(items, index, this.element);
+    if (targetItem) {
+      this.lastHoveredItem = targetItem;
     }
-    console.log("[focusItem] setting focus on item at index", index, ":", targetItem.textContent.trim());
-    targetItem.setAttribute("tabindex", "0");
-    targetItem.focus();
-    this.lastHoveredItem = targetItem;
-    console.log("[focusItem] done, lastHoveredItem:", this.lastHoveredItem?.textContent.trim());
-  }
-  getKeyboardFocusedItem() {
-    const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    return Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
-  }
-  hasSubmenu(menuItem) {
-    if (!menuItem) return false;
-    const nextSibling = menuItem.nextElementSibling;
-    return nextSibling && nextSibling.hasAttribute("role") && nextSibling.getAttribute("role") === "menu";
   }
   openSubmenuWithKeyboard(trigger) {
     const submenu = trigger.nextElementSibling;
     if (submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu") {
       this.closeSiblingSubmenus(trigger);
-      submenu.classList.remove("hidden");
-      submenu.setAttribute("data-state", "open");
-      trigger.setAttribute("data-state", "open");
-      this.positionSubmenu(trigger, submenu);
+      openSubmenu(trigger, submenu);
       const commandElement = submenu.querySelector('[data-controller~="command"]');
       if (commandElement) {
         this.focusFirstCommandItem(submenu);
@@ -1922,10 +1983,7 @@ class DropdownController extends Controller {
           }
         }
       });
-      const allMenuItems = this.element.querySelectorAll('[role="menuitem"]');
-      allMenuItems.forEach(item => {
-        item.setAttribute("tabindex", "-1");
-      });
+      clearAllTabindexes(this.element);
       if (submenuItems.length > 0) {
         const firstItem = submenuItems[0];
         firstItem.setAttribute("tabindex", "0");
@@ -1943,7 +2001,7 @@ class DropdownController extends Controller {
     const dataSide = parentMenu.getAttribute("data-side");
     if (dataSide === "right" || dataSide === "right-start") {
       const trigger = parentMenu.previousElementSibling;
-      this.closeSubmenuAndChildren(parentMenu, trigger);
+      closeSubmenu(parentMenu, trigger);
       if (trigger) {
         const triggerParentMenu = trigger.closest('[role="menu"]');
         if (triggerParentMenu) {
@@ -2003,9 +2061,7 @@ class DropdownController extends Controller {
       option.removeAttribute("data-focused");
       option.classList.remove("bg-accent", "text-accent-foreground");
     });
-    submenu.classList.add("hidden");
-    submenu.setAttribute("data-state", "closed");
-    trigger.setAttribute("data-state", "closed");
+    closeSubmenu(submenu, trigger);
     const parentMenu = trigger.closest('[role="menu"]');
     if (parentMenu) {
       const parentItems = [];
@@ -12385,6 +12441,579 @@ class DatepickerController extends Controller {
   }
 }
 
+class MenubarController extends Controller {
+  static targets=[ "trigger", "content", "item" ];
+  static values={
+    open: {
+      type: Boolean,
+      default: false
+    },
+    activeIndex: {
+      type: Number,
+      default: -1
+    }
+  };
+  connect() {
+    this.closeSubmenuTimeouts = new Map;
+    this.submenuCleanups = new Map;
+    this.lastHoveredItem = null;
+    this.isMenubarActive = false;
+    this.boundHandleClickOutside = this.handleClickOutside.bind(this);
+    this.boundHandleKeydown = this.handleKeydown.bind(this);
+    document.addEventListener("click", this.boundHandleClickOutside);
+    this.initializeTriggers();
+  }
+  disconnect() {
+    this.closeSubmenuTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.closeSubmenuTimeouts.clear();
+    this.submenuCleanups.forEach(cleanup => cleanup());
+    this.submenuCleanups.clear();
+    document.removeEventListener("click", this.boundHandleClickOutside);
+    document.removeEventListener("keydown", this.boundHandleKeydown);
+  }
+  initializeTriggers() {
+    this.triggerTargets.forEach((trigger, index) => {
+      trigger.setAttribute("tabindex", index === 0 ? "0" : "-1");
+    });
+  }
+  toggle(event) {
+    if (event.detail === 0) return;
+    const trigger = event.currentTarget;
+    const triggerIndex = this.triggerTargets.indexOf(trigger);
+    const content = this.contentTargets[triggerIndex];
+    if (!content) return;
+    const isCurrentlyOpen = !content.classList.contains("hidden");
+    this.closeAll();
+    if (!isCurrentlyOpen) {
+      this.openMenu(triggerIndex);
+    }
+  }
+  openMenu(index) {
+    const trigger = this.triggerTargets[index];
+    const content = this.contentTargets[index];
+    if (!trigger || !content) return;
+    this.triggerTargets.forEach((t, i) => {
+      const c = this.contentTargets[i];
+      if (c) {
+        closeAllSubmenus(c);
+        c.classList.add("hidden");
+        c.setAttribute("data-state", "closed");
+        clearAllTabindexes(c);
+      }
+      t.setAttribute("data-state", "closed");
+      t.setAttribute("aria-expanded", "false");
+      t.blur();
+    });
+    content.classList.remove("hidden");
+    content.setAttribute("data-state", "open");
+    trigger.setAttribute("data-state", "open");
+    trigger.setAttribute("aria-expanded", "true");
+    this.openValue = true;
+    this.activeIndexValue = index;
+    this.isMenubarActive = true;
+    positionDropdown(trigger, content, {
+      placement: "bottom-start",
+      offsetValue: 4,
+      flipEnabled: true
+    });
+    this.setupKeyboardNavigation();
+    clearAllTabindexes(content);
+    this.lastHoveredItem = null;
+  }
+  closeAll(options = {}) {
+    const {returnFocus: returnFocus = false} = options;
+    this.submenuCleanups.forEach(cleanup => cleanup());
+    this.submenuCleanups.clear();
+    this.triggerTargets.forEach((trigger, index) => {
+      const content = this.contentTargets[index];
+      if (content) {
+        closeAllSubmenus(content);
+        content.classList.add("hidden");
+        content.setAttribute("data-state", "closed");
+        clearAllTabindexes(content);
+      }
+      trigger.setAttribute("data-state", "closed");
+      trigger.setAttribute("aria-expanded", "false");
+    });
+    this.openValue = false;
+    this.lastHoveredItem = null;
+    this.teardownKeyboardNavigation();
+    if (returnFocus && this.activeIndexValue >= 0) {
+      const trigger = this.triggerTargets[this.activeIndexValue];
+      if (trigger) {
+        setTimeout(() => trigger.focus(), 50);
+      }
+    }
+  }
+  handleTriggerHover(event) {
+    if (!this.isMenubarActive || !this.openValue) return;
+    const trigger = event.currentTarget;
+    const triggerIndex = this.triggerTargets.indexOf(trigger);
+    if (triggerIndex !== this.activeIndexValue && triggerIndex >= 0) {
+      this.openMenu(triggerIndex);
+    }
+  }
+  trackHoveredItem(event) {
+    const item = event.currentTarget;
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    if (!activeContent) return;
+    clearAllTabindexes(activeContent);
+    item.setAttribute("tabindex", "0");
+    item.focus();
+    this.lastHoveredItem = item;
+    const parentMenu = item.closest('[role="menu"]');
+    if (parentMenu) {
+      this.closeSiblingSubmenus(item, parentMenu);
+    }
+  }
+  selectItem(event) {
+    const item = event.currentTarget;
+    const role = item.getAttribute("role");
+    if (role === "menuitemcheckbox") {
+      event.stopPropagation();
+      this.toggleCheckbox(item);
+    } else if (role === "menuitemradio") {
+      event.stopPropagation();
+      this.selectRadio(item);
+    } else {
+      this.closeAll();
+      this.isMenubarActive = false;
+    }
+  }
+  openSubmenu(event) {
+    const trigger = event.currentTarget;
+    const submenu = trigger.nextElementSibling;
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    if (!submenu || submenu.getAttribute("role") !== "menu") return;
+    if (this.closeSubmenuTimeouts.has(trigger)) {
+      clearTimeout(this.closeSubmenuTimeouts.get(trigger));
+      this.closeSubmenuTimeouts.delete(trigger);
+    }
+    if (activeContent) {
+      clearAllTabindexes(activeContent);
+      trigger.setAttribute("tabindex", "0");
+      trigger.focus();
+      this.lastHoveredItem = trigger;
+    }
+    const parentMenu = trigger.closest('[role="menu"]');
+    if (parentMenu) {
+      this.closeSiblingSubmenus(trigger, parentMenu);
+    }
+    this.openSubmenuWithAutoUpdate(trigger, submenu);
+  }
+  openSubmenuWithAutoUpdate(trigger, submenu) {
+    if (!submenu || submenu.getAttribute("role") !== "menu") return;
+    if (this.submenuCleanups.has(submenu)) {
+      this.submenuCleanups.get(submenu)();
+      this.submenuCleanups.delete(submenu);
+    }
+    submenu.classList.remove("hidden");
+    submenu.setAttribute("data-state", "open");
+    trigger.setAttribute("data-state", "open");
+    const side = submenu.getAttribute("data-side") || "right";
+    const align = submenu.getAttribute("data-align") || "start";
+    const placement = `${side}-${align}`;
+    const update = () => {
+      computePosition(trigger, submenu, {
+        placement: placement,
+        middleware: [ offset(4), flip({
+          fallbackPlacements: [ "left-start" ]
+        }), shift({
+          padding: 8
+        }) ],
+        strategy: "fixed"
+      }).then(({x: x, y: y, placement: finalPlacement}) => {
+        Object.assign(submenu.style, {
+          position: "fixed",
+          left: `${x}px`,
+          top: `${y}px`
+        });
+        const [finalSide, finalAlign] = finalPlacement.split("-");
+        submenu.setAttribute("data-side", finalSide);
+        submenu.setAttribute("data-align", finalAlign || "start");
+      });
+    };
+    const cleanup = autoUpdate(trigger, submenu, update, {
+      ancestorScroll: true,
+      ancestorResize: true,
+      elementResize: true,
+      layoutShift: true,
+      animationFrame: true
+    });
+    this.submenuCleanups.set(submenu, cleanup);
+  }
+  closeSubmenuAndCleanup(submenu, trigger) {
+    if (!submenu) return;
+    if (this.submenuCleanups.has(submenu)) {
+      this.submenuCleanups.get(submenu)();
+      this.submenuCleanups.delete(submenu);
+    }
+    const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
+    nestedSubmenus.forEach(nested => {
+      if (this.submenuCleanups.has(nested)) {
+        this.submenuCleanups.get(nested)();
+        this.submenuCleanups.delete(nested);
+      }
+      nested.classList.add("hidden");
+      nested.setAttribute("data-state", "closed");
+      const nestedTrigger = nested.previousElementSibling;
+      if (nestedTrigger) {
+        nestedTrigger.setAttribute("data-state", "closed");
+      }
+    });
+    submenu.classList.add("hidden");
+    submenu.setAttribute("data-state", "closed");
+    if (trigger) {
+      trigger.setAttribute("data-state", "closed");
+    }
+  }
+  closeSubmenu(event) {
+    const trigger = event.currentTarget;
+    const submenu = trigger.nextElementSibling;
+    const relatedTarget = event.relatedTarget;
+    if (!submenu || submenu.getAttribute("role") !== "menu") return;
+    if (relatedTarget && submenu.contains(relatedTarget)) {
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      this.closeSubmenuAndCleanup(submenu, trigger);
+      this.closeSubmenuTimeouts.delete(trigger);
+    }, 300);
+    this.closeSubmenuTimeouts.set(trigger, timeoutId);
+  }
+  cancelSubmenuClose(event) {
+    const submenu = event.currentTarget;
+    const trigger = submenu.previousElementSibling;
+    if (trigger && this.closeSubmenuTimeouts.has(trigger)) {
+      clearTimeout(this.closeSubmenuTimeouts.get(trigger));
+      this.closeSubmenuTimeouts.delete(trigger);
+    }
+  }
+  closeSiblingSubmenus(currentItem, parentMenu) {
+    Array.from(parentMenu.children).forEach(child => {
+      if (child.classList && child.classList.contains("relative")) {
+        const trigger = child.querySelector(':scope > [role="menuitem"]');
+        const submenu = trigger?.nextElementSibling;
+        if (trigger !== currentItem && submenu && submenu.getAttribute("role") === "menu") {
+          this.closeSubmenuAndCleanup(submenu, trigger);
+        }
+      }
+    });
+  }
+  handleClickOutside(event) {
+    if (!this.element.contains(event.target)) {
+      this.closeAll();
+      this.isMenubarActive = false;
+    }
+  }
+  setupKeyboardNavigation() {
+    document.addEventListener("keydown", this.boundHandleKeydown);
+  }
+  teardownKeyboardNavigation() {
+    document.removeEventListener("keydown", this.boundHandleKeydown);
+  }
+  handleKeydown(event) {
+    if (!this.openValue) {
+      const isTrigger = this.triggerTargets.includes(event.target);
+      if (isTrigger) {
+        this.handleTriggerKeydown(event);
+      }
+      return;
+    }
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    if (!activeContent) return;
+    switch (event.key) {
+     case "ArrowDown":
+      event.preventDefault();
+      this.focusNextMenuItem();
+      break;
+
+     case "ArrowUp":
+      event.preventDefault();
+      this.focusPreviousMenuItem();
+      break;
+
+     case "ArrowRight":
+      event.preventDefault();
+      this.handleArrowRight();
+      break;
+
+     case "ArrowLeft":
+      event.preventDefault();
+      this.handleArrowLeft();
+      break;
+
+     case "Home":
+      event.preventDefault();
+      this.focusFirstMenuItem();
+      break;
+
+     case "End":
+      event.preventDefault();
+      this.focusLastMenuItem();
+      break;
+
+     case "Escape":
+      event.preventDefault();
+      if (!this.closeCurrentSubmenu()) {
+        this.closeAll({
+          returnFocus: true
+        });
+      }
+      break;
+
+     case "Enter":
+     case " ":
+      event.preventDefault();
+      this.activateCurrentItem();
+      break;
+
+     case "Tab":
+      this.closeAll();
+      this.isMenubarActive = false;
+      break;
+    }
+  }
+  handleTriggerKeydown(event) {
+    const trigger = event.currentTarget;
+    const triggerIndex = this.triggerTargets.indexOf(trigger);
+    if (triggerIndex === -1) return;
+    switch (event.key) {
+     case "ArrowRight":
+      event.preventDefault();
+      this.focusNextTrigger(triggerIndex);
+      break;
+
+     case "ArrowLeft":
+      event.preventDefault();
+      this.focusPreviousTrigger(triggerIndex);
+      break;
+
+     case "ArrowDown":
+     case "Enter":
+     case " ":
+      event.preventDefault();
+      event.stopPropagation();
+      this.openMenu(triggerIndex);
+      break;
+
+     case "Home":
+      event.preventDefault();
+      this.focusTrigger(0);
+      break;
+
+     case "End":
+      event.preventDefault();
+      this.focusTrigger(this.triggerTargets.length - 1);
+      break;
+    }
+  }
+  handleArrowRight() {
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
+    if (currentItem && hasSubmenu(currentItem)) {
+      this.openSubmenuWithKeyboard(currentItem);
+    } else {
+      this.navigateToNextMenu();
+    }
+  }
+  handleArrowLeft() {
+    if (!this.closeCurrentSubmenu()) {
+      this.navigateToPreviousMenu();
+    }
+  }
+  focusNextTrigger(currentIndex) {
+    const nextIndex = (currentIndex + 1) % this.triggerTargets.length;
+    this.focusTrigger(nextIndex);
+  }
+  focusPreviousTrigger(currentIndex) {
+    const prevIndex = currentIndex === 0 ? this.triggerTargets.length - 1 : currentIndex - 1;
+    this.focusTrigger(prevIndex);
+  }
+  focusTrigger(index) {
+    this.triggerTargets.forEach((t, i) => {
+      t.setAttribute("tabindex", i === index ? "0" : "-1");
+    });
+    this.triggerTargets[index].focus();
+  }
+  navigateToNextMenu() {
+    const nextIndex = (this.activeIndexValue + 1) % this.triggerTargets.length;
+    this.openMenu(nextIndex);
+  }
+  navigateToPreviousMenu() {
+    const prevIndex = this.activeIndexValue === 0 ? this.triggerTargets.length - 1 : this.activeIndexValue - 1;
+    this.openMenu(prevIndex);
+  }
+  getDirectMenuItems(menu) {
+    const items = [];
+    Array.from(menu.children).forEach(child => {
+      const role = child.getAttribute("role");
+      if (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio") {
+        if (!child.hasAttribute("data-disabled")) {
+          items.push(child);
+        }
+      } else if (role === "group") {
+        const radioItems = child.querySelectorAll('[role="menuitemradio"]');
+        radioItems.forEach(item => {
+          if (!item.hasAttribute("data-disabled")) {
+            items.push(item);
+          }
+        });
+      } else if (child.classList && child.classList.contains("relative")) {
+        const trigger = child.querySelector(':scope > [role="menuitem"]');
+        if (trigger && !trigger.hasAttribute("data-disabled")) {
+          items.push(trigger);
+        }
+      }
+    });
+    return items;
+  }
+  getCurrentMenuItems() {
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    if (!activeContent) return [];
+    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
+    let currentMenu;
+    if (currentItem) {
+      currentMenu = currentItem.closest('[role="menu"]');
+    } else {
+      currentMenu = activeContent.getAttribute("role") === "menu" ? activeContent : activeContent.querySelector('[role="menu"]');
+    }
+    if (!currentMenu) return [];
+    return this.getDirectMenuItems(currentMenu);
+  }
+  focusMenuItem(item, content) {
+    if (!item) return;
+    content = content || this.contentTargets[this.activeIndexValue];
+    if (!content) return;
+    clearAllTabindexes(content);
+    item.setAttribute("tabindex", "0");
+    item.focus();
+    this.lastHoveredItem = item;
+    const parentMenu = item.closest('[role="menu"]');
+    if (parentMenu) {
+      this.closeSiblingSubmenus(item, parentMenu);
+    }
+  }
+  focusNextMenuItem() {
+    const items = this.getCurrentMenuItems();
+    if (items.length === 0) return;
+    const currentItem = getKeyboardFocusedItem(this.contentTargets[this.activeIndexValue]) || this.lastHoveredItem;
+    let currentIndex = currentItem ? items.indexOf(currentItem) : -1;
+    const nextIndex = currentIndex >= items.length - 1 ? 0 : currentIndex + 1;
+    this.focusMenuItem(items[nextIndex]);
+  }
+  focusPreviousMenuItem() {
+    const items = this.getCurrentMenuItems();
+    if (items.length === 0) return;
+    const currentItem = getKeyboardFocusedItem(this.contentTargets[this.activeIndexValue]) || this.lastHoveredItem;
+    let currentIndex = currentItem ? items.indexOf(currentItem) : -1;
+    const prevIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+    this.focusMenuItem(items[prevIndex]);
+  }
+  focusFirstMenuItem() {
+    const items = this.getCurrentMenuItems();
+    if (items.length > 0) {
+      this.focusMenuItem(items[0]);
+    }
+  }
+  focusLastMenuItem() {
+    const items = this.getCurrentMenuItems();
+    if (items.length > 0) {
+      this.focusMenuItem(items[items.length - 1]);
+    }
+  }
+  openSubmenuWithKeyboard(trigger) {
+    const submenu = trigger.nextElementSibling;
+    if (!submenu || submenu.getAttribute("role") !== "menu") return;
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    const parentMenu = trigger.closest('[role="menu"]');
+    if (parentMenu) {
+      this.closeSiblingSubmenus(trigger, parentMenu);
+    }
+    this.openSubmenuWithAutoUpdate(trigger, submenu);
+    const submenuItems = this.getDirectMenuItems(submenu);
+    if (submenuItems.length > 0 && activeContent) {
+      clearAllTabindexes(activeContent);
+      submenuItems[0].setAttribute("tabindex", "0");
+      submenuItems[0].focus();
+      this.lastHoveredItem = submenuItems[0];
+    }
+  }
+  closeCurrentSubmenu() {
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    if (!activeContent) return false;
+    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
+    if (!currentItem) return false;
+    const parentMenu = currentItem.closest('[role="menu"]');
+    if (!parentMenu) return false;
+    const dataSide = parentMenu.getAttribute("data-side");
+    if (dataSide === "right" || dataSide === "right-start") {
+      const trigger = parentMenu.previousElementSibling;
+      this.closeSubmenuAndCleanup(parentMenu, trigger);
+      if (trigger) {
+        clearAllTabindexes(activeContent);
+        trigger.setAttribute("tabindex", "0");
+        trigger.focus();
+        this.lastHoveredItem = trigger;
+      }
+      return true;
+    }
+    return false;
+  }
+  activateCurrentItem() {
+    const activeContent = this.contentTargets[this.activeIndexValue];
+    if (!activeContent) return;
+    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
+    if (!currentItem) return;
+    const role = currentItem.getAttribute("role");
+    if (role === "menuitem") {
+      if (hasSubmenu(currentItem)) {
+        this.openSubmenuWithKeyboard(currentItem);
+      } else {
+        currentItem.click();
+        this.closeAll();
+        this.isMenubarActive = false;
+      }
+    } else if (role === "menuitemcheckbox") {
+      this.toggleCheckbox(currentItem);
+    } else if (role === "menuitemradio") {
+      this.selectRadio(currentItem);
+    }
+  }
+  toggleCheckbox(item) {
+    if (item.getAttribute("role") !== "menuitemcheckbox") return;
+    const currentState = item.getAttribute("data-state");
+    const newState = currentState === "checked" ? "unchecked" : "checked";
+    const isChecked = newState === "checked";
+    item.setAttribute("data-state", newState);
+    item.setAttribute("aria-checked", isChecked);
+    const iconContainer = item.querySelector(".absolute.left-2") || item.querySelector("span.absolute");
+    if (iconContainer) {
+      iconContainer.innerHTML = isChecked ? `\n        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">\n          <path d="M20 6 9 17l-5-5"></path>\n        </svg>\n      ` : "";
+    }
+  }
+  selectRadio(item) {
+    if (item.getAttribute("role") !== "menuitemradio") return;
+    const radioGroup = item.closest('[role="group"]') || item.closest('[role="menu"]');
+    if (!radioGroup) return;
+    const allRadios = radioGroup.querySelectorAll('[role="menuitemradio"]');
+    allRadios.forEach(radio => {
+      radio.setAttribute("data-state", "unchecked");
+      radio.setAttribute("aria-checked", "false");
+      const iconContainer = radio.querySelector(".absolute.left-2") || radio.querySelector("span.absolute");
+      if (iconContainer) {
+        iconContainer.innerHTML = "";
+      }
+    });
+    item.setAttribute("data-state", "checked");
+    item.setAttribute("aria-checked", "true");
+    const iconContainer = item.querySelector(".absolute.left-2") || item.querySelector("span.absolute");
+    if (iconContainer) {
+      iconContainer.innerHTML = `\n        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-2">\n          <circle cx="12" cy="12" r="10"></circle>\n        </svg>\n      `;
+    }
+  }
+}
+
 function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
@@ -12428,8 +13057,9 @@ function registerControllers(application) {
     "ui--toggle-group": ToggleGroupController,
     "ui--calendar": CalendarController,
     "ui--carousel": CarouselController,
-    "ui--datepicker": DatepickerController
+    "ui--datepicker": DatepickerController,
+    "ui--menubar": MenubarController
   });
 }
 
-export { AccordionController, AlertDialogController, AvatarController, CalendarController, CarouselController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, DatepickerController, DialogController, DrawerController, DropdownController, HelloController, HoverCardController, InputOtpController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };
+export { AccordionController, AlertDialogController, AvatarController, CalendarController, CarouselController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, DatepickerController, DialogController, DrawerController, DropdownController, HelloController, HoverCardController, InputOtpController, MenubarController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController, TooltipController, registerControllers, registerControllersInto, version };

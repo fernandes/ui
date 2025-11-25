@@ -1,0 +1,25 @@
+<%# Menubar Radio Item Component - Menu item with radio selection %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @value = local_assigns.fetch(:value, nil)
+  @checked = local_assigns.fetch(:checked, false)
+  @disabled = local_assigns.fetch(:disabled, false)
+
+  # Extend behavior for shared logic
+  extend UI::Menubar::MenubarRadioItemBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = menubar_radio_item_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <span class="absolute left-2 flex size-3.5 items-center justify-center">
+    <% if @checked %>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-2" data-state="checked">
+        <circle cx="12" cy="12" r="10"></circle>
+      </svg>
+    <% end %>
+  </span>
+  <%= content || yield %>
+<% end %>
