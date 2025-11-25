@@ -13,6 +13,7 @@ module UI
         month: Date.today,
         number_of_months: 1,
         week_starts_on: 0,
+        locale: "en-US",
         min_date: nil,
         max_date: nil,
         disabled_dates: [],
@@ -20,6 +21,10 @@ module UI
         fixed_weeks: false,
         show_dropdowns: false,
         year_range: 100,
+        min_range_days: 0,
+        max_range_days: 0,
+        exclude_disabled: false,
+        use_native_select: true,
         name: nil,
         classes: "",
         attributes: {}
@@ -29,6 +34,7 @@ module UI
         @month = month
         @number_of_months = number_of_months
         @week_starts_on = week_starts_on
+        @locale = locale
         @min_date = min_date
         @max_date = max_date
         @disabled_dates = disabled_dates
@@ -36,6 +42,10 @@ module UI
         @fixed_weeks = fixed_weeks
         @show_dropdowns = show_dropdowns
         @year_range = year_range
+        @min_range_days = min_range_days
+        @max_range_days = max_range_days
+        @exclude_disabled = exclude_disabled
+        @use_native_select = use_native_select
         @name = name
         @classes = classes
         @attributes = attributes
@@ -45,6 +55,7 @@ module UI
       def call
         content_tag(:div, **calendar_html_attributes) do
           safe_join([
+            live_region_html,
             hidden_input,
             months_html
           ].compact)
@@ -52,6 +63,10 @@ module UI
       end
 
       private
+
+      def live_region_html
+        tag.div("", class: "sr-only", "aria-live": "polite", "aria-atomic": "true", data: { ui__calendar_target: "liveRegion" })
+      end
 
       def hidden_input
         return unless @name
@@ -134,16 +149,16 @@ module UI
       end
 
       def table_html
-        content_tag(:table, class: "w-full border-collapse space-y-1") do
+        content_tag(:table, class: "w-full border-collapse space-y-1", role: "grid") do
           safe_join([
             content_tag(:thead) { weekdays_html },
-            content_tag(:tbody, "", data: { ui__calendar_target: "grid" })
+            content_tag(:tbody, "", data: { ui__calendar_target: "grid" }, role: "rowgroup")
           ])
         end
       end
 
       def weekdays_html
-        content_tag(:tr, class: "flex") do
+        content_tag(:tr, class: "flex", data: { ui__calendar_target: "weekdaysHeader" }) do
           safe_join(ordered_weekdays.map { |day| tag.th(day, scope: "col", class: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]") })
         end
       end

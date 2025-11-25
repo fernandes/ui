@@ -4797,6 +4797,9 @@ class SelectController extends Controller {
       this.updateDisplay(this.valueValue);
       this.updateSelection(this.valueValue);
     }
+    if (this.hasHiddenInputTarget && this.valueValue) {
+      this.hiddenInputTarget.value = this.valueValue;
+    }
     this.contentTarget.dataset.state = "closed";
     this.boundHandleKeydown = this.handleKeydown.bind(this);
     this.boundHandleScroll = this.handleScroll.bind(this);
@@ -4804,6 +4807,14 @@ class SelectController extends Controller {
       this.viewportTarget.addEventListener("scroll", this.boundHandleScroll, {
         passive: true
       });
+    }
+  }
+  valueValueChanged(value, previousValue) {
+    if (previousValue === undefined) return;
+    this.updateDisplay(value);
+    this.updateSelection(value);
+    if (this.hasHiddenInputTarget) {
+      this.hiddenInputTarget.value = value;
     }
   }
   toggle(event) {
@@ -6166,6 +6177,10 @@ function startOfISOWeekYear(date, options) {
   return startOfISOWeek(fourthOfJanuary);
 }
 
+function addYears(date, amount, options) {
+  return addMonths(date, amount * 12, options);
+}
+
 function constructNow(date) {
   return constructFrom(date, Date.now());
 }
@@ -6181,6 +6196,23 @@ function isDate(value) {
 
 function isValid(date) {
   return !(!isDate(date) && typeof date !== "number" || isNaN(+toDate(date)));
+}
+
+function differenceInDays(laterDate, earlierDate, options) {
+  const [laterDate_, earlierDate_] = normalizeDates(options?.in, laterDate, earlierDate);
+  const sign = compareLocalAsc(laterDate_, earlierDate_);
+  const difference = Math.abs(differenceInCalendarDays(laterDate_, earlierDate_));
+  laterDate_.setDate(laterDate_.getDate() - sign * difference);
+  const isLastDayNotFull = Number(compareLocalAsc(laterDate_, earlierDate_) === -sign);
+  const result = sign * (difference - isLastDayNotFull);
+  return result === 0 ? 0 : result;
+}
+
+function compareLocalAsc(laterDate, earlierDate) {
+  const diff = laterDate.getFullYear() - earlierDate.getFullYear() || laterDate.getMonth() - earlierDate.getMonth() || laterDate.getDate() - earlierDate.getDate() || laterDate.getHours() - earlierDate.getHours() || laterDate.getMinutes() - earlierDate.getMinutes() || laterDate.getSeconds() - earlierDate.getSeconds() || laterDate.getMilliseconds() - earlierDate.getMilliseconds();
+  if (diff < 0) return -1;
+  if (diff > 0) return 1;
+  return diff;
 }
 
 function endOfMonth(date, options) {
@@ -7904,8 +7936,12 @@ function subMonths(date, amount, options) {
   return addMonths(date, -1, options);
 }
 
+function subYears(date, amount, options) {
+  return addYears(date, -1, options);
+}
+
 class CalendarController extends Controller {
-  static targets=[ "grid", "monthLabel", "input", "monthSelect", "yearSelect" ];
+  static targets=[ "grid", "monthLabel", "input", "monthSelect", "yearSelect", "liveRegion", "weekdaysHeader", "monthContainer" ];
   static values={
     mode: {
       type: String,
@@ -7954,29 +7990,130 @@ class CalendarController extends Controller {
     yearRange: {
       type: Number,
       default: 100
+    },
+    minRangeDays: {
+      type: Number,
+      default: 0
+    },
+    maxRangeDays: {
+      type: Number,
+      default: 0
+    },
+    excludeDisabled: {
+      type: Boolean,
+      default: false
     }
   };
   connect() {
     this.currentMonth = this.monthValue ? new Date(this.monthValue) : new Date;
+    this.hoveredDate = null;
+    this.animationDirection = null;
+    this.initializeLocale();
     this.render();
+    this.renderWeekdayHeaders();
+  }
+  disconnect() {
+    this.hoveredDate = null;
+  }
+  initializeLocale() {
+    const locale = this.localeValue || "en-US";
+    this.monthFormatter = new Intl.DateTimeFormat(locale, {
+      month: "long",
+      year: "numeric"
+    });
+    this.weekdayFormatter = new Intl.DateTimeFormat(locale, {
+      weekday: "short"
+    });
+    this.weekdayFullFormatter = new Intl.DateTimeFormat(locale, {
+      weekday: "long"
+    });
+    this.monthNameFormatter = new Intl.DateTimeFormat(locale, {
+      month: "long"
+    });
+    this.dayFormatter = new Intl.DateTimeFormat(locale, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
   }
   previousMonth() {
+    this.animationDirection = "prev";
     this.currentMonth = subMonths(this.currentMonth);
     this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
   }
   nextMonth() {
+    this.animationDirection = "next";
     this.currentMonth = addMonths(this.currentMonth, 1);
     this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
+  }
+  previousYear() {
+    this.animationDirection = "prev";
+    this.currentMonth = subYears(this.currentMonth);
+    this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
+  }
+  nextYear() {
+    this.animationDirection = "next";
+    this.currentMonth = addYears(this.currentMonth, 1);
+    this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
   }
   goToMonth(event) {
     const month = parseInt(event.target.value);
+    const oldMonth = getMonth(this.currentMonth);
+    this.animationDirection = month > oldMonth ? "next" : "prev";
     this.currentMonth = setMonth(this.currentMonth, month);
     this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
   }
   goToYear(event) {
     const year = parseInt(event.target.value);
+    const oldYear = getYear(this.currentMonth);
+    this.animationDirection = year > oldYear ? "next" : "prev";
     this.currentMonth = setYear(this.currentMonth, year);
     this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
+  }
+  goToToday() {
+    const today = new Date;
+    const oldMonth = this.currentMonth;
+    this.animationDirection = isBefore(oldMonth, today) ? "next" : "prev";
+    this.currentMonth = startOfMonth(today);
+    this.focusedDate = format(today, "yyyy-MM-dd");
+    this.render();
+    this.announceMonthChange();
+    this.dispatchMonthChange();
+    this.restoreFocus();
+  }
+  dispatchMonthChange() {
+    this.dispatch("monthChange", {
+      detail: {
+        month: this.currentMonth,
+        direction: this.animationDirection
+      }
+    });
+  }
+  announceMonthChange() {
+    if (this.hasLiveRegionTarget) {
+      const monthName = this.monthFormatter.format(this.currentMonth);
+      this.liveRegionTarget.textContent = monthName;
+    }
+  }
+  announceSelection(dateStr) {
+    if (this.hasLiveRegionTarget) {
+      const date = parseISO(dateStr);
+      const formattedDate = this.dayFormatter.format(date);
+      this.liveRegionTarget.textContent = `Selected: ${formattedDate}`;
+    }
   }
   selectDate(event) {
     const dateStr = event.currentTarget.dataset.date;
@@ -7998,6 +8135,7 @@ class CalendarController extends Controller {
     this.updateInput();
     this.render();
     this.restoreFocus();
+    this.announceSelection(dateStr);
     this.dispatch("select", {
       detail: {
         selected: this.selectedValue,
@@ -8012,8 +8150,49 @@ class CalendarController extends Controller {
     } else {
       const start = parseISO(selected[0]);
       const end = parseISO(dateStr);
-      this.selectedValue = isBefore(end, start) ? [ dateStr, selected[0] ] : [ selected[0], dateStr ];
+      const [rangeStart, rangeEnd] = isBefore(end, start) ? [ end, start ] : [ start, end ];
+      const daysDiff = differenceInDays(rangeEnd, rangeStart);
+      if (this.minRangeDaysValue > 0 && daysDiff < this.minRangeDaysValue) {
+        this.dispatch("rangeError", {
+          detail: {
+            error: "min",
+            minDays: this.minRangeDaysValue,
+            actualDays: daysDiff
+          }
+        });
+        return;
+      }
+      if (this.maxRangeDaysValue > 0 && daysDiff > this.maxRangeDaysValue) {
+        this.dispatch("rangeError", {
+          detail: {
+            error: "max",
+            maxDays: this.maxRangeDaysValue,
+            actualDays: daysDiff
+          }
+        });
+        return;
+      }
+      if (this.excludeDisabledValue) {
+        const hasDisabledInRange = this.hasDisabledDatesInRange(rangeStart, rangeEnd);
+        if (hasDisabledInRange) {
+          this.dispatch("rangeError", {
+            detail: {
+              error: "disabled",
+              message: "Range contains disabled dates"
+            }
+          });
+          return;
+        }
+      }
+      this.selectedValue = [ format(rangeStart, "yyyy-MM-dd"), format(rangeEnd, "yyyy-MM-dd") ];
     }
+  }
+  hasDisabledDatesInRange(start, end) {
+    const days = eachDayOfInterval({
+      start: start,
+      end: end
+    });
+    return days.some(day => this.isDisabled(day));
   }
   toggleDate(dateStr) {
     const idx = this.selectedValue.indexOf(dateStr);
@@ -8022,6 +8201,72 @@ class CalendarController extends Controller {
     } else {
       this.selectedValue = this.selectedValue.filter((_, i) => i !== idx);
     }
+  }
+  handleDayHover(event) {
+    if (this.modeValue !== "range") return;
+    if (this.selectedValue.length !== 1) return;
+    const dateStr = event.currentTarget.dataset.date;
+    if (!dateStr) return;
+    this.hoveredDate = parseISO(dateStr);
+    this.updateRangePreview();
+  }
+  handleDayLeave() {
+    if (this.modeValue !== "range") return;
+    if (!this.hoveredDate) return;
+    this.hoveredDate = null;
+    this.updateRangePreview();
+  }
+  updateRangePreview() {
+    if (!this.hasGridTarget) return;
+    const buttons = this.element.querySelectorAll("[data-date]");
+    buttons.forEach(button => {
+      const dateStr = button.dataset.date;
+      const date = parseISO(dateStr);
+      const isInPreview = this.isInRangePreview(date);
+      const isPreviewStart = this.isRangePreviewStart(date);
+      const isPreviewEnd = this.isRangePreviewEnd(date);
+      const td = button.closest("td");
+      if (td) {
+        td.classList.toggle("bg-accent/50", isInPreview && !this.isSelected(date));
+      }
+      button.classList.toggle("bg-accent/50", isInPreview && !this.isSelected(date));
+      if (isPreviewStart && !isPreviewEnd) {
+        button.classList.add("rounded-l-md", "rounded-r-none");
+      } else if (isPreviewEnd && !isPreviewStart) {
+        button.classList.add("rounded-r-md", "rounded-l-none");
+      } else if (!isInPreview) {
+        if (!this.isRangeStart(date) && !this.isRangeEnd(date)) {
+          button.classList.remove("rounded-l-md", "rounded-r-md", "rounded-l-none", "rounded-r-none");
+          button.classList.add("rounded-md");
+        }
+      }
+    });
+  }
+  isInRangePreview(date) {
+    if (this.modeValue !== "range") return false;
+    if (this.selectedValue.length !== 1) return false;
+    if (!this.hoveredDate) return false;
+    const start = parseISO(this.selectedValue[0]);
+    const end = this.hoveredDate;
+    const [rangeStart, rangeEnd] = isBefore(end, start) ? [ end, start ] : [ start, end ];
+    return isWithinInterval(date, {
+      start: rangeStart,
+      end: rangeEnd
+    });
+  }
+  isRangePreviewStart(date) {
+    if (!this.isInRangePreview(date)) return false;
+    const start = parseISO(this.selectedValue[0]);
+    const end = this.hoveredDate;
+    const actualStart = isBefore(end, start) ? end : start;
+    return isSameDay(date, actualStart);
+  }
+  isRangePreviewEnd(date) {
+    if (!this.isInRangePreview(date)) return false;
+    const start = parseISO(this.selectedValue[0]);
+    const end = this.hoveredDate;
+    const actualEnd = isBefore(end, start) ? start : end;
+    return isSameDay(date, actualEnd);
   }
   render() {
     this.renderMonthLabels();
@@ -8032,29 +8277,93 @@ class CalendarController extends Controller {
     if (this.hasMonthLabelTarget) {
       this.monthLabelTargets.forEach((label, index) => {
         const monthDate = addMonths(this.currentMonth, index);
-        label.textContent = format(monthDate, "MMMM yyyy");
+        label.textContent = this.monthFormatter.format(monthDate);
       });
     }
+  }
+  renderWeekdayHeaders() {
+    if (!this.hasWeekdaysHeaderTarget) return;
+    this.weekdaysHeaderTargets.forEach(header => {
+      const weekdays = this.getLocalizedWeekdays();
+      header.innerHTML = weekdays.map(day => `<th scope="col" class="text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]" aria-label="${day.full}">${day.short}</th>`).join("");
+    });
+  }
+  getLocalizedWeekdays() {
+    const weekdays = [];
+    const baseSunday = new Date(1970, 0, 4);
+    for (let i = 0; i < 7; i++) {
+      const dayIndex = (i + this.weekStartsOnValue) % 7;
+      const date = new Date(baseSunday);
+      date.setDate(baseSunday.getDate() + dayIndex);
+      weekdays.push({
+        short: this.weekdayFormatter.format(date).slice(0, 2),
+        full: this.weekdayFullFormatter.format(date)
+      });
+    }
+    return weekdays;
+  }
+  getLocalizedMonthNames() {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(2024, i, 1);
+      months.push({
+        value: i,
+        name: this.monthNameFormatter.format(date)
+      });
+    }
+    return months;
   }
   renderDropdowns() {
     if (this.hasMonthSelectTarget) {
       this.monthSelectTargets.forEach((select, index) => {
         const monthDate = addMonths(this.currentMonth, index);
-        select.value = getMonth(monthDate);
+        const value = getMonth(monthDate).toString();
+        this.updateSelectValue(select, value);
       });
     }
     if (this.hasYearSelectTarget) {
       this.yearSelectTargets.forEach((select, index) => {
         const monthDate = addMonths(this.currentMonth, index);
-        select.value = getYear(monthDate);
+        const value = getYear(monthDate).toString();
+        this.updateSelectValue(select, value);
       });
+    }
+  }
+  updateSelectValue(element, value) {
+    if (element.tagName === "SELECT") {
+      element.value = value;
+      return;
+    }
+    element.value = value;
+    const selectElement = element.closest("[data-controller='ui--select']");
+    if (selectElement) {
+      selectElement.dataset.uiSelectValueValue = value;
     }
   }
   renderGrids() {
     if (!this.hasGridTarget) return;
+    if (this.animationDirection) {
+      this.animateMonthTransition();
+    }
     this.gridTargets.forEach((grid, index) => {
       const monthDate = addMonths(this.currentMonth, index);
       this.renderGrid(grid, monthDate);
+    });
+  }
+  animateMonthTransition() {
+    this.gridTargets.forEach(grid => {
+      grid.style.opacity = "0";
+      grid.style.transform = this.animationDirection === "next" ? "translateX(10px)" : "translateX(-10px)";
+      requestAnimationFrame(() => {
+        grid.style.transition = "opacity 150ms ease-out, transform 150ms ease-out";
+        grid.style.opacity = "1";
+        grid.style.transform = "translateX(0)";
+      });
+      setTimeout(() => {
+        grid.style.transition = "";
+        grid.style.transform = "";
+        this.animationDirection = null;
+      }, 160);
     });
   }
   renderGrid(gridElement, monthDate) {
@@ -8110,7 +8419,31 @@ class CalendarController extends Controller {
     if (!isCurrentMonth && !this.showOutsideDaysValue) {
       return `<td class="relative p-0 text-center text-sm h-9 w-9"></td>`;
     }
-    return `\n      <td class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20 ${this.getTdClasses(isSelected, isCurrentMonth, isRangeMiddle)}">\n        <button\n          type="button"\n          data-date="${dateStr}"\n          data-action="click->ui--calendar#selectDate"\n          ${isDisabledDate ? "disabled" : ""}\n          aria-selected="${isSelected}"\n          class="${classes}"\n          tabindex="${isSelected || isTodayDate ? 0 : -1}"\n        >${date.getDate()}</button>\n      </td>\n    `;
+    let actions = "click->ui--calendar#selectDate focus->ui--calendar#handleDayFocus blur->ui--calendar#handleDayBlur";
+    if (this.modeValue === "range") {
+      actions += " mouseenter->ui--calendar#handleDayHover mouseleave->ui--calendar#handleDayLeave";
+    }
+    return `\n      <td class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20 ${this.getTdClasses(isSelected, isCurrentMonth, isRangeMiddle)}">\n        <button\n          type="button"\n          data-date="${dateStr}"\n          data-action="${actions}"\n          ${isDisabledDate ? "disabled" : ""}\n          aria-selected="${isSelected}"\n          class="${classes}"\n          tabindex="${isSelected || isTodayDate ? 0 : -1}"\n        >${date.getDate()}</button>\n      </td>\n    `;
+  }
+  handleDayFocus(event) {
+    const dateStr = event.currentTarget.dataset.date;
+    if (!dateStr) return;
+    this.dispatch("dayFocus", {
+      detail: {
+        date: dateStr,
+        element: event.currentTarget
+      }
+    });
+  }
+  handleDayBlur(event) {
+    const dateStr = event.currentTarget.dataset.date;
+    if (!dateStr) return;
+    this.dispatch("dayBlur", {
+      detail: {
+        date: dateStr,
+        element: event.currentTarget
+      }
+    });
   }
   getTdClasses(isSelected, isCurrentMonth, isRangeMiddle) {
     const classes = [];
@@ -8176,13 +8509,35 @@ class CalendarController extends Controller {
     }
   }
   handleKeydown(event) {
+    const focusedElement = document.activeElement;
+    const isFocusOnDayButton = focusedElement?.hasAttribute("data-date");
+    if ((event.key === "Enter" || event.key === " ") && !isFocusOnDayButton) {
+      return;
+    }
+    if (event.shiftKey) {
+      const shiftActions = {
+        ArrowLeft: () => this.navigateAndFocus("previousMonth"),
+        ArrowRight: () => this.navigateAndFocus("nextMonth"),
+        ArrowUp: () => this.navigateAndFocus("previousYear"),
+        ArrowDown: () => this.navigateAndFocus("nextYear"),
+        PageUp: () => this.navigateAndFocus("previousYear"),
+        PageDown: () => this.navigateAndFocus("nextYear")
+      };
+      if (shiftActions[event.key]) {
+        event.preventDefault();
+        shiftActions[event.key]();
+        return;
+      }
+    }
     const actions = {
       ArrowLeft: () => this.moveFocus(-1),
       ArrowRight: () => this.moveFocus(1),
       ArrowUp: () => this.moveFocus(-7),
       ArrowDown: () => this.moveFocus(7),
-      PageUp: () => this.previousMonth(),
-      PageDown: () => this.nextMonth(),
+      PageUp: () => this.navigateAndFocus("previousMonth"),
+      PageDown: () => this.navigateAndFocus("nextMonth"),
+      Home: () => this.moveToStartOfWeek(),
+      End: () => this.moveToEndOfWeek(),
       Enter: () => this.selectFocusedDate(),
       " ": () => this.selectFocusedDate()
     };
@@ -8228,6 +8583,92 @@ class CalendarController extends Controller {
         const target = this.element.querySelector(`[data-date="${this.focusedDate}"]`);
         target?.focus();
       });
+    }
+  }
+  navigateAndFocus(direction) {
+    const focused = this.element.querySelector("[data-date]:focus");
+    let currentDateStr = focused?.dataset.date || this.focusedDate;
+    if (!currentDateStr) {
+      this[direction]();
+      return;
+    }
+    const currentDate = parseISO(currentDateStr);
+    let newDate;
+    switch (direction) {
+     case "previousMonth":
+      newDate = subMonths(currentDate);
+      break;
+
+     case "nextMonth":
+      newDate = addMonths(currentDate, 1);
+      break;
+
+     case "previousYear":
+      newDate = subYears(currentDate);
+      break;
+
+     case "nextYear":
+      newDate = addYears(currentDate, 1);
+      break;
+    }
+    const newDateStr = format(newDate, "yyyy-MM-dd");
+    this.focusedDate = newDateStr;
+    this.currentMonth = startOfMonth(newDate);
+    this.render();
+    this.announceMonthChange();
+    requestAnimationFrame(() => {
+      const target = this.element.querySelector(`[data-date="${newDateStr}"]`);
+      target?.focus();
+    });
+  }
+  moveToStartOfWeek() {
+    const focused = this.element.querySelector("[data-date]:focus");
+    let currentDateStr = focused?.dataset.date || this.focusedDate;
+    if (!currentDateStr) {
+      const firstButton = this.element.querySelector("[data-date]");
+      if (!firstButton) return;
+      currentDateStr = firstButton.dataset.date;
+    }
+    const currentDate = parseISO(currentDateStr);
+    const weekStart = startOfWeek(currentDate, {
+      weekStartsOn: this.weekStartsOnValue
+    });
+    const weekStartStr = format(weekStart, "yyyy-MM-dd");
+    this.focusedDate = weekStartStr;
+    let target = this.element.querySelector(`[data-date="${weekStartStr}"]`);
+    if (!target) {
+      this.previousMonth();
+      requestAnimationFrame(() => {
+        target = this.element.querySelector(`[data-date="${weekStartStr}"]`);
+        target?.focus();
+      });
+    } else {
+      target.focus();
+    }
+  }
+  moveToEndOfWeek() {
+    const focused = this.element.querySelector("[data-date]:focus");
+    let currentDateStr = focused?.dataset.date || this.focusedDate;
+    if (!currentDateStr) {
+      const firstButton = this.element.querySelector("[data-date]");
+      if (!firstButton) return;
+      currentDateStr = firstButton.dataset.date;
+    }
+    const currentDate = parseISO(currentDateStr);
+    const weekEnd = endOfWeek(currentDate, {
+      weekStartsOn: this.weekStartsOnValue
+    });
+    const weekEndStr = format(weekEnd, "yyyy-MM-dd");
+    this.focusedDate = weekEndStr;
+    let target = this.element.querySelector(`[data-date="${weekEndStr}"]`);
+    if (!target) {
+      this.nextMonth();
+      requestAnimationFrame(() => {
+        target = this.element.querySelector(`[data-date="${weekEndStr}"]`);
+        target?.focus();
+      });
+    } else {
+      target.focus();
     }
   }
 }

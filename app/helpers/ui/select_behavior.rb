@@ -7,12 +7,19 @@
 module UI::SelectBehavior
   # Returns HTML attributes for the select element
     def select_html_attributes
+      data_attrs = {
+        controller: "ui--select",
+        ui__select_open_value: "false"
+      }
+
+      # Add value if provided
+      if @value.present?
+        data_attrs[:ui__select_value_value] = @value.to_s
+      end
+
       attrs = {
         class: select_classes,
-        data: {
-          controller: "ui--select",
-          ui__select_open_value: "false"
-        }
+        data: data_attrs
       }
 
       # Add data-placeholder attribute if there's a placeholder and no selected value
@@ -38,8 +45,9 @@ module UI::SelectBehavior
     # Base classes applied to all selects
     # The select container is just a wrapper for Stimulus controller
     # All visual styling is on the trigger button
+    # h-fit prevents wrapper from expanding to include absolutely positioned content
     def select_base_classes
-      "relative"
+      "relative h-fit"
     end
 
     # Size-specific classes based on @size

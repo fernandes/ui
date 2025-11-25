@@ -7,6 +7,7 @@
   @param month [Date] initially displayed month (default: Date.today)
   @param number_of_months [Integer] number of months to display side by side (default: 1)
   @param week_starts_on [Integer] 0 for Sunday, 1 for Monday, etc. (default: 0)
+  @param locale [String] BCP 47 locale tag for formatting (default: "en-US")
   @param min_date [Date] minimum selectable date
   @param max_date [Date] maximum selectable date
   @param disabled_dates [Array<Date>] dates that cannot be selected (default: [])
@@ -14,6 +15,10 @@
   @param fixed_weeks [Boolean] always show 6 weeks (default: false)
   @param show_dropdowns [Boolean] show month/year dropdowns (default: false)
   @param year_range [Integer] number of years to show in dropdown (default: 100)
+  @param min_range_days [Integer] minimum days for range selection (default: 0 = no min)
+  @param max_range_days [Integer] maximum days for range selection (default: 0 = no max)
+  @param exclude_disabled [Boolean] prevent ranges that contain disabled dates (default: false)
+  @param use_native_select [Boolean] use native HTML select for dropdowns (default: true)
   @param name [String] form field name for hidden input
   @param classes [String] additional CSS classes
   @param attributes [Hash] additional HTML attributes
@@ -21,6 +26,8 @@
   Basic usage: render "ui/calendar/calendar", selected: Date.today
   Range selection: render "ui/calendar/calendar", mode: "range", selected: Date.today..Date.today + 7
   Multiple months: render "ui/calendar/calendar", number_of_months: 2
+  Localized: render "ui/calendar/calendar", locale: "pt-BR"
+  With UI Select: render "ui/calendar/calendar", show_dropdowns: true, use_native_select: false
 %>
 <%
   @mode = local_assigns.fetch(:mode, :single)
@@ -28,6 +35,7 @@
   @month = local_assigns.fetch(:month, Date.today)
   @number_of_months = local_assigns.fetch(:number_of_months, 1)
   @week_starts_on = local_assigns.fetch(:week_starts_on, 0)
+  @locale = local_assigns.fetch(:locale, "en-US")
   @min_date = local_assigns.fetch(:min_date, nil)
   @max_date = local_assigns.fetch(:max_date, nil)
   @disabled_dates = local_assigns.fetch(:disabled_dates, [])
@@ -35,6 +43,10 @@
   @fixed_weeks = local_assigns.fetch(:fixed_weeks, false)
   @show_dropdowns = local_assigns.fetch(:show_dropdowns, false)
   @year_range = local_assigns.fetch(:year_range, 100)
+  @min_range_days = local_assigns.fetch(:min_range_days, 0)
+  @max_range_days = local_assigns.fetch(:max_range_days, 0)
+  @exclude_disabled = local_assigns.fetch(:exclude_disabled, false)
+  @use_native_select = local_assigns.key?(:use_native_select) ? local_assigns[:use_native_select] : true
   @name = local_assigns.fetch(:name, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
@@ -49,6 +61,9 @@
   nav_button_classes = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
 -%>
 <%= content_tag :div, all_attributes do %>
+  <%# Screen reader live region for announcements %>
+  <div class="sr-only" aria-live="polite" aria-atomic="true" data-ui--calendar-target="liveRegion"></div>
+
   <% if @name %>
     <%= hidden_field_tag @name, selected_value, data: { ui__calendar_target: "input" } %>
   <% end %>
@@ -68,28 +83,62 @@
         </button>
 
         <% if @show_dropdowns %>
-          <div class="flex items-center gap-1">
-            <select
-              data-ui--calendar-target="monthSelect"
-              data-action="change->ui--calendar#goToMonth"
-              class="text-sm font-medium h-7 px-2 rounded-md border border-input bg-background"
-            >
-              <% Date::MONTHNAMES.compact.each_with_index do |m_name, idx| %>
-                <option value="<%= idx %>"><%= m_name %></option>
+          <% if use_native_select? %>
+            <%# Native HTML selects %>
+            <div class="flex items-center gap-1">
+              <select
+                data-ui--calendar-target="monthSelect"
+                data-action="change->ui--calendar#goToMonth"
+                class="text-sm font-medium h-7 px-2 rounded-md border border-input bg-background"
+              >
+                <% Date::MONTHNAMES.compact.each_with_index do |m_name, idx| %>
+                  <option value="<%= idx %>" <%= 'selected' if idx == @month.month - 1 %>><%= m_name %></option>
+                <% end %>
+              </select>
+              <select
+                data-ui--calendar-target="yearSelect"
+                data-action="change->ui--calendar#goToYear"
+                class="text-sm font-medium h-7 px-2 rounded-md border border-input bg-background"
+              >
+                <% current_year = Date.today.year %>
+                <% ((current_year - @year_range)..(current_year + 10)).each do |y| %>
+                  <option value="<%= y %>" <%= 'selected' if y == @month.year %>><%= y %></option>
+                <% end %>
+              </select>
+            </div>
+          <% else %>
+            <%# UI Select components %>
+            <div class="flex items-center gap-1 px-8 flex-1">
+              <%= render "ui/select/select", classes: "flex-1", value: (@month.month - 1).to_s do %>
+                <%= render "ui/select/select_trigger", classes: "h-9 w-full gap-1 px-2 text-sm font-medium border-0 shadow-none" %>
+                <%= render "ui/select/select_content", classes: "min-w-[8rem]" do %>
+                  <% Date::MONTHNAMES.compact.each_with_index do |m_name, idx| %>
+                    <%= render "ui/select/select_item", value: idx.to_s do %><%= m_name %><% end %>
+                  <% end %>
+                <% end %>
+                <input type="hidden"
+                       data-ui--select-target="hiddenInput"
+                       data-ui--calendar-target="monthSelect"
+                       data-action="change->ui--calendar#goToMonth"
+                       value="<%= @month.month - 1 %>">
               <% end %>
-            </select>
 
-            <select
-              data-ui--calendar-target="yearSelect"
-              data-action="change->ui--calendar#goToYear"
-              class="text-sm font-medium h-7 px-2 rounded-md border border-input bg-background"
-            >
-              <% current_year = Date.today.year %>
-              <% ((current_year - @year_range)..(current_year + 10)).each do |y| %>
-                <option value="<%= y %>"><%= y %></option>
+              <%= render "ui/select/select", value: @month.year.to_s do %>
+                <%= render "ui/select/select_trigger", classes: "min-w-[75px] h-9 w-auto gap-1 px-2 text-sm font-medium border-0 shadow-none" %>
+                <%= render "ui/select/select_content", classes: "min-w-[5rem] max-h-[200px]" do %>
+                  <% current_year = Date.today.year %>
+                  <% ((current_year - @year_range)..(current_year + 10)).each do |y| %>
+                    <%= render "ui/select/select_item", value: y.to_s do %><%= y %><% end %>
+                  <% end %>
+                <% end %>
+                <input type="hidden"
+                       data-ui--select-target="hiddenInput"
+                       data-ui--calendar-target="yearSelect"
+                       data-action="change->ui--calendar#goToYear"
+                       value="<%= @month.year %>">
               <% end %>
-            </select>
-          </div>
+            </div>
+          <% end %>
         <% else %>
           <div class="text-sm font-medium" data-ui--calendar-target="monthLabel"></div>
         <% end %>
@@ -106,15 +155,16 @@
         </button>
       </div>
 
-      <table class="w-full border-collapse space-y-1">
+      <table class="w-full border-collapse space-y-1" role="grid">
         <thead>
-          <tr class="flex">
+          <tr class="flex" data-ui--calendar-target="weekdaysHeader">
+            <%# Weekday headers rendered by JavaScript for localization %>
             <% ordered_weekdays.each do |day| %>
               <th scope="col" class="text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]"><%= day %></th>
             <% end %>
           </tr>
         </thead>
-        <tbody data-ui--calendar-target="grid">
+        <tbody data-ui--calendar-target="grid" role="rowgroup">
         </tbody>
       </table>
     </div>

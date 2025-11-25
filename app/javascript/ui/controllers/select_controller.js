@@ -33,6 +33,11 @@ export default class extends Controller {
       this.updateSelection(this.valueValue)
     }
 
+    // Sync hidden input with initial value
+    if (this.hasHiddenInputTarget && this.valueValue) {
+      this.hiddenInputTarget.value = this.valueValue
+    }
+
     // Hide content initially using invisible pattern (not display:none)
     this.contentTarget.dataset.state = "closed"
 
@@ -45,6 +50,18 @@ export default class extends Controller {
       // Listen to scroll event (works for both mouse wheel and touch scroll)
       // Adding both via addEventListener AND data-action for maximum compatibility
       this.viewportTarget.addEventListener("scroll", this.boundHandleScroll, { passive: true })
+    }
+  }
+
+  // Callback when value changes externally (e.g., from another controller)
+  valueValueChanged(value, previousValue) {
+    if (previousValue === undefined) return // Skip initial connect
+
+    this.updateDisplay(value)
+    this.updateSelection(value)
+
+    if (this.hasHiddenInputTarget) {
+      this.hiddenInputTarget.value = value
     }
   }
 

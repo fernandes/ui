@@ -9,21 +9,37 @@ module UI
 
       # Generate Stimulus controller data attributes
       def calendar_data_attributes
-        {
+        attrs = {
           controller: "ui--calendar",
           ui__calendar_mode_value: @mode.to_s,
           ui__calendar_selected_value: selected_json,
           ui__calendar_month_value: @month.to_s,
           ui__calendar_number_of_months_value: @number_of_months,
           ui__calendar_week_starts_on_value: @week_starts_on,
+          ui__calendar_locale_value: @locale,
           ui__calendar_min_date_value: @min_date&.to_s,
           ui__calendar_max_date_value: @max_date&.to_s,
           ui__calendar_disabled_value: disabled_dates_json,
           ui__calendar_show_outside_days_value: @show_outside_days,
           ui__calendar_fixed_weeks_value: @fixed_weeks,
           ui__calendar_year_range_value: @year_range,
+          # Range constraints
+          ui__calendar_min_range_days_value: @min_range_days,
+          ui__calendar_max_range_days_value: @max_range_days,
+          ui__calendar_exclude_disabled_value: @exclude_disabled,
           action: "keydown->ui--calendar#handleKeydown"
-        }.compact
+        }
+
+        # Add UI Select controller if using custom select
+        if @show_dropdowns && !use_native_select?
+          attrs[:controller] = "ui--calendar ui--select-calendar-sync"
+        end
+
+        attrs.compact
+      end
+
+      def use_native_select?
+        @use_native_select.nil? ? true : @use_native_select
       end
 
       # Build complete HTML attributes hash for calendar container
@@ -32,8 +48,24 @@ module UI
         user_data = @attributes&.fetch(:data, {}) || {}
         base_attrs.merge(
           class: calendar_classes,
+          role: "application",
+          aria: {
+            label: aria_label_text
+          },
           data: user_data.merge(calendar_data_attributes)
         )
+      end
+
+      # Generate aria-label based on mode
+      def aria_label_text
+        case @mode.to_s
+        when "range"
+          "Date range picker"
+        when "multiple"
+          "Multiple date picker"
+        else
+          "Date picker"
+        end
       end
 
       # Default calendar classes

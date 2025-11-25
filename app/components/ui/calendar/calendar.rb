@@ -24,6 +24,7 @@ module UI
       # @param month [Date] initially displayed month
       # @param number_of_months [Integer] number of months to display side by side
       # @param week_starts_on [Integer] 0 for Sunday, 1 for Monday, etc.
+      # @param locale [String] BCP 47 locale tag for formatting (default: "en-US")
       # @param min_date [Date] minimum selectable date
       # @param max_date [Date] maximum selectable date
       # @param disabled_dates [Array<Date>] dates that cannot be selected
@@ -31,6 +32,10 @@ module UI
       # @param fixed_weeks [Boolean] always show 6 weeks
       # @param show_dropdowns [Boolean] show month/year dropdowns
       # @param year_range [Integer] number of years to show in dropdown
+      # @param min_range_days [Integer] minimum days for range selection (0 = no min)
+      # @param max_range_days [Integer] maximum days for range selection (0 = no max)
+      # @param exclude_disabled [Boolean] prevent ranges that contain disabled dates
+      # @param use_native_select [Boolean] use native HTML select for dropdowns (default: true)
       # @param name [String] form field name for hidden input
       # @param classes [String] additional CSS classes
       # @param attributes [Hash] additional HTML attributes
@@ -40,6 +45,7 @@ module UI
         month: Date.today,
         number_of_months: 1,
         week_starts_on: 0,
+        locale: "en-US",
         min_date: nil,
         max_date: nil,
         disabled_dates: [],
@@ -47,6 +53,10 @@ module UI
         fixed_weeks: false,
         show_dropdowns: false,
         year_range: 100,
+        min_range_days: 0,
+        max_range_days: 0,
+        exclude_disabled: false,
+        use_native_select: true,
         name: nil,
         classes: "",
         attributes: {},
@@ -57,6 +67,7 @@ module UI
         @month = month
         @number_of_months = number_of_months
         @week_starts_on = week_starts_on
+        @locale = locale
         @min_date = min_date
         @max_date = max_date
         @disabled_dates = disabled_dates
@@ -64,6 +75,10 @@ module UI
         @fixed_weeks = fixed_weeks
         @show_dropdowns = show_dropdowns
         @year_range = year_range
+        @min_range_days = min_range_days
+        @max_range_days = max_range_days
+        @exclude_disabled = exclude_disabled
+        @use_native_select = use_native_select
         @name = name
         @classes = classes
         @attributes = attributes
@@ -72,6 +87,9 @@ module UI
 
       def view_template
         div(**calendar_html_attributes) do
+          # Screen reader live region for announcements
+          div(class: "sr-only", aria_live: "polite", aria_atomic: "true", data: { ui__calendar_target: "liveRegion" })
+
           # Hidden input for form submission
           if @name
             input(type: "hidden", name: @name, value: selected_value, data: { ui__calendar_target: "input" })
@@ -146,14 +164,14 @@ module UI
       end
 
       def render_table
-        table(class: "w-full border-collapse space-y-1") do
+        table(class: "w-full border-collapse space-y-1", role: "grid") do
           thead { render_weekdays }
-          tbody(data: { ui__calendar_target: "grid" })
+          tbody(data: { ui__calendar_target: "grid" }, role: "rowgroup")
         end
       end
 
       def render_weekdays
-        tr(class: "flex") do
+        tr(class: "flex", data: { ui__calendar_target: "weekdaysHeader" }) do
           ordered_weekdays.each do |day|
             th(scope: "col", class: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]") { day }
           end
