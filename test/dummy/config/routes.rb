@@ -50,6 +50,7 @@ Rails.application.routes.draw do
   get "/components/slider", to: "components#slider"
   get "/components/spinner", to: "components#spinner"
   get "/components/switch", to: "components#switch"
+  get "/components/table", to: "components#table"
   get "/components/tabs", to: "components#tabs"
   get "/components/textarea", to: "components#textarea"
   get "/components/toggle", to: "components#toggle"

@@ -1,0 +1,18 @@
+<%
+  # Table Header - ERB Partial
+  #
+  # A table header (thead) with consistent styling.
+  # Uses HeaderBehavior module for shared styling logic.
+  #
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Table::HeaderBehavior
+  all_attributes = header_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :thead, all_attributes do %>
+  <%= yield %>
+<% end %>

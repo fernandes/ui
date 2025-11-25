@@ -141,6 +141,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/switch.html.erb
   end
 
+  def table
+    # Renders app/views/components/table.html.erb
+  end
+
   def tabs
     # Renders app/views/components/tabs.html.erb
   end

@@ -1,0 +1,18 @@
+<%
+  # Table Cell - ERB Partial
+  #
+  # A table data cell (td) with consistent styling.
+  # Uses CellBehavior module for shared styling logic.
+  #
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::Table::CellBehavior
+  all_attributes = cell_html_attributes.deep_merge(@attributes)
+%>
+<%= content_tag :td, all_attributes do %>
+  <%= yield %>
+<% end %>

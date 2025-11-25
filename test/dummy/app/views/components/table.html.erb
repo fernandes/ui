@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Table Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Table Component</h1>
+      <p class="text-muted-foreground">A responsive table component with semantic HTML structure.</p>
+    </header>
+
+    <!-- Basic Table - Phlex DSL -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Table (Phlex DSL)</h2>
+      <%= render UI::Table::Table.new do |t|
+        t.caption { "A list of your recent invoices." }
+        t.header do
+          t.row do
+            t.head(classes: "w-[100px]") { "Invoice" }
+            t.head { "Status" }
+            t.head { "Method" }
+            t.head(classes: "text-right") { "Amount" }
+          end
+        end
+        t.body do
+          t.row do
+            t.cell(classes: "font-medium") { "INV001" }
+            t.cell { "Paid" }
+            t.cell { "Credit Card" }
+            t.cell(classes: "text-right") { "$250.00" }
+          end
+          t.row do
+            t.cell(classes: "font-medium") { "INV002" }
+            t.cell { "Pending" }
+            t.cell { "PayPal" }
+            t.cell(classes: "text-right") { "$150.00" }
+          end
+          t.row do
+            t.cell(classes: "font-medium") { "INV003" }
+            t.cell { "Unpaid" }
+            t.cell { "Bank Transfer" }
+            t.cell(classes: "text-right") { "$350.00" }
+          end
+          t.row do
+            t.cell(classes: "font-medium") { "INV004" }
+            t.cell { "Paid" }
+            t.cell { "Credit Card" }
+            t.cell(classes: "text-right") { "$450.00" }
+          end
+          t.row do
+            t.cell(classes: "font-medium") { "INV005" }
+            t.cell { "Paid" }
+            t.cell { "PayPal" }
+            t.cell(classes: "text-right") { "$550.00" }
+          end
+        end
+        t.footer do
+          t.row do
+            t.cell(colspan: 3) { "Total" }
+            t.cell(classes: "text-right") { "$1,750.00" }
+          end
+        end
+      end %>
+    </section>
+
+    <!-- Basic Table - ViewComponent Slots -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Table (ViewComponent Slots)</h2>
+      <%= render UI::Table::TableComponent.new do |t|
+        t.caption { "A list of your recent invoices." }
+        t.header do |h|
+          h.row do |r|
+            r.head(classes: "w-[100px]") { "Invoice" }
+            r.head { "Status" }
+            r.head { "Method" }
+            r.head(classes: "text-right") { "Amount" }
+          end
+        end
+        t.body do |b|
+          b.row do |r|
+            r.cell(classes: "font-medium") { "INV001" }
+            r.cell { "Paid" }
+            r.cell { "Credit Card" }
+            r.cell(classes: "text-right") { "$250.00" }
+          end
+          b.row do |r|
+            r.cell(classes: "font-medium") { "INV002" }
+            r.cell { "Pending" }
+            r.cell { "PayPal" }
+            r.cell(classes: "text-right") { "$150.00" }
+          end
+          b.row do |r|
+            r.cell(classes: "font-medium") { "INV003" }
+            r.cell { "Unpaid" }
+            r.cell { "Bank Transfer" }
+            r.cell(classes: "text-right") { "$350.00" }
+          end
+        end
+        t.footer do |f|
+          f.row do |r|
+            r.cell(colspan: 3) { "Total" }
+            r.cell(classes: "text-right") { "$750.00" }
+          end
+        end
+      end %>
+    </section>
+
+    <!-- Basic Table - ERB Partials -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Basic Table (ERB Partials)</h2>
+      <%= render "ui/table/table" do %>
+        <%= render "ui/table/caption" do %>A list of your recent invoices.<% end %>
+        <%= render "ui/table/header" do %>
+          <%= render "ui/table/row" do %>
+            <%= render "ui/table/head", classes: "w-[100px]" do %>Invoice<% end %>
+            <%= render "ui/table/head" do %>Status<% end %>
+            <%= render "ui/table/head" do %>Method<% end %>
+            <%= render "ui/table/head", classes: "text-right" do %>Amount<% end %>
+          <% end %>
+        <% end %>
+        <%= render "ui/table/body" do %>
+          <%= render "ui/table/row" do %>
+            <%= render "ui/table/cell", classes: "font-medium" do %>INV001<% end %>
+            <%= render "ui/table/cell" do %>Paid<% end %>
+            <%= render "ui/table/cell" do %>Credit Card<% end %>
+            <%= render "ui/table/cell", classes: "text-right" do %>$250.00<% end %>
+          <% end %>
+          <%= render "ui/table/row" do %>
+            <%= render "ui/table/cell", classes: "font-medium" do %>INV002<% end %>
+            <%= render "ui/table/cell" do %>Pending<% end %>
+            <%= render "ui/table/cell" do %>PayPal<% end %>
+            <%= render "ui/table/cell", classes: "text-right" do %>$150.00<% end %>
+          <% end %>
+          <%= render "ui/table/row" do %>
+            <%= render "ui/table/cell", classes: "font-medium" do %>INV003<% end %>
+            <%= render "ui/table/cell" do %>Unpaid<% end %>
+            <%= render "ui/table/cell" do %>Bank Transfer<% end %>
+            <%= render "ui/table/cell", classes: "text-right" do %>$350.00<% end %>
+          <% end %>
+        <% end %>
+        <%= render "ui/table/footer" do %>
+          <%= render "ui/table/row" do %>
+            <%= render "ui/table/cell", attributes: { colspan: 3 } do %>Total<% end %>
+            <%= render "ui/table/cell", classes: "text-right" do %>$750.00<% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <!-- Simple Table without Footer -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Simple Table</h2>
+      <%= render UI::Table::Table.new do |t|
+        t.header do
+          t.row do
+            t.head { "Name" }
+            t.head { "Email" }
+            t.head { "Role" }
+          end
+        end
+        t.body do
+          t.row do
+            t.cell { "John Doe" }
+            t.cell { "john@example.com" }
+            t.cell { "Admin" }
+          end
+          t.row do
+            t.cell { "Jane Smith" }
+            t.cell { "jane@example.com" }
+            t.cell { "Editor" }
+          end
+          t.row do
+            t.cell { "Bob Johnson" }
+            t.cell { "bob@example.com" }
+            t.cell { "Viewer" }
+          end
+        end
+      end %>
+    </section>
+
+    <!-- Table with Hover State -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Table with Hover Effect</h2>
+      <p class="text-sm text-muted-foreground">Hover over rows to see the hover effect (hover:bg-muted/50).</p>
+      <%= render UI::Table::Table.new do |t|
+        t.header do
+          t.row do
+            t.head { "Product" }
+            t.head { "Category" }
+            t.head(classes: "text-right") { "Price" }
+          end
+        end
+        t.body do
+          t.row do
+            t.cell { "MacBook Pro" }
+            t.cell { "Electronics" }
+            t.cell(classes: "text-right") { "$2,499.00" }
+          end
+          t.row do
+            t.cell { "iPhone 15 Pro" }
+            t.cell { "Electronics" }
+            t.cell(classes: "text-right") { "$1,199.00" }
+          end
+          t.row do
+            t.cell { "AirPods Pro" }
+            t.cell { "Accessories" }
+            t.cell(classes: "text-right") { "$249.00" }
+          end
+        end
+      end %>
+    </section>
+
+    <!-- Table inside Card -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Table inside Card</h2>
+      <%= render UI::Card::Card.new do %>
+        <%= render UI::Card::Header.new do %>
+          <%= render UI::Card::Title.new { "Recent Orders" } %>
+          <%= render UI::Card::Description.new { "A list of your recent orders." } %>
+        <% end %>
+        <%= render UI::Card::Content.new do %>
+          <%= render UI::Table::Table.new do |t|
+            t.header do
+              t.row do
+                t.head { "Order ID" }
+                t.head { "Date" }
+                t.head { "Status" }
+                t.head(classes: "text-right") { "Total" }
+              end
+            end
+            t.body do
+              t.row do
+                t.cell(classes: "font-medium") { "#3210" }
+                t.cell { "Jan 20, 2024" }
+                t.cell { "Delivered" }
+                t.cell(classes: "text-right") { "$125.00" }
+              end
+              t.row do
+                t.cell(classes: "font-medium") { "#3209" }
+                t.cell { "Jan 18, 2024" }
+                t.cell { "Shipped" }
+                t.cell(classes: "text-right") { "$89.00" }
+              end
+              t.row do
+                t.cell(classes: "font-medium") { "#3208" }
+                t.cell { "Jan 15, 2024" }
+                t.cell { "Processing" }
+                t.cell(classes: "text-right") { "$245.00" }
+              end
+            end
+          end %>
+        <% end %>
+      <% end %>
+    </section>
+  </div>
+</body>
+</html>
