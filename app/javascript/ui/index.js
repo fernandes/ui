@@ -33,6 +33,7 @@ import ToggleGroupController from "./controllers/toggle_group_controller.js";
 import TabsController from "./controllers/tabs_controller.js";
 import SliderController from "./controllers/slider_controller.js";
 import SwitchController from "./controllers/switch_controller.js";
+import CarouselController from "./controllers/carousel_controller.js";
 
 // Import registration function
 import { registerControllersInto } from "./common.js";
@@ -67,7 +68,8 @@ export function registerControllers(application) {
     "ui--switch": SwitchController,
     "ui--tabs": TabsController,
     "ui--toggle": ToggleController,
-    "ui--toggle-group": ToggleGroupController
+    "ui--toggle-group": ToggleGroupController,
+    "ui--carousel": CarouselController
   });
 }
 
@@ -75,4 +77,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController, CarouselController };

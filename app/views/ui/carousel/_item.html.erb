@@ -1,0 +1,14 @@
+<%
+  # Carousel Item - ERB Partial
+  # Individual carousel slide
+
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
+
+  extend UI::Carousel::CarouselItemBehavior
+  all_attributes = carousel_item_html_attributes
+%>
+<%= content_tag :div, all_attributes do %>
+  <%= content_param || yield %>
+<% end %>
