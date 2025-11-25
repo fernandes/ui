@@ -1,0 +1,6 @@
+[test]
+# Preload setup file from dummy app
+preload = ["./test/dummy/test/javascript/setup.js"]
+
+# Test file patterns - look in dummy app test directory
+root = "./test/dummy/test/javascript"

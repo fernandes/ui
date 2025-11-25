@@ -37,6 +37,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/button_group.html.erb
   end
 
+  def calendar
+    # Renders app/views/components/calendar.html.erb
+  end
+
   def carousel
     # Renders app/views/components/carousel.html.erb
   end

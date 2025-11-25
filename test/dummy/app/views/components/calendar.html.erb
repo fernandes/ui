@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calendar Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-6xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Calendar Component</h1>
+      <p class="text-muted-foreground">A date picker calendar built with date-fns and Stimulus</p>
+    </header>
+
+    <!-- Basic Calendar (Phlex) -->
+    <section class="space-y-6">
+      <div>
+        <h2 class="text-2xl font-semibold">Basic Calendar</h2>
+        <p class="text-muted-foreground text-sm">Single date selection (default mode)</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Pre-selected Date -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">With Selected Date</h2>
+        <p class="text-muted-foreground text-sm">Calendar with a pre-selected date</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(selected: Date.today) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(selected: Date.today) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Date Range Selection -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">Date Range</h2>
+        <p class="text-muted-foreground text-sm">Select a start and end date</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(
+            mode: :range,
+            selected: Date.today..(Date.today + 7)
+          ) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+  mode: :range,
+  selected: Date.today..(Date.today + 7)
+) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Multiple Months -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">Multiple Months</h2>
+        <p class="text-muted-foreground text-sm">Display 2 months side by side</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(number_of_months: 2) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(number_of_months: 2) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Dropdowns -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">With Dropdowns</h2>
+        <p class="text-muted-foreground text-sm">Month/Year dropdown navigation</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(show_dropdowns: true) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(show_dropdowns: true) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Date of Birth -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">Date of Birth</h2>
+        <p class="text-muted-foreground text-sm">With year dropdown going back 100 years</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(
+            show_dropdowns: true,
+            month: Date.new(1990, 1, 1),
+            min_date: Date.today - 100.years,
+            max_date: Date.today
+          ) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+  show_dropdowns: true,
+  month: Date.new(1990, 1, 1),
+  min_date: Date.today - 100.years,
+  max_date: Date.today
+) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Min/Max Dates -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">With Min/Max Dates</h2>
+        <p class="text-muted-foreground text-sm">Restricted date range (next 30 days only)</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(
+            min_date: Date.today,
+            max_date: Date.today + 30.days
+          ) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+  min_date: Date.today,
+  max_date: Date.today + 30.days
+) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week Starts Monday -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">Week Starts Monday</h2>
+        <p class="text-muted-foreground text-sm">European-style calendar starting on Monday</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::Calendar.new(week_starts_on: 1) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(week_starts_on: 1) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- With Form -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">Form Integration</h2>
+        <p class="text-muted-foreground text-sm">Hidden input for form submission</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <%= form_with url: "#", method: :get, class: "space-y-4" do |f| %>
+          <div class="rounded-md border">
+            <%= render UI::Calendar::Calendar.new(name: "booking_date", selected: Date.today) %>
+          </div>
+          <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+            Submit Form
+          </button>
+        <% end %>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+  name: "booking_date",
+  selected: Date.today
+) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ERB Partial -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">ERB Partial</h2>
+        <p class="text-muted-foreground text-sm">Using the ERB partial directly</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render "ui/calendar/calendar" %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar/calendar" %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ERB Partial with Options -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">ERB with Options</h2>
+        <p class="text-muted-foreground text-sm">ERB partial with dropdowns and selected date</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render "ui/calendar/calendar", show_dropdowns: true, selected: Date.today %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar/calendar", show_dropdowns: true, selected: Date.today %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ViewComponent Implementation -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">ViewComponent</h2>
+        <p class="text-muted-foreground text-sm">Using the ViewComponent class</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::CalendarComponent.new %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::CalendarComponent.new %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ViewComponent with options -->
+    <section class="space-y-6 border-t pt-8">
+      <div>
+        <h2 class="text-2xl font-semibold">ViewComponent with Options</h2>
+        <p class="text-muted-foreground text-sm">ViewComponent with dropdowns enabled</p>
+      </div>
+
+      <div class="flex flex-wrap gap-8">
+        <div class="rounded-md border">
+          <%= render UI::Calendar::CalendarComponent.new(show_dropdowns: true) %>
+        </div>
+
+        <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::CalendarComponent.new(show_dropdowns: true) %&gt;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuration Reference -->
+    <section class="space-y-6 border-t pt-8">
+      <h2 class="text-2xl font-semibold">Configuration</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left p-2 font-medium">Option</th>
+              <th class="text-left p-2 font-medium">Type</th>
+              <th class="text-left p-2 font-medium">Default</th>
+              <th class="text-left p-2 font-medium">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">mode</td>
+              <td class="p-2">Symbol/String</td>
+              <td class="p-2 font-mono text-xs">:single</td>
+              <td class="p-2">Selection mode: :single, :range, or :multiple</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">selected</td>
+              <td class="p-2">Date/Range/Array</td>
+              <td class="p-2 font-mono text-xs">nil</td>
+              <td class="p-2">Initially selected date(s)</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">month</td>
+              <td class="p-2">Date</td>
+              <td class="p-2 font-mono text-xs">Date.today</td>
+              <td class="p-2">Initially displayed month</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">number_of_months</td>
+              <td class="p-2">Integer</td>
+              <td class="p-2 font-mono text-xs">1</td>
+              <td class="p-2">Number of months to display side by side</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">week_starts_on</td>
+              <td class="p-2">Integer</td>
+              <td class="p-2 font-mono text-xs">0</td>
+              <td class="p-2">First day of week (0=Sunday, 1=Monday, etc.)</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">min_date</td>
+              <td class="p-2">Date</td>
+              <td class="p-2 font-mono text-xs">nil</td>
+              <td class="p-2">Minimum selectable date</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">max_date</td>
+              <td class="p-2">Date</td>
+              <td class="p-2 font-mono text-xs">nil</td>
+              <td class="p-2">Maximum selectable date</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">disabled_dates</td>
+              <td class="p-2">Array&lt;Date&gt;</td>
+              <td class="p-2 font-mono text-xs">[]</td>
+              <td class="p-2">Dates that cannot be selected</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">show_outside_days</td>
+              <td class="p-2">Boolean</td>
+              <td class="p-2 font-mono text-xs">true</td>
+              <td class="p-2">Show days from adjacent months</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">fixed_weeks</td>
+              <td class="p-2">Boolean</td>
+              <td class="p-2 font-mono text-xs">false</td>
+              <td class="p-2">Always show 6 weeks</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">show_dropdowns</td>
+              <td class="p-2">Boolean</td>
+              <td class="p-2 font-mono text-xs">false</td>
+              <td class="p-2">Show month/year dropdown selectors</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">year_range</td>
+              <td class="p-2">Integer</td>
+              <td class="p-2 font-mono text-xs">100</td>
+              <td class="p-2">Number of years to show in dropdown</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">name</td>
+              <td class="p-2">String</td>
+              <td class="p-2 font-mono text-xs">nil</td>
+              <td class="p-2">Form field name for hidden input</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- JavaScript Events -->
+    <section class="space-y-6 border-t pt-8">
+      <h2 class="text-2xl font-semibold">JavaScript Events</h2>
+      <p class="text-muted-foreground text-sm">The calendar dispatches events when dates are selected</p>
+
+      <div class="rounded-md bg-muted p-4">
+        <p class="text-sm font-mono whitespace-pre-wrap">// Listen for date selection
+document.addEventListener("ui--calendar:select", (event) => {
+  console.log("Selected dates:", event.detail.selected)
+  console.log("Clicked date:", event.detail.date)
+})</p>
+      </div>
+    </section>
+
+    <!-- Keyboard Navigation -->
+    <section class="space-y-6 border-t pt-8">
+      <h2 class="text-2xl font-semibold">Keyboard Navigation</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left p-2 font-medium">Key</th>
+              <th class="text-left p-2 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Arrow Left</td>
+              <td class="p-2">Move to previous day</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Arrow Right</td>
+              <td class="p-2">Move to next day</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Arrow Up</td>
+              <td class="p-2">Move to same day previous week</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Arrow Down</td>
+              <td class="p-2">Move to same day next week</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Page Up</td>
+              <td class="p-2">Go to previous month</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Page Down</td>
+              <td class="p-2">Go to next month</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">Enter / Space</td>
+              <td class="p-2">Select focused date</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
