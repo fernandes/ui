@@ -117,6 +117,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/separator.html.erb
   end
 
+  def sheet
+    # Renders app/views/components/sheet.html.erb
+  end
+
   def slider
     # Renders app/views/components/slider.html.erb
   end

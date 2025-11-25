@@ -1,0 +1,19 @@
+<%# Sheet Overlay Component - Container and backdrop %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @open = local_assigns.fetch(:open, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Sheet::SheetOverlayBehavior
+
+  # Get HTML attributes from behavior
+  container_attrs = sheet_overlay_container_html_attributes.deep_merge(@attributes.except(:data))
+  container_attrs[:data] = sheet_overlay_container_html_attributes[:data].merge(@attributes.fetch(:data, {}))
+  overlay_attrs = sheet_overlay_html_attributes
+-%>
+<%= content_tag :div, **container_attrs do %>
+  <%= content_tag :div, "", **overlay_attrs %>
+  <%= content || yield %>
+<% end %>

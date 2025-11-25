@@ -1,0 +1,24 @@
+<%# Sheet Close Component - Closes sheet on click %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @as_child = local_assigns.fetch(:as_child, false)
+  @variant = local_assigns.fetch(:variant, :outline)
+  @size = local_assigns.fetch(:size, :default)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Build close attributes
+  close_attrs = {
+    data: { action: "click->ui--dialog#close" }
+  }.deep_merge(@attributes)
+-%>
+<% if @as_child %>
+  <%# asChild pattern: yield attributes to block %>
+  <%= yield(close_attrs) if block_given? %>
+  <%= content&.call(close_attrs) %>
+<% else %>
+  <%# Default: render as Button component %>
+  <%= render "ui/button/button", variant: @variant, size: @size, classes: @classes, attributes: close_attrs do %>
+    <%= content || yield %>
+  <% end %>
+<% end %>

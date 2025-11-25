@@ -14,15 +14,18 @@ export default class extends Controller {
     if (this.openValue) {
       this.show()
     } else {
-      // Set initial closed state
+      // Set initial closed state with data-initial to prevent exit animations on page load
       if (this.hasContainerTarget) {
         this.containerTarget.setAttribute("data-state", "closed")
+        this.containerTarget.setAttribute("data-initial", "")
       }
       if (this.hasOverlayTarget) {
         this.overlayTarget.setAttribute("data-state", "closed")
+        this.overlayTarget.setAttribute("data-initial", "")
       }
       if (this.hasContentTarget) {
         this.contentTarget.setAttribute("data-state", "closed")
+        this.contentTarget.setAttribute("data-initial", "")
       }
     }
   }
@@ -39,15 +42,18 @@ export default class extends Controller {
 
   show() {
     // Set data-state to open for animations
-    // Never use .hidden - pointer-events and animations control visibility
+    // Remove data-initial to enable exit animations after first open
     if (this.hasContainerTarget) {
+      this.containerTarget.removeAttribute("data-initial")
       this.containerTarget.setAttribute("data-state", "open")
     }
 
     if (this.hasOverlayTarget) {
+      this.overlayTarget.removeAttribute("data-initial")
       this.overlayTarget.setAttribute("data-state", "open")
     }
     if (this.hasContentTarget) {
+      this.contentTarget.removeAttribute("data-initial")
       this.contentTarget.setAttribute("data-state", "open")
     }
 

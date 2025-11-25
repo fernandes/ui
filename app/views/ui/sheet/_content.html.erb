@@ -1,0 +1,30 @@
+<%# Sheet Content Component - Main content panel with side variants %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @side = local_assigns.fetch(:side, "right")
+  @open = local_assigns.fetch(:open, false)
+  @show_close = local_assigns.fetch(:show_close, true)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Sheet::SheetContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = sheet_content_html_attributes
+
+  # Merge user-provided attributes
+  if @attributes.present?
+    all_attributes = all_attributes.deep_merge(@attributes.except(:data))
+    all_attributes[:data] = all_attributes[:data].merge(@attributes.fetch(:data, {}))
+  end
+-%>
+<%= content_tag :div, **all_attributes do %>
+  <%= content || yield %>
+  <% if @show_close %>
+    <button class="<%= sheet_content_close_button_classes %>" data-action="click->ui--dialog#close">
+      <%= lucide_icon("x", class: "size-4") %>
+      <span class="sr-only">Close</span>
+    </button>
+  <% end %>
+<% end %>

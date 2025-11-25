@@ -1,0 +1,365 @@
+<div class="container py-8">
+  <div class="space-y-8">
+    <h1 class="text-4xl font-bold">Sheet</h1>
+    <p class="text-muted-foreground">
+      Extends the Dialog component to display content that complements the main content of the screen.
+    </p>
+
+    <!-- ERB -->
+    <h2 class="text-2xl font-semibold border-b pb-2">ERB</h2>
+
+    <!-- Basic Sheet (Right Side - Default) -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Basic (Right Side)</h3>
+      <p class="text-muted-foreground text-sm">
+        Default sheet that slides in from the right side.
+      </p>
+
+      <%= render "ui/sheet/sheet" do %>
+        <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
+          <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+            Open Sheet
+          <% end %>
+        <% end %>
+
+        <%= render "ui/sheet/overlay" do %>
+          <%= render "ui/sheet/content" do %>
+            <%= render "ui/sheet/header" do %>
+              <%= render "ui/sheet/title" do %>
+                Edit profile
+              <% end %>
+              <%= render "ui/sheet/description" do %>
+                Make changes to your profile here. Click save when you're done.
+              <% end %>
+            <% end %>
+
+            <div class="grid flex-1 auto-rows-min gap-6 px-4">
+              <div class="grid gap-3">
+                <label for="sheet-name" class="text-sm font-medium">Name</label>
+                <input id="sheet-name" type="text" value="Pedro Duarte" class="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              </div>
+              <div class="grid gap-3">
+                <label for="sheet-username" class="text-sm font-medium">Username</label>
+                <input id="sheet-username" type="text" value="@peduarte" class="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              </div>
+            </div>
+
+            <%= render "ui/sheet/footer" do %>
+              <%= render "ui/button/button", variant: :default do %>
+                Save changes
+              <% end %>
+              <%= render "ui/sheet/close", as_child: true do |attrs| %>
+                <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+                  Close
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Side Variants -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Side Variants</h3>
+      <p class="text-muted-foreground text-sm">
+        Sheet can slide in from any side: top, right, bottom, or left.
+      </p>
+
+      <div class="flex flex-wrap gap-4">
+        <% %w[top right bottom left].each do |side| %>
+          <%= render "ui/sheet/sheet" do %>
+            <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
+              <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+                <%= side.capitalize %>
+              <% end %>
+            <% end %>
+
+            <%= render "ui/sheet/overlay" do %>
+              <%= render "ui/sheet/content", side: side do %>
+                <%= render "ui/sheet/header" do %>
+                  <%= render "ui/sheet/title" do %>
+                    <%= side.capitalize %> Sheet
+                  <% end %>
+                  <%= render "ui/sheet/description" do %>
+                    This sheet slides in from the <%= side %> side of the screen.
+                  <% end %>
+                <% end %>
+
+                <div class="p-4 flex-1">
+                  <p class="text-sm text-muted-foreground">Sheet content goes here.</p>
+                </div>
+
+                <%= render "ui/sheet/footer" do %>
+                  <%= render "ui/sheet/close" do %>
+                    Close
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Custom Width -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Custom Width</h3>
+      <p class="text-muted-foreground text-sm">
+        Customize the sheet width using Tailwind classes.
+      </p>
+
+      <%= render "ui/sheet/sheet" do %>
+        <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
+          <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+            Wide Sheet
+          <% end %>
+        <% end %>
+
+        <%= render "ui/sheet/overlay" do %>
+          <%= render "ui/sheet/content", classes: "sm:max-w-xl" do %>
+            <%= render "ui/sheet/header" do %>
+              <%= render "ui/sheet/title" do %>
+                Wide Sheet
+              <% end %>
+              <%= render "ui/sheet/description" do %>
+                This sheet has a custom width of sm:max-w-xl.
+              <% end %>
+            <% end %>
+
+            <div class="p-4 flex-1">
+              <p class="text-sm text-muted-foreground">More space for content!</p>
+            </div>
+
+            <%= render "ui/sheet/footer" do %>
+              <%= render "ui/sheet/close" do %>
+                Close
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Without Close Button -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Without Close Button</h3>
+      <p class="text-muted-foreground text-sm">
+        Sheet without the built-in close button in the corner.
+      </p>
+
+      <%= render "ui/sheet/sheet" do %>
+        <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
+          <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+            No X Button
+          <% end %>
+        <% end %>
+
+        <%= render "ui/sheet/overlay" do %>
+          <%= render "ui/sheet/content", show_close: false do %>
+            <%= render "ui/sheet/header" do %>
+              <%= render "ui/sheet/title" do %>
+                Custom Close
+              <% end %>
+              <%= render "ui/sheet/description" do %>
+                This sheet doesn't have the default X button. Use the footer button to close.
+              <% end %>
+            <% end %>
+
+            <div class="p-4 flex-1">
+              <p class="text-sm text-muted-foreground">You can still close by clicking the overlay or pressing Escape.</p>
+            </div>
+
+            <%= render "ui/sheet/footer" do %>
+              <%= render "ui/sheet/close", variant: :default do %>
+                Close Sheet
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Phlex -->
+    <h2 class="text-2xl font-semibold border-b pb-2 mt-12">Phlex</h2>
+
+    <!-- Basic Sheet (Phlex) -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Basic (Right Side)</h3>
+
+      <%= render UI::Sheet::Sheet.new do %>
+        <%= render UI::Sheet::Trigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button::Button.new(**attrs, variant: :outline) do %>
+            Open Sheet
+          <% end %>
+        <% end %>
+
+        <%= render UI::Sheet::Overlay.new do %>
+          <%= render UI::Sheet::Content.new do %>
+            <%= render UI::Sheet::Header.new do %>
+              <%= render UI::Sheet::Title.new do %>
+                Edit profile
+              <% end %>
+              <%= render UI::Sheet::Description.new do %>
+                Make changes to your profile here. Click save when you're done.
+              <% end %>
+            <% end %>
+
+            <div class="grid flex-1 auto-rows-min gap-6 px-4">
+              <div class="grid gap-3">
+                <label for="phlex-name" class="text-sm font-medium">Name</label>
+                <input id="phlex-name" type="text" value="Pedro Duarte" class="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              </div>
+              <div class="grid gap-3">
+                <label for="phlex-username" class="text-sm font-medium">Username</label>
+                <input id="phlex-username" type="text" value="@peduarte" class="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              </div>
+            </div>
+
+            <%= render UI::Sheet::Footer.new do %>
+              <%= render UI::Button::Button.new(variant: :default) do %>
+                Save changes
+              <% end %>
+              <%= render UI::Sheet::Close.new(as_child: true) do |attrs| %>
+                <%= render UI::Button::Button.new(**attrs, variant: :outline) do %>
+                  Close
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Side Variants (Phlex) -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Side Variants</h3>
+
+      <div class="flex flex-wrap gap-4">
+        <% %w[top right bottom left].each do |side| %>
+          <%= render UI::Sheet::Sheet.new do %>
+            <%= render UI::Sheet::Trigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button::Button.new(**attrs, variant: :outline) do %>
+                <%= side.capitalize %>
+              <% end %>
+            <% end %>
+
+            <%= render UI::Sheet::Overlay.new do %>
+              <%= render UI::Sheet::Content.new(side: side) do %>
+                <%= render UI::Sheet::Header.new do %>
+                  <%= render UI::Sheet::Title.new do %>
+                    <%= side.capitalize %> Sheet
+                  <% end %>
+                  <%= render UI::Sheet::Description.new do %>
+                    This sheet slides in from the <%= side %> side.
+                  <% end %>
+                <% end %>
+
+                <div class="p-4 flex-1">
+                  <p class="text-sm text-muted-foreground">Sheet content goes here.</p>
+                </div>
+
+                <%= render UI::Sheet::Footer.new do %>
+                  <%= render UI::Sheet::Close.new do %>
+                    Close
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- ViewComponent -->
+    <h2 class="text-2xl font-semibold border-b pb-2 mt-12">ViewComponent</h2>
+
+    <!-- Basic Sheet (ViewComponent) -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Basic (Right Side)</h3>
+
+      <%= render UI::Sheet::SheetComponent.new do %>
+        <%= render UI::Sheet::TriggerComponent.new(as_child: true) do %>
+          <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+            Open Sheet
+          <% end %>
+        <% end %>
+
+        <%= render UI::Sheet::OverlayComponent.new do %>
+          <%= render UI::Sheet::ContentComponent.new do %>
+            <%= render UI::Sheet::HeaderComponent.new do %>
+              <%= render UI::Sheet::TitleComponent.new do %>
+                Edit profile
+              <% end %>
+              <%= render UI::Sheet::DescriptionComponent.new do %>
+                Make changes to your profile here. Click save when you're done.
+              <% end %>
+            <% end %>
+
+            <div class="grid flex-1 auto-rows-min gap-6 px-4">
+              <div class="grid gap-3">
+                <label for="vc-name" class="text-sm font-medium">Name</label>
+                <input id="vc-name" type="text" value="Pedro Duarte" class="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              </div>
+              <div class="grid gap-3">
+                <label for="vc-username" class="text-sm font-medium">Username</label>
+                <input id="vc-username" type="text" value="@peduarte" class="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              </div>
+            </div>
+
+            <%= render UI::Sheet::FooterComponent.new do %>
+              <%= render UI::Button::ButtonComponent.new(variant: :default) do %>
+                Save changes
+              <% end %>
+              <%= render UI::Sheet::CloseComponent.new(as_child: true) do %>
+                <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+                  Close
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Side Variants (ViewComponent) -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold">Side Variants</h3>
+
+      <div class="flex flex-wrap gap-4">
+        <% %w[top right bottom left].each do |side| %>
+          <%= render UI::Sheet::SheetComponent.new do %>
+            <%= render UI::Sheet::TriggerComponent.new(as_child: true) do %>
+              <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+                <%= side.capitalize %>
+              <% end %>
+            <% end %>
+
+            <%= render UI::Sheet::OverlayComponent.new do %>
+              <%= render UI::Sheet::ContentComponent.new(side: side) do %>
+                <%= render UI::Sheet::HeaderComponent.new do %>
+                  <%= render UI::Sheet::TitleComponent.new do %>
+                    <%= side.capitalize %> Sheet
+                  <% end %>
+                  <%= render UI::Sheet::DescriptionComponent.new do %>
+                    This sheet slides in from the <%= side %> side.
+                  <% end %>
+                <% end %>
+
+                <div class="p-4 flex-1">
+                  <p class="text-sm text-muted-foreground">Sheet content goes here.</p>
+                </div>
+
+                <%= render UI::Sheet::FooterComponent.new do %>
+                  <%= render UI::Sheet::CloseComponent.new do %>
+                    Close
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
