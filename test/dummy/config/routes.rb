@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   get "/components/separator", to: "components#separator"
   get "/components/sheet", to: "components#sheet"
   get "/components/skeleton", to: "components#skeleton"
+  get "/components/sonner", to: "components#sonner"
   get "/components/slider", to: "components#slider"
   get "/components/spinner", to: "components#spinner"
   get "/components/switch", to: "components#switch"

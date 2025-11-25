@@ -1,0 +1,38 @@
+<%#
+  Sonner Toaster partial (ERB)
+  Container for toast notifications - render once in your layout
+
+  @example Basic usage
+    <%= render "ui/sonner/toaster" %>
+
+  @example With options
+    <%= render "ui/sonner/toaster",
+      position: "top-center",
+      theme: "dark",
+      rich_colors: true,
+      close_button: true
+    %>
+
+  @param position [String] Toast position (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right)
+  @param theme [String] Theme (light, dark, system)
+  @param rich_colors [Boolean] Use rich colors for toast types
+  @param expand [Boolean] Expand toasts on hover
+  @param duration [Integer] Default toast duration in milliseconds
+  @param close_button [Boolean] Show close button on toasts
+  @param visible_toasts [Integer] Maximum number of visible toasts
+  @param classes [String] Additional CSS classes
+  @param attributes [Hash] Additional HTML attributes
+-%>
+<%
+  @position = local_assigns.fetch(:position, "bottom-right")
+  @theme = local_assigns.fetch(:theme, "system")
+  @rich_colors = local_assigns.fetch(:rich_colors, false)
+  @expand = local_assigns.fetch(:expand, false)
+  @duration = local_assigns.fetch(:duration, 4000)
+  @close_button = local_assigns.fetch(:close_button, false)
+  @visible_toasts = local_assigns.fetch(:visible_toasts, 3)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  extend UI::Sonner::ToasterBehavior
+-%>
+<%= content_tag :ol, "", **toaster_html_attributes %>

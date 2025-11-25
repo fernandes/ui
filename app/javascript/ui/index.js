@@ -28,6 +28,7 @@ import PopoverController from "./controllers/popover_controller.js";
 import ResponsiveDialogController from "./controllers/responsive_dialog_controller.js";
 import ScrollAreaController from "./controllers/scroll_area_controller.js";
 import SelectController from "./controllers/select_controller.js";
+import SonnerController from "./controllers/sonner_controller.js";
 import ToggleController from "./controllers/toggle_controller.js";
 import ToggleGroupController from "./controllers/toggle_group_controller.js";
 import TabsController from "./controllers/tabs_controller.js";
@@ -65,6 +66,7 @@ export function registerControllers(application) {
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController,
     "ui--slider": SliderController,
+    "ui--sonner": SonnerController,
     "ui--switch": SwitchController,
     "ui--tabs": TabsController,
     "ui--toggle": ToggleController,
@@ -77,4 +79,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SwitchController, TabsController, ToggleController, ToggleGroupController, CarouselController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController, CarouselController };

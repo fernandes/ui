@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sonner Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <!-- Toaster container - render once -->
+  <%= render UI::Sonner::Toaster.new %>
+
+  <div class="max-w-4xl mx-auto space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Sonner Component</h1>
+      <p class="text-muted-foreground">An opinionated toast notification component</p>
+    </header>
+
+    <!-- Phlex Implementation -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
+
+      <!-- Basic Toast Types -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Toast Types</h3>
+        <div class="flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { message: 'Event has been created', description: 'Sunday, December 03, 2023 at 9:00 AM' } }))"
+          >Default</button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Profile updated', description: 'Your changes have been saved successfully.' } }))"
+          >Success</button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'error', message: 'Error occurred', description: 'There was a problem with your request.' } }))"
+          >Error</button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Did you know?', description: 'You can customize the position of toasts.' } }))"
+          >Info</button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'warning', message: 'Warning', description: 'Your session will expire in 5 minutes.' } }))"
+          >Warning</button>
+        </div>
+      </div>
+
+      <!-- Simple Toast (no description) -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Simple Toast (no description)</h3>
+        <div class="flex items-center gap-4">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Copied to clipboard!' } }))"
+          >Copy</button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'error', message: 'Failed to save' } }))"
+          >Save (fails)</button>
+        </div>
+      </div>
+
+      <!-- Custom Duration -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Custom Duration</h3>
+        <div class="flex items-center gap-4">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Quick toast', description: 'This disappears in 1 second', duration: 1000 } }))"
+          >1 second</button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Long toast', description: 'This stays for 10 seconds', duration: 10000 } }))"
+          >10 seconds</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScript API -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold">JavaScript API</h2>
+      <p class="text-muted-foreground text-sm">Trigger toasts from JavaScript using custom events</p>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Using Custom Events</h3>
+        <div class="flex items-center gap-4">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Event from JS', description: 'Triggered via CustomEvent' } }))"
+          >
+            Trigger via JS
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'With Action', description: 'Click the button to undo', action: { label: 'Undo', event: 'undo:action' } } }))"
+          >
+            With Action Button
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-md bg-muted p-4">
+        <p class="text-sm font-mono">
+          // Trigger a toast from anywhere in your JavaScript
+          <br>
+          document.dispatchEvent(new CustomEvent('ui:toast', {
+          <br>
+          &nbsp;&nbsp;detail: {
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;type: 'success', // success, error, info, warning
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;message: 'Event created',
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;description: 'Optional description',
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;duration: 4000, // Optional, in ms
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;action: { label: 'Undo', event: 'undo:event' }
+          <br>
+          &nbsp;&nbsp;}
+          <br>
+          }));
+        </p>
+      </div>
+    </section>
+
+    <!-- ERB Implementation -->
+    <section class="space-y-6 border-t pt-8">
+      <h2 class="text-2xl font-semibold">ERB Implementation</h2>
+      <p class="text-muted-foreground text-sm">Using ERB partials</p>
+
+      <div class="rounded-md bg-muted p-4 mb-4">
+        <p class="text-sm font-mono">
+          &lt;%= render "ui/sonner/toaster" %&gt;
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">ERB Toaster with options</h3>
+        <div class="rounded-md bg-muted p-4">
+          <p class="text-sm font-mono">
+            &lt;%= render "ui/sonner/toaster",
+            <br>
+            &nbsp;&nbsp;position: "top-center",
+            <br>
+            &nbsp;&nbsp;theme: "dark",
+            <br>
+            &nbsp;&nbsp;rich_colors: true,
+            <br>
+            &nbsp;&nbsp;close_button: true
+            <br>
+            %&gt;
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ViewComponent Implementation -->
+    <section class="space-y-6 border-t pt-8">
+      <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
+      <p class="text-muted-foreground text-sm">Using ViewComponents</p>
+
+      <div class="rounded-md bg-muted p-4 mb-4">
+        <p class="text-sm font-mono">
+          &lt;%= render UI::Sonner::ToasterComponent.new %&gt;
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">ViewComponent Toaster with options</h3>
+        <div class="rounded-md bg-muted p-4">
+          <p class="text-sm font-mono">
+            &lt;%= render UI::Sonner::ToasterComponent.new(
+            <br>
+            &nbsp;&nbsp;position: "top-center",
+            <br>
+            &nbsp;&nbsp;theme: "dark",
+            <br>
+            &nbsp;&nbsp;rich_colors: true,
+            <br>
+            &nbsp;&nbsp;close_button: true
+            <br>
+            ) %&gt;
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuration Reference -->
+    <section class="space-y-6 border-t pt-8">
+      <h2 class="text-2xl font-semibold">Configuration</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left p-2 font-medium">Option</th>
+              <th class="text-left p-2 font-medium">Type</th>
+              <th class="text-left p-2 font-medium">Default</th>
+              <th class="text-left p-2 font-medium">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">position</td>
+              <td class="p-2">String</td>
+              <td class="p-2 font-mono text-xs">"bottom-right"</td>
+              <td class="p-2">Toast position (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right)</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">theme</td>
+              <td class="p-2">String</td>
+              <td class="p-2 font-mono text-xs">"system"</td>
+              <td class="p-2">Theme (light, dark, system)</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">rich_colors</td>
+              <td class="p-2">Boolean</td>
+              <td class="p-2 font-mono text-xs">false</td>
+              <td class="p-2">Use colorful backgrounds for toast types</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">expand</td>
+              <td class="p-2">Boolean</td>
+              <td class="p-2 font-mono text-xs">false</td>
+              <td class="p-2">Expand toasts on hover</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">duration</td>
+              <td class="p-2">Integer</td>
+              <td class="p-2 font-mono text-xs">4000</td>
+              <td class="p-2">Default toast duration in milliseconds</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">close_button</td>
+              <td class="p-2">Boolean</td>
+              <td class="p-2 font-mono text-xs">false</td>
+              <td class="p-2">Show close button on toasts</td>
+            </tr>
+            <tr class="border-b">
+              <td class="p-2 font-mono text-xs">visible_toasts</td>
+              <td class="p-2">Integer</td>
+              <td class="p-2 font-mono text-xs">3</td>
+              <td class="p-2">Maximum number of visible toasts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

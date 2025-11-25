@@ -121,6 +121,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/sheet.html.erb
   end
 
+  def sonner
+    # Renders app/views/components/sonner.html.erb
+  end
+
   def slider
     # Renders app/views/components/slider.html.erb
   end
