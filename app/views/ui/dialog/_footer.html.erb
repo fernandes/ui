@@ -1,0 +1,14 @@
+<%# Dialog Footer Component %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+
+  # Extend behavior for shared logic
+  extend ::UI::Dialog::DialogFooterBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dialog_footer_html_attributes
+-%>
+<%= content_tag :div, **all_attributes do %>
+  <%= content || yield %>
+<% end %>

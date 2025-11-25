@@ -1,0 +1,22 @@
+<%# Dialog Content Component - Main content area %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @open = local_assigns.fetch(:open, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Dialog::DialogContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dialog_content_html_attributes
+
+  # Merge user-provided attributes
+  if @attributes.present?
+    all_attributes = all_attributes.deep_merge(@attributes.except(:data))
+    all_attributes[:data] = all_attributes[:data].merge(@attributes.fetch(:data, {}))
+  end
+-%>
+<%= content_tag :div, **all_attributes do %>
+  <%= content || yield %>
+<% end %>

@@ -1,8 +1,3 @@
-Form
-Typography
-Carousel
-Resizable
-Sheet
 Sonner
 Chart
 Calendar
@@ -12,3 +7,4 @@ Table
 Menubar
 Navigation Menu
 Sidebar
+Resizable (outra lib react, vou realmente usar o resizable?!)

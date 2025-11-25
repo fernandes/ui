@@ -1,0 +1,14 @@
+<%# Dialog Description Component %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+
+  # Build description classes
+  description_classes = TailwindMerge::Merger.new.merge([
+    "text-muted-foreground text-sm",
+    @classes
+  ].compact.join(" "))
+-%>
+<%= content_tag :p, class: description_classes do %>
+  <%= content || yield %>
+<% end %>

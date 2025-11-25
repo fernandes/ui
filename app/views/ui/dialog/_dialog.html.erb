@@ -1,0 +1,18 @@
+<%# Dialog Component - Root container for dialog %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @open = local_assigns.fetch(:open, false)
+  @close_on_escape = local_assigns.fetch(:close_on_escape, true)
+  @close_on_overlay_click = local_assigns.fetch(:close_on_overlay_click, true)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Dialog::DialogBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dialog_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

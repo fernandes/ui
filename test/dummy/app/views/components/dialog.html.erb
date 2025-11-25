@@ -170,5 +170,183 @@
         <% end %>
       <% end %>
     </div>
+
+    <!-- ERB Section -->
+    <div class="border-t pt-8 mt-8">
+      <h2 class="text-3xl font-bold mb-6">ERB Partials</h2>
+      <p class="text-muted-foreground mb-8">
+        Dialog components using ERB partial rendering with <code class="px-1 py-0.5 rounded bg-muted text-sm">render "ui/dialog/..."</code>
+      </p>
+
+      <!-- ERB Default Dialog -->
+      <div class="space-y-4">
+        <h3 class="text-2xl font-semibold">ERB Default</h3>
+        <p class="text-muted-foreground text-sm">
+          A basic dialog using ERB partials.
+        </p>
+
+        <%= render "ui/dialog/dialog" do %>
+          <%= render "ui/dialog/trigger" do %>
+            Open ERB Dialog
+          <% end %>
+
+          <%= render "ui/dialog/overlay" do %>
+            <%= render "ui/dialog/content", classes: "sm:max-w-[425px]" do %>
+              <%= render "ui/dialog/header" do %>
+                <%= render "ui/dialog/title" do %>
+                  ERB Dialog
+                <% end %>
+                <%= render "ui/dialog/description" do %>
+                  This dialog is rendered using ERB partials.
+                <% end %>
+              <% end %>
+
+              <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-4 items-center gap-4">
+                  <label for="erb-name" class="text-right text-sm font-medium">Name</label>
+                  <input id="erb-name" type="text" value="Jane Doe" class="col-span-3 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-all placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+                </div>
+              </div>
+
+              <%= render "ui/dialog/footer" do %>
+                <%= render "ui/dialog/close", variant: :default do %>
+                  Save
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ERB asChild Dialog -->
+      <div class="space-y-4 mt-8">
+        <h3 class="text-2xl font-semibold">ERB with asChild</h3>
+        <p class="text-muted-foreground text-sm">
+          Using <code class="px-1 py-0.5 rounded bg-muted text-sm">as_child: true</code> with ERB partials.
+        </p>
+
+        <%= render "ui/dialog/dialog" do %>
+          <%= render "ui/dialog/trigger", as_child: true do |attrs| %>
+            <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+              Open with asChild (ERB)
+            <% end %>
+          <% end %>
+
+          <%= render "ui/dialog/overlay" do %>
+            <%= render "ui/dialog/content" do %>
+              <%= render "ui/dialog/header" do %>
+                <%= render "ui/dialog/title" do %>
+                  asChild Composition (ERB)
+                <% end %>
+                <%= render "ui/dialog/description" do %>
+                  This dialog trigger uses the asChild pattern with ERB partials.
+                <% end %>
+              <% end %>
+
+              <div class="py-4">
+                <p class="text-sm">The trigger button received its attributes via the yielded block parameter.</p>
+              </div>
+
+              <%= render "ui/dialog/footer" do %>
+                <%= render "ui/dialog/close", as_child: true do |attrs| %>
+                  <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+                    Close (asChild)
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- ViewComponent Section -->
+    <div class="border-t pt-8 mt-8">
+      <h2 class="text-3xl font-bold mb-6">ViewComponents</h2>
+      <p class="text-muted-foreground mb-8">
+        Dialog components using ViewComponent rendering with <code class="px-1 py-0.5 rounded bg-muted text-sm">UI::Dialog::*Component</code>
+      </p>
+
+      <!-- ViewComponent Default Dialog -->
+      <div class="space-y-4">
+        <h3 class="text-2xl font-semibold">ViewComponent Default</h3>
+        <p class="text-muted-foreground text-sm">
+          A basic dialog using ViewComponents.
+        </p>
+
+        <%= render UI::Dialog::DialogComponent.new do %>
+          <%= render UI::Dialog::TriggerComponent.new do %>
+            Open VC Dialog
+          <% end %>
+
+          <%= render UI::Dialog::OverlayComponent.new do %>
+            <%= render UI::Dialog::ContentComponent.new(classes: "sm:max-w-[425px]") do %>
+              <%= render UI::Dialog::HeaderComponent.new do %>
+                <%= render UI::Dialog::TitleComponent.new do %>
+                  ViewComponent Dialog
+                <% end %>
+                <%= render UI::Dialog::DescriptionComponent.new do %>
+                  This dialog is rendered using ViewComponents.
+                <% end %>
+              <% end %>
+
+              <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-4 items-center gap-4">
+                  <label for="vc-name" class="text-right text-sm font-medium">Name</label>
+                  <input id="vc-name" type="text" value="John Smith" class="col-span-3 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-all placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+                </div>
+              </div>
+
+              <%= render UI::Dialog::FooterComponent.new do %>
+                <%= render UI::Dialog::CloseComponent.new(variant: :default) do %>
+                  Save
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ViewComponent asChild Dialog -->
+      <div class="space-y-4 mt-8">
+        <h3 class="text-2xl font-semibold">ViewComponent with asChild</h3>
+        <p class="text-muted-foreground text-sm">
+          Using <code class="px-1 py-0.5 rounded bg-muted text-sm">as_child: true</code> with ViewComponents (Nokogiri pattern - no block params needed).
+        </p>
+
+        <%= render UI::Dialog::DialogComponent.new do %>
+          <%= render UI::Dialog::TriggerComponent.new(as_child: true) do %>
+            <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+              Open with asChild (VC)
+            <% end %>
+          <% end %>
+
+          <%= render UI::Dialog::OverlayComponent.new do %>
+            <%= render UI::Dialog::ContentComponent.new do %>
+              <%= render UI::Dialog::HeaderComponent.new do %>
+                <%= render UI::Dialog::TitleComponent.new do %>
+                  asChild Composition (ViewComponent)
+                <% end %>
+                <%= render UI::Dialog::DescriptionComponent.new do %>
+                  ViewComponent uses Nokogiri to inject attributes - no block parameter needed!
+                <% end %>
+              <% end %>
+
+              <div class="py-4">
+                <p class="text-sm">ViewComponent parses the rendered HTML and injects data attributes into the first child element automatically.</p>
+              </div>
+
+              <%= render UI::Dialog::FooterComponent.new do %>
+                <%= render UI::Dialog::CloseComponent.new(as_child: true) do %>
+                  <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+                    Close (asChild)
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>

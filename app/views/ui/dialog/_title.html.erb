@@ -1,0 +1,14 @@
+<%# Dialog Title Component %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+
+  # Build title classes
+  title_classes = TailwindMerge::Merger.new.merge([
+    "text-lg font-semibold",
+    @classes
+  ].compact.join(" "))
+-%>
+<%= content_tag :h2, class: title_classes do %>
+  <%= content || yield %>
+<% end %>

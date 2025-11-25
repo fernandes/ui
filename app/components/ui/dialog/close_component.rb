@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module UI
-  module Sheet
-    # Sheet close component (ViewComponent)
-    # Closes the sheet on click
+  module Dialog
+    # Dialog close component (ViewComponent)
+    # Closes the dialog on click
     #
     # @example As button (default)
-    #   <%= render UI::Sheet::CloseComponent.new { "Close" } %>
+    #   <%= render UI::Dialog::CloseComponent.new { "Close" } %>
     #
     # @example As child (composition pattern)
-    #   <%= render UI::Sheet::CloseComponent.new(as_child: true) do %>
+    #   <%= render UI::Dialog::CloseComponent.new(as_child: true) do %>
     #     <%= render UI::Button::ButtonComponent.new(variant: :outline) { "Cancel" } %>
     #   <% end %>
     class CloseComponent < ViewComponent::Base

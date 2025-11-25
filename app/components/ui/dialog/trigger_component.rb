@@ -1,34 +1,28 @@
 # frozen_string_literal: true
 
 module UI
-  module Sheet
-    # Sheet close component (ViewComponent)
-    # Closes the sheet on click
+  module Dialog
+    # Dialog trigger component (ViewComponent)
+    # Opens the dialog on click
     #
     # @example As button (default)
-    #   <%= render UI::Sheet::CloseComponent.new { "Close" } %>
+    #   <%= render UI::Dialog::TriggerComponent.new { "Open Dialog" } %>
     #
     # @example As child (composition pattern)
-    #   <%= render UI::Sheet::CloseComponent.new(as_child: true) do %>
-    #     <%= render UI::Button::ButtonComponent.new(variant: :outline) { "Cancel" } %>
+    #   <%= render UI::Dialog::TriggerComponent.new(as_child: true) do %>
+    #     <%= render UI::Button::ButtonComponent.new(variant: :outline) { "Open" } %>
     #   <% end %>
-    class CloseComponent < ViewComponent::Base
+    class TriggerComponent < ViewComponent::Base
       # @param as_child [Boolean] merge attributes into child element
-      # @param variant [Symbol] button variant (when not using as_child)
-      # @param size [Symbol] button size (when not using as_child)
-      # @param classes [String] additional CSS classes
       # @param attributes [Hash] additional HTML attributes
-      def initialize(as_child: false, variant: :outline, size: :default, classes: "", **attributes)
+      def initialize(as_child: false, **attributes)
         @as_child = as_child
-        @variant = variant
-        @size = size
-        @classes = classes
         @attributes = attributes
       end
 
       def call
-        close_attrs = {
-          data: { action: "click->ui--dialog#close" }
+        trigger_attrs = {
+          data: { action: "click->ui--dialog#open" }
         }.deep_merge(@attributes)
 
         if @as_child
@@ -39,20 +33,20 @@ module UI
 
           if first_element
             # Merge data attributes (convert Rails naming to HTML)
-            close_attrs.fetch(:data, {}).each do |key, value|
+            trigger_attrs.fetch(:data, {}).each do |key, value|
               html_key = key.to_s.gsub("__", "--").gsub("_", "-")
               first_element["data-#{html_key}"] = value
             end
 
             # Merge CSS classes with TailwindMerge
-            if close_attrs[:class]
+            if trigger_attrs[:class]
               existing_classes = first_element["class"] || ""
-              merged_classes = TailwindMerge::Merger.new.merge([existing_classes, close_attrs[:class]].join(" "))
+              merged_classes = TailwindMerge::Merger.new.merge([existing_classes, trigger_attrs[:class]].join(" "))
               first_element["class"] = merged_classes
             end
 
             # Merge other attributes (except data and class)
-            close_attrs.except(:data, :class).each do |key, value|
+            trigger_attrs.except(:data, :class).each do |key, value|
               first_element[key.to_s] = value
             end
 
@@ -61,13 +55,8 @@ module UI
             content
           end
         else
-          # Default: render as Button component
-          render(UI::Button::ButtonComponent.new(
-            variant: @variant,
-            size: @size,
-            classes: @classes,
-            **close_attrs
-          ).with_content(content))
+          # Default: render as button
+          content_tag :button, content, **trigger_attrs
         end
       end
     end
