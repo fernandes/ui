@@ -46,13 +46,24 @@ module UI
       def calendar_html_attributes
         base_attrs = @attributes&.except(:data) || {}
         user_data = @attributes&.fetch(:data, {}) || {}
+
+        # Merge data attributes, concatenating action values
+        merged_data = calendar_data_attributes.merge(user_data) do |key, calendar_val, user_val|
+          if key == :action
+            # Concatenate Stimulus actions with space separator
+            [calendar_val, user_val].compact.join(" ")
+          else
+            user_val
+          end
+        end
+
         base_attrs.merge(
           class: calendar_classes,
           role: "application",
           aria: {
             label: aria_label_text
           },
-          data: user_data.merge(calendar_data_attributes)
+          data: merged_data
         )
       end
 

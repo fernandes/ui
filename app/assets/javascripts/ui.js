@@ -5930,6 +5930,7 @@
   const millisecondsInDay = 864e5;
   const millisecondsInMinute = 6e4;
   const millisecondsInHour = 36e5;
+  const millisecondsInSecond = 1e3;
   const constructFromSymbol = Symbol.for("constructDateFrom");
   function constructFrom(date, value) {
     if (typeof date === "function") return date(value);
@@ -5942,7 +5943,7 @@
   }
   function addDays(date, amount, options) {
     const _date = toDate(date, options?.in);
-    if (isNaN(amount)) return constructFrom(date, NaN);
+    if (isNaN(amount)) return constructFrom(options?.in || date, NaN);
     if (!amount) return _date;
     _date.setDate(_date.getDate() + amount);
     return _date;
@@ -5965,11 +5966,11 @@
     }
   }
   let defaultOptions$2 = {};
-  function getDefaultOptions() {
+  function getDefaultOptions$1() {
     return defaultOptions$2;
   }
   function startOfWeek(date, options) {
-    const defaultOptions = getDefaultOptions();
+    const defaultOptions = getDefaultOptions$1();
     const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions.weekStartsOn ?? defaultOptions.locale?.options?.weekStartsOn ?? 0;
     const _date = toDate(date, options?.in);
     const day = _date.getDay();
@@ -6106,7 +6107,7 @@
     return date_;
   }
   function endOfWeek(date, options) {
-    const defaultOptions = getDefaultOptions();
+    const defaultOptions = getDefaultOptions$1();
     const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions.weekStartsOn ?? defaultOptions.locale?.options?.weekStartsOn ?? 0;
     const _date = toDate(date, options?.in);
     const day = _date.getDay();
@@ -6560,7 +6561,7 @@
   function getWeekYear(date, options) {
     const _date = toDate(date, options?.in);
     const year = _date.getFullYear();
-    const defaultOptions = getDefaultOptions();
+    const defaultOptions = getDefaultOptions$1();
     const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions.firstWeekContainsDate ?? defaultOptions.locale?.options?.firstWeekContainsDate ?? 1;
     const firstWeekOfNextYear = constructFrom(options?.in || date, 0);
     firstWeekOfNextYear.setFullYear(year + 1, 0, firstWeekContainsDate);
@@ -6579,7 +6580,7 @@
     }
   }
   function startOfWeekYear(date, options) {
-    const defaultOptions = getDefaultOptions();
+    const defaultOptions = getDefaultOptions$1();
     const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions.firstWeekContainsDate ?? defaultOptions.locale?.options?.firstWeekContainsDate ?? 1;
     const year = getWeekYear(date, options);
     const firstWeek = constructFrom(options?.in || date, 0);
@@ -7393,13 +7394,13 @@
     const subject = token[0] === "Y" ? "years" : "days of the month";
     return `Use \`${token.toLowerCase()}\` instead of \`${token}\` (in \`${format}\`) for formatting ${subject} to the input \`${input}\`; see: https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md`;
   }
-  const formattingTokensRegExp = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g;
-  const longFormattingTokensRegExp = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
-  const escapedStringRegExp = /^'([^]*?)'?$/;
-  const doubleQuoteRegExp = /''/g;
-  const unescapedLatinCharacterRegExp = /[a-zA-Z]/;
+  const formattingTokensRegExp$1 = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g;
+  const longFormattingTokensRegExp$1 = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
+  const escapedStringRegExp$1 = /^'([^]*?)'?$/;
+  const doubleQuoteRegExp$1 = /''/g;
+  const unescapedLatinCharacterRegExp$1 = /[a-zA-Z]/;
   function format(date, formatStr, options) {
-    const defaultOptions = getDefaultOptions();
+    const defaultOptions = getDefaultOptions$1();
     const locale = defaultOptions.locale ?? enUS;
     const firstWeekContainsDate = defaultOptions.firstWeekContainsDate ?? defaultOptions.locale?.options?.firstWeekContainsDate ?? 1;
     const weekStartsOn = defaultOptions.weekStartsOn ?? defaultOptions.locale?.options?.weekStartsOn ?? 0;
@@ -7407,14 +7408,14 @@
     if (!isValid(originalDate)) {
       throw new RangeError("Invalid time value");
     }
-    let parts = formatStr.match(longFormattingTokensRegExp).map(substring => {
+    let parts = formatStr.match(longFormattingTokensRegExp$1).map(substring => {
       const firstCharacter = substring[0];
       if (firstCharacter === "p" || firstCharacter === "P") {
         const longFormatter = longFormatters[firstCharacter];
         return longFormatter(substring, locale.formatLong);
       }
       return substring;
-    }).join("").match(formattingTokensRegExp).map(substring => {
+    }).join("").match(formattingTokensRegExp$1).map(substring => {
       if (substring === "''") {
         return {
           isToken: false,
@@ -7425,7 +7426,7 @@
       if (firstCharacter === "'") {
         return {
           isToken: false,
-          value: cleanEscapedString(substring)
+          value: cleanEscapedString$1(substring)
         };
       }
       if (formatters[firstCharacter]) {
@@ -7434,7 +7435,7 @@
           value: substring
         };
       }
-      if (firstCharacter.match(unescapedLatinCharacterRegExp)) {
+      if (firstCharacter.match(unescapedLatinCharacterRegExp$1)) {
         throw new RangeError("Format string contains an unescaped latin alphabet character `" + firstCharacter + "`");
       }
       return {
@@ -7460,12 +7461,12 @@
       return formatter(originalDate, token, locale.localize, formatterOptions);
     }).join("");
   }
-  function cleanEscapedString(input) {
-    const matched = input.match(escapedStringRegExp);
+  function cleanEscapedString$1(input) {
+    const matched = input.match(escapedStringRegExp$1);
     if (!matched) {
       return input;
     }
-    return matched[1].replace(doubleQuoteRegExp, "'");
+    return matched[1].replace(doubleQuoteRegExp$1, "'");
   }
   function getDaysInMonth(date, options) {
     const _date = toDate(date, options?.in);
@@ -7475,6 +7476,13 @@
     lastDayOfMonth.setFullYear(year, monthIndex + 1, 0);
     lastDayOfMonth.setHours(0, 0, 0, 0);
     return lastDayOfMonth.getDate();
+  }
+  function getDefaultOptions() {
+    return Object.assign({}, getDefaultOptions$1());
+  }
+  function getISODay(date, options) {
+    const day = toDate(date, options?.in).getDay();
+    return day === 0 ? 7 : day;
   }
   function getMonth(date, options) {
     return toDate(date, options?.in).getMonth();
@@ -7487,6 +7495,1496 @@
   }
   function isBefore(date, dateToCompare) {
     return +toDate(date) < +toDate(dateToCompare);
+  }
+  function transpose(date, constructor) {
+    const date_ = isConstructor(constructor) ? new constructor(0) : constructFrom(constructor, 0);
+    date_.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+    date_.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+    return date_;
+  }
+  function isConstructor(constructor) {
+    return typeof constructor === "function" && constructor.prototype?.constructor === constructor;
+  }
+  const TIMEZONE_UNIT_PRIORITY = 10;
+  class Setter {
+    subPriority=0;
+    validate(_utcDate, _options) {
+      return true;
+    }
+  }
+  class ValueSetter extends Setter {
+    constructor(value, validateValue, setValue, priority, subPriority) {
+      super();
+      this.value = value;
+      this.validateValue = validateValue;
+      this.setValue = setValue;
+      this.priority = priority;
+      if (subPriority) {
+        this.subPriority = subPriority;
+      }
+    }
+    validate(date, options) {
+      return this.validateValue(date, this.value, options);
+    }
+    set(date, flags, options) {
+      return this.setValue(date, flags, this.value, options);
+    }
+  }
+  class DateTimezoneSetter extends Setter {
+    priority=TIMEZONE_UNIT_PRIORITY;
+    subPriority=-1;
+    constructor(context, reference) {
+      super();
+      this.context = context || (date => constructFrom(reference, date));
+    }
+    set(date, flags) {
+      if (flags.timestampIsSet) return date;
+      return constructFrom(date, transpose(date, this.context));
+    }
+  }
+  class Parser {
+    run(dateString, token, match, options) {
+      const result = this.parse(dateString, token, match, options);
+      if (!result) {
+        return null;
+      }
+      return {
+        setter: new ValueSetter(result.value, this.validate, this.set, this.priority, this.subPriority),
+        rest: result.rest
+      };
+    }
+    validate(_utcDate, _value, _options) {
+      return true;
+    }
+  }
+  class EraParser extends Parser {
+    priority=140;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "G":
+       case "GG":
+       case "GGG":
+        return match.era(dateString, {
+          width: "abbreviated"
+        }) || match.era(dateString, {
+          width: "narrow"
+        });
+
+       case "GGGGG":
+        return match.era(dateString, {
+          width: "narrow"
+        });
+
+       case "GGGG":
+       default:
+        return match.era(dateString, {
+          width: "wide"
+        }) || match.era(dateString, {
+          width: "abbreviated"
+        }) || match.era(dateString, {
+          width: "narrow"
+        });
+      }
+    }
+    set(date, flags, value) {
+      flags.era = value;
+      date.setFullYear(value, 0, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "R", "u", "t", "T" ];
+  }
+  const numericPatterns = {
+    month: /^(1[0-2]|0?\d)/,
+    date: /^(3[0-1]|[0-2]?\d)/,
+    dayOfYear: /^(36[0-6]|3[0-5]\d|[0-2]?\d?\d)/,
+    week: /^(5[0-3]|[0-4]?\d)/,
+    hour23h: /^(2[0-3]|[0-1]?\d)/,
+    hour24h: /^(2[0-4]|[0-1]?\d)/,
+    hour11h: /^(1[0-1]|0?\d)/,
+    hour12h: /^(1[0-2]|0?\d)/,
+    minute: /^[0-5]?\d/,
+    second: /^[0-5]?\d/,
+    singleDigit: /^\d/,
+    twoDigits: /^\d{1,2}/,
+    threeDigits: /^\d{1,3}/,
+    fourDigits: /^\d{1,4}/,
+    anyDigitsSigned: /^-?\d+/,
+    singleDigitSigned: /^-?\d/,
+    twoDigitsSigned: /^-?\d{1,2}/,
+    threeDigitsSigned: /^-?\d{1,3}/,
+    fourDigitsSigned: /^-?\d{1,4}/
+  };
+  const timezonePatterns = {
+    basicOptionalMinutes: /^([+-])(\d{2})(\d{2})?|Z/,
+    basic: /^([+-])(\d{2})(\d{2})|Z/,
+    basicOptionalSeconds: /^([+-])(\d{2})(\d{2})((\d{2}))?|Z/,
+    extended: /^([+-])(\d{2}):(\d{2})|Z/,
+    extendedOptionalSeconds: /^([+-])(\d{2}):(\d{2})(:(\d{2}))?|Z/
+  };
+  function mapValue(parseFnResult, mapFn) {
+    if (!parseFnResult) {
+      return parseFnResult;
+    }
+    return {
+      value: mapFn(parseFnResult.value),
+      rest: parseFnResult.rest
+    };
+  }
+  function parseNumericPattern(pattern, dateString) {
+    const matchResult = dateString.match(pattern);
+    if (!matchResult) {
+      return null;
+    }
+    return {
+      value: parseInt(matchResult[0], 10),
+      rest: dateString.slice(matchResult[0].length)
+    };
+  }
+  function parseTimezonePattern(pattern, dateString) {
+    const matchResult = dateString.match(pattern);
+    if (!matchResult) {
+      return null;
+    }
+    if (matchResult[0] === "Z") {
+      return {
+        value: 0,
+        rest: dateString.slice(1)
+      };
+    }
+    const sign = matchResult[1] === "+" ? 1 : -1;
+    const hours = matchResult[2] ? parseInt(matchResult[2], 10) : 0;
+    const minutes = matchResult[3] ? parseInt(matchResult[3], 10) : 0;
+    const seconds = matchResult[5] ? parseInt(matchResult[5], 10) : 0;
+    return {
+      value: sign * (hours * millisecondsInHour + minutes * millisecondsInMinute + seconds * millisecondsInSecond),
+      rest: dateString.slice(matchResult[0].length)
+    };
+  }
+  function parseAnyDigitsSigned(dateString) {
+    return parseNumericPattern(numericPatterns.anyDigitsSigned, dateString);
+  }
+  function parseNDigits(n, dateString) {
+    switch (n) {
+     case 1:
+      return parseNumericPattern(numericPatterns.singleDigit, dateString);
+
+     case 2:
+      return parseNumericPattern(numericPatterns.twoDigits, dateString);
+
+     case 3:
+      return parseNumericPattern(numericPatterns.threeDigits, dateString);
+
+     case 4:
+      return parseNumericPattern(numericPatterns.fourDigits, dateString);
+
+     default:
+      return parseNumericPattern(new RegExp("^\\d{1," + n + "}"), dateString);
+    }
+  }
+  function parseNDigitsSigned(n, dateString) {
+    switch (n) {
+     case 1:
+      return parseNumericPattern(numericPatterns.singleDigitSigned, dateString);
+
+     case 2:
+      return parseNumericPattern(numericPatterns.twoDigitsSigned, dateString);
+
+     case 3:
+      return parseNumericPattern(numericPatterns.threeDigitsSigned, dateString);
+
+     case 4:
+      return parseNumericPattern(numericPatterns.fourDigitsSigned, dateString);
+
+     default:
+      return parseNumericPattern(new RegExp("^-?\\d{1," + n + "}"), dateString);
+    }
+  }
+  function dayPeriodEnumToHours(dayPeriod) {
+    switch (dayPeriod) {
+     case "morning":
+      return 4;
+
+     case "evening":
+      return 17;
+
+     case "pm":
+     case "noon":
+     case "afternoon":
+      return 12;
+
+     case "am":
+     case "midnight":
+     case "night":
+     default:
+      return 0;
+    }
+  }
+  function normalizeTwoDigitYear(twoDigitYear, currentYear) {
+    const isCommonEra = currentYear > 0;
+    const absCurrentYear = isCommonEra ? currentYear : 1 - currentYear;
+    let result;
+    if (absCurrentYear <= 50) {
+      result = twoDigitYear || 100;
+    } else {
+      const rangeEnd = absCurrentYear + 50;
+      const rangeEndCentury = Math.trunc(rangeEnd / 100) * 100;
+      const isPreviousCentury = twoDigitYear >= rangeEnd % 100;
+      result = twoDigitYear + rangeEndCentury - (isPreviousCentury ? 100 : 0);
+    }
+    return isCommonEra ? result : 1 - result;
+  }
+  function isLeapYearIndex$1(year) {
+    return year % 400 === 0 || year % 4 === 0 && year % 100 !== 0;
+  }
+  class YearParser extends Parser {
+    priority=130;
+    incompatibleTokens=[ "Y", "R", "u", "w", "I", "i", "e", "c", "t", "T" ];
+    parse(dateString, token, match) {
+      const valueCallback = year => ({
+        year: year,
+        isTwoDigitYear: token === "yy"
+      });
+      switch (token) {
+       case "y":
+        return mapValue(parseNDigits(4, dateString), valueCallback);
+
+       case "yo":
+        return mapValue(match.ordinalNumber(dateString, {
+          unit: "year"
+        }), valueCallback);
+
+       default:
+        return mapValue(parseNDigits(token.length, dateString), valueCallback);
+      }
+    }
+    validate(_date, value) {
+      return value.isTwoDigitYear || value.year > 0;
+    }
+    set(date, flags, value) {
+      const currentYear = date.getFullYear();
+      if (value.isTwoDigitYear) {
+        const normalizedTwoDigitYear = normalizeTwoDigitYear(value.year, currentYear);
+        date.setFullYear(normalizedTwoDigitYear, 0, 1);
+        date.setHours(0, 0, 0, 0);
+        return date;
+      }
+      const year = !("era" in flags) || flags.era === 1 ? value.year : 1 - value.year;
+      date.setFullYear(year, 0, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+  }
+  class LocalWeekYearParser extends Parser {
+    priority=130;
+    parse(dateString, token, match) {
+      const valueCallback = year => ({
+        year: year,
+        isTwoDigitYear: token === "YY"
+      });
+      switch (token) {
+       case "Y":
+        return mapValue(parseNDigits(4, dateString), valueCallback);
+
+       case "Yo":
+        return mapValue(match.ordinalNumber(dateString, {
+          unit: "year"
+        }), valueCallback);
+
+       default:
+        return mapValue(parseNDigits(token.length, dateString), valueCallback);
+      }
+    }
+    validate(_date, value) {
+      return value.isTwoDigitYear || value.year > 0;
+    }
+    set(date, flags, value, options) {
+      const currentYear = getWeekYear(date, options);
+      if (value.isTwoDigitYear) {
+        const normalizedTwoDigitYear = normalizeTwoDigitYear(value.year, currentYear);
+        date.setFullYear(normalizedTwoDigitYear, 0, options.firstWeekContainsDate);
+        date.setHours(0, 0, 0, 0);
+        return startOfWeek(date, options);
+      }
+      const year = !("era" in flags) || flags.era === 1 ? value.year : 1 - value.year;
+      date.setFullYear(year, 0, options.firstWeekContainsDate);
+      date.setHours(0, 0, 0, 0);
+      return startOfWeek(date, options);
+    }
+    incompatibleTokens=[ "y", "R", "u", "Q", "q", "M", "L", "I", "d", "D", "i", "t", "T" ];
+  }
+  class ISOWeekYearParser extends Parser {
+    priority=130;
+    parse(dateString, token) {
+      if (token === "R") {
+        return parseNDigitsSigned(4, dateString);
+      }
+      return parseNDigitsSigned(token.length, dateString);
+    }
+    set(date, _flags, value) {
+      const firstWeekOfYear = constructFrom(date, 0);
+      firstWeekOfYear.setFullYear(value, 0, 4);
+      firstWeekOfYear.setHours(0, 0, 0, 0);
+      return startOfISOWeek(firstWeekOfYear);
+    }
+    incompatibleTokens=[ "G", "y", "Y", "u", "Q", "q", "M", "L", "w", "d", "D", "e", "c", "t", "T" ];
+  }
+  class ExtendedYearParser extends Parser {
+    priority=130;
+    parse(dateString, token) {
+      if (token === "u") {
+        return parseNDigitsSigned(4, dateString);
+      }
+      return parseNDigitsSigned(token.length, dateString);
+    }
+    set(date, _flags, value) {
+      date.setFullYear(value, 0, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "G", "y", "Y", "R", "w", "I", "i", "e", "c", "t", "T" ];
+  }
+  class QuarterParser extends Parser {
+    priority=120;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "Q":
+       case "QQ":
+        return parseNDigits(token.length, dateString);
+
+       case "Qo":
+        return match.ordinalNumber(dateString, {
+          unit: "quarter"
+        });
+
+       case "QQQ":
+        return match.quarter(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.quarter(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "QQQQQ":
+        return match.quarter(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "QQQQ":
+       default:
+        return match.quarter(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.quarter(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.quarter(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 4;
+    }
+    set(date, _flags, value) {
+      date.setMonth((value - 1) * 3, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "Y", "R", "q", "M", "L", "w", "I", "d", "D", "i", "e", "c", "t", "T" ];
+  }
+  class StandAloneQuarterParser extends Parser {
+    priority=120;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "q":
+       case "qq":
+        return parseNDigits(token.length, dateString);
+
+       case "qo":
+        return match.ordinalNumber(dateString, {
+          unit: "quarter"
+        });
+
+       case "qqq":
+        return match.quarter(dateString, {
+          width: "abbreviated",
+          context: "standalone"
+        }) || match.quarter(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "qqqqq":
+        return match.quarter(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "qqqq":
+       default:
+        return match.quarter(dateString, {
+          width: "wide",
+          context: "standalone"
+        }) || match.quarter(dateString, {
+          width: "abbreviated",
+          context: "standalone"
+        }) || match.quarter(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 4;
+    }
+    set(date, _flags, value) {
+      date.setMonth((value - 1) * 3, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "Y", "R", "Q", "M", "L", "w", "I", "d", "D", "i", "e", "c", "t", "T" ];
+  }
+  class MonthParser extends Parser {
+    incompatibleTokens=[ "Y", "R", "q", "Q", "L", "w", "I", "D", "i", "e", "c", "t", "T" ];
+    priority=110;
+    parse(dateString, token, match) {
+      const valueCallback = value => value - 1;
+      switch (token) {
+       case "M":
+        return mapValue(parseNumericPattern(numericPatterns.month, dateString), valueCallback);
+
+       case "MM":
+        return mapValue(parseNDigits(2, dateString), valueCallback);
+
+       case "Mo":
+        return mapValue(match.ordinalNumber(dateString, {
+          unit: "month"
+        }), valueCallback);
+
+       case "MMM":
+        return match.month(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.month(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "MMMMM":
+        return match.month(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "MMMM":
+       default:
+        return match.month(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.month(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.month(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 11;
+    }
+    set(date, _flags, value) {
+      date.setMonth(value, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+  }
+  class StandAloneMonthParser extends Parser {
+    priority=110;
+    parse(dateString, token, match) {
+      const valueCallback = value => value - 1;
+      switch (token) {
+       case "L":
+        return mapValue(parseNumericPattern(numericPatterns.month, dateString), valueCallback);
+
+       case "LL":
+        return mapValue(parseNDigits(2, dateString), valueCallback);
+
+       case "Lo":
+        return mapValue(match.ordinalNumber(dateString, {
+          unit: "month"
+        }), valueCallback);
+
+       case "LLL":
+        return match.month(dateString, {
+          width: "abbreviated",
+          context: "standalone"
+        }) || match.month(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "LLLLL":
+        return match.month(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "LLLL":
+       default:
+        return match.month(dateString, {
+          width: "wide",
+          context: "standalone"
+        }) || match.month(dateString, {
+          width: "abbreviated",
+          context: "standalone"
+        }) || match.month(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 11;
+    }
+    set(date, _flags, value) {
+      date.setMonth(value, 1);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "Y", "R", "q", "Q", "M", "w", "I", "D", "i", "e", "c", "t", "T" ];
+  }
+  function setWeek(date, week, options) {
+    const date_ = toDate(date, options?.in);
+    const diff = getWeek(date_, options) - week;
+    date_.setDate(date_.getDate() - diff * 7);
+    return toDate(date_, options?.in);
+  }
+  class LocalWeekParser extends Parser {
+    priority=100;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "w":
+        return parseNumericPattern(numericPatterns.week, dateString);
+
+       case "wo":
+        return match.ordinalNumber(dateString, {
+          unit: "week"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 53;
+    }
+    set(date, _flags, value, options) {
+      return startOfWeek(setWeek(date, value, options), options);
+    }
+    incompatibleTokens=[ "y", "R", "u", "q", "Q", "M", "L", "I", "d", "D", "i", "t", "T" ];
+  }
+  function setISOWeek(date, week, options) {
+    const _date = toDate(date, options?.in);
+    const diff = getISOWeek(_date, options) - week;
+    _date.setDate(_date.getDate() - diff * 7);
+    return _date;
+  }
+  class ISOWeekParser extends Parser {
+    priority=100;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "I":
+        return parseNumericPattern(numericPatterns.week, dateString);
+
+       case "Io":
+        return match.ordinalNumber(dateString, {
+          unit: "week"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 53;
+    }
+    set(date, _flags, value) {
+      return startOfISOWeek(setISOWeek(date, value));
+    }
+    incompatibleTokens=[ "y", "Y", "u", "q", "Q", "M", "L", "w", "d", "D", "e", "c", "t", "T" ];
+  }
+  const DAYS_IN_MONTH = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+  const DAYS_IN_MONTH_LEAP_YEAR = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+  class DateParser extends Parser {
+    priority=90;
+    subPriority=1;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "d":
+        return parseNumericPattern(numericPatterns.date, dateString);
+
+       case "do":
+        return match.ordinalNumber(dateString, {
+          unit: "date"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(date, value) {
+      const year = date.getFullYear();
+      const isLeapYear = isLeapYearIndex$1(year);
+      const month = date.getMonth();
+      if (isLeapYear) {
+        return value >= 1 && value <= DAYS_IN_MONTH_LEAP_YEAR[month];
+      } else {
+        return value >= 1 && value <= DAYS_IN_MONTH[month];
+      }
+    }
+    set(date, _flags, value) {
+      date.setDate(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "Y", "R", "q", "Q", "w", "I", "D", "i", "e", "c", "t", "T" ];
+  }
+  class DayOfYearParser extends Parser {
+    priority=90;
+    subpriority=1;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "D":
+       case "DD":
+        return parseNumericPattern(numericPatterns.dayOfYear, dateString);
+
+       case "Do":
+        return match.ordinalNumber(dateString, {
+          unit: "date"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(date, value) {
+      const year = date.getFullYear();
+      const isLeapYear = isLeapYearIndex$1(year);
+      if (isLeapYear) {
+        return value >= 1 && value <= 366;
+      } else {
+        return value >= 1 && value <= 365;
+      }
+    }
+    set(date, _flags, value) {
+      date.setMonth(0, value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "Y", "R", "q", "Q", "M", "L", "w", "I", "d", "E", "i", "e", "c", "t", "T" ];
+  }
+  function setDay(date, day, options) {
+    const defaultOptions = getDefaultOptions$1();
+    const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions.weekStartsOn ?? defaultOptions.locale?.options?.weekStartsOn ?? 0;
+    const date_ = toDate(date, options?.in);
+    const currentDay = date_.getDay();
+    const remainder = day % 7;
+    const dayIndex = (remainder + 7) % 7;
+    const delta = 7 - weekStartsOn;
+    const diff = day < 0 || day > 6 ? day - (currentDay + delta) % 7 : (dayIndex + delta) % 7 - (currentDay + delta) % 7;
+    return addDays(date_, diff, options);
+  }
+  class DayParser extends Parser {
+    priority=90;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "E":
+       case "EE":
+       case "EEE":
+        return match.day(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "EEEEE":
+        return match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "EEEEEE":
+        return match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "EEEE":
+       default:
+        return match.day(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 6;
+    }
+    set(date, _flags, value, options) {
+      date = setDay(date, value, options);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "D", "i", "e", "c", "t", "T" ];
+  }
+  class LocalDayParser extends Parser {
+    priority=90;
+    parse(dateString, token, match, options) {
+      const valueCallback = value => {
+        const wholeWeekDays = Math.floor((value - 1) / 7) * 7;
+        return (value + options.weekStartsOn + 6) % 7 + wholeWeekDays;
+      };
+      switch (token) {
+       case "e":
+       case "ee":
+        return mapValue(parseNDigits(token.length, dateString), valueCallback);
+
+       case "eo":
+        return mapValue(match.ordinalNumber(dateString, {
+          unit: "day"
+        }), valueCallback);
+
+       case "eee":
+        return match.day(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "eeeee":
+        return match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "eeeeee":
+        return match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "eeee":
+       default:
+        return match.day(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 6;
+    }
+    set(date, _flags, value, options) {
+      date = setDay(date, value, options);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "y", "R", "u", "q", "Q", "M", "L", "I", "d", "D", "E", "i", "c", "t", "T" ];
+  }
+  class StandAloneLocalDayParser extends Parser {
+    priority=90;
+    parse(dateString, token, match, options) {
+      const valueCallback = value => {
+        const wholeWeekDays = Math.floor((value - 1) / 7) * 7;
+        return (value + options.weekStartsOn + 6) % 7 + wholeWeekDays;
+      };
+      switch (token) {
+       case "c":
+       case "cc":
+        return mapValue(parseNDigits(token.length, dateString), valueCallback);
+
+       case "co":
+        return mapValue(match.ordinalNumber(dateString, {
+          unit: "day"
+        }), valueCallback);
+
+       case "ccc":
+        return match.day(dateString, {
+          width: "abbreviated",
+          context: "standalone"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "standalone"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "ccccc":
+        return match.day(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "cccccc":
+        return match.day(dateString, {
+          width: "short",
+          context: "standalone"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+
+       case "cccc":
+       default:
+        return match.day(dateString, {
+          width: "wide",
+          context: "standalone"
+        }) || match.day(dateString, {
+          width: "abbreviated",
+          context: "standalone"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "standalone"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "standalone"
+        });
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 6;
+    }
+    set(date, _flags, value, options) {
+      date = setDay(date, value, options);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "y", "R", "u", "q", "Q", "M", "L", "I", "d", "D", "E", "i", "e", "t", "T" ];
+  }
+  function setISODay(date, day, options) {
+    const date_ = toDate(date, options?.in);
+    const currentDay = getISODay(date_, options);
+    const diff = day - currentDay;
+    return addDays(date_, diff, options);
+  }
+  class ISODayParser extends Parser {
+    priority=90;
+    parse(dateString, token, match) {
+      const valueCallback = value => {
+        if (value === 0) {
+          return 7;
+        }
+        return value;
+      };
+      switch (token) {
+       case "i":
+       case "ii":
+        return parseNDigits(token.length, dateString);
+
+       case "io":
+        return match.ordinalNumber(dateString, {
+          unit: "day"
+        });
+
+       case "iii":
+        return mapValue(match.day(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        }), valueCallback);
+
+       case "iiiii":
+        return mapValue(match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        }), valueCallback);
+
+       case "iiiiii":
+        return mapValue(match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        }), valueCallback);
+
+       case "iiii":
+       default:
+        return mapValue(match.day(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "short",
+          context: "formatting"
+        }) || match.day(dateString, {
+          width: "narrow",
+          context: "formatting"
+        }), valueCallback);
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 7;
+    }
+    set(date, _flags, value) {
+      date = setISODay(date, value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "y", "Y", "u", "q", "Q", "M", "L", "w", "d", "D", "E", "e", "c", "t", "T" ];
+  }
+  class AMPMParser extends Parser {
+    priority=80;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "a":
+       case "aa":
+       case "aaa":
+        return match.dayPeriod(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "aaaaa":
+        return match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "aaaa":
+       default:
+        return match.dayPeriod(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    set(date, _flags, value) {
+      date.setHours(dayPeriodEnumToHours(value), 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "b", "B", "H", "k", "t", "T" ];
+  }
+  class AMPMMidnightParser extends Parser {
+    priority=80;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "b":
+       case "bb":
+       case "bbb":
+        return match.dayPeriod(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "bbbbb":
+        return match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "bbbb":
+       default:
+        return match.dayPeriod(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    set(date, _flags, value) {
+      date.setHours(dayPeriodEnumToHours(value), 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "a", "B", "H", "k", "t", "T" ];
+  }
+  class DayPeriodParser extends Parser {
+    priority=80;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "B":
+       case "BB":
+       case "BBB":
+        return match.dayPeriod(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "BBBBB":
+        return match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+
+       case "BBBB":
+       default:
+        return match.dayPeriod(dateString, {
+          width: "wide",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "abbreviated",
+          context: "formatting"
+        }) || match.dayPeriod(dateString, {
+          width: "narrow",
+          context: "formatting"
+        });
+      }
+    }
+    set(date, _flags, value) {
+      date.setHours(dayPeriodEnumToHours(value), 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "a", "b", "t", "T" ];
+  }
+  class Hour1to12Parser extends Parser {
+    priority=70;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "h":
+        return parseNumericPattern(numericPatterns.hour12h, dateString);
+
+       case "ho":
+        return match.ordinalNumber(dateString, {
+          unit: "hour"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 12;
+    }
+    set(date, _flags, value) {
+      const isPM = date.getHours() >= 12;
+      if (isPM && value < 12) {
+        date.setHours(value + 12, 0, 0, 0);
+      } else if (!isPM && value === 12) {
+        date.setHours(0, 0, 0, 0);
+      } else {
+        date.setHours(value, 0, 0, 0);
+      }
+      return date;
+    }
+    incompatibleTokens=[ "H", "K", "k", "t", "T" ];
+  }
+  class Hour0to23Parser extends Parser {
+    priority=70;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "H":
+        return parseNumericPattern(numericPatterns.hour23h, dateString);
+
+       case "Ho":
+        return match.ordinalNumber(dateString, {
+          unit: "hour"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 23;
+    }
+    set(date, _flags, value) {
+      date.setHours(value, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "a", "b", "h", "K", "k", "t", "T" ];
+  }
+  class Hour0To11Parser extends Parser {
+    priority=70;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "K":
+        return parseNumericPattern(numericPatterns.hour11h, dateString);
+
+       case "Ko":
+        return match.ordinalNumber(dateString, {
+          unit: "hour"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 11;
+    }
+    set(date, _flags, value) {
+      const isPM = date.getHours() >= 12;
+      if (isPM && value < 12) {
+        date.setHours(value + 12, 0, 0, 0);
+      } else {
+        date.setHours(value, 0, 0, 0);
+      }
+      return date;
+    }
+    incompatibleTokens=[ "h", "H", "k", "t", "T" ];
+  }
+  class Hour1To24Parser extends Parser {
+    priority=70;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "k":
+        return parseNumericPattern(numericPatterns.hour24h, dateString);
+
+       case "ko":
+        return match.ordinalNumber(dateString, {
+          unit: "hour"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 1 && value <= 24;
+    }
+    set(date, _flags, value) {
+      const hours = value <= 24 ? value % 24 : value;
+      date.setHours(hours, 0, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "a", "b", "h", "H", "K", "t", "T" ];
+  }
+  class MinuteParser extends Parser {
+    priority=60;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "m":
+        return parseNumericPattern(numericPatterns.minute, dateString);
+
+       case "mo":
+        return match.ordinalNumber(dateString, {
+          unit: "minute"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 59;
+    }
+    set(date, _flags, value) {
+      date.setMinutes(value, 0, 0);
+      return date;
+    }
+    incompatibleTokens=[ "t", "T" ];
+  }
+  class SecondParser extends Parser {
+    priority=50;
+    parse(dateString, token, match) {
+      switch (token) {
+       case "s":
+        return parseNumericPattern(numericPatterns.second, dateString);
+
+       case "so":
+        return match.ordinalNumber(dateString, {
+          unit: "second"
+        });
+
+       default:
+        return parseNDigits(token.length, dateString);
+      }
+    }
+    validate(_date, value) {
+      return value >= 0 && value <= 59;
+    }
+    set(date, _flags, value) {
+      date.setSeconds(value, 0);
+      return date;
+    }
+    incompatibleTokens=[ "t", "T" ];
+  }
+  class FractionOfSecondParser extends Parser {
+    priority=30;
+    parse(dateString, token) {
+      const valueCallback = value => Math.trunc(value * Math.pow(10, -token.length + 3));
+      return mapValue(parseNDigits(token.length, dateString), valueCallback);
+    }
+    set(date, _flags, value) {
+      date.setMilliseconds(value);
+      return date;
+    }
+    incompatibleTokens=[ "t", "T" ];
+  }
+  class ISOTimezoneWithZParser extends Parser {
+    priority=10;
+    parse(dateString, token) {
+      switch (token) {
+       case "X":
+        return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, dateString);
+
+       case "XX":
+        return parseTimezonePattern(timezonePatterns.basic, dateString);
+
+       case "XXXX":
+        return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, dateString);
+
+       case "XXXXX":
+        return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, dateString);
+
+       case "XXX":
+       default:
+        return parseTimezonePattern(timezonePatterns.extended, dateString);
+      }
+    }
+    set(date, flags, value) {
+      if (flags.timestampIsSet) return date;
+      return constructFrom(date, date.getTime() - getTimezoneOffsetInMilliseconds(date) - value);
+    }
+    incompatibleTokens=[ "t", "T", "x" ];
+  }
+  class ISOTimezoneParser extends Parser {
+    priority=10;
+    parse(dateString, token) {
+      switch (token) {
+       case "x":
+        return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, dateString);
+
+       case "xx":
+        return parseTimezonePattern(timezonePatterns.basic, dateString);
+
+       case "xxxx":
+        return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, dateString);
+
+       case "xxxxx":
+        return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, dateString);
+
+       case "xxx":
+       default:
+        return parseTimezonePattern(timezonePatterns.extended, dateString);
+      }
+    }
+    set(date, flags, value) {
+      if (flags.timestampIsSet) return date;
+      return constructFrom(date, date.getTime() - getTimezoneOffsetInMilliseconds(date) - value);
+    }
+    incompatibleTokens=[ "t", "T", "X" ];
+  }
+  class TimestampSecondsParser extends Parser {
+    priority=40;
+    parse(dateString) {
+      return parseAnyDigitsSigned(dateString);
+    }
+    set(date, _flags, value) {
+      return [ constructFrom(date, value * 1e3), {
+        timestampIsSet: true
+      } ];
+    }
+    incompatibleTokens="*";
+  }
+  class TimestampMillisecondsParser extends Parser {
+    priority=20;
+    parse(dateString) {
+      return parseAnyDigitsSigned(dateString);
+    }
+    set(date, _flags, value) {
+      return [ constructFrom(date, value), {
+        timestampIsSet: true
+      } ];
+    }
+    incompatibleTokens="*";
+  }
+  const parsers = {
+    G: new EraParser,
+    y: new YearParser,
+    Y: new LocalWeekYearParser,
+    R: new ISOWeekYearParser,
+    u: new ExtendedYearParser,
+    Q: new QuarterParser,
+    q: new StandAloneQuarterParser,
+    M: new MonthParser,
+    L: new StandAloneMonthParser,
+    w: new LocalWeekParser,
+    I: new ISOWeekParser,
+    d: new DateParser,
+    D: new DayOfYearParser,
+    E: new DayParser,
+    e: new LocalDayParser,
+    c: new StandAloneLocalDayParser,
+    i: new ISODayParser,
+    a: new AMPMParser,
+    b: new AMPMMidnightParser,
+    B: new DayPeriodParser,
+    h: new Hour1to12Parser,
+    H: new Hour0to23Parser,
+    K: new Hour0To11Parser,
+    k: new Hour1To24Parser,
+    m: new MinuteParser,
+    s: new SecondParser,
+    S: new FractionOfSecondParser,
+    X: new ISOTimezoneWithZParser,
+    x: new ISOTimezoneParser,
+    t: new TimestampSecondsParser,
+    T: new TimestampMillisecondsParser
+  };
+  const formattingTokensRegExp = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g;
+  const longFormattingTokensRegExp = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
+  const escapedStringRegExp = /^'([^]*?)'?$/;
+  const doubleQuoteRegExp = /''/g;
+  const notWhitespaceRegExp = /\S/;
+  const unescapedLatinCharacterRegExp = /[a-zA-Z]/;
+  function parse(dateStr, formatStr, referenceDate, options) {
+    const invalidDate = () => constructFrom(referenceDate, NaN);
+    const defaultOptions = getDefaultOptions();
+    const locale = defaultOptions.locale ?? enUS;
+    const firstWeekContainsDate = defaultOptions.firstWeekContainsDate ?? defaultOptions.locale?.options?.firstWeekContainsDate ?? 1;
+    const weekStartsOn = defaultOptions.weekStartsOn ?? defaultOptions.locale?.options?.weekStartsOn ?? 0;
+    if (!formatStr) return dateStr ? invalidDate() : toDate(referenceDate, options?.in);
+    const subFnOptions = {
+      firstWeekContainsDate: firstWeekContainsDate,
+      weekStartsOn: weekStartsOn,
+      locale: locale
+    };
+    const setters = [ new DateTimezoneSetter(options?.in, referenceDate) ];
+    const tokens = formatStr.match(longFormattingTokensRegExp).map(substring => {
+      const firstCharacter = substring[0];
+      if (firstCharacter in longFormatters) {
+        const longFormatter = longFormatters[firstCharacter];
+        return longFormatter(substring, locale.formatLong);
+      }
+      return substring;
+    }).join("").match(formattingTokensRegExp);
+    const usedTokens = [];
+    for (let token of tokens) {
+      if (isProtectedWeekYearToken(token)) {
+        warnOrThrowProtectedError(token, formatStr, dateStr);
+      }
+      if (isProtectedDayOfYearToken(token)) {
+        warnOrThrowProtectedError(token, formatStr, dateStr);
+      }
+      const firstCharacter = token[0];
+      const parser = parsers[firstCharacter];
+      if (parser) {
+        const {incompatibleTokens: incompatibleTokens} = parser;
+        if (Array.isArray(incompatibleTokens)) {
+          const incompatibleToken = usedTokens.find(usedToken => incompatibleTokens.includes(usedToken.token) || usedToken.token === firstCharacter);
+          if (incompatibleToken) {
+            throw new RangeError(`The format string mustn't contain \`${incompatibleToken.fullToken}\` and \`${token}\` at the same time`);
+          }
+        } else if (parser.incompatibleTokens === "*" && usedTokens.length > 0) {
+          throw new RangeError(`The format string mustn't contain \`${token}\` and any other token at the same time`);
+        }
+        usedTokens.push({
+          token: firstCharacter,
+          fullToken: token
+        });
+        const parseResult = parser.run(dateStr, token, locale.match, subFnOptions);
+        if (!parseResult) {
+          return invalidDate();
+        }
+        setters.push(parseResult.setter);
+        dateStr = parseResult.rest;
+      } else {
+        if (firstCharacter.match(unescapedLatinCharacterRegExp)) {
+          throw new RangeError("Format string contains an unescaped latin alphabet character `" + firstCharacter + "`");
+        }
+        if (token === "''") {
+          token = "'";
+        } else if (firstCharacter === "'") {
+          token = cleanEscapedString(token);
+        }
+        if (dateStr.indexOf(token) === 0) {
+          dateStr = dateStr.slice(token.length);
+        } else {
+          return invalidDate();
+        }
+      }
+    }
+    if (dateStr.length > 0 && notWhitespaceRegExp.test(dateStr)) {
+      return invalidDate();
+    }
+    const uniquePrioritySetters = setters.map(setter => setter.priority).sort((a, b) => b - a).filter((priority, index, array) => array.indexOf(priority) === index).map(priority => setters.filter(setter => setter.priority === priority).sort((a, b) => b.subPriority - a.subPriority)).map(setterArray => setterArray[0]);
+    let date = toDate(referenceDate, options?.in);
+    if (isNaN(+date)) return invalidDate();
+    const flags = {};
+    for (const setter of uniquePrioritySetters) {
+      if (!setter.validate(date, subFnOptions)) {
+        return invalidDate();
+      }
+      const result = setter.set(date, flags, subFnOptions);
+      if (Array.isArray(result)) {
+        date = result[0];
+        Object.assign(flags, result[1]);
+      } else {
+        date = result;
+      }
+    }
+    return date;
+  }
+  function cleanEscapedString(input) {
+    return input.match(escapedStringRegExp)[1].replace(doubleQuoteRegExp, "'");
   }
   function isSameMonth(laterDate, earlierDate, options) {
     const [laterDate_, earlierDate_] = normalizeDates(options?.in, laterDate, earlierDate);
@@ -7861,6 +9359,7 @@
       }
     }
     selectDate(event) {
+      event.stopPropagation();
       const dateStr = event.currentTarget.dataset.date;
       if (this.isDisabled(parseISO(dateStr))) return;
       this.focusedDate = dateStr;
@@ -10236,6 +11735,273 @@
       }
     }
   }
+  class DatepickerController extends stimulus.Controller {
+    static targets=[ "trigger", "label", "input", "hiddenInput", "calendar" ];
+    static outlets=[ "ui--popover", "ui--calendar" ];
+    static values={
+      format: {
+        type: String,
+        default: "long"
+      },
+      locale: {
+        type: String,
+        default: "en-US"
+      },
+      placeholder: {
+        type: String,
+        default: "Select date"
+      },
+      rangePlaceholder: {
+        type: String,
+        default: "Select date range"
+      },
+      closeOnSelect: {
+        type: Boolean,
+        default: true
+      },
+      mode: {
+        type: String,
+        default: "single"
+      },
+      selected: {
+        type: Array,
+        default: []
+      },
+      inputFormat: {
+        type: String,
+        default: "yyyy-MM-dd"
+      }
+    };
+    connect() {
+      if (this.selectedValue.length > 0) {
+        this.updateDisplay();
+      }
+    }
+    handleSelect(event) {
+      const {selected: selected, date: date} = event.detail;
+      this.selectedValue = selected;
+      this.updateDisplay();
+      this.updateHiddenInput();
+      if (this.shouldClosePopover()) {
+        this.closePopover();
+      }
+      this.dispatch("select", {
+        detail: {
+          selected: this.selectedValue,
+          date: date,
+          formatted: this.getFormattedDate()
+        }
+      });
+    }
+    handleInput(event) {
+      const inputValue = event.target.value;
+      if (!inputValue.trim()) {
+        this.selectedValue = [];
+        this.syncCalendarMonth(new Date);
+        return;
+      }
+      const parsedDate = this.parseInputDate(inputValue);
+      if (parsedDate && isValid(parsedDate)) {
+        const dateStr = format(parsedDate, "yyyy-MM-dd");
+        this.selectedValue = [ dateStr ];
+        this.syncCalendarMonth(parsedDate);
+        this.syncCalendarSelection([ dateStr ]);
+      }
+    }
+    handleInputKeydown(event) {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        this.openPopover();
+      }
+    }
+    parseInputDate(value) {
+      const formats = [ "yyyy-MM-dd", "MM/dd/yyyy", "dd/MM/yyyy", "MMMM dd, yyyy", "MMM dd, yyyy", "dd MMMM yyyy", "dd MMM yyyy" ];
+      const nativeDate = new Date(value);
+      if (isValid(nativeDate) && !isNaN(nativeDate.getTime())) {
+        return nativeDate;
+      }
+      for (const fmt of formats) {
+        try {
+          const parsed = parse(value, fmt, new Date);
+          if (isValid(parsed)) {
+            return parsed;
+          }
+        } catch {}
+      }
+      return null;
+    }
+    updateDisplay() {
+      const formatted = this.getFormattedDate();
+      if (this.hasLabelTarget) {
+        this.labelTarget.textContent = formatted;
+      }
+      if (this.hasInputTarget) {
+        this.inputTarget.value = formatted;
+      }
+      if (this.hasTriggerTarget && !this.hasLabelTarget && !this.hasInputTarget) {
+        this.triggerTarget.textContent = formatted;
+      }
+    }
+    updateHiddenInput() {
+      if (this.hasHiddenInputTarget) {
+        if (this.modeValue === "range" && this.selectedValue.length === 2) {
+          this.hiddenInputTarget.value = this.selectedValue.join(",");
+        } else if (this.selectedValue.length > 0) {
+          this.hiddenInputTarget.value = this.selectedValue.join(",");
+        } else {
+          this.hiddenInputTarget.value = "";
+        }
+      }
+    }
+    getFormattedDate() {
+      if (this.selectedValue.length === 0) {
+        return this.modeValue === "range" ? this.rangePlaceholderValue : this.placeholderValue;
+      }
+      if (this.modeValue === "range") {
+        return this.formatRangeDate();
+      }
+      if (this.modeValue === "multiple") {
+        return this.formatMultipleDates();
+      }
+      return this.formatSingleDate(this.selectedValue[0]);
+    }
+    formatSingleDate(dateStr) {
+      if (!dateStr) return this.placeholderValue;
+      try {
+        const date = parseISO(dateStr);
+        if (!isValid(date)) return this.placeholderValue;
+        const options = this.getDateFormatOptions();
+        const formatter = new Intl.DateTimeFormat(this.localeValue, options);
+        return formatter.format(date);
+      } catch {
+        return this.placeholderValue;
+      }
+    }
+    formatRangeDate() {
+      if (this.selectedValue.length === 0) {
+        return this.rangePlaceholderValue;
+      }
+      if (this.selectedValue.length === 1) {
+        return this.formatSingleDate(this.selectedValue[0]) + " - ...";
+      }
+      const start = this.formatSingleDate(this.selectedValue[0]);
+      const end = this.formatSingleDate(this.selectedValue[1]);
+      return `${start} - ${end}`;
+    }
+    formatMultipleDates() {
+      if (this.selectedValue.length === 0) {
+        return this.placeholderValue;
+      }
+      if (this.selectedValue.length === 1) {
+        return this.formatSingleDate(this.selectedValue[0]);
+      }
+      return `${this.selectedValue.length} dates selected`;
+    }
+    getDateFormatOptions() {
+      switch (this.formatValue) {
+       case "short":
+        return {
+          dateStyle: "short"
+        };
+
+       case "medium":
+        return {
+          dateStyle: "medium"
+        };
+
+       case "long":
+        return {
+          dateStyle: "long"
+        };
+
+       case "full":
+        return {
+          dateStyle: "full"
+        };
+
+       default:
+        return {
+          dateStyle: "long"
+        };
+      }
+    }
+    shouldClosePopover() {
+      if (!this.closeOnSelectValue) return false;
+      switch (this.modeValue) {
+       case "single":
+        return this.selectedValue.length === 1;
+
+       case "range":
+        return this.selectedValue.length === 2;
+
+       case "multiple":
+        return false;
+
+       default:
+        return true;
+      }
+    }
+    closePopover() {
+      if (this.hasUiPopoverOutlet) {
+        this.uiPopoverOutlet.hide();
+        return;
+      }
+      const popoverElement = this.element.querySelector("[data-controller*='ui--popover']");
+      if (popoverElement) {
+        const popoverController = this.application.getControllerForElementAndIdentifier(popoverElement, "ui--popover");
+        if (popoverController) {
+          popoverController.hide();
+        }
+      }
+    }
+    openPopover() {
+      if (this.hasUiPopoverOutlet) {
+        this.uiPopoverOutlet.show();
+        return;
+      }
+      const popoverElement = this.element.querySelector("[data-controller*='ui--popover']");
+      if (popoverElement) {
+        const popoverController = this.application.getControllerForElementAndIdentifier(popoverElement, "ui--popover");
+        if (popoverController) {
+          popoverController.show();
+        }
+      }
+    }
+    syncCalendarMonth(date) {
+      if (this.hasUiCalendarOutlet) {
+        this.uiCalendarOutlet.currentMonth = date;
+        this.uiCalendarOutlet.render();
+        return;
+      }
+      const calendarElement = this.element.querySelector("[data-controller*='ui--calendar']");
+      if (calendarElement) {
+        const calendarController = this.application.getControllerForElementAndIdentifier(calendarElement, "ui--calendar");
+        if (calendarController) {
+          calendarController.currentMonth = date;
+          calendarController.render();
+        }
+      }
+    }
+    syncCalendarSelection(selected) {
+      if (this.hasUiCalendarOutlet) {
+        this.uiCalendarOutlet.selectedValue = selected;
+        this.uiCalendarOutlet.render();
+        return;
+      }
+      const calendarElement = this.element.querySelector("[data-controller*='ui--calendar']");
+      if (calendarElement) {
+        const calendarController = this.application.getControllerForElementAndIdentifier(calendarElement, "ui--calendar");
+        if (calendarController) {
+          calendarController.selectedValue = selected;
+          calendarController.render();
+        }
+      }
+    }
+    toggle(event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -10276,7 +12042,8 @@
       "ui--toggle": ToggleController,
       "ui--toggle-group": ToggleGroupController,
       "ui--calendar": CalendarController,
-      "ui--carousel": CarouselController
+      "ui--carousel": CarouselController,
+      "ui--datepicker": DatepickerController
     });
   }
   exports.AccordionController = AccordionController;
@@ -10290,6 +12057,7 @@
   exports.CommandController = CommandController;
   exports.CommandDialogController = CommandDialogController;
   exports.ContextMenuController = ContextMenuController;
+  exports.DatepickerController = DatepickerController;
   exports.DialogController = DialogController;
   exports.DrawerController = DrawerController;
   exports.DropdownController = DropdownController;

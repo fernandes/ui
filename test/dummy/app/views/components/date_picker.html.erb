@@ -1,0 +1,405 @@
+<div class="space-y-12 py-8">
+  <div class="space-y-4">
+    <h1 class="text-4xl font-bold">Date Picker</h1>
+    <p class="text-lg text-muted-foreground">A date picker component that combines a popover trigger with a calendar.</p>
+  </div>
+
+  <!-- Basic Date Picker -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Basic Date Picker</h2>
+      <p class="text-muted-foreground text-sm">A simple date picker with button trigger</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker" do %>
+          <%= render "ui/date_picker/date_picker_trigger", placeholder: "Pick a date" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker" do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Pick a date" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Picker with Label -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Picker with Label</h2>
+      <p class="text-muted-foreground text-sm">Date picker with an associated label</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker", label: "Date of birth" do %>
+          <%= render "ui/date_picker/date_picker_trigger", placeholder: "Select your birth date" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  label: "Date of birth" do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Select your birth date" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Picker with Form Field -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Picker with Form Field</h2>
+      <p class="text-muted-foreground text-sm">Date picker with hidden input for form submission</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= form_with url: "#", method: :get, local: true, class: "space-y-4" do |f| %>
+          <%= render "ui/date_picker/date_picker",
+            name: "booking[date]",
+            label: "Booking Date",
+            selected: Date.today + 7 do %>
+            <%= render "ui/date_picker/date_picker_trigger",
+              selected: Date.today + 7 %>
+          <% end %>
+          <%= render "ui/button/button", type: "submit", content: "Submit" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  name: "booking[date]",
+  label: "Booking Date",
+  selected: Date.today + 7 do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    selected: Date.today + 7 %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Picker with Dropdowns -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Picker with Dropdowns</h2>
+      <p class="text-muted-foreground text-sm">Calendar with month/year dropdown navigation</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker",
+          label: "Date of birth",
+          show_dropdowns: true do %>
+          <%= render "ui/date_picker/date_picker_trigger", placeholder: "Select date" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  label: "Date of birth",
+  show_dropdowns: true do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Select date" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Range Picker -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Range Picker</h2>
+      <p class="text-muted-foreground text-sm">Select a date range</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker",
+          mode: :range,
+          label: "Trip dates" do %>
+          <%= render "ui/date_picker/date_picker_trigger",
+            placeholder: "Select dates",
+            classes: "w-[320px]" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  mode: :range,
+  label: "Trip dates" do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Select dates",
+    classes: "w-[320px]" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Range with Multiple Months -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Range with Multiple Months</h2>
+      <p class="text-muted-foreground text-sm">Date range picker showing 2 months</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker",
+          mode: :range,
+          number_of_months: 2,
+          label: "Vacation dates" do %>
+          <%= render "ui/date_picker/date_picker_trigger",
+            placeholder: "Select vacation dates",
+            classes: "w-[320px]" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  mode: :range,
+  number_of_months: 2,
+  label: "Vacation dates" do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Select vacation dates",
+    classes: "w-[320px]" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Picker with Calendar Icon -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Picker with Calendar Icon</h2>
+      <p class="text-muted-foreground text-sm">Using calendar icon instead of chevron</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker" do %>
+          <%= render "ui/date_picker/date_picker_trigger",
+            placeholder: "Pick a date",
+            icon: :calendar %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker" do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Pick a date",
+    icon: :calendar %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Date Picker with Date Constraints -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Date Picker with Constraints</h2>
+      <p class="text-muted-foreground text-sm">With min/max date constraints</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker",
+          label: "Appointment (next 30 days)",
+          min_date: Date.today,
+          max_date: Date.today + 30 do %>
+          <%= render "ui/date_picker/date_picker_trigger",
+            placeholder: "Select appointment" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  label: "Appointment (next 30 days)",
+  min_date: Date.today,
+  max_date: Date.today + 30 do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Select appointment" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phlex Component -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Phlex Component</h2>
+      <p class="text-muted-foreground text-sm">Using the Phlex component</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render UI::DatePicker::DatePicker.new(label: "Event date") do |dp| %>
+          <% dp.trigger(placeholder: "Select event date") %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::DatePicker::DatePicker.new(
+  label: "Event date"
+) do |dp| %&gt;
+  &lt;% dp.trigger(placeholder: "Select event date") %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Localized Date Picker -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Localized Date Picker</h2>
+      <p class="text-muted-foreground text-sm">Date picker with Portuguese (Brazil) locale</p>
+    </div>
+
+    <div class="flex flex-wrap gap-8">
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker/date_picker",
+          locale: "pt-BR",
+          label: "Data de nascimento" do %>
+          <%= render "ui/date_picker/date_picker_trigger",
+            placeholder: "Selecione uma data" %>
+        <% end %>
+      </div>
+
+      <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+  locale: "pt-BR",
+  label: "Data de nascimento" do %&gt;
+  &lt;%= render "ui/date_picker/date_picker_trigger",
+    placeholder: "Selecione uma data" %&gt;
+&lt;% end %&gt;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Configuration Reference -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">Configuration Reference</h2>
+      <p class="text-muted-foreground text-sm">Available parameters for the date picker component</p>
+    </div>
+
+    <div class="rounded-md border overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-muted/50 border-b">
+            <th class="text-left p-3 font-medium">Parameter</th>
+            <th class="text-left p-3 font-medium">Type</th>
+            <th class="text-left p-3 font-medium">Default</th>
+            <th class="text-left p-3 font-medium">Description</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr>
+            <td class="p-3 font-mono text-xs">mode</td>
+            <td class="p-3">Symbol/String</td>
+            <td class="p-3"><code>:single</code></td>
+            <td class="p-3">Selection mode: :single, :range, or :multiple</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">selected</td>
+            <td class="p-3">Date/Range/Array</td>
+            <td class="p-3"><code>nil</code></td>
+            <td class="p-3">Initially selected date(s)</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">locale</td>
+            <td class="p-3">String</td>
+            <td class="p-3"><code>"en-US"</code></td>
+            <td class="p-3">BCP 47 locale tag for formatting</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">format</td>
+            <td class="p-3">String</td>
+            <td class="p-3"><code>"long"</code></td>
+            <td class="p-3">Date format: "short", "medium", "long", "full"</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">placeholder</td>
+            <td class="p-3">String</td>
+            <td class="p-3"><code>"Select date"</code></td>
+            <td class="p-3">Placeholder text</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">name</td>
+            <td class="p-3">String</td>
+            <td class="p-3"><code>nil</code></td>
+            <td class="p-3">Form field name for hidden input</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">label</td>
+            <td class="p-3">String</td>
+            <td class="p-3"><code>nil</code></td>
+            <td class="p-3">Label text for the date picker</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">show_dropdowns</td>
+            <td class="p-3">Boolean</td>
+            <td class="p-3"><code>false</code></td>
+            <td class="p-3">Show month/year dropdowns in calendar</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">min_date</td>
+            <td class="p-3">Date</td>
+            <td class="p-3"><code>nil</code></td>
+            <td class="p-3">Minimum selectable date</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">max_date</td>
+            <td class="p-3">Date</td>
+            <td class="p-3"><code>nil</code></td>
+            <td class="p-3">Maximum selectable date</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">number_of_months</td>
+            <td class="p-3">Integer</td>
+            <td class="p-3"><code>1</code></td>
+            <td class="p-3">Number of months to display</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono text-xs">close_on_select</td>
+            <td class="p-3">Boolean</td>
+            <td class="p-3"><code>true</code></td>
+            <td class="p-3">Close popover after selection</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- JavaScript Events -->
+  <section class="space-y-6 border-t pt-8">
+    <div>
+      <h2 class="text-2xl font-semibold">JavaScript Events</h2>
+      <p class="text-muted-foreground text-sm">Events dispatched by the date picker</p>
+    </div>
+
+    <div class="rounded-md border overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-muted/50 border-b">
+            <th class="text-left p-3 font-medium">Event</th>
+            <th class="text-left p-3 font-medium">Detail</th>
+            <th class="text-left p-3 font-medium">Description</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr>
+            <td class="p-3 font-mono text-xs">ui--datepicker:select</td>
+            <td class="p-3"><code>{ selected, date, formatted }</code></td>
+            <td class="p-3">Fired when a date is selected</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

@@ -171,6 +171,11 @@ export default class extends Controller {
 
   // Selection handlers
   selectDate(event) {
+    // Stop propagation to prevent popover's handleClickOutside from closing the popover
+    // This is necessary because render() replaces the DOM, removing event.target from the document
+    // which would make contains() return false in handleClickOutside
+    event.stopPropagation()
+
     const dateStr = event.currentTarget.dataset.date
     if (this.isDisabled(parseISO(dateStr))) return
 

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   get "/components/combobox", to: "components#combobox"
   get "/components/command", to: "components#command"
   get "/components/context_menu", to: "components#context_menu"
+  get "/components/date_picker", to: "components#date_picker"
   get "/components/dialog", to: "components#dialog"
   get "/components/drawer", to: "components#drawer"
   get "/components/dropdown_menu", to: "components#dropdown_menu"

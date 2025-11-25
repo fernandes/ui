@@ -57,6 +57,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/context_menu.html.erb
   end
 
+  def date_picker
+    # Renders app/views/components/date_picker.html.erb
+  end
+
   def dialog
     # Renders app/views/components/dialog.html.erb
   end
