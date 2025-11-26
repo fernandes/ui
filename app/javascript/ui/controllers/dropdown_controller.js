@@ -22,7 +22,8 @@ export default class extends Controller {
     open: { type: Boolean, default: false },
     placement: { type: String, default: "bottom-start" },
     offset: { type: Number, default: 4 },
-    flip: { type: Boolean, default: true }
+    flip: { type: Boolean, default: true },
+    strategy: { type: String, default: "fixed" }
   }
 
   constructor() {
@@ -766,14 +767,21 @@ export default class extends Controller {
     // Add shift to keep dropdown in viewport
     middleware.push(shift({ padding: 8 }))
 
+    // Set trigger width CSS variable for dropdown content sizing
+    content.style.setProperty('--ui-dropdown-menu-trigger-width', `${trigger.offsetWidth}px`)
+
     // Define update function
     const update = () => {
       computePosition(trigger, content, {
         placement: this.placementValue,
         middleware: middleware,
-        strategy: 'absolute'
+        strategy: this.strategyValue
       }).then(({ x, y, placement, middlewareData }) => {
+        // Update trigger width in case it changed
+        content.style.setProperty('--ui-dropdown-menu-trigger-width', `${trigger.offsetWidth}px`)
+
         Object.assign(content.style, {
+          position: this.strategyValue,
           left: `${x}px`,
           top: `${y}px`,
         })

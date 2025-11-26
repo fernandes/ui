@@ -10,11 +10,14 @@ module UI
       SIDES = %w[top right bottom left].freeze
 
       # Base CSS classes for sheet content (all sides)
-      # Match shadcn exactly - no opacity/pointer-events, just slide animations
+      # Match shadcn exactly - slide animations with proper pointer-events
       def sheet_content_base_classes
         [
-          # Base structure (same as shadcn)
-          "bg-background fixed z-50 flex flex-col gap-4 shadow-lg",
+          # Base structure (same as shadcn) - shadow only when open to avoid shadow bleeding when closed
+          "bg-background fixed z-50 flex flex-col gap-4",
+          "data-[state=open]:shadow-lg data-[state=closed]:shadow-none",
+          # Pointer events control - prevent interaction when closed
+          "data-[state=open]:pointer-events-auto data-[state=closed]:pointer-events-none",
           # Transition timing (same as shadcn)
           "transition ease-in-out",
           "data-[state=closed]:duration-300 data-[state=open]:duration-500",
@@ -26,21 +29,22 @@ module UI
       end
 
       # Side-specific CSS classes
+      # Include translate classes to keep content off-screen when closed (after animation ends)
       def sheet_content_side_classes
         side = @side || "right"
 
         case side.to_s
         when "right"
-          "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm"
+          "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:translate-x-full data-[state=open]:translate-x-0 inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm"
         when "left"
-          "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm"
+          "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0 inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm"
         when "top"
-          "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b"
+          "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top data-[state=closed]:-translate-y-full data-[state=open]:translate-y-0 inset-x-0 top-0 h-auto border-b"
         when "bottom"
-          "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t"
+          "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom data-[state=closed]:translate-y-full data-[state=open]:translate-y-0 inset-x-0 bottom-0 h-auto border-t"
         else
           # Default to right
-          "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm"
+          "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:translate-x-full data-[state=open]:translate-x-0 inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm"
         end
       end
 

@@ -28,6 +28,7 @@ import PopoverController from "./controllers/popover_controller.js";
 import ResponsiveDialogController from "./controllers/responsive_dialog_controller.js";
 import ScrollAreaController from "./controllers/scroll_area_controller.js";
 import SelectController from "./controllers/select_controller.js";
+import SidebarController from "./controllers/sidebar_controller.js";
 import SonnerController from "./controllers/sonner_controller.js";
 import ToggleController from "./controllers/toggle_controller.js";
 import ToggleGroupController from "./controllers/toggle_group_controller.js";
@@ -68,6 +69,7 @@ export function registerControllers(application) {
     "ui--responsive-dialog": ResponsiveDialogController,
     "ui--scroll-area": ScrollAreaController,
     "ui--select": SelectController,
+    "ui--sidebar": SidebarController,
     "ui--slider": SliderController,
     "ui--sonner": SonnerController,
     "ui--switch": SwitchController,
@@ -85,4 +87,4 @@ export function registerControllers(application) {
 export { registerControllersInto };
 
 // Export individual controllers for selective import
-export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, CalendarController, CarouselController, DatepickerController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, MenubarController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController };
+export { HelloController, DropdownController, AccordionController, AlertDialogController, AvatarController, CalendarController, CarouselController, DatepickerController, DialogController, DrawerController, CheckboxController, CollapsibleController, ComboboxController, CommandController, CommandDialogController, ContextMenuController, HoverCardController, InputOtpController, MenubarController, TooltipController, PopoverController, ResponsiveDialogController, ScrollAreaController, SelectController, SidebarController, SliderController, SonnerController, SwitchController, TabsController, ToggleController, ToggleGroupController };

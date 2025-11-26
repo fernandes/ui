@@ -129,6 +129,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/separator.html.erb
   end
 
+  def sidebar_phlex_07
+    # Renders app/views/components/sidebar_phlex_07.html.erb
+  end
+
   def sheet
     # Renders app/views/components/sheet.html.erb
   end

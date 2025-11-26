@@ -45,6 +45,7 @@ Rails.application.routes.draw do
   get "/components/scroll_area", to: "components#scroll_area"
   get "/components/select", to: "components#select"
   get "/components/separator", to: "components#separator"
+  get "/components/sidebar-phlex-07", to: "components#sidebar_phlex_07"
   get "/components/sheet", to: "components#sheet"
   get "/components/skeleton", to: "components#skeleton"
   get "/components/sonner", to: "components#sonner"

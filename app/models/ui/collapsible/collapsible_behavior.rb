@@ -39,7 +39,7 @@ module UI
       private
 
       def collapsible_base_classes
-        ""
+        "group/collapsible"
       end
     end
   end

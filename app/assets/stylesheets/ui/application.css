@@ -71,12 +71,12 @@
   }
 
   /* Select viewport scrollbar hiding */
-  [data-radix-select-viewport] {
+  [data-ui-select-viewport] {
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
   }
-  [data-radix-select-viewport]::-webkit-scrollbar {
+  [data-ui-select-viewport]::-webkit-scrollbar {
     display: none;
   }
 
@@ -199,7 +199,14 @@
   --duration-collapsible:300ms;
   --ease-collapsible:cubic-bezier(0.87, 0, 0.13, 1);
   --duration-drawer:500ms;
-  --ease-drawer:cubic-bezier(0.32, 0.72, 0, 1)
+  --ease-drawer:cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Sidebar Variables */
+  --sidebar-width:16rem;
+  --sidebar-width-mobile:18rem;
+  --sidebar-width-icon:3rem;
+  --duration-sidebar:200ms;
+  --ease-sidebar:linear
 }
 @supports (color:lab(0% 0 0)) {
   :root {
@@ -567,4 +574,11 @@
   --ease-accordion: cubic-bezier(0.87, 0, 0.13, 1);
   --duration-drawer: 500ms;
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Sidebar Variables */
+  --sidebar-width: 16rem;
+  --sidebar-width-mobile: 18rem;
+  --sidebar-width-icon: 3rem;
+  --duration-sidebar: 200ms;
+  --ease-sidebar: linear;
 }

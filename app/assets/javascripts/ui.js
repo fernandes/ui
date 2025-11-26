@@ -1491,6 +1491,10 @@
       flip: {
         type: Boolean,
         default: true
+      },
+      strategy: {
+        type: String,
+        default: "fixed"
       }
     };
     constructor() {
@@ -1988,13 +1992,16 @@
       middleware.push(shift({
         padding: 8
       }));
+      content.style.setProperty("--ui-dropdown-menu-trigger-width", `${trigger.offsetWidth}px`);
       const update = () => {
         computePosition(trigger, content, {
           placement: this.placementValue,
           middleware: middleware,
-          strategy: "absolute"
+          strategy: this.strategyValue
         }).then(({x: x, y: y, placement: placement, middlewareData: middlewareData}) => {
+          content.style.setProperty("--ui-dropdown-menu-trigger-width", `${trigger.offsetWidth}px`);
           Object.assign(content.style, {
+            position: this.strategyValue,
             left: `${x}px`,
             top: `${y}px`
           });
@@ -5033,6 +5040,208 @@
       if (this.boundHandleScroll && this.hasViewportTarget) {
         this.viewportTarget.removeEventListener("scroll", this.boundHandleScroll);
       }
+    }
+  }
+  class SidebarController extends stimulus.Controller {
+    static targets=[ "sidebar", "trigger", "mobileSheet", "mobileDrawer" ];
+    static values={
+      open: {
+        type: Boolean,
+        default: true
+      },
+      openMobile: {
+        type: Boolean,
+        default: false
+      },
+      collapsible: {
+        type: String,
+        default: "icon"
+      },
+      side: {
+        type: String,
+        default: "left"
+      },
+      cookieName: {
+        type: String,
+        default: "sidebar_state"
+      },
+      cookieExpires: {
+        type: Number,
+        default: 7
+      }
+    };
+    MOBILE_BREAKPOINT=768;
+    connect() {
+      this.loadCookie();
+      this.boundHandleKeyboard = this.handleKeyboard.bind(this);
+      document.addEventListener("keydown", this.boundHandleKeyboard);
+      this.boundHandleResize = this.handleResize.bind(this);
+      window.addEventListener("resize", this.boundHandleResize);
+      this.boundHandleSheetClose = this.handleSheetClose.bind(this);
+      this.element.addEventListener("dialog:close", this.boundHandleSheetClose);
+      this.updateState();
+    }
+    disconnect() {
+      document.removeEventListener("keydown", this.boundHandleKeyboard);
+      window.removeEventListener("resize", this.boundHandleResize);
+      this.element.removeEventListener("dialog:close", this.boundHandleSheetClose);
+    }
+    toggle() {
+      if (this.isMobile()) {
+        this.toggleMobile();
+      } else {
+        this.toggleDesktop();
+      }
+    }
+    open() {
+      if (this.isMobile()) {
+        this.openMobile();
+      } else {
+        this.openDesktop();
+      }
+    }
+    close() {
+      if (this.isMobile()) {
+        this.closeMobile();
+      } else {
+        this.closeDesktop();
+      }
+    }
+    setOpen(open) {
+      if (this.isMobile()) {
+        this.openMobileValue = open;
+      } else {
+        this.openValue = open;
+        this.saveCookie();
+      }
+      this.updateState();
+    }
+    toggleDesktop() {
+      this.openValue = !this.openValue;
+      this.saveCookie();
+      this.updateState();
+      this.dispatchToggleEvent();
+    }
+    openDesktop() {
+      this.openValue = true;
+      this.saveCookie();
+      this.updateState();
+      this.dispatchToggleEvent();
+    }
+    closeDesktop() {
+      this.openValue = false;
+      this.saveCookie();
+      this.updateState();
+      this.dispatchToggleEvent();
+    }
+    toggleMobile() {
+      this.openMobileValue = !this.openMobileValue;
+      this.updateMobileDrawer();
+    }
+    openMobile() {
+      this.openMobileValue = true;
+      this.updateMobileDrawer();
+    }
+    closeMobile() {
+      this.openMobileValue = false;
+      this.updateMobileDrawer();
+    }
+    updateMobileDrawer() {
+      if (this.hasMobileSheetTarget) {
+        const sheetController = this.application.getControllerForElementAndIdentifier(this.mobileSheetTarget, "ui--dialog");
+        if (sheetController) {
+          if (this.openMobileValue) {
+            sheetController.open();
+          } else {
+            sheetController.close();
+          }
+        }
+        return;
+      }
+      if (this.hasMobileDrawerTarget) {
+        const drawerController = this.application.getControllerForElementAndIdentifier(this.mobileDrawerTarget, "ui--drawer");
+        if (drawerController) {
+          if (this.openMobileValue) {
+            drawerController.open();
+          } else {
+            drawerController.close();
+          }
+        }
+      }
+    }
+    getState() {
+      if (this.collapsibleValue === "none") {
+        return "expanded";
+      }
+      return this.openValue ? "expanded" : "collapsed";
+    }
+    isMobile() {
+      return window.innerWidth < this.MOBILE_BREAKPOINT;
+    }
+    updateState() {
+      const state = this.getState();
+      const collapsibleAttr = state === "collapsed" ? this.collapsibleValue : "";
+      this.element.dataset.state = state;
+      this.element.dataset.collapsible = collapsibleAttr;
+      this.element.dataset.side = this.sideValue;
+      if (this.hasSidebarTarget) {
+        this.sidebarTarget.dataset.state = state;
+        this.sidebarTarget.dataset.collapsible = collapsibleAttr;
+        this.sidebarTarget.dataset.side = this.sideValue;
+      }
+      this.triggerTargets.forEach(trigger => {
+        trigger.dataset.state = state;
+      });
+    }
+    saveCookie() {
+      const expires = new Date;
+      expires.setDate(expires.getDate() + this.cookieExpiresValue);
+      document.cookie = `${this.cookieNameValue}=${this.openValue}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+    }
+    loadCookie() {
+      const cookies = document.cookie.split("; ");
+      const cookie = cookies.find(c => c.startsWith(`${this.cookieNameValue}=`));
+      if (cookie) {
+        const value = cookie.split("=")[1];
+        this.openValue = value === "true";
+      }
+    }
+    handleKeyboard(event) {
+      if ((event.metaKey || event.ctrlKey) && event.key === "b") {
+        event.preventDefault();
+        this.toggle();
+      }
+    }
+    handleResize() {
+      this.updateState();
+    }
+    handleSheetClose(event) {
+      if (this.hasMobileSheetTarget && this.mobileSheetTarget.contains(event.target)) {
+        this.openMobileValue = false;
+      }
+    }
+    dispatchToggleEvent() {
+      this.element.dispatchEvent(new CustomEvent("sidebar:toggle", {
+        bubbles: true,
+        detail: {
+          open: this.openValue,
+          state: this.getState(),
+          collapsible: this.collapsibleValue,
+          side: this.sideValue
+        }
+      }));
+    }
+    openValueChanged() {
+      this.updateState();
+    }
+    openMobileValueChanged() {
+      this.updateMobileDrawer();
+    }
+    collapsibleValueChanged() {
+      this.updateState();
+    }
+    sideValueChanged() {
+      this.updateState();
     }
   }
   class SonnerController extends stimulus.Controller {
@@ -12650,6 +12859,7 @@
       "ui--responsive-dialog": ResponsiveDialogController,
       "ui--scroll-area": ScrollAreaController,
       "ui--select": SelectController,
+      "ui--sidebar": SidebarController,
       "ui--slider": SliderController,
       "ui--sonner": SonnerController,
       "ui--switch": SwitchController,
@@ -12685,6 +12895,7 @@
   exports.ResponsiveDialogController = ResponsiveDialogController;
   exports.ScrollAreaController = ScrollAreaController;
   exports.SelectController = SelectController;
+  exports.SidebarController = SidebarController;
   exports.SliderController = SliderController;
   exports.SonnerController = SonnerController;
   exports.SwitchController = SwitchController;
