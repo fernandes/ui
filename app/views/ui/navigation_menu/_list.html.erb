@@ -1,0 +1,12 @@
+<%# NavigationMenu List Component - Container for menu items %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::NavigationMenu::ListBehavior
+
+  all_attributes = navigation_menu_list_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :ul, all_attributes do %>
+  <%= yield %>
+<% end %>

@@ -12826,6 +12826,372 @@
       }
     }
   }
+  class NavigationMenuController extends stimulus.Controller {
+    static targets=[ "trigger", "content", "viewport", "item" ];
+    static values={
+      viewport: {
+        type: Boolean,
+        default: true
+      },
+      delayDuration: {
+        type: Number,
+        default: 200
+      },
+      skipDelayDuration: {
+        type: Number,
+        default: 300
+      },
+      activeIndex: {
+        type: Number,
+        default: -1
+      },
+      previousIndex: {
+        type: Number,
+        default: -1
+      }
+    };
+    connect() {
+      this.openTimerRef = null;
+      this.closeTimerRef = null;
+      this.skipDelayTimerRef = null;
+      this.isOpenDelayed = true;
+      this.isMenuActive = false;
+      this.boundHandleClickOutside = this.handleClickOutside.bind(this);
+      this.boundHandleKeydown = this.handleKeydown.bind(this);
+      document.addEventListener("click", this.boundHandleClickOutside);
+      document.addEventListener("keydown", this.boundHandleKeydown);
+      this.initializeTriggers();
+    }
+    disconnect() {
+      this.clearTimers();
+      document.removeEventListener("click", this.boundHandleClickOutside);
+      document.removeEventListener("keydown", this.boundHandleKeydown);
+    }
+    initializeTriggers() {
+      this.triggerTargets.forEach((trigger, index) => {
+        trigger.setAttribute("tabindex", index === 0 ? "0" : "-1");
+      });
+    }
+    clearTimers() {
+      if (this.openTimerRef) {
+        clearTimeout(this.openTimerRef);
+        this.openTimerRef = null;
+      }
+      if (this.closeTimerRef) {
+        clearTimeout(this.closeTimerRef);
+        this.closeTimerRef = null;
+      }
+      if (this.skipDelayTimerRef) {
+        clearTimeout(this.skipDelayTimerRef);
+        this.skipDelayTimerRef = null;
+      }
+    }
+    toggle(event) {
+      const trigger = event.currentTarget;
+      const triggerIndex = this.triggerTargets.indexOf(trigger);
+      const content = this.contentTargets[triggerIndex];
+      if (!content) return;
+      const isCurrentlyOpen = trigger.getAttribute("data-state") === "open";
+      if (isCurrentlyOpen) {
+        this.closeMenu();
+      } else {
+        this.openMenu(triggerIndex);
+      }
+    }
+    openMenu(index) {
+      const trigger = this.triggerTargets[index];
+      const content = this.contentTargets[index];
+      if (!trigger || !content) return;
+      const enterMotion = this.calculateEnterMotion(index);
+      const exitMotion = this.calculateExitMotion(index);
+      this.triggerTargets.forEach((t, i) => {
+        const c = this.contentTargets[i];
+        if (c && i !== index && t.getAttribute("data-state") === "open") {
+          this.animateContentOut(c, t, exitMotion);
+        }
+      });
+      content.setAttribute("data-motion", enterMotion);
+      content.setAttribute("data-state", "open");
+      trigger.setAttribute("data-state", "open");
+      trigger.setAttribute("aria-expanded", "true");
+      this.previousIndexValue = this.activeIndexValue;
+      this.activeIndexValue = index;
+      this.isMenuActive = true;
+      if (this.viewportValue && this.hasViewportTarget) {
+        this.updateViewport(content);
+      }
+    }
+    animateContentOut(content, trigger, motion) {
+      content.setAttribute("data-motion", motion);
+      trigger.setAttribute("data-state", "closed");
+      trigger.setAttribute("aria-expanded", "false");
+      content.addEventListener("animationend", () => {
+        content.setAttribute("data-state", "closed");
+      }, {
+        once: true
+      });
+    }
+    closeMenu() {
+      const index = this.activeIndexValue;
+      if (index < 0) return;
+      const trigger = this.triggerTargets[index];
+      const content = this.contentTargets[index];
+      if (content && trigger) {
+        const motion = "to-none";
+        this.animateContentOut(content, trigger, motion);
+      }
+      if (this.viewportValue && this.hasViewportTarget) {
+        this.viewportTarget.setAttribute("data-state", "closed");
+      }
+      this.previousIndexValue = this.activeIndexValue;
+      this.activeIndexValue = -1;
+      this.isMenuActive = false;
+    }
+    closeAll() {
+      this.triggerTargets.forEach((trigger, index) => {
+        const content = this.contentTargets[index];
+        if (content) {
+          content.setAttribute("data-state", "closed");
+        }
+        trigger.setAttribute("data-state", "closed");
+        trigger.setAttribute("aria-expanded", "false");
+      });
+      if (this.viewportValue && this.hasViewportTarget) {
+        this.viewportTarget.setAttribute("data-state", "closed");
+      }
+      this.activeIndexValue = -1;
+      this.isMenuActive = false;
+    }
+    handleTriggerHover(event) {
+      const trigger = event.currentTarget;
+      const triggerIndex = this.triggerTargets.indexOf(trigger);
+      if (this.closeTimerRef) {
+        clearTimeout(this.closeTimerRef);
+        this.closeTimerRef = null;
+      }
+      if (this.isMenuActive && triggerIndex !== this.activeIndexValue) {
+        this.openMenu(triggerIndex);
+        return;
+      }
+      if (triggerIndex === this.activeIndexValue) {
+        return;
+      }
+      if (this.isOpenDelayed) {
+        this.openTimerRef = setTimeout(() => {
+          this.openMenu(triggerIndex);
+          this.isOpenDelayed = false;
+          this.skipDelayTimerRef = setTimeout(() => {
+            this.isOpenDelayed = true;
+          }, this.skipDelayDurationValue);
+        }, this.delayDurationValue);
+      } else {
+        this.openMenu(triggerIndex);
+      }
+    }
+    handleTriggerLeave(event) {
+      const trigger = event.currentTarget;
+      const triggerIndex = this.triggerTargets.indexOf(trigger);
+      const relatedTarget = event.relatedTarget;
+      if (this.openTimerRef) {
+        clearTimeout(this.openTimerRef);
+        this.openTimerRef = null;
+      }
+      const content = this.contentTargets[triggerIndex];
+      if (content && content.contains(relatedTarget)) {
+        return;
+      }
+      if (relatedTarget && this.triggerTargets.includes(relatedTarget)) {
+        return;
+      }
+      if (this.hasViewportTarget && this.viewportTarget.contains(relatedTarget)) {
+        return;
+      }
+      this.closeTimerRef = setTimeout(() => {
+        this.closeMenu();
+      }, this.delayDurationValue);
+    }
+    handleContentLeave(event) {
+      const content = event.currentTarget;
+      const contentIndex = this.contentTargets.indexOf(content);
+      const relatedTarget = event.relatedTarget;
+      const trigger = this.triggerTargets[contentIndex];
+      if (trigger && trigger.contains(relatedTarget)) {
+        return;
+      }
+      if (relatedTarget && this.triggerTargets.includes(relatedTarget)) {
+        return;
+      }
+      if (this.hasViewportTarget && this.viewportTarget.contains(relatedTarget)) {
+        return;
+      }
+      this.closeTimerRef = setTimeout(() => {
+        this.closeMenu();
+      }, this.delayDurationValue);
+    }
+    handleViewportEnter() {
+      if (this.closeTimerRef) {
+        clearTimeout(this.closeTimerRef);
+        this.closeTimerRef = null;
+      }
+    }
+    handleViewportLeave(event) {
+      const relatedTarget = event.relatedTarget;
+      if (relatedTarget && this.triggerTargets.includes(relatedTarget)) {
+        return;
+      }
+      this.closeTimerRef = setTimeout(() => {
+        this.closeMenu();
+      }, this.delayDurationValue);
+    }
+    calculateEnterMotion(newIndex) {
+      if (this.activeIndexValue === -1) {
+        return "from-none";
+      }
+      if (newIndex > this.activeIndexValue) {
+        return "from-end";
+      }
+      return "from-start";
+    }
+    calculateExitMotion(newIndex) {
+      if (newIndex > this.activeIndexValue) {
+        return "to-start";
+      }
+      return "to-end";
+    }
+    updateViewport(content) {
+      if (!this.hasViewportTarget) return;
+      const viewport = this.viewportTarget;
+      viewport.innerHTML = "";
+      const clonedContent = content.cloneNode(true);
+      clonedContent.style.position = "relative";
+      clonedContent.style.left = "auto";
+      clonedContent.style.top = "auto";
+      viewport.appendChild(clonedContent);
+      const contentRect = clonedContent.getBoundingClientRect();
+      viewport.style.setProperty("--ui-navigation-menu-viewport-width", `${contentRect.width}px`);
+      viewport.style.setProperty("--ui-navigation-menu-viewport-height", `${contentRect.height}px`);
+      viewport.setAttribute("data-state", "open");
+    }
+    handleKeydown(event) {
+      if (!this.element.contains(document.activeElement)) return;
+      const trigger = this.triggerTargets.find(t => t === document.activeElement);
+      if (!trigger) {
+        if (this.isMenuActive) {
+          this.handleContentKeydown(event);
+        }
+        return;
+      }
+      const triggerIndex = this.triggerTargets.indexOf(trigger);
+      switch (event.key) {
+       case "ArrowRight":
+        event.preventDefault();
+        this.focusNextTrigger(triggerIndex);
+        break;
+
+       case "ArrowLeft":
+        event.preventDefault();
+        this.focusPreviousTrigger(triggerIndex);
+        break;
+
+       case "ArrowDown":
+        event.preventDefault();
+        if (this.activeIndexValue === triggerIndex) {
+          this.focusFirstContentLink();
+        } else {
+          this.openMenu(triggerIndex);
+          setTimeout(() => this.focusFirstContentLink(), 50);
+        }
+        break;
+
+       case "Enter":
+       case " ":
+        event.preventDefault();
+        if (this.activeIndexValue === triggerIndex) {
+          this.closeMenu();
+        } else {
+          this.openMenu(triggerIndex);
+        }
+        break;
+
+       case "Escape":
+        event.preventDefault();
+        if (this.isMenuActive) {
+          this.closeMenu();
+          const activeTrigger = this.triggerTargets[this.previousIndexValue >= 0 ? this.previousIndexValue : 0];
+          if (activeTrigger) activeTrigger.focus();
+        }
+        break;
+
+       case "Home":
+        event.preventDefault();
+        this.focusTrigger(0);
+        break;
+
+       case "End":
+        event.preventDefault();
+        this.focusTrigger(this.triggerTargets.length - 1);
+        break;
+
+       case "Tab":
+        if (!event.shiftKey && this.isMenuActive) ; else if (event.shiftKey && this.isMenuActive) {
+          this.closeMenu();
+        }
+        break;
+      }
+    }
+    handleContentKeydown(event) {
+      switch (event.key) {
+       case "Escape":
+        event.preventDefault();
+        this.closeMenu();
+        const activeTrigger = this.triggerTargets[this.previousIndexValue >= 0 ? this.previousIndexValue : this.activeIndexValue];
+        if (activeTrigger) activeTrigger.focus();
+        break;
+
+       case "Tab":
+        const content = this.contentTargets[this.activeIndexValue];
+        if (content) {
+          const focusableElements = content.querySelectorAll('a, button, input, [tabindex]:not([tabindex="-1"])');
+          const lastFocusable = focusableElements[focusableElements.length - 1];
+          if (!event.shiftKey && document.activeElement === lastFocusable) {
+            event.preventDefault();
+            this.closeMenu();
+            this.focusNextTrigger(this.activeIndexValue);
+          } else if (event.shiftKey && document.activeElement === focusableElements[0]) {
+            event.preventDefault();
+            this.closeMenu();
+            this.focusTrigger(this.activeIndexValue >= 0 ? this.activeIndexValue : 0);
+          }
+        }
+        break;
+      }
+    }
+    focusNextTrigger(currentIndex) {
+      const nextIndex = (currentIndex + 1) % this.triggerTargets.length;
+      this.focusTrigger(nextIndex);
+    }
+    focusPreviousTrigger(currentIndex) {
+      const prevIndex = currentIndex === 0 ? this.triggerTargets.length - 1 : currentIndex - 1;
+      this.focusTrigger(prevIndex);
+    }
+    focusTrigger(index) {
+      this.triggerTargets.forEach((t, i) => {
+        t.setAttribute("tabindex", i === index ? "0" : "-1");
+      });
+      this.triggerTargets[index]?.focus();
+    }
+    focusFirstContentLink() {
+      const content = this.contentTargets[this.activeIndexValue];
+      if (!content) return;
+      const firstLink = content.querySelector('a, button, [tabindex]:not([tabindex="-1"])');
+      if (firstLink) firstLink.focus();
+    }
+    handleClickOutside(event) {
+      if (!this.element.contains(event.target)) {
+        this.closeAll();
+      }
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -12869,7 +13235,8 @@
       "ui--calendar": CalendarController,
       "ui--carousel": CarouselController,
       "ui--datepicker": DatepickerController,
-      "ui--menubar": MenubarController
+      "ui--menubar": MenubarController,
+      "ui--navigation-menu": NavigationMenuController
     });
   }
   exports.AccordionController = AccordionController;
@@ -12891,6 +13258,7 @@
   exports.HoverCardController = HoverCardController;
   exports.InputOtpController = InputOtpController;
   exports.MenubarController = MenubarController;
+  exports.NavigationMenuController = NavigationMenuController;
   exports.PopoverController = PopoverController;
   exports.ResponsiveDialogController = ResponsiveDialogController;
   exports.ScrollAreaController = ScrollAreaController;

@@ -1,0 +1,33 @@
+<%# NavigationMenu Link Component - Navigation link with optional asChild %>
+<%#
+  @example Basic usage
+    render "ui/navigation_menu/link", href: "/docs" { "Docs" }
+
+  @example With trigger style (for direct links without dropdown)
+    render "ui/navigation_menu/link", href: "/about", trigger_style: true { "About" }
+%>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @href = local_assigns.fetch(:href, nil)
+  @active = local_assigns.fetch(:active, false)
+  @trigger_style = local_assigns.fetch(:trigger_style, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::NavigationMenu::LinkBehavior
+
+  # Build link attributes
+  base_attrs = navigation_menu_link_html_attributes
+
+  if @trigger_style
+    base_attrs[:class] = TailwindMerge::Merger.new.merge([
+      navigation_menu_link_trigger_style_classes,
+      @classes
+    ].compact.join(" "))
+  end
+
+  all_attributes = base_attrs.deep_merge(@attributes)
+-%>
+<%= content_tag :a, all_attributes do %>
+  <%= content || yield %>
+<% end %>

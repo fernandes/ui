@@ -105,6 +105,10 @@ class ComponentsController < ApplicationController
     # Renders app/views/components/menubar.html.erb
   end
 
+  def navigation_menu
+    # Renders app/views/components/navigation_menu.html.erb
+  end
+
   def pagination
     # Renders app/views/components/pagination.html.erb
   end

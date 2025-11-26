@@ -1,0 +1,13 @@
+<%# NavigationMenu Viewport Component - Container for content positioning %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::NavigationMenu::ViewportBehavior
+
+  wrapper_attributes = navigation_menu_viewport_wrapper_html_attributes
+  viewport_attributes = navigation_menu_viewport_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, wrapper_attributes do %>
+  <%= content_tag :div, nil, viewport_attributes %>
+<% end %>

@@ -1,0 +1,30 @@
+<%# NavigationMenu Trigger Component - Button with chevron %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @first = local_assigns.fetch(:first, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::NavigationMenu::TriggerBehavior
+
+  all_attributes = navigation_menu_trigger_html_attributes.deep_merge(@attributes)
+
+  chevron_svg = content_tag(:svg,
+    content_tag(:path, nil, d: "m6 9 6 6 6-6"),
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "24",
+    height: "24",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    "stroke-width": "2",
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round",
+    class: navigation_menu_trigger_chevron_classes,
+    "aria-hidden": "true"
+  )
+-%>
+<%= content_tag :button, all_attributes do %>
+  <%= content || yield %>
+  <%= chevron_svg %>
+<% end %>

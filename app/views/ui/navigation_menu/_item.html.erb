@@ -1,0 +1,13 @@
+<%# NavigationMenu Item Component - Wrapper for individual menu item %>
+<%
+  @value = local_assigns.fetch(:value, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::NavigationMenu::ItemBehavior
+
+  all_attributes = navigation_menu_item_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :li, all_attributes do %>
+  <%= yield %>
+<% end %>
