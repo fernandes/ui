@@ -1,0 +1,21 @@
+<%# ResizablePanel Component - Individual resizable panel %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @default_size = local_assigns.fetch(:default_size, nil)
+  @min_size = local_assigns.fetch(:min_size, nil)
+  @max_size = local_assigns.fetch(:max_size, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend ::UI::Resizable::PanelBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = panel_html_attributes.deep_merge(@attributes.except(:data))
+  if @attributes[:data]
+    all_attributes[:data] = all_attributes[:data].merge(@attributes[:data])
+  end
+-%>
+<%= content_tag :div, **all_attributes do %>
+  <%= content || yield %>
+<% end %>

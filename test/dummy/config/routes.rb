@@ -43,6 +43,7 @@ Rails.application.routes.draw do
   get "/components/popover", to: "components#popover"
   get "/components/progress", to: "components#progress"
   get "/components/radio_button", to: "components#radio_button"
+  get "/components/resizable", to: "components#resizable"
   get "/components/scroll_area", to: "components#scroll_area"
   get "/components/select", to: "components#select"
   get "/components/separator", to: "components#separator"

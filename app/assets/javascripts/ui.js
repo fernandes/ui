@@ -13192,6 +13192,309 @@
       }
     }
   }
+  class ResizableController extends stimulus.Controller {
+    static targets=[ "panel", "handle" ];
+    static values={
+      direction: {
+        type: String,
+        default: "horizontal"
+      },
+      keyboardResizeBy: {
+        type: Number,
+        default: 10
+      }
+    };
+    connect() {
+      this.isDragging = false;
+      this.activeHandleIndex = -1;
+      this.startPosition = 0;
+      this.startSizes = [];
+      this.activePointerId = null;
+      this.initializePanelSizes();
+      this.element.setAttribute("data-panel-group-direction", this.directionValue);
+      this.handleTargets.forEach((handle, index) => {
+        handle.setAttribute("tabindex", "0");
+        handle.setAttribute("role", "separator");
+        handle.setAttribute("aria-valuenow", "50");
+        handle.setAttribute("aria-valuemin", "0");
+        handle.setAttribute("aria-valuemax", "100");
+        handle.setAttribute("data-resize-handle-state", "inactive");
+        handle.setAttribute("data-panel-group-direction", this.directionValue);
+        handle.style.touchAction = "none";
+        handle.addEventListener("keydown", this.handleKeyDown.bind(this, index));
+      });
+      this._boundHandleMove = this.handleMove.bind(this);
+      this._boundEndDrag = this.endDrag.bind(this);
+    }
+    disconnect() {
+      this.handleTargets.forEach((handle, index) => {
+        handle.removeEventListener("keydown", this.handleKeyDown.bind(this, index));
+      });
+      document.removeEventListener("pointermove", this._boundHandleMove);
+      document.removeEventListener("pointerup", this._boundEndDrag);
+      document.removeEventListener("pointercancel", this._boundEndDrag);
+      if (this.isDragging) {
+        this.cleanupDragState();
+      }
+    }
+    cleanupDragState() {
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+    }
+    initializePanelSizes() {
+      const panels = this.panelTargets;
+      let totalDefaultSize = 0;
+      let panelsWithoutDefault = 0;
+      panels.forEach(panel => {
+        const defaultSize = parseFloat(panel.dataset.defaultSize);
+        if (!isNaN(defaultSize)) {
+          totalDefaultSize += defaultSize;
+        } else {
+          panelsWithoutDefault++;
+        }
+      });
+      const remainingSpace = 100 - totalDefaultSize;
+      const defaultForUnspecified = panelsWithoutDefault > 0 ? remainingSpace / panelsWithoutDefault : 0;
+      panels.forEach(panel => {
+        let size = parseFloat(panel.dataset.defaultSize);
+        if (isNaN(size)) {
+          size = defaultForUnspecified;
+        }
+        this.setPanelSize(panel, size);
+      });
+    }
+    setPanelSize(panel, size) {
+      panel.dataset.panelSize = size;
+      panel.style.flexGrow = size.toString();
+      panel.style.flexShrink = size.toString();
+      panel.style.flexBasis = "0";
+    }
+    getPanelSize(panel) {
+      return parseFloat(panel.dataset.panelSize) || 0;
+    }
+    startDrag(event) {
+      const handle = event.currentTarget;
+      const handleIndex = this.handleTargets.indexOf(handle);
+      if (handleIndex === -1) return;
+      event.preventDefault();
+      this.isDragging = true;
+      this.activeHandleIndex = handleIndex;
+      this.activePointerId = event.pointerId;
+      if (this.directionValue === "horizontal") {
+        this.startPosition = event.clientX;
+      } else {
+        this.startPosition = event.clientY;
+      }
+      const leftPanel = this.panelTargets[handleIndex];
+      const rightPanel = this.panelTargets[handleIndex + 1];
+      this.startSizes = [ this.getPanelSize(leftPanel), this.getPanelSize(rightPanel) ];
+      handle.setAttribute("data-resize-handle-state", "drag");
+      handle.setAttribute("data-resize-handle-active", "pointer");
+      document.body.style.userSelect = "none";
+      document.body.style.cursor = this.directionValue === "horizontal" ? "col-resize" : "row-resize";
+      handle.setPointerCapture(event.pointerId);
+      document.addEventListener("pointermove", this._boundHandleMove);
+      document.addEventListener("pointerup", this._boundEndDrag);
+      document.addEventListener("pointercancel", this._boundEndDrag);
+      this.dispatch("resizeStart", {
+        detail: {
+          handleIndex: handleIndex,
+          sizes: this.getCurrentSizes()
+        }
+      });
+    }
+    handleMove(event) {
+      if (!this.isDragging || this.activeHandleIndex === -1) return;
+      event.preventDefault();
+      let delta;
+      if (this.directionValue === "horizontal") {
+        delta = event.clientX - this.startPosition;
+      } else {
+        delta = event.clientY - this.startPosition;
+      }
+      const containerRect = this.element.getBoundingClientRect();
+      const containerSize = this.directionValue === "horizontal" ? containerRect.width : containerRect.height;
+      const percentageDelta = delta / containerSize * 100;
+      const leftPanel = this.panelTargets[this.activeHandleIndex];
+      const rightPanel = this.panelTargets[this.activeHandleIndex + 1];
+      let newLeftSize = this.startSizes[0] + percentageDelta;
+      let newRightSize = this.startSizes[1] - percentageDelta;
+      const leftMin = parseFloat(leftPanel.dataset.minSize) || 0;
+      const leftMax = parseFloat(leftPanel.dataset.maxSize) || 100;
+      const rightMin = parseFloat(rightPanel.dataset.minSize) || 0;
+      const rightMax = parseFloat(rightPanel.dataset.maxSize) || 100;
+      if (newLeftSize < leftMin) {
+        const adjustment = leftMin - newLeftSize;
+        newLeftSize = leftMin;
+        newRightSize -= adjustment;
+      }
+      if (newLeftSize > leftMax) {
+        const adjustment = newLeftSize - leftMax;
+        newLeftSize = leftMax;
+        newRightSize += adjustment;
+      }
+      if (newRightSize < rightMin) {
+        const adjustment = rightMin - newRightSize;
+        newRightSize = rightMin;
+        newLeftSize -= adjustment;
+      }
+      if (newRightSize > rightMax) {
+        const adjustment = newRightSize - rightMax;
+        newRightSize = rightMax;
+        newLeftSize += adjustment;
+      }
+      newLeftSize = Math.max(leftMin, Math.min(leftMax, newLeftSize));
+      newRightSize = Math.max(rightMin, Math.min(rightMax, newRightSize));
+      this.setPanelSize(leftPanel, newLeftSize);
+      this.setPanelSize(rightPanel, newRightSize);
+      const handle = this.handleTargets[this.activeHandleIndex];
+      handle.setAttribute("aria-valuenow", Math.round(newLeftSize));
+      this.dispatch("resize", {
+        detail: {
+          handleIndex: this.activeHandleIndex,
+          sizes: this.getCurrentSizes()
+        }
+      });
+    }
+    endDrag(event) {
+      if (!this.isDragging) return;
+      const handle = this.handleTargets[this.activeHandleIndex];
+      if (handle) {
+        handle.setAttribute("data-resize-handle-state", "inactive");
+        handle.removeAttribute("data-resize-handle-active");
+        if (this.activePointerId !== null) {
+          try {
+            handle.releasePointerCapture(this.activePointerId);
+          } catch (e) {}
+        }
+      }
+      this.isDragging = false;
+      this.activeHandleIndex = -1;
+      this.activePointerId = null;
+      this.cleanupDragState();
+      document.removeEventListener("pointermove", this._boundHandleMove);
+      document.removeEventListener("pointerup", this._boundEndDrag);
+      document.removeEventListener("pointercancel", this._boundEndDrag);
+      this.dispatch("resizeEnd", {
+        detail: {
+          sizes: this.getCurrentSizes()
+        }
+      });
+    }
+    handleEnter(event) {
+      if (!this.isDragging) {
+        event.currentTarget.setAttribute("data-resize-handle-state", "hover");
+      }
+    }
+    handleLeave(event) {
+      if (!this.isDragging) {
+        event.currentTarget.setAttribute("data-resize-handle-state", "inactive");
+      }
+    }
+    handleKeyDown(handleIndex, event) {
+      const leftPanel = this.panelTargets[handleIndex];
+      const rightPanel = this.panelTargets[handleIndex + 1];
+      if (!leftPanel || !rightPanel) return;
+      let delta = 0;
+      const resizeBy = this.keyboardResizeByValue;
+      const isHorizontal = this.directionValue === "horizontal";
+      switch (event.key) {
+       case "ArrowLeft":
+        if (isHorizontal) delta = -resizeBy;
+        event.preventDefault();
+        break;
+
+       case "ArrowRight":
+        if (isHorizontal) delta = resizeBy;
+        event.preventDefault();
+        break;
+
+       case "ArrowUp":
+        if (!isHorizontal) delta = -resizeBy;
+        event.preventDefault();
+        break;
+
+       case "ArrowDown":
+        if (!isHorizontal) delta = resizeBy;
+        event.preventDefault();
+        break;
+
+       case "Home":
+        delta = -(this.getPanelSize(leftPanel) - (parseFloat(leftPanel.dataset.minSize) || 0));
+        event.preventDefault();
+        break;
+
+       case "End":
+        delta = (parseFloat(leftPanel.dataset.maxSize) || 100) - this.getPanelSize(leftPanel);
+        event.preventDefault();
+        break;
+
+       case "Enter":
+       case " ":
+        event.preventDefault();
+        break;
+
+       default:
+        return;
+      }
+      if (delta === 0) return;
+      const handle = this.handleTargets[handleIndex];
+      handle.setAttribute("data-resize-handle-active", "keyboard");
+      let newLeftSize = this.getPanelSize(leftPanel) + delta;
+      let newRightSize = this.getPanelSize(rightPanel) - delta;
+      const leftMin = parseFloat(leftPanel.dataset.minSize) || 0;
+      const leftMax = parseFloat(leftPanel.dataset.maxSize) || 100;
+      const rightMin = parseFloat(rightPanel.dataset.minSize) || 0;
+      const rightMax = parseFloat(rightPanel.dataset.maxSize) || 100;
+      newLeftSize = Math.max(leftMin, Math.min(leftMax, newLeftSize));
+      newRightSize = Math.max(rightMin, Math.min(rightMax, newRightSize));
+      const total = newLeftSize + newRightSize;
+      if (Math.abs(total - (this.getPanelSize(leftPanel) + this.getPanelSize(rightPanel))) > .1) {
+        const targetTotal = this.getPanelSize(leftPanel) + this.getPanelSize(rightPanel);
+        const ratio = targetTotal / total;
+        newLeftSize *= ratio;
+        newRightSize *= ratio;
+      }
+      this.setPanelSize(leftPanel, newLeftSize);
+      this.setPanelSize(rightPanel, newRightSize);
+      handle.setAttribute("aria-valuenow", Math.round(newLeftSize));
+      this.dispatch("resize", {
+        detail: {
+          handleIndex: handleIndex,
+          sizes: this.getCurrentSizes()
+        }
+      });
+      setTimeout(() => {
+        handle.removeAttribute("data-resize-handle-active");
+      }, 100);
+    }
+    handleFocus(event) {
+      event.currentTarget.setAttribute("data-resize-handle-state", "hover");
+    }
+    handleBlur(event) {
+      event.currentTarget.setAttribute("data-resize-handle-state", "inactive");
+    }
+    getCurrentSizes() {
+      return this.panelTargets.map(panel => this.getPanelSize(panel));
+    }
+    setSizes(sizes) {
+      if (sizes.length !== this.panelTargets.length) {
+        console.warn("Number of sizes must match number of panels");
+        return;
+      }
+      this.panelTargets.forEach((panel, index) => {
+        this.setPanelSize(panel, sizes[index]);
+      });
+      this.handleTargets.forEach((handle, index) => {
+        handle.setAttribute("aria-valuenow", Math.round(sizes[index]));
+      });
+      this.dispatch("resize", {
+        detail: {
+          sizes: this.getCurrentSizes()
+        }
+      });
+    }
+  }
   function registerControllersInto(application, controllers) {
     for (const [name, controller] of Object.entries(controllers)) {
       try {
@@ -13236,7 +13539,8 @@
       "ui--carousel": CarouselController,
       "ui--datepicker": DatepickerController,
       "ui--menubar": MenubarController,
-      "ui--navigation-menu": NavigationMenuController
+      "ui--navigation-menu": NavigationMenuController,
+      "ui--resizable": ResizableController
     });
   }
   exports.AccordionController = AccordionController;
@@ -13260,6 +13564,7 @@
   exports.MenubarController = MenubarController;
   exports.NavigationMenuController = NavigationMenuController;
   exports.PopoverController = PopoverController;
+  exports.ResizableController = ResizableController;
   exports.ResponsiveDialogController = ResponsiveDialogController;
   exports.ScrollAreaController = ScrollAreaController;
   exports.SelectController = SelectController;

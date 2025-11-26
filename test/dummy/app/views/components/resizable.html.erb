@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resizable Component Showcase</title>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="p-8 bg-background text-foreground">
+  <div class="max-w-4xl mx-auto space-y-16">
+    <header>
+      <h1 class="text-4xl font-bold mb-2">Resizable Component</h1>
+      <p class="text-muted-foreground">Accessible resizable panel groups with keyboard support</p>
+    </header>
+
+    <!-- ==================== ERB SECTION ==================== -->
+    <section class="space-y-8">
+      <div class="border-b pb-4">
+        <h2 class="text-3xl font-bold text-primary">ERB Partials</h2>
+        <p class="text-muted-foreground">Using render "ui/resizable/..." partials</p>
+      </div>
+
+      <!-- ERB - Main Example (One, Two, Three) -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Basic Horizontal (shadcn demo)</h3>
+        <p class="text-sm text-muted-foreground">The main example from shadcn/ui with nested panels.</p>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "max-w-md rounded-lg border md:min-w-[450px]" do %>
+          <%= render "ui/resizable/panel", default_size: 50 do %>
+            <div class="flex h-[200px] items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render "ui/resizable/handle" %>
+          <%= render "ui/resizable/panel", default_size: 50 do %>
+            <%= render "ui/resizable/panel_group", direction: "vertical" do %>
+              <%= render "ui/resizable/panel", default_size: 25 do %>
+                <div class="flex h-full items-center justify-center p-6">
+                  <span class="font-semibold">Two</span>
+                </div>
+              <% end %>
+              <%= render "ui/resizable/handle" %>
+              <%= render "ui/resizable/panel", default_size: 75 do %>
+                <div class="flex h-full items-center justify-center p-6">
+                  <span class="font-semibold">Three</span>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ERB - Vertical -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Vertical</h3>
+        <p class="text-sm text-muted-foreground">Panels stacked vertically.</p>
+        <%= render "ui/resizable/panel_group", direction: "vertical", classes: "min-h-[200px] max-w-md rounded-lg border" do %>
+          <%= render "ui/resizable/panel", default_size: 50 do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render "ui/resizable/handle" %>
+          <%= render "ui/resizable/panel", default_size: 50 do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">Two</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ERB - Handle with Grip -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Handle with Grip</h3>
+        <p class="text-sm text-muted-foreground">Handle with visible grip icon for better visibility.</p>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border" do %>
+          <%= render "ui/resizable/panel", default_size: 50 do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render "ui/resizable/handle", with_handle: true %>
+          <%= render "ui/resizable/panel", default_size: 50 do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">Two</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ERB - With Constraints -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">With Constraints</h3>
+        <p class="text-sm text-muted-foreground">Panels with min_size: 20% and max_size: 80%.</p>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border" do %>
+          <%= render "ui/resizable/panel", default_size: 50, min_size: 20, max_size: 80 do %>
+            <div class="flex h-full items-center justify-center p-6 bg-muted/50">
+              <span class="font-semibold text-sm">Min 20% / Max 80%</span>
+            </div>
+          <% end %>
+          <%= render "ui/resizable/handle", with_handle: true %>
+          <%= render "ui/resizable/panel", default_size: 50, min_size: 20, max_size: 80 do %>
+            <div class="flex h-full items-center justify-center p-6 bg-muted/50">
+              <span class="font-semibold text-sm">Min 20% / Max 80%</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ERB - Sidebar Layout -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Sidebar Layout</h3>
+        <p class="text-sm text-muted-foreground">A common sidebar + main content layout.</p>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[300px] rounded-lg border" do %>
+          <%= render "ui/resizable/panel", default_size: 20, min_size: 15, max_size: 30 do %>
+            <div class="flex h-full flex-col bg-muted/30 p-4">
+              <span class="font-semibold mb-4">Sidebar</span>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li class="hover:text-foreground cursor-pointer">Dashboard</li>
+                <li class="hover:text-foreground cursor-pointer">Projects</li>
+                <li class="hover:text-foreground cursor-pointer">Settings</li>
+              </ul>
+            </div>
+          <% end %>
+          <%= render "ui/resizable/handle", with_handle: true %>
+          <%= render "ui/resizable/panel", default_size: 80 do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="text-muted-foreground">Main Content Area</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ==================== PHLEX SECTION ==================== -->
+    <section class="space-y-8">
+      <div class="border-b pb-4">
+        <h2 class="text-3xl font-bold text-primary">Phlex Components</h2>
+        <p class="text-muted-foreground">Using UI::Resizable::PanelGroup, Panel, Handle</p>
+      </div>
+
+      <!-- Phlex - Main Example (One, Two, Three) -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Basic Horizontal (shadcn demo)</h3>
+        <p class="text-sm text-muted-foreground">The main example from shadcn/ui with nested panels.</p>
+        <%= render UI::Resizable::PanelGroup.new(direction: "horizontal", classes: "max-w-md rounded-lg border md:min-w-[450px]") do %>
+          <%= render UI::Resizable::Panel.new(default_size: 50) do %>
+            <div class="flex h-[200px] items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::Handle.new %>
+          <%= render UI::Resizable::Panel.new(default_size: 50) do %>
+            <%= render UI::Resizable::PanelGroup.new(direction: "vertical") do %>
+              <%= render UI::Resizable::Panel.new(default_size: 25) do %>
+                <div class="flex h-full items-center justify-center p-6">
+                  <span class="font-semibold">Two</span>
+                </div>
+              <% end %>
+              <%= render UI::Resizable::Handle.new %>
+              <%= render UI::Resizable::Panel.new(default_size: 75) do %>
+                <div class="flex h-full items-center justify-center p-6">
+                  <span class="font-semibold">Three</span>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Phlex - Vertical -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Vertical</h3>
+        <p class="text-sm text-muted-foreground">Panels stacked vertically.</p>
+        <%= render UI::Resizable::PanelGroup.new(direction: "vertical", classes: "min-h-[200px] max-w-md rounded-lg border") do %>
+          <%= render UI::Resizable::Panel.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::Handle.new %>
+          <%= render UI::Resizable::Panel.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">Two</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Phlex - Handle with Grip -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Handle with Grip</h3>
+        <p class="text-sm text-muted-foreground">Handle with visible grip icon for better visibility.</p>
+        <%= render UI::Resizable::PanelGroup.new(direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border") do %>
+          <%= render UI::Resizable::Panel.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::Handle.new(with_handle: true) %>
+          <%= render UI::Resizable::Panel.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">Two</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Phlex - With Constraints -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">With Constraints</h3>
+        <p class="text-sm text-muted-foreground">Panels with min_size: 20% and max_size: 80%.</p>
+        <%= render UI::Resizable::PanelGroup.new(direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border") do %>
+          <%= render UI::Resizable::Panel.new(default_size: 50, min_size: 20, max_size: 80) do %>
+            <div class="flex h-full items-center justify-center p-6 bg-muted/50">
+              <span class="font-semibold text-sm">Min 20% / Max 80%</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::Handle.new(with_handle: true) %>
+          <%= render UI::Resizable::Panel.new(default_size: 50, min_size: 20, max_size: 80) do %>
+            <div class="flex h-full items-center justify-center p-6 bg-muted/50">
+              <span class="font-semibold text-sm">Min 20% / Max 80%</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Phlex - Sidebar Layout -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Sidebar Layout</h3>
+        <p class="text-sm text-muted-foreground">A common sidebar + main content layout.</p>
+        <%= render UI::Resizable::PanelGroup.new(direction: "horizontal", classes: "min-h-[300px] rounded-lg border") do %>
+          <%= render UI::Resizable::Panel.new(default_size: 20, min_size: 15, max_size: 30) do %>
+            <div class="flex h-full flex-col bg-muted/30 p-4">
+              <span class="font-semibold mb-4">Sidebar</span>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li class="hover:text-foreground cursor-pointer">Dashboard</li>
+                <li class="hover:text-foreground cursor-pointer">Projects</li>
+                <li class="hover:text-foreground cursor-pointer">Settings</li>
+              </ul>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::Handle.new(with_handle: true) %>
+          <%= render UI::Resizable::Panel.new(default_size: 80) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="text-muted-foreground">Main Content Area</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ==================== VIEWCOMPONENT SECTION ==================== -->
+    <section class="space-y-8">
+      <div class="border-b pb-4">
+        <h2 class="text-3xl font-bold text-primary">ViewComponents</h2>
+        <p class="text-muted-foreground">Using UI::Resizable::PanelGroupComponent, PanelComponent, HandleComponent</p>
+      </div>
+
+      <!-- ViewComponent - Main Example (One, Two, Three) -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Basic Horizontal (shadcn demo)</h3>
+        <p class="text-sm text-muted-foreground">The main example from shadcn/ui with nested panels.</p>
+        <%= render UI::Resizable::PanelGroupComponent.new(direction: "horizontal", classes: "max-w-md rounded-lg border md:min-w-[450px]") do %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50) do %>
+            <div class="flex h-[200px] items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::HandleComponent.new %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50) do %>
+            <%= render UI::Resizable::PanelGroupComponent.new(direction: "vertical") do %>
+              <%= render UI::Resizable::PanelComponent.new(default_size: 25) do %>
+                <div class="flex h-full items-center justify-center p-6">
+                  <span class="font-semibold">Two</span>
+                </div>
+              <% end %>
+              <%= render UI::Resizable::HandleComponent.new %>
+              <%= render UI::Resizable::PanelComponent.new(default_size: 75) do %>
+                <div class="flex h-full items-center justify-center p-6">
+                  <span class="font-semibold">Three</span>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ViewComponent - Vertical -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Vertical</h3>
+        <p class="text-sm text-muted-foreground">Panels stacked vertically.</p>
+        <%= render UI::Resizable::PanelGroupComponent.new(direction: "vertical", classes: "min-h-[200px] max-w-md rounded-lg border") do %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::HandleComponent.new %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">Two</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ViewComponent - Handle with Grip -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Handle with Grip</h3>
+        <p class="text-sm text-muted-foreground">Handle with visible grip icon for better visibility.</p>
+        <%= render UI::Resizable::PanelGroupComponent.new(direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border") do %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">One</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::HandleComponent.new(with_handle: true) %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="font-semibold">Two</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ViewComponent - With Constraints -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">With Constraints</h3>
+        <p class="text-sm text-muted-foreground">Panels with min_size: 20% and max_size: 80%.</p>
+        <%= render UI::Resizable::PanelGroupComponent.new(direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border") do %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50, min_size: 20, max_size: 80) do %>
+            <div class="flex h-full items-center justify-center p-6 bg-muted/50">
+              <span class="font-semibold text-sm">Min 20% / Max 80%</span>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::HandleComponent.new(with_handle: true) %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 50, min_size: 20, max_size: 80) do %>
+            <div class="flex h-full items-center justify-center p-6 bg-muted/50">
+              <span class="font-semibold text-sm">Min 20% / Max 80%</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- ViewComponent - Sidebar Layout -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold">Sidebar Layout</h3>
+        <p class="text-sm text-muted-foreground">A common sidebar + main content layout.</p>
+        <%= render UI::Resizable::PanelGroupComponent.new(direction: "horizontal", classes: "min-h-[300px] rounded-lg border") do %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 20, min_size: 15, max_size: 30) do %>
+            <div class="flex h-full flex-col bg-muted/30 p-4">
+              <span class="font-semibold mb-4">Sidebar</span>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li class="hover:text-foreground cursor-pointer">Dashboard</li>
+                <li class="hover:text-foreground cursor-pointer">Projects</li>
+                <li class="hover:text-foreground cursor-pointer">Settings</li>
+              </ul>
+            </div>
+          <% end %>
+          <%= render UI::Resizable::HandleComponent.new(with_handle: true) %>
+          <%= render UI::Resizable::PanelComponent.new(default_size: 80) do %>
+            <div class="flex h-full items-center justify-center p-6">
+              <span class="text-muted-foreground">Main Content Area</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- ==================== FEATURES REFERENCE ==================== -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Features</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Keyboard Navigation</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">→</kbd> / <kbd class="px-2 py-1 bg-muted rounded text-xs">↓</kbd> Increase size</li>
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">←</kbd> / <kbd class="px-2 py-1 bg-muted rounded text-xs">↑</kbd> Decrease size</li>
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">Home</kbd> Minimize left panel</li>
+            <li><kbd class="px-2 py-1 bg-muted rounded text-xs">End</kbd> Maximize left panel</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Mouse/Touch Interaction</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li>Drag handle to resize panels</li>
+            <li>Hover handle to see visual feedback</li>
+            <li>Touch-friendly hit area for mobile</li>
+            <li>Smooth drag with pointer capture</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Accessibility</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">role="separator"</code> on handles</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-valuenow</code> for current size</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-valuemin/max</code> for range</li>
+            <li>Full keyboard navigation support</li>
+            <li>Focus visible ring on handles</li>
+          </ul>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-medium">Events</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">ui--resizable:resizeStart</code></li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">ui--resizable:resize</code></li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">ui--resizable:resizeEnd</code></li>
+            <li>Event detail contains panel sizes</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <footer class="pt-8 border-t">
+      <%= link_to "← Back to Components Index", components_path, class: "text-sm text-muted-foreground hover:text-foreground" %>
+    </footer>
+  </div>
+</body>
+</html>
