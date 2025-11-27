@@ -2683,12 +2683,39 @@
     connect() {
       this.boundHandleSelect = this.handleSelect.bind(this);
       this.element.addEventListener("command:select", this.boundHandleSelect);
+      this.boundHandleOpen = this.handleOpen.bind(this);
+      this.element.addEventListener("popover:show", this.boundHandleOpen);
+      this.element.addEventListener("drawer:open", this.boundHandleOpen);
+      this.boundHandleClose = this.handleClose.bind(this);
+      this.element.addEventListener("popover:hide", this.boundHandleClose);
+      this.element.addEventListener("drawer:close", this.boundHandleClose);
       if (this.valueValue) {
         this.updateCheckIcons();
       }
     }
     disconnect() {
       this.element.removeEventListener("command:select", this.boundHandleSelect);
+      this.element.removeEventListener("popover:show", this.boundHandleOpen);
+      this.element.removeEventListener("drawer:open", this.boundHandleOpen);
+      this.element.removeEventListener("popover:hide", this.boundHandleClose);
+      this.element.removeEventListener("drawer:close", this.boundHandleClose);
+    }
+    handleOpen() {
+      requestAnimationFrame(() => {
+        const input = this.element.querySelector('[data-slot="command-input"]');
+        if (input) {
+          input.focus();
+        }
+      });
+    }
+    handleClose() {
+      const input = this.element.querySelector('[data-slot="command-input"]');
+      if (input && input.value) {
+        input.value = "";
+        input.dispatchEvent(new Event("input", {
+          bubbles: true
+        }));
+      }
     }
     handleSelect(event) {
       const {value: value, item: item} = event.detail;

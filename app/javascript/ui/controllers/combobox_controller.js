@@ -6,6 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // - Updates text target when item is selected
 // - Controls check icon visibility (opacity-0/100)
 // - Closes container (Popover/Drawer) after selection
+// - Auto-focuses search input when opened
 //
 // This controller should be attached to the container element (Popover/Drawer/DropdownMenu)
 // and listens for command:select events from Command items inside
@@ -20,6 +21,16 @@ export default class extends Controller {
     this.boundHandleSelect = this.handleSelect.bind(this)
     this.element.addEventListener('command:select', this.boundHandleSelect)
 
+    // Listen for popover/drawer open events to focus search input
+    this.boundHandleOpen = this.handleOpen.bind(this)
+    this.element.addEventListener('popover:show', this.boundHandleOpen)
+    this.element.addEventListener('drawer:open', this.boundHandleOpen)
+
+    // Listen for popover/drawer close events to clear search input
+    this.boundHandleClose = this.handleClose.bind(this)
+    this.element.addEventListener('popover:hide', this.boundHandleClose)
+    this.element.addEventListener('drawer:close', this.boundHandleClose)
+
     // Apply initial state if value is set
     if (this.valueValue) {
       this.updateCheckIcons()
@@ -28,6 +39,31 @@ export default class extends Controller {
 
   disconnect() {
     this.element.removeEventListener('command:select', this.boundHandleSelect)
+    this.element.removeEventListener('popover:show', this.boundHandleOpen)
+    this.element.removeEventListener('drawer:open', this.boundHandleOpen)
+    this.element.removeEventListener('popover:hide', this.boundHandleClose)
+    this.element.removeEventListener('drawer:close', this.boundHandleClose)
+  }
+
+  // Focus the search input when the combobox opens
+  handleOpen() {
+    // Use requestAnimationFrame to ensure the content is visible
+    requestAnimationFrame(() => {
+      const input = this.element.querySelector('[data-slot="command-input"]')
+      if (input) {
+        input.focus()
+      }
+    })
+  }
+
+  // Clear the search input when the combobox closes
+  handleClose() {
+    const input = this.element.querySelector('[data-slot="command-input"]')
+    if (input && input.value) {
+      input.value = ''
+      // Dispatch input event to trigger Command filter and show all options
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
   }
 
   // Handle when a Command item is selected
