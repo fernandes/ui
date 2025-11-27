@@ -21,7 +21,17 @@
   content_param = local_assigns.fetch(:content, nil)
 
   extend UI::ButtonBehavior
-  all_attributes = button_html_attributes.deep_merge(@attributes)
+  base_attrs = button_html_attributes
+
+  # Merge classes using TailwindMerge to properly combine button classes with passed attributes
+  merged_class = TailwindMerge::Merger.new.merge([
+    base_attrs[:class],
+    @attributes[:class]
+  ].compact.join(" "))
+
+  # Deep merge other attributes, then set the merged class
+  all_attributes = base_attrs.deep_merge(@attributes.except(:class))
+  all_attributes[:class] = merged_class
 %>
 <%= content_tag :button, all_attributes do %>
   <%= content_param || yield %>

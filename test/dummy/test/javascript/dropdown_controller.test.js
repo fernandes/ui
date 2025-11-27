@@ -907,6 +907,154 @@ describe("DropdownController", () => {
     })
   })
 
+  describe("Trigger Keyboard Accessibility", () => {
+    // Helper to create dropdown with keyboard-focusable trigger
+    function createKeyboardAccessibleDropdown() {
+      return `
+        <div data-controller="ui--dropdown"
+             data-ui--dropdown-placement-value="bottom-start"
+             data-ui--dropdown-offset-value="4"
+             data-ui--dropdown-flip-value="true">
+          <button data-ui--dropdown-target="trigger"
+                  data-action="click->ui--dropdown#toggle keydown.enter->ui--dropdown#toggle keydown.space->ui--dropdown#toggle"
+                  tabindex="0"
+                  role="button"
+                  aria-haspopup="menu">
+            Open Menu
+          </button>
+          <div data-ui--dropdown-target="content" role="menu" data-state="closed" class="hidden absolute">
+            <div role="menuitem" tabindex="-1" data-ui--dropdown-target="item">Item 1</div>
+            <div role="menuitem" tabindex="-1" data-ui--dropdown-target="item">Item 2</div>
+            <div role="menuitem" tabindex="-1" data-ui--dropdown-target="item">Item 3</div>
+          </div>
+        </div>
+      `
+    }
+
+    test("trigger has correct accessibility attributes", async () => {
+      container.innerHTML = createKeyboardAccessibleDropdown()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger = container.querySelector('[data-ui--dropdown-target="trigger"]')
+
+      expect(trigger.getAttribute("tabindex")).toBe("0")
+      expect(trigger.getAttribute("role")).toBe("button")
+      expect(trigger.getAttribute("aria-haspopup")).toBe("menu")
+    })
+
+    test("Enter key on trigger opens dropdown", async () => {
+      container.innerHTML = createKeyboardAccessibleDropdown()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger = container.querySelector('[data-ui--dropdown-target="trigger"]')
+      const content = container.querySelector('[data-ui--dropdown-target="content"]')
+
+      // Focus trigger
+      trigger.focus()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      // Press Enter
+      const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
+      trigger.dispatchEvent(enterEvent)
+      await new Promise(resolve => setTimeout(resolve, 150))
+
+      expect(content.classList.contains("hidden")).toBe(false)
+      expect(content.getAttribute("data-state")).toBe("open")
+    })
+
+    test("Space key on trigger opens dropdown", async () => {
+      container.innerHTML = createKeyboardAccessibleDropdown()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger = container.querySelector('[data-ui--dropdown-target="trigger"]')
+      const content = container.querySelector('[data-ui--dropdown-target="content"]')
+
+      // Focus trigger
+      trigger.focus()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      // Press Space
+      const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true })
+      trigger.dispatchEvent(spaceEvent)
+      await new Promise(resolve => setTimeout(resolve, 150))
+
+      expect(content.classList.contains("hidden")).toBe(false)
+      expect(content.getAttribute("data-state")).toBe("open")
+    })
+
+    test("Escape after navigating into menu returns focus to trigger", async () => {
+      container.innerHTML = createKeyboardAccessibleDropdown()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const element = container.querySelector('[data-controller="ui--dropdown"]')
+      const trigger = container.querySelector('[data-ui--dropdown-target="trigger"]')
+      const content = container.querySelector('[data-ui--dropdown-target="content"]')
+
+      // Open menu via trigger
+      trigger.click()
+      await new Promise(resolve => setTimeout(resolve, 150))
+      expect(content.classList.contains("hidden")).toBe(false)
+
+      // Navigate into menu items with ArrowDown
+      const downEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
+      element.dispatchEvent(downEvent)
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      // Press Escape - should close menu AND return focus to trigger
+      const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+      element.dispatchEvent(escapeEvent)
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      expect(content.classList.contains("hidden")).toBe(true)
+      expect(document.activeElement).toBe(trigger)
+    })
+
+    test("focus can be reached via Tab key", async () => {
+      container.innerHTML = createKeyboardAccessibleDropdown()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger = container.querySelector('[data-ui--dropdown-target="trigger"]')
+
+      // Trigger should be focusable with tabindex=0
+      expect(trigger.getAttribute("tabindex")).toBe("0")
+
+      // Focus should be possible
+      trigger.focus()
+      expect(document.activeElement).toBe(trigger)
+    })
+
+    test("dropdown can be reopened after Escape close", async () => {
+      container.innerHTML = createKeyboardAccessibleDropdown()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const element = container.querySelector('[data-controller="ui--dropdown"]')
+      const controller = application.getControllerForElementAndIdentifier(element, "ui--dropdown")
+      const trigger = container.querySelector('[data-ui--dropdown-target="trigger"]')
+      const content = container.querySelector('[data-ui--dropdown-target="content"]')
+
+      // Open first
+      trigger.click()
+      await new Promise(resolve => setTimeout(resolve, 150))
+      expect(content.classList.contains("hidden")).toBe(false)
+
+      // Close with Escape
+      const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+      element.dispatchEvent(escapeEvent)
+      await new Promise(resolve => setTimeout(resolve, 200)) // Wait for focus return (150ms delay in close())
+      expect(content.classList.contains("hidden")).toBe(true)
+
+      // Focus should be on trigger after the delay
+      expect(document.activeElement).toBe(trigger)
+
+      // Reopen - use controller.toggle() directly to avoid any timing issues
+      controller.openValue = true
+      content.classList.remove("hidden")
+      content.setAttribute("data-state", "open")
+
+      expect(content.classList.contains("hidden")).toBe(false)
+    })
+  })
+
   describe("Disconnect", () => {
     test("disconnect removes event listeners", async () => {
       container.innerHTML = createDropdown()

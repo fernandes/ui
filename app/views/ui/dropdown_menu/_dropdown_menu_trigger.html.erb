@@ -3,6 +3,7 @@
   content ||= local_assigns.fetch(:content, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
+  as_child = local_assigns.fetch(:as_child, false)
 
   # Extend behavior for shared logic
   extend UI::DropdownMenu::DropdownMenuTriggerBehavior
@@ -10,6 +11,10 @@
   # Get HTML attributes from behavior
   all_attributes = dropdown_menu_trigger_html_attributes.deep_merge(@attributes)
 -%>
-<%= content_tag :div, all_attributes do %>
-  <%= content || yield %>
+<% if as_child %>
+  <%= yield(all_attributes) %>
+<% else %>
+  <%= content_tag :div, all_attributes do %>
+    <%= content || yield %>
+  <% end %>
 <% end %>

@@ -13,8 +13,8 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Dropdown</h3>
         <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new do %>
-            <%= render UI::Button::Button.new(variant: :outline) { "Open Menu" } %>
+          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "Open Menu" } %>
           <% end %>
 
           <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
@@ -49,8 +49,8 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Checkboxes</h3>
         <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new do %>
-            <%= render UI::Button::Button.new(variant: :outline) { "View Options" } %>
+          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "View Options" } %>
           <% end %>
 
           <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
@@ -67,8 +67,8 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Radio Group</h3>
         <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new do %>
-            <%= render UI::Button::Button.new(variant: :outline) { "Panel Position" } %>
+          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "Panel Position" } %>
           <% end %>
 
           <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
@@ -87,8 +87,8 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Submenu</h3>
         <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new do %>
-            <%= render UI::Button::Button.new(variant: :outline) { "More Options" } %>
+          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "More Options" } %>
           <% end %>
 
           <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
@@ -129,8 +129,8 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
         <%= render "ui/dropdown_menu/dropdown_menu" do %>
-          <%= render "ui/dropdown_menu/dropdown_menu_trigger" do %>
-            <%= render "ui/button/button", variant: :outline do %>
+          <%= render "ui/dropdown_menu/dropdown_menu_trigger", as_child: true do |trigger_attrs| %>
+            <%= render "ui/button/button", variant: :outline, attributes: trigger_attrs do %>
               Actions
             <% end %>
           <% end %>
@@ -154,8 +154,8 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Labels</h3>
         <%= render "ui/dropdown_menu/dropdown_menu" do %>
-          <%= render "ui/dropdown_menu/dropdown_menu_trigger" do %>
-            <%= render "ui/button/button", variant: :outline do %>
+          <%= render "ui/dropdown_menu/dropdown_menu_trigger", as_child: true do |trigger_attrs| %>
+            <%= render "ui/button/button", variant: :outline, attributes: trigger_attrs do %>
               File Menu
             <% end %>
           <% end %>
@@ -198,7 +198,7 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
         <%= render(UI::DropdownMenu::DropdownMenuComponent.new) do %>
-          <%= render(UI::DropdownMenu::TriggerComponent.new) do %>
+          <%= render(UI::DropdownMenu::TriggerComponent.new(as_child: true)) do %>
             <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Open" } %>
           <% end %>
 
@@ -215,7 +215,7 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
         <%= render(UI::DropdownMenu::DropdownMenuComponent.new) do %>
-          <%= render(UI::DropdownMenu::TriggerComponent.new) do %>
+          <%= render(UI::DropdownMenu::TriggerComponent.new(as_child: true)) do %>
             <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Complete Menu" } %>
           <% end %>
 

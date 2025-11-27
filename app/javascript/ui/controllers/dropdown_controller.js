@@ -38,7 +38,11 @@ export default class extends Controller {
     // Close dropdown when clicking outside
     this.boundHandleClickOutside = this.handleClickOutside.bind(this)
     this.boundHandleKeydown = this.handleKeydown.bind(this)
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this)
     document.addEventListener('click', this.boundHandleClickOutside)
+
+    // Listen for focus leaving the dropdown
+    this.element.addEventListener('focusout', this.boundHandleFocusOut)
   }
 
   disconnect() {
@@ -54,6 +58,23 @@ export default class extends Controller {
 
     document.removeEventListener('click', this.boundHandleClickOutside)
     document.removeEventListener('keydown', this.boundHandleKeydown)
+    this.element.removeEventListener('focusout', this.boundHandleFocusOut)
+  }
+
+  handleFocusOut(event) {
+    // Don't do anything if dropdown is not open
+    if (!this.openValue) return
+
+    // Check if focus is moving outside the dropdown element
+    // Use setTimeout to allow the new focus target to be set
+    setTimeout(() => {
+      const newFocusedElement = document.activeElement
+
+      // If the new focused element is outside our dropdown, close without returning focus
+      if (!this.element.contains(newFocusedElement)) {
+        this.close({ returnFocus: false })
+      }
+    }, 0)
   }
 
   // Submenu hover handlers
@@ -432,7 +453,8 @@ export default class extends Controller {
           const commandElement = focusedCommandOption.closest('[data-controller~="command"]')
           this.closeCommandSubmenu(commandElement)
         } else if (!this.closeCurrentSubmenuWithKeyboard(focusedElement)) {
-          this.close()
+          // Return focus to trigger when closing with Escape (ARIA best practice)
+          this.close({ returnFocus: true })
         }
         break
 

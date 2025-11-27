@@ -1559,7 +1559,9 @@
     connect() {
       this.boundHandleClickOutside = this.handleClickOutside.bind(this);
       this.boundHandleKeydown = this.handleKeydown.bind(this);
+      this.boundHandleFocusOut = this.handleFocusOut.bind(this);
       document.addEventListener("click", this.boundHandleClickOutside);
+      this.element.addEventListener("focusout", this.boundHandleFocusOut);
     }
     disconnect() {
       if (this.cleanup) {
@@ -1570,6 +1572,18 @@
       this.closeSubmenuTimeouts.clear();
       document.removeEventListener("click", this.boundHandleClickOutside);
       document.removeEventListener("keydown", this.boundHandleKeydown);
+      this.element.removeEventListener("focusout", this.boundHandleFocusOut);
+    }
+    handleFocusOut(event) {
+      if (!this.openValue) return;
+      setTimeout(() => {
+        const newFocusedElement = document.activeElement;
+        if (!this.element.contains(newFocusedElement)) {
+          this.close({
+            returnFocus: false
+          });
+        }
+      }, 0);
     }
     openSubmenuHandler(event) {
       const trigger = event.currentTarget;
@@ -1804,7 +1818,9 @@
           const commandElement = focusedCommandOption.closest('[data-controller~="command"]');
           this.closeCommandSubmenu(commandElement);
         } else if (!this.closeCurrentSubmenuWithKeyboard(focusedElement)) {
-          this.close();
+          this.close({
+            returnFocus: true
+          });
         }
         break;
 
@@ -2232,7 +2248,7 @@
       }
     }
   }
-  function createEscapeKeyHandler(onEscape, options = {}) {
+  function createEscapeKeyHandler$1(onEscape, options = {}) {
     const {enabled: enabled = true, stopPropagation: stopPropagation = false, preventDefault: preventDefault = false} = options;
     let handler = null;
     let isAttached = false;
@@ -2276,7 +2292,7 @@
     };
   }
   function onEscapeKey(onEscape, options = {}) {
-    const handler = createEscapeKeyHandler(onEscape, options);
+    const handler = createEscapeKeyHandler$1(onEscape, options);
     handler.attach();
     return () => handler.detach();
   }
@@ -2378,7 +2394,7 @@
       }
     };
     connect() {
-      this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+      this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
         enabled: this.closeOnEscapeValue
       });
       if (this.openValue) {
@@ -2505,7 +2521,7 @@
       }
     };
     connect() {
-      this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+      this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
         enabled: this.closeOnEscapeValue
       });
       if (this.openValue) {

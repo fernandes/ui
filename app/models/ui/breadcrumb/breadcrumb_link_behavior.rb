@@ -30,7 +30,7 @@ module UI
 
       # Base classes applied to breadcrumb link
       def breadcrumb_link_base_classes
-        "transition-colors hover:text-foreground"
+        "transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
       end
     end
   end

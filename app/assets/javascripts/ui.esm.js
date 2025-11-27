@@ -1674,7 +1674,9 @@ class DropdownController extends Controller {
   connect() {
     this.boundHandleClickOutside = this.handleClickOutside.bind(this);
     this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this);
     document.addEventListener("click", this.boundHandleClickOutside);
+    this.element.addEventListener("focusout", this.boundHandleFocusOut);
   }
   disconnect() {
     if (this.cleanup) {
@@ -1685,6 +1687,18 @@ class DropdownController extends Controller {
     this.closeSubmenuTimeouts.clear();
     document.removeEventListener("click", this.boundHandleClickOutside);
     document.removeEventListener("keydown", this.boundHandleKeydown);
+    this.element.removeEventListener("focusout", this.boundHandleFocusOut);
+  }
+  handleFocusOut(event) {
+    if (!this.openValue) return;
+    setTimeout(() => {
+      const newFocusedElement = document.activeElement;
+      if (!this.element.contains(newFocusedElement)) {
+        this.close({
+          returnFocus: false
+        });
+      }
+    }, 0);
   }
   openSubmenuHandler(event) {
     const trigger = event.currentTarget;
@@ -1919,7 +1933,9 @@ class DropdownController extends Controller {
         const commandElement = focusedCommandOption.closest('[data-controller~="command"]');
         this.closeCommandSubmenu(commandElement);
       } else if (!this.closeCurrentSubmenuWithKeyboard(focusedElement)) {
-        this.close();
+        this.close({
+          returnFocus: true
+        });
       }
       break;
 
@@ -2353,7 +2369,7 @@ class AccordionController extends Controller {
   }
 }
 
-function createEscapeKeyHandler(onEscape, options = {}) {
+function createEscapeKeyHandler$1(onEscape, options = {}) {
   const {enabled: enabled = true, stopPropagation: stopPropagation = false, preventDefault: preventDefault = false} = options;
   let handler = null;
   let isAttached = false;
@@ -2398,7 +2414,7 @@ function createEscapeKeyHandler(onEscape, options = {}) {
 }
 
 function onEscapeKey(onEscape, options = {}) {
-  const handler = createEscapeKeyHandler(onEscape, options);
+  const handler = createEscapeKeyHandler$1(onEscape, options);
   handler.attach();
   return () => handler.detach();
 }
@@ -2515,7 +2531,7 @@ class AlertDialogController extends Controller {
     }
   };
   connect() {
-    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+    this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
       enabled: this.closeOnEscapeValue
     });
     if (this.openValue) {
@@ -2644,7 +2660,7 @@ class DialogController extends Controller {
     }
   };
   connect() {
-    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+    this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
       enabled: this.closeOnEscapeValue
     });
     if (this.openValue) {

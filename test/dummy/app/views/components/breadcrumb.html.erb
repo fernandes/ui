@@ -10,7 +10,7 @@
 
     <div class="space-y-6">
       <!-- Basic Example -->
-      <div class="space-y-2">
+      <div class="space-y-2" id="basic-breadcrumb">
         <h3 class="text-lg font-medium">Basic Breadcrumb</h3>
         <%= render UI::Breadcrumb::Breadcrumb.new do %>
           <%= render UI::Breadcrumb::List.new do %>
@@ -54,7 +54,7 @@
       </div>
 
       <!-- Responsive with Dropdown -->
-      <div class="space-y-2">
+      <div class="space-y-2" id="dropdown-breadcrumb">
         <h3 class="text-lg font-medium">Responsive with Dropdown (Collapsed Items)</h3>
         <p class="text-sm text-muted-foreground">Click the ellipsis to see hidden breadcrumb items</p>
         <%= render UI::Breadcrumb::Breadcrumb.new do %>
