@@ -2685,6 +2685,9 @@ class DialogController extends Controller {
       setState(target, "closed");
       target.setAttribute("data-initial", "");
     });
+    if (this.hasContentTarget) {
+      this.contentTarget.inert = true;
+    }
   }
   open() {
     this.openValue = true;
@@ -2700,6 +2703,9 @@ class DialogController extends Controller {
       target.removeAttribute("data-initial");
       setState(target, "open");
     });
+    if (this.hasContentTarget) {
+      this.contentTarget.inert = false;
+    }
     lockScroll();
     if (this.hasContentTarget) {
       focusFirstElement(this.contentTarget);
@@ -2719,6 +2725,9 @@ class DialogController extends Controller {
     targets.forEach(target => {
       setState(target, "closed");
     });
+    if (this.hasContentTarget) {
+      this.contentTarget.inert = true;
+    }
     unlockScroll();
     this.escapeHandler.detach();
     this.element.dispatchEvent(new CustomEvent("dialog:close", {

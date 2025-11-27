@@ -2546,6 +2546,9 @@
         setState(target, "closed");
         target.setAttribute("data-initial", "");
       });
+      if (this.hasContentTarget) {
+        this.contentTarget.inert = true;
+      }
     }
     open() {
       this.openValue = true;
@@ -2561,6 +2564,9 @@
         target.removeAttribute("data-initial");
         setState(target, "open");
       });
+      if (this.hasContentTarget) {
+        this.contentTarget.inert = false;
+      }
       lockScroll();
       if (this.hasContentTarget) {
         focusFirstElement(this.contentTarget);
@@ -2580,6 +2586,9 @@
       targets.forEach(target => {
         setState(target, "closed");
       });
+      if (this.hasContentTarget) {
+        this.contentTarget.inert = true;
+      }
       unlockScroll();
       this.escapeHandler.detach();
       this.element.dispatchEvent(new CustomEvent("dialog:close", {

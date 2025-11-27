@@ -82,6 +82,8 @@ module UI
         )
         # Add data-initial when closed to prevent exit animations on page load
         attrs["data-initial"] = "" unless @open
+        # Add inert when closed to prevent focus on elements inside
+        attrs[:inert] = true unless @open
         attrs
       end
 

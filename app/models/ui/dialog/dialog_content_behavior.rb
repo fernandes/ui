@@ -34,13 +34,16 @@ module UI
       # Build complete HTML attributes hash for dialog content
       def dialog_content_html_attributes
         base_attrs = @attributes&.except(:data) || {}
-        base_attrs.merge(
+        attrs = base_attrs.merge(
           class: dialog_content_classes,
           role: "dialog",
           "aria-modal": "true",
           "data-state": @open ? "open" : "closed",
           data: merged_dialog_content_data_attributes
         )
+        # Add inert when closed to prevent focus on elements inside
+        attrs[:inert] = true unless @open
+        attrs
       end
     end
   end

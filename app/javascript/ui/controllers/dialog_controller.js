@@ -39,6 +39,11 @@ export default class extends Controller {
       setState(target, 'closed')
       target.setAttribute("data-initial", "")
     })
+
+    // Use inert to prevent focus on content when closed
+    if (this.hasContentTarget) {
+      this.contentTarget.inert = true
+    }
   }
 
   open() {
@@ -63,6 +68,11 @@ export default class extends Controller {
       target.removeAttribute("data-initial")
       setState(target, 'open')
     })
+
+    // Remove inert to allow focus on content when open
+    if (this.hasContentTarget) {
+      this.contentTarget.inert = false
+    }
 
     // Lock body scroll
     lockScroll()
@@ -94,6 +104,11 @@ export default class extends Controller {
     targets.forEach(target => {
       setState(target, 'closed')
     })
+
+    // Use inert to prevent focus on content when closed
+    if (this.hasContentTarget) {
+      this.contentTarget.inert = true
+    }
 
     // Unlock body scroll
     unlockScroll()
