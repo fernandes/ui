@@ -32,8 +32,8 @@
           <div class="p-4">
             <div class="grid gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium">Goal (minutes)</label>
-                <input type="number" value="350" class="w-full px-3 py-2 border rounded-md">
+                <%= render UI::Label::Label.new(for: "goal-phlex") { "Goal (minutes)" } %>
+                <%= render UI::Input::Input.new(id: "goal-phlex", type: "number", value: "350") %>
               </div>
             </div>
           </div>
@@ -66,8 +66,8 @@
           <div class="p-4">
             <div class="grid gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium">Goal (minutes)</label>
-                <input type="number" value="350" class="w-full px-3 py-2 border rounded-md">
+                <%= render "ui/label/label", for: "goal-erb" do %>Goal (minutes)<% end %>
+                <%= render "ui/input/input", id: "goal-erb", type: "number", value: "350" %>
               </div>
             </div>
           </div>
@@ -104,8 +104,8 @@
           <div class="p-4">
             <div class="grid gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium">Goal (minutes)</label>
-                <input type="number" value="350" class="w-full px-3 py-2 border rounded-md">
+                <%= render UI::Label::LabelComponent.new(for: "goal-vc") do %>Goal (minutes)<% end %>
+                <%= render UI::Input::InputComponent.new(id: "goal-vc", type: "number", value: "350") %>
               </div>
             </div>
           </div>

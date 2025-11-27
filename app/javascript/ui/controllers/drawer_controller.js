@@ -861,6 +861,8 @@ export default class extends Controller {
   // ============================================================================
 
   setAllTargetsState(state) {
+    const isOpen = state === "open"
+
     if (this.hasContainerTarget) {
       setState(this.containerTarget, state)
     }
@@ -869,6 +871,8 @@ export default class extends Controller {
     }
     if (this.hasContentTarget) {
       setState(this.contentTarget, state)
+      // Use inert to prevent focus when closed
+      this.contentTarget.inert = !isOpen
     }
   }
 

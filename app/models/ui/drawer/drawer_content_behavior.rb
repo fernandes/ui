@@ -93,7 +93,7 @@ module UI
         direction = @direction || "bottom"
 
         base_attrs = @attributes&.except(:data) || {}
-        base_attrs.merge(
+        attrs = base_attrs.merge(
           class: drawer_content_classes,
           role: "dialog",
           "aria-modal": "true",
@@ -102,6 +102,9 @@ module UI
           "data-vaul-drawer-direction": direction,
           data: merged_drawer_content_data_attributes
         )
+        # Add inert when closed to prevent focus on elements inside
+        attrs[:inert] = true unless @open
+        attrs
       end
     end
   end

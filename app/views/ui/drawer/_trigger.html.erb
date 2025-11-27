@@ -2,6 +2,9 @@
 <%
   content ||= local_assigns.fetch(:content, nil)
   @as_child = local_assigns.fetch(:as_child, false)
+  @variant = local_assigns.fetch(:variant, :outline)
+  @size = local_assigns.fetch(:size, :default)
+  @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
@@ -15,8 +18,8 @@
   <%= yield(all_attributes) if block_given? %>
   <%= content&.call(all_attributes) %>
 <% else %>
-  <%# Default: render as button %>
-  <%= content_tag :button, all_attributes do %>
+  <%# Default: render as Button component %>
+  <%= render "ui/button/button", variant: @variant, size: @size, classes: @classes, attributes: all_attributes do %>
     <%= content || yield %>
   <% end %>
 <% end %>

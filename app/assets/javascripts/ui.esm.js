@@ -3888,6 +3888,7 @@ class DrawerController extends Controller {
     event.preventDefault();
   }
   setAllTargetsState(state) {
+    const isOpen = state === "open";
     if (this.hasContainerTarget) {
       setState(this.containerTarget, state);
     }
@@ -3896,6 +3897,7 @@ class DrawerController extends Controller {
     }
     if (this.hasContentTarget) {
       setState(this.contentTarget, state);
+      this.contentTarget.inert = !isOpen;
     }
   }
   hasSnapPoints() {

@@ -3742,6 +3742,7 @@
       event.preventDefault();
     }
     setAllTargetsState(state) {
+      const isOpen = state === "open";
       if (this.hasContainerTarget) {
         setState(this.containerTarget, state);
       }
@@ -3750,6 +3751,7 @@
       }
       if (this.hasContentTarget) {
         setState(this.contentTarget, state);
+        this.contentTarget.inert = !isOpen;
       }
     }
     hasSnapPoints() {
