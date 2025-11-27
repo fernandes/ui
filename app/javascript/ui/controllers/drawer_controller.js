@@ -1,4 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { setState } from "../utils/state-manager.js"
+import { lockScroll, unlockScroll } from "../utils/scroll-lock-manager.js"
+import { onEscapeKey } from "../utils/escape-key-manager.js"
+import { focusFirstElement } from "../utils/focus-trap-manager.js"
 
 // Drawer controller for gesture-based mobile-first drawers
 // Based on Vaul (https://vaul.emilkowal.ski)
@@ -58,15 +62,7 @@ export default class extends Controller {
       this.show()
     } else {
       // Set initial closed state
-      if (this.hasContainerTarget) {
-        this.containerTarget.setAttribute("data-state", "closed")
-      }
-      if (this.hasOverlayTarget) {
-        this.overlayTarget.setAttribute("data-state", "closed")
-      }
-      if (this.hasContentTarget) {
-        this.contentTarget.setAttribute("data-state", "closed")
-      }
+      this.setAllTargetsState("closed")
     }
 
     // Setup viewport resize handler for input repositioning
@@ -77,11 +73,8 @@ export default class extends Controller {
   }
 
   disconnect() {
-    document.body.style.overflow = ""
-    document.body.removeAttribute("data-scroll-locked")
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler)
-    }
+    unlockScroll()
+    this.cleanupEscapeHandler()
     if (this.preventScrollHandler) {
       document.removeEventListener("touchmove", this.preventScrollHandler)
     }
@@ -223,10 +216,7 @@ export default class extends Controller {
     }
 
     // Dispatch drag start event
-    this.element.dispatchEvent(new CustomEvent("drawer:drag:start", {
-      bubbles: true,
-      detail: { direction: this.directionValue }
-    }))
+    this.dispatchEvent("drawer:drag:start", { direction: this.directionValue })
   }
 
   updateTransform(delta) {
@@ -269,14 +259,11 @@ export default class extends Controller {
     }
 
     // Dispatch drag end event
-    this.element.dispatchEvent(new CustomEvent("drawer:drag:end", {
-      bubbles: true,
-      detail: {
-        direction: this.directionValue,
-        velocity,
-        delta: finalDelta
-      }
-    }))
+    this.dispatchEvent("drawer:drag:end", {
+      direction: this.directionValue,
+      velocity,
+      delta: finalDelta
+    })
   }
 
   // ============================================================================
@@ -291,60 +278,52 @@ export default class extends Controller {
     }
 
     const snapPoint = this.snapPointsValue[snapIndex]
-
-    // Use window.innerHeight for viewport-based snap points
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
-
-    // For mobile Safari: subtract threshold to account for browser UI (address bar, etc)
-    // This ensures 100% snap point is always visible and accessible
-    const MOBILE_THRESHOLD = 80
-
-    let containerSize
-    if (this.directionValue === "left" || this.directionValue === "right") {
-      containerSize = viewportWidth
-    } else {
-      // For snap point 1 (100%): use viewport - threshold to keep handle accessible
-      // For other snap points: use full viewport
-      if (snapPoint === 1) {
-        containerSize = viewportHeight - MOBILE_THRESHOLD
-      } else {
-        containerSize = viewportHeight
-      }
-    }
+    const containerSize = this.getContainerSizeForSnapPoint(snapPoint)
 
     if (containerSize === 0) return 0
 
-    let pixels
+    const pixels = this.snapPointToPixels(snapPoint, containerSize)
 
+    return this.calculateSnapPosition(snapPoint, pixels, containerSize)
+  }
+
+  getContainerSizeForSnapPoint(snapPoint) {
+    // For mobile Safari: subtract threshold to account for browser UI
+    const MOBILE_THRESHOLD = 80
+
+    if (this.isHorizontalDirection()) {
+      return window.innerWidth
+    }
+
+    // For 100% snap point: use viewport - threshold to keep handle accessible
+    return snapPoint === 1
+      ? window.innerHeight - MOBILE_THRESHOLD
+      : window.innerHeight
+  }
+
+  snapPointToPixels(snapPoint, containerSize) {
     if (typeof snapPoint === 'string' && snapPoint.includes('px')) {
-      // Explicit pixel value
-      pixels = parseInt(snapPoint)
-    } else if (snapPoint > 1) {
+      return parseInt(snapPoint)
+    }
+    if (snapPoint > 1) {
       // Percentage (1-100)
-      pixels = (snapPoint / 100) * containerSize
-    } else {
-      // Decimal percentage (0-1)
-      // 0.25 = 25% of viewport, 0.5 = 50% of viewport, 1 = 100% of viewport
-      pixels = snapPoint * containerSize
+      return (snapPoint / 100) * containerSize
+    }
+    // Decimal percentage (0-1)
+    return snapPoint * containerSize
+  }
+
+  calculateSnapPosition(snapPoint, pixels, containerSize) {
+    const MOBILE_THRESHOLD = 80
+    const isClosingSide = this.directionValue === 'bottom' || this.directionValue === 'right'
+
+    if (isClosingSide) {
+      // Special case for 100% snap point: position at threshold
+      if (snapPoint === 1) return MOBILE_THRESHOLD
+      return containerSize - pixels
     }
 
-    // For bottom/right drawers: Y position = containerSize - pixels
-    // More pixels visible = lower Y position (closer to 0)
-    // For top/left drawers: Y position = pixels
-    let yPosition
-    if (this.directionValue === 'bottom' || this.directionValue === 'right') {
-      yPosition = containerSize - pixels
-
-      // Special case for snap 1 (100%): add threshold to prevent hiding behind browser UI
-      if (snapPoint === 1) {
-        yPosition = MOBILE_THRESHOLD
-      }
-    } else {
-      yPosition = pixels
-    }
-
-    return yPosition
+    return pixels
   }
 
   handleSnapPointRelease(delta, velocity) {
@@ -446,37 +425,14 @@ export default class extends Controller {
 
     // Update transform to snap position
     if (this.hasContentTarget) {
-      const currentTransform = this.contentTarget.style.transform
-      const targetTransform = this.getTransformForSnapPoint(snapY)
-
-      if (animated) {
-        this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
-      }
-
-      this.contentTarget.style.transform = targetTransform
-
-      // Clear transition after animation
-      if (animated) {
-        setTimeout(() => {
-          if (this.hasContentTarget) {
-            this.contentTarget.style.transition = ""
-          }
-        }, this.TRANSITIONS.DURATION * 1000)
-      }
+      this.applyTransform(this.getTransformForSnapPoint(snapY), animated)
     }
 
     // Update overlay opacity based on snap point
     this.updateOverlayOpacityForSnapPoint(snapPointIndex)
 
     // Dispatch snap event
-    this.element.dispatchEvent(new CustomEvent("drawer:snap", {
-      bubbles: true,
-      detail: {
-        snapPoint,
-        snapPointIndex,
-        y: snapY
-      }
-    }))
+    this.dispatchEvent("drawer:snap", { snapPoint, snapPointIndex, y: snapY })
   }
 
   snapPointToPercentage(snapPoint) {
@@ -525,19 +481,29 @@ export default class extends Controller {
     }
   }
 
+  isHorizontalDirection() {
+    return this.directionValue === "left" || this.directionValue === "right"
+  }
+
+  isVerticalDirection() {
+    return this.directionValue === "bottom" || this.directionValue === "top"
+  }
+
   getDelta(start, current) {
-    switch (this.directionValue) {
-      case "bottom":
-        return current.y - start.y // Positive = dragging down = closing
-      case "top":
-        return start.y - current.y // Positive = dragging up = closing
-      case "left":
-        return start.x - current.x // Positive = dragging left = closing
-      case "right":
-        return current.x - start.x // Positive = dragging right = closing
-      default:
-        return current.y - start.y
+    // Calculate delta in the direction of drawer movement
+    // Positive delta = closing direction, negative = opening direction
+    if (this.isHorizontalDirection()) {
+      // left: drag left (start.x - current.x) = closing
+      // right: drag right (current.x - start.x) = closing
+      return this.directionValue === "left"
+        ? start.x - current.x
+        : current.x - start.x
     }
+    // bottom: drag down (current.y - start.y) = closing
+    // top: drag up (start.y - current.y) = closing
+    return this.directionValue === "top"
+      ? start.y - current.y
+      : current.y - start.y
   }
 
   isClosingDirection(delta) {
@@ -548,35 +514,21 @@ export default class extends Controller {
   getDrawerSize() {
     if (!this.hasContentTarget) return 0
 
-    if (this.directionValue === "left" || this.directionValue === "right") {
-      return this.contentTarget.offsetWidth
-    } else {
-      return this.contentTarget.offsetHeight
-    }
+    return this.isHorizontalDirection()
+      ? this.contentTarget.offsetWidth
+      : this.contentTarget.offsetHeight
+  }
+
+  getViewportSize() {
+    return this.isHorizontalDirection()
+      ? window.innerWidth
+      : window.innerHeight
   }
 
   getClosedPosition() {
-    // Get viewport size for the drawer direction
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
-    const drawerSize = this.getDrawerSize()
-
-    // Return position that's completely off-screen based on direction
-    // For drawer to be fully off-screen, it needs to move by viewport size + drawer size
-    // Note: getTransformForDirection() will apply direction-specific transformations
-    // So we return positive values and let that function handle the sign
-    switch (this.directionValue) {
-      case "bottom":
-      case "top":
-        // Move beyond viewport by drawer height to ensure it's fully off-screen
-        return viewportHeight + drawerSize
-      case "right":
-      case "left":
-        // Move beyond viewport by drawer width to ensure it's fully off-screen
-        return viewportWidth + drawerSize
-      default:
-        return 0
-    }
+    // Return position that's completely off-screen
+    // Viewport size + drawer size ensures it's fully hidden
+    return this.getViewportSize() + this.getDrawerSize()
   }
 
   // ============================================================================
@@ -649,9 +601,7 @@ export default class extends Controller {
         return true
       }
 
-      const isVertical = this.directionValue === "bottom" || this.directionValue === "top"
-
-      if (isVertical) {
+      if (this.isVerticalDirection()) {
         const canScrollUp = scrollableEl.scrollTop > 0
         const canScrollDown = scrollableEl.scrollTop < scrollableEl.scrollHeight - scrollableEl.clientHeight
 
@@ -672,86 +622,58 @@ export default class extends Controller {
   resetPosition() {
     if (!this.hasContentTarget) return
     // Animate back to open position
-    this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
-    this.contentTarget.style.transform = "translate3d(0, 0, 0)"
-
-    // Clear transition after animation
-    setTimeout(() => {
-      if (this.hasContentTarget) {
-        this.contentTarget.style.transition = ""
-        this.contentTarget.style.transform = ""
-      }
-    }, this.TRANSITIONS.DURATION * 1000)
-
+    this.applyTransform("translate3d(0, 0, 0)", true, true)
     this.updateOverlayOpacity(0)
   }
 
-  updateOverlayOpacity(delta) {
-    if (!this.hasOverlayTarget) return
-    if (!this.snapPointsValue || this.snapPointsValue.length === 0) return
+  // ============================================================================
+  // OVERLAY OPACITY
+  // ============================================================================
 
-    const currentY = delta
+  getFadeIndex() {
+    return this.fadeFromIndexValue >= 0 ? this.fadeFromIndexValue : 0
+  }
 
-    // fadeFromIndex: overlay APPEARS starting from this snap point
-    // Behavior:
-    // 1. MORE OPEN than fadeEndIndex: opacity = 1 (ALWAYS)
-    // 2. BETWEEN fadeFromIndex and fadeEndIndex: opacity gradual (0 → 1)
-    // 3. MORE CLOSED than fadeFromIndex: opacity = 0
-    let fadeIndex
-    if (this.fadeFromIndexValue >= 0) {
-      fadeIndex = this.fadeFromIndexValue
-    } else {
-      // When not specified, overlay visible from first snap point
-      fadeIndex = 0
-    }
+  updateOverlayOpacity(currentY) {
+    if (!this.hasOverlayTarget || !this.hasSnapPoints()) return
 
+    const fadeIndex = this.getFadeIndex()
     const fadeStartY = this.getSnapPointY(fadeIndex)
     const fadeEndIndex = Math.min(fadeIndex + 1, this.snapPointsValue.length - 1)
     const fadeEndY = this.getSnapPointY(fadeEndIndex)
 
-    // 1. MORE OPEN than fadeEndIndex (currentY < fadeEndY) - ALWAYS opacity = 1
-    if (currentY < fadeEndY) {
-      this.overlayTarget.style.opacity = "1"
-      return
-    }
-
-    // 2. BETWEEN fadeFromIndex and fadeEndIndex - overlay appears gradually
-    if (currentY >= fadeEndY && currentY <= fadeStartY) {
-      const range = fadeStartY - fadeEndY
-      const progress = (fadeStartY - currentY) / range
-      const finalOpacity = Math.min(1, Math.max(0, progress))
-      this.overlayTarget.style.opacity = finalOpacity
-      return
-    }
-
-    // 3. MORE CLOSED than fadeFromIndex (currentY > fadeStartY) - NO overlay
-    this.overlayTarget.style.opacity = "0"
+    this.setOverlayOpacity(this.calculateOverlayOpacity(currentY, fadeStartY, fadeEndY))
   }
 
   updateOverlayOpacityForSnapPoint(snapPointIndex) {
-    if (!this.hasOverlayTarget) return
-    if (!this.snapPointsValue || this.snapPointsValue.length === 0) return
+    if (!this.hasOverlayTarget || !this.hasSnapPoints()) return
 
-    const fadeIndex = this.fadeFromIndexValue >= 0
-      ? this.fadeFromIndexValue
-      : 0
+    const fadeIndex = this.getFadeIndex()
     const fadeEndIndex = fadeIndex + 1
 
-    // BEFORE fadeFromIndex - NO overlay
     if (snapPointIndex < fadeIndex) {
-      this.overlayTarget.style.opacity = "0"
-      return
+      this.setOverlayOpacity(0)
+    } else if (snapPointIndex >= fadeEndIndex) {
+      this.setOverlayOpacity(1)
+    } else {
+      // AT fadeFromIndex - use Y position for precise opacity
+      this.updateOverlayOpacity(this.getSnapPointY(snapPointIndex))
     }
+  }
 
-    // AT or AFTER fadeEndIndex - overlay fully visible
-    if (snapPointIndex >= fadeEndIndex) {
-      this.overlayTarget.style.opacity = "1"
-      return
-    }
+  calculateOverlayOpacity(currentY, fadeStartY, fadeEndY) {
+    // MORE OPEN than fadeEndIndex
+    if (currentY < fadeEndY) return 1
+    // MORE CLOSED than fadeFromIndex
+    if (currentY > fadeStartY) return 0
+    // BETWEEN: gradual opacity
+    const range = fadeStartY - fadeEndY
+    const progress = (fadeStartY - currentY) / range
+    return Math.min(1, Math.max(0, progress))
+  }
 
-    // AT fadeFromIndex - overlay starting to appear (use Y position for precise opacity)
-    const currentY = this.getSnapPointY(snapPointIndex)
-    this.updateOverlayOpacity(currentY)
+  setOverlayOpacity(opacity) {
+    this.overlayTarget.style.opacity = String(opacity)
   }
 
   // ============================================================================
@@ -760,55 +682,26 @@ export default class extends Controller {
 
   show() {
     // Set data-state to open for animations
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "open")
-    }
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "open")
-    }
-    if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "open")
-    }
+    this.setAllTargetsState("open")
 
     // If using snap points, position drawer at FIRST snap point (Vaul behavior)
-    if (this.snapPointsValue && this.snapPointsValue.length > 0) {
+    if (this.hasSnapPoints()) {
       const initialIndex = 0 // Always start at first snap point
 
       if (this.hasContentTarget) {
         // Always animate from closed position (both first open and re-opens)
-        // 1. Reset activeSnapPoint to ensure we're starting fresh
         this.activeSnapPointValue = initialIndex
-
-        // 2. Position at closed (off-screen) without animation
-        const closedPosition = this.getClosedPosition()
-        this.contentTarget.style.transition = "none"
-        this.contentTarget.style.transform = this.getTransformForDirection(closedPosition)
-
-        // 3. Force reflow to ensure position is applied
-        this.contentTarget.offsetHeight
-
-        // 4. Animate to first snap position (ALWAYS index 0)
+        this.positionAtClosed()
         this.snapTo(initialIndex, true)
       }
 
       this.hasBeenOpened = true
-
-      // Set initial overlay opacity based on fadeFromIndex
       this.updateOverlayOpacityForSnapPoint(initialIndex)
     } else {
       // No snap points - always animate from closed position to fully open
       if (this.hasContentTarget) {
-        // 1. Position at closed (off-screen) without animation
-        const closedPosition = this.getClosedPosition()
-        this.contentTarget.style.transition = "none"
-        this.contentTarget.style.transform = this.getTransformForDirection(closedPosition)
-
-        // 2. Force reflow
-        this.contentTarget.offsetHeight
-
-        // 3. Animate to open position (Y=0)
-        this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
-        this.contentTarget.style.transform = "translate3d(0, 0, 0)"
+        this.positionAtClosed()
+        this.animateToOpen()
       }
 
       this.hasBeenOpened = true
@@ -816,10 +709,7 @@ export default class extends Controller {
 
     // Lock body scroll in modal mode
     if (this.modalValue) {
-      document.body.style.overflow = "hidden"
-      document.body.setAttribute("data-scroll-locked", "1")
-
-      // Prevent page scroll on touch devices while allowing drawer drag
+      lockScroll()
       this.preventScrollHandler = this.handlePreventScroll.bind(this)
       document.addEventListener("touchmove", this.preventScrollHandler, { passive: false })
     }
@@ -829,19 +719,11 @@ export default class extends Controller {
 
     // Setup escape key handler
     if (this.dismissibleValue) {
-      this.escapeHandler = (e) => {
-        if (e.key === "Escape") {
-          this.animateToClosedPosition()
-        }
-      }
-      document.addEventListener("keydown", this.escapeHandler)
+      this.setupEscapeHandler()
     }
 
     // Dispatch open event
-    this.element.dispatchEvent(new CustomEvent("drawer:open", {
-      bubbles: true,
-      detail: { open: true }
-    }))
+    this.dispatchEvent("drawer:open", { open: true })
   }
 
   hide() {
@@ -853,10 +735,9 @@ export default class extends Controller {
     // Animate from current position to closed position, then close
     if (this.hasContentTarget) {
       const closedPosition = this.getClosedPosition()
-      const currentTransform = this.contentTarget.style.transform
 
       // Apply transition for smooth animation
-      this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
+      this.contentTarget.style.transition = this.getTransitionStyle()
       this.contentTarget.style.transform = this.getTransformForDirection(closedPosition)
 
       // Fade out overlay
@@ -865,53 +746,44 @@ export default class extends Controller {
         this.overlayTarget.style.opacity = "0"
       }
 
-      // After animation completes, clean up and update state WITHOUT calling hide()
+      // After animation completes, clean up
       setTimeout(() => {
-        // Clear inline styles and set data-state
-        if (this.hasContentTarget) {
-          // Set transition to none BEFORE clearing styles to prevent CSS transition from triggering
-          this.contentTarget.style.transition = "none"
-          this.contentTarget.style.transform = ""
-          this.contentTarget.setAttribute("data-state", "closed")
-        }
-        if (this.hasOverlayTarget) {
-          this.overlayTarget.style.transition = "none"
-          this.overlayTarget.style.opacity = ""
-          this.overlayTarget.setAttribute("data-state", "closed")
-        }
-        if (this.hasContainerTarget) {
-          this.containerTarget.setAttribute("data-state", "closed")
-        }
-
-        // Update state and clean up (without calling hide() which would animate again)
-        this.openValue = false
-
-        // Unlock body scroll
-        document.body.style.overflow = ""
-        document.body.removeAttribute("data-scroll-locked")
-
-        // Remove touch scroll prevention
-        if (this.preventScrollHandler) {
-          document.removeEventListener("touchmove", this.preventScrollHandler)
-          this.preventScrollHandler = null
-        }
-
-        // Remove escape handler
-        if (this.escapeHandler) {
-          document.removeEventListener("keydown", this.escapeHandler)
-          this.escapeHandler = null
-        }
-
-        // Dispatch close event
-        this.element.dispatchEvent(new CustomEvent("drawer:close", {
-          bubbles: true,
-          detail: { open: false }
-        }))
+        this.cleanupAfterClose()
       }, this.TRANSITIONS.DURATION * 1000)
     } else {
       // Fallback if no content target
       this.close()
     }
+  }
+
+  cleanupAfterClose() {
+    // Clear inline styles and set data-state
+    if (this.hasContentTarget) {
+      this.contentTarget.style.transition = "none"
+      this.contentTarget.style.transform = ""
+    }
+    if (this.hasOverlayTarget) {
+      this.overlayTarget.style.transition = "none"
+      this.overlayTarget.style.opacity = ""
+    }
+
+    this.setAllTargetsState("closed")
+    this.openValue = false
+
+    // Unlock body scroll
+    unlockScroll()
+
+    // Remove touch scroll prevention
+    if (this.preventScrollHandler) {
+      document.removeEventListener("touchmove", this.preventScrollHandler)
+      this.preventScrollHandler = null
+    }
+
+    // Remove escape handler
+    this.cleanupEscapeHandler()
+
+    // Dispatch close event
+    this.dispatchEvent("drawer:close", { open: false })
   }
 
   isMobile() {
@@ -922,27 +794,11 @@ export default class extends Controller {
   setupFocusTrap() {
     if (!this.hasContentTarget) return
 
-    const focusableElements = this.contentTarget.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-
-    if (focusableElements.length === 0) return
-
     // On mobile, avoid focusing inputs/textareas to prevent keyboard popup
-    if (this.isMobile()) {
-      // Find first non-input focusable element
-      const nonInputElement = Array.from(focusableElements).find(el =>
-        el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA' && el.tagName !== 'SELECT'
-      )
-
-      if (nonInputElement) {
-        nonInputElement.focus({ preventScroll: true })
-      }
-      // If only inputs exist, don't focus anything on mobile
-    } else {
-      // Desktop: focus first element as usual
-      focusableElements[0].focus({ preventScroll: true })
-    }
+    focusFirstElement(this.contentTarget, {
+      excludeInputsOnMobile: true,
+      preventScroll: true
+    })
   }
 
   // ============================================================================
@@ -998,5 +854,88 @@ export default class extends Controller {
 
     // Prevent page scroll for everything else
     event.preventDefault()
+  }
+
+  // ============================================================================
+  // HELPER METHODS
+  // ============================================================================
+
+  setAllTargetsState(state) {
+    if (this.hasContainerTarget) {
+      setState(this.containerTarget, state)
+    }
+    if (this.hasOverlayTarget) {
+      setState(this.overlayTarget, state)
+    }
+    if (this.hasContentTarget) {
+      setState(this.contentTarget, state)
+    }
+  }
+
+  hasSnapPoints() {
+    return this.snapPointsValue && this.snapPointsValue.length > 0
+  }
+
+  positionAtClosed() {
+    const closedPosition = this.getClosedPosition()
+    this.contentTarget.style.transition = "none"
+    this.contentTarget.style.transform = this.getTransformForDirection(closedPosition)
+    // Force reflow to ensure position is applied
+    this.contentTarget.offsetHeight
+  }
+
+  animateToOpen() {
+    this.contentTarget.style.transition = this.getTransitionStyle()
+    this.contentTarget.style.transform = "translate3d(0, 0, 0)"
+  }
+
+  getTransitionStyle() {
+    return `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
+  }
+
+  setupEscapeHandler() {
+    this.cleanupEscapeHandler()
+    this.escapeCleanup = onEscapeKey(() => {
+      this.animateToClosedPosition()
+    })
+  }
+
+  cleanupEscapeHandler() {
+    if (this.escapeCleanup) {
+      this.escapeCleanup()
+      this.escapeCleanup = null
+    }
+  }
+
+  applyTransform(transform, animated = false, clearAfter = false) {
+    if (!this.hasContentTarget) return
+
+    if (animated) {
+      this.contentTarget.style.transition = this.getTransitionStyle()
+    }
+
+    this.contentTarget.style.transform = transform
+
+    if (animated && clearAfter) {
+      setTimeout(() => {
+        if (this.hasContentTarget) {
+          this.contentTarget.style.transition = ""
+          this.contentTarget.style.transform = ""
+        }
+      }, this.TRANSITIONS.DURATION * 1000)
+    } else if (animated) {
+      setTimeout(() => {
+        if (this.hasContentTarget) {
+          this.contentTarget.style.transition = ""
+        }
+      }, this.TRANSITIONS.DURATION * 1000)
+    }
+  }
+
+  dispatchEvent(eventName, detail = {}) {
+    this.element.dispatchEvent(new CustomEvent(eventName, {
+      bubbles: true,
+      detail
+    }))
   }
 }

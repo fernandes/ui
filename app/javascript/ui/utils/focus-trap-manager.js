@@ -69,23 +69,32 @@ export function isMobileDevice() {
  * @param {HTMLElement} container - Container to focus within
  * @param {Object} options - Options
  * @param {boolean} options.mobileAware - Skip inputs on mobile to avoid keyboard popup
+ * @param {boolean} options.excludeInputsOnMobile - Alias for mobileAware (for compatibility)
+ * @param {boolean} options.preventScroll - Pass preventScroll option to focus()
  * @param {HTMLElement} options.preferredElement - Specific element to focus if available
  */
 export function focusFirstElement(container, options = {}) {
-  const { mobileAware = true, preferredElement = null } = options
+  const {
+    mobileAware = true,
+    excludeInputsOnMobile = mobileAware,
+    preventScroll = false,
+    preferredElement = null
+  } = options
+
+  const focusOptions = preventScroll ? { preventScroll: true } : undefined
 
   // Try preferred element first
   if (preferredElement && container.contains(preferredElement)) {
-    preferredElement.focus()
+    preferredElement.focus(focusOptions)
     return preferredElement
   }
 
   // On mobile, skip text inputs to avoid keyboard popup
-  const skipInputs = mobileAware && isMobileDevice()
+  const skipInputs = excludeInputsOnMobile && isMobileDevice()
   const element = getFirstFocusable(container, { skipInputs })
 
   if (element) {
-    element.focus()
+    element.focus(focusOptions)
     return element
   }
 
