@@ -358,16 +358,31 @@ export default class extends Controller {
 
     // Return focus to trigger button (ARIA best practice)
     if (returnFocus && this.hasTriggerTarget) {
-      // Use a longer delay to ensure all DOM updates and event handlers complete
       setTimeout(() => {
-        if (this.triggerTarget) {
-          this.triggerTarget.focus()
-        }
-      }, 150)
+        this.focusTrigger()
+      }, 0)
     }
 
     // Reset the flag
     this.shouldReturnFocusToTrigger = false
+  }
+
+  // Focus the trigger element, or first focusable child if trigger is not focusable
+  focusTrigger() {
+    if (!this.triggerTarget) return
+
+    // Check if trigger itself is focusable
+    const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+
+    if (isFocusable) {
+      this.triggerTarget.focus()
+    } else {
+      // Find first focusable element inside the trigger
+      const focusableChild = this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+      if (focusableChild) {
+        focusableChild.focus()
+      }
+    }
   }
 
   handleClickOutside(event) {

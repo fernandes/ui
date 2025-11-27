@@ -1742,12 +1742,22 @@
       this.teardownKeyboardNavigation();
       if (returnFocus && this.hasTriggerTarget) {
         setTimeout(() => {
-          if (this.triggerTarget) {
-            this.triggerTarget.focus();
-          }
-        }, 150);
+          this.focusTrigger();
+        }, 0);
       }
       this.shouldReturnFocusToTrigger = false;
+    }
+    focusTrigger() {
+      if (!this.triggerTarget) return;
+      const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (isFocusable) {
+        this.triggerTarget.focus();
+      } else {
+        const focusableChild = this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusableChild) {
+          focusableChild.focus();
+        }
+      }
     }
     handleClickOutside(event) {
       if (!this.element.contains(event.target)) {
