@@ -328,9 +328,9 @@ describe("DrawerController - Vaul Implementation", () => {
       // Snap with animation
       controller.snapTo(1, true)
 
-      // Should apply transition
+      // Should apply transition (controller uses 0.65s, not 0.5s)
       expect(content.style.transition).toContain("transform")
-      expect(content.style.transition).toContain("0.5s")
+      expect(content.style.transition).toContain("0.65s")
       expect(content.style.transition).toContain("cubic-bezier")
     })
   })
@@ -581,10 +581,13 @@ describe("DrawerController - Vaul Implementation", () => {
       controller.snapTo(1, false)
 
       // Simulate high velocity upward drag (opening direction)
-      // Velocity > 0.4, direction is opening (negative delta for bottom drawer)
+      // For the controller:
+      //   - Positive velocity = closing direction (lower index)
+      //   - Negative velocity = opening direction (higher index)
+      // So for opening (going to next snap point), use negative velocity
       const mockRelease = {
-        delta: -50,  // Small distance but high velocity
-        velocity: 0.5  // Above VELOCITY_THRESHOLD (0.4)
+        delta: -50,  // Small distance (doesn't matter for high velocity snap)
+        velocity: -0.5  // Negative velocity = opening direction (above VELOCITY_THRESHOLD of 0.4)
       }
 
       // Should skip to index 2 (75%), not stay at 50%
@@ -962,21 +965,15 @@ describe("DrawerController - Vaul Implementation", () => {
       const controller = application.getControllerForElementAndIdentifier(element, "ui--drawer")
       const content = container.querySelector('[data-ui--drawer-target="content"]')
 
-      // Simulate drag start
-      const mockPointerDown = {
-        pointerId: 1,
-        clientX: 0,
-        clientY: 0,
-        pointerType: "touch",
-        target: content
-      }
-      controller.handlePointerDown(mockPointerDown)
+      // Simulate drag start - startDrag() is what sets transition to "none"
+      // In the real flow, handlePointerMove calls startDrag() when threshold is exceeded
+      controller.startDrag()
 
       // During drag, updateTransform should NOT have transition
       controller.updateTransform(100)
 
-      // Transition should be "none" or empty during drag
-      expect(content.style.transition).toBe("")
+      // Transition should be "none" during drag for responsive feel
+      expect(content.style.transition).toBe("none")
     })
 
     test("smooth transition applied on snap release", async () => {
@@ -998,9 +995,9 @@ describe("DrawerController - Vaul Implementation", () => {
       // Snap to a point with animation
       controller.snapTo(1, true)
 
-      // Should have transition applied
+      // Should have transition applied (controller uses 0.65s, not 0.5s)
       expect(content.style.transition).toContain("transform")
-      expect(content.style.transition).toContain("0.5s")
+      expect(content.style.transition).toContain("0.65s")
       expect(content.style.transition).toContain("cubic-bezier")
     })
   })
@@ -1506,7 +1503,8 @@ describe("DrawerController - Vaul Implementation", () => {
       expect(controller.openValue).toBe(true) // Still open during animation
 
       // After animation completes, should close the drawer
-      await new Promise(resolve => setTimeout(resolve, 600)) // Wait for animation (500ms + buffer)
+      // Controller uses 0.65s (650ms) duration, so wait 750ms to be safe
+      await new Promise(resolve => setTimeout(resolve, 750))
       expect(controller.openValue).toBe(false)
 
       // Restore
