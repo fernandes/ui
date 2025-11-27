@@ -2,6 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 import { syncExpandedState } from "../utils/state-manager.js"
 
 // Accordion controller for collapsible content sections
+// Implements WAI-ARIA APG Accordion Pattern keyboard navigation
+// https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
 export default class extends Controller {
   static targets = ["item", "trigger", "content"]
   static values = {
@@ -11,6 +13,73 @@ export default class extends Controller {
 
   connect() {
     this.setupItems()
+    this.setupKeyboardNavigation()
+  }
+
+  disconnect() {
+    this.removeKeyboardNavigation()
+  }
+
+  setupKeyboardNavigation() {
+    this.handleKeydown = this.handleKeydown.bind(this)
+    this.element.addEventListener("keydown", this.handleKeydown)
+  }
+
+  removeKeyboardNavigation() {
+    this.element.removeEventListener("keydown", this.handleKeydown)
+  }
+
+  handleKeydown(event) {
+    const trigger = event.target.closest("[data-ui--accordion-target='trigger']")
+    if (!trigger) return
+
+    const currentIndex = this.triggerTargets.indexOf(trigger)
+    if (currentIndex === -1) return
+
+    let targetIndex = -1
+    let shouldPreventDefault = true
+
+    switch (event.key) {
+      case "ArrowDown":
+        // Move focus to next trigger, wrap to first if at end
+        targetIndex = (currentIndex + 1) % this.triggerTargets.length
+        break
+
+      case "ArrowUp":
+        // Move focus to previous trigger, wrap to last if at start
+        targetIndex = currentIndex - 1
+        if (targetIndex < 0) {
+          targetIndex = this.triggerTargets.length - 1
+        }
+        break
+
+      case "Home":
+        // Move focus to first trigger
+        targetIndex = 0
+        break
+
+      case "End":
+        // Move focus to last trigger
+        targetIndex = this.triggerTargets.length - 1
+        break
+
+      case "Enter":
+      case " ":
+        // Toggle current accordion item
+        this.toggle({ currentTarget: trigger })
+        break
+
+      default:
+        shouldPreventDefault = false
+    }
+
+    if (shouldPreventDefault) {
+      event.preventDefault()
+    }
+
+    if (targetIndex !== -1 && this.triggerTargets[targetIndex]) {
+      this.triggerTargets[targetIndex].focus()
+    }
   }
 
   setupItems() {

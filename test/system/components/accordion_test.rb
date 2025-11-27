@@ -230,6 +230,142 @@ class AccordionTest < UI::SystemTestCase
     assert accordion.collapsed?("erb-2")
   end
 
+  # === Arrow Key Navigation Tests (WAI-ARIA APG) ===
+
+  test "Arrow Down moves focus to next accordion header" do
+    accordion = basic_accordion
+
+    # Focus the first trigger by clicking
+    accordion.trigger("erb-1").click
+    sleep 0.1
+
+    # Verify first trigger has focus
+    first_trigger_id = accordion.trigger("erb-1")["id"]
+    focused_id_before = page.evaluate_script("document.activeElement?.id")
+    assert_equal first_trigger_id, focused_id_before, "First trigger should be focused"
+
+    # Press ArrowDown to move to next trigger
+    accordion.arrow_down
+    sleep 0.1
+
+    # Verify second trigger has focus
+    second_trigger_id = accordion.trigger("erb-2")["id"]
+    focused_id_after = page.evaluate_script("document.activeElement?.id")
+    assert_equal second_trigger_id, focused_id_after, "Second trigger should be focused after ArrowDown"
+  end
+
+  test "Arrow Down wraps from last to first header" do
+    accordion = basic_accordion
+
+    # Focus last trigger
+    accordion.trigger("erb-3").click
+    sleep 0.1
+
+    # Press ArrowDown to wrap to first
+    accordion.arrow_down
+    sleep 0.1
+
+    # Verify first trigger has focus
+    first_trigger_id = accordion.trigger("erb-1")["id"]
+    focused_id = page.evaluate_script("document.activeElement?.id")
+    assert_equal first_trigger_id, focused_id, "First trigger should be focused after wrap"
+  end
+
+  test "Arrow Up moves focus to previous accordion header" do
+    accordion = basic_accordion
+
+    # Focus second trigger
+    accordion.trigger("erb-2").click
+    sleep 0.1
+
+    # Press ArrowUp to move to first
+    accordion.arrow_up
+    sleep 0.1
+
+    # Verify first trigger has focus
+    first_trigger_id = accordion.trigger("erb-1")["id"]
+    focused_id = page.evaluate_script("document.activeElement?.id")
+    assert_equal first_trigger_id, focused_id, "First trigger should be focused"
+  end
+
+  test "Arrow Up wraps from first to last header" do
+    accordion = basic_accordion
+
+    # Focus first trigger
+    accordion.trigger("erb-1").click
+    sleep 0.1
+
+    # Press ArrowUp to wrap to last
+    accordion.arrow_up
+    sleep 0.1
+
+    # Verify last trigger has focus
+    last_trigger_id = accordion.trigger("erb-3")["id"]
+    focused_id = page.evaluate_script("document.activeElement?.id")
+    assert_equal last_trigger_id, focused_id, "Last trigger should be focused after wrap"
+  end
+
+  test "Home key moves focus to first accordion header" do
+    accordion = basic_accordion
+
+    # Focus last trigger
+    accordion.trigger("erb-3").click
+    sleep 0.1
+
+    # Press Home to jump to first
+    accordion.go_home
+    sleep 0.1
+
+    # Verify first trigger has focus
+    first_trigger_id = accordion.trigger("erb-1")["id"]
+    focused_id = page.evaluate_script("document.activeElement?.id")
+    assert_equal first_trigger_id, focused_id, "First trigger should be focused"
+  end
+
+  test "End key moves focus to last accordion header" do
+    accordion = basic_accordion
+
+    # Focus first trigger
+    accordion.trigger("erb-1").click
+    sleep 0.1
+
+    # Press End to jump to last
+    accordion.go_end
+    sleep 0.1
+
+    # Verify last trigger has focus
+    last_trigger_id = accordion.trigger("erb-3")["id"]
+    focused_id = page.evaluate_script("document.activeElement?.id")
+    assert_equal last_trigger_id, focused_id, "Last trigger should be focused"
+  end
+
+  test "Arrow navigation does not expand or collapse items" do
+    accordion = basic_accordion
+
+    # Start with first item collapsed
+    assert accordion.collapsed?("erb-1")
+
+    # Focus first trigger
+    accordion.trigger("erb-1").click
+    # Collapse it again (click expands it)
+    accordion.collapse("erb-1")
+    sleep 0.1
+
+    # Focus first again
+    accordion.trigger("erb-1").click
+    sleep 0.1
+
+    # Press ArrowDown
+    accordion.arrow_down
+    sleep 0.1
+
+    # Second item should be focused but not expanded
+    second_trigger_id = accordion.trigger("erb-2")["id"]
+    focused_id = page.evaluate_script("document.activeElement?.id")
+    assert_equal second_trigger_id, focused_id
+    assert accordion.collapsed?("erb-2"), "Second item should remain collapsed after arrow navigation"
+  end
+
   # === ARIA Accessibility Tests ===
 
   test "trigger has correct aria-expanded when closed" do
@@ -278,6 +414,27 @@ class AccordionTest < UI::SystemTestCase
 
     trigger = accordion.trigger("erb-1")
     assert_focusable(trigger)
+  end
+
+  test "trigger header has correct heading role and aria-level" do
+    accordion = basic_accordion
+
+    wrapper = accordion.trigger_wrapper("erb-1")
+
+    # The h3 element implicitly has heading role with aria-level 3
+    assert_equal "h3", wrapper.tag_name.downcase
+  end
+
+  test "content aria-labelledby points to trigger id" do
+    accordion = basic_accordion
+
+    trigger = accordion.trigger("erb-1")
+    content = accordion.content("erb-1")
+
+    trigger_id = trigger["id"]
+    labelledby = content["aria-labelledby"]
+
+    assert_equal trigger_id, labelledby
   end
 
   # === Data State Management Tests ===

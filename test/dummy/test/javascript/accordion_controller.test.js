@@ -320,6 +320,141 @@ describe("AccordionController", () => {
     })
   })
 
+  describe("Keyboard navigation", () => {
+    test("Arrow Down moves focus to next trigger", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const trigger2 = container.querySelector('[data-testid="trigger-item-2"]')
+
+      trigger1.focus()
+      trigger1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(trigger2)
+    })
+
+    test("Arrow Down wraps from last to first trigger", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const trigger3 = container.querySelector('[data-testid="trigger-item-3"]')
+
+      trigger3.focus()
+      trigger3.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(trigger1)
+    })
+
+    test("Arrow Up moves focus to previous trigger", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const trigger2 = container.querySelector('[data-testid="trigger-item-2"]')
+
+      trigger2.focus()
+      trigger2.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(trigger1)
+    })
+
+    test("Arrow Up wraps from first to last trigger", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const trigger3 = container.querySelector('[data-testid="trigger-item-3"]')
+
+      trigger1.focus()
+      trigger1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(trigger3)
+    })
+
+    test("Home key moves focus to first trigger", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const trigger3 = container.querySelector('[data-testid="trigger-item-3"]')
+
+      trigger3.focus()
+      trigger3.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(trigger1)
+    })
+
+    test("End key moves focus to last trigger", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const trigger3 = container.querySelector('[data-testid="trigger-item-3"]')
+
+      trigger1.focus()
+      trigger1.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(trigger3)
+    })
+
+    test("Arrow keys do not toggle accordion state", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const item1 = container.querySelector('[data-testid="item-item-1"]')
+
+      trigger1.focus()
+      expect(item1.dataset.state).toBe("closed")
+
+      trigger1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      // Item should still be closed
+      expect(item1.dataset.state).toBe("closed")
+    })
+
+    test("Enter key toggles accordion item", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const item1 = container.querySelector('[data-testid="item-item-1"]')
+
+      trigger1.focus()
+      expect(item1.dataset.state).toBe("closed")
+
+      trigger1.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(item1.dataset.state).toBe("open")
+    })
+
+    test("Space key toggles accordion item", async () => {
+      container.innerHTML = createAccordion()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const trigger1 = container.querySelector('[data-testid="trigger-item-1"]')
+      const item1 = container.querySelector('[data-testid="item-item-1"]')
+
+      trigger1.focus()
+      expect(item1.dataset.state).toBe("closed")
+
+      trigger1.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(item1.dataset.state).toBe("open")
+    })
+  })
+
   describe("Animation support", () => {
     test("sets height style for animation", async () => {
       container.innerHTML = createAccordion()

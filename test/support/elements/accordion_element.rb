@@ -211,6 +211,67 @@ module UI
         press_shift_tab
       end
 
+      # Send key using Playwright's keyboard API (more reliable than send_keys)
+      def press_key_via_keyboard(key)
+        page.driver.with_playwright_page do |pw_page|
+          pw_page.keyboard.press(key)
+        end
+      end
+
+      # Navigate to next trigger with Arrow Down
+      def arrow_down
+        press_key_via_keyboard("ArrowDown")
+      end
+
+      # Navigate to previous trigger with Arrow Up
+      def arrow_up
+        press_key_via_keyboard("ArrowUp")
+      end
+
+      # Jump to first trigger with Home
+      def go_home
+        press_key_via_keyboard("Home")
+      end
+
+      # Jump to last trigger with End
+      def go_end
+        press_key_via_keyboard("End")
+      end
+
+      # Get the currently focused element
+      def focused_element
+        page.evaluate_script("document.activeElement")
+      end
+
+      # Check if a specific trigger has focus
+      def trigger_focused?(value)
+        trigger(value).native == page.driver.browser.evaluate("document.activeElement")
+      rescue
+        # Fallback: compare via id
+        trigger_id = trigger(value)["id"]
+        focused_id = page.evaluate_script("document.activeElement?.id")
+        trigger_id == focused_id
+      end
+
+      # Get the value of the currently focused trigger
+      def focused_trigger_value
+        focused_id = page.evaluate_script("document.activeElement?.id")
+        return nil unless focused_id
+
+        # Find the trigger with this id and get its parent item's value
+        all_trigger_elements.each_with_index do |trigger_el, index|
+          if trigger_el["id"] == focused_id
+            return all_items[index]["data-value"]
+          end
+        end
+        nil
+      end
+
+      # Get all trigger elements
+      def all_trigger_elements
+        node.all("button[data-ui--accordion-target='trigger']")
+      end
+
       # === ARIA Queries ===
 
       # Get ARIA attributes for a trigger

@@ -2124,6 +2124,61 @@
     };
     connect() {
       this.setupItems();
+      this.setupKeyboardNavigation();
+    }
+    disconnect() {
+      this.removeKeyboardNavigation();
+    }
+    setupKeyboardNavigation() {
+      this.handleKeydown = this.handleKeydown.bind(this);
+      this.element.addEventListener("keydown", this.handleKeydown);
+    }
+    removeKeyboardNavigation() {
+      this.element.removeEventListener("keydown", this.handleKeydown);
+    }
+    handleKeydown(event) {
+      const trigger = event.target.closest("[data-ui--accordion-target='trigger']");
+      if (!trigger) return;
+      const currentIndex = this.triggerTargets.indexOf(trigger);
+      if (currentIndex === -1) return;
+      let targetIndex = -1;
+      let shouldPreventDefault = true;
+      switch (event.key) {
+       case "ArrowDown":
+        targetIndex = (currentIndex + 1) % this.triggerTargets.length;
+        break;
+
+       case "ArrowUp":
+        targetIndex = currentIndex - 1;
+        if (targetIndex < 0) {
+          targetIndex = this.triggerTargets.length - 1;
+        }
+        break;
+
+       case "Home":
+        targetIndex = 0;
+        break;
+
+       case "End":
+        targetIndex = this.triggerTargets.length - 1;
+        break;
+
+       case "Enter":
+       case " ":
+        this.toggle({
+          currentTarget: trigger
+        });
+        break;
+
+       default:
+        shouldPreventDefault = false;
+      }
+      if (shouldPreventDefault) {
+        event.preventDefault();
+      }
+      if (targetIndex !== -1 && this.triggerTargets[targetIndex]) {
+        this.triggerTargets[targetIndex].focus();
+      }
     }
     setupItems() {
       this.itemTargets.forEach((item, index) => {
@@ -2177,7 +2232,7 @@
       }
     }
   }
-  function createEscapeKeyHandler$1(onEscape, options = {}) {
+  function createEscapeKeyHandler(onEscape, options = {}) {
     const {enabled: enabled = true, stopPropagation: stopPropagation = false, preventDefault: preventDefault = false} = options;
     let handler = null;
     let isAttached = false;
@@ -2221,7 +2276,7 @@
     };
   }
   function onEscapeKey(onEscape, options = {}) {
-    const handler = createEscapeKeyHandler$1(onEscape, options);
+    const handler = createEscapeKeyHandler(onEscape, options);
     handler.attach();
     return () => handler.detach();
   }
@@ -2323,7 +2378,7 @@
       }
     };
     connect() {
-      this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
+      this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
         enabled: this.closeOnEscapeValue
       });
       if (this.openValue) {
@@ -2450,7 +2505,7 @@
       }
     };
     connect() {
-      this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
+      this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
         enabled: this.closeOnEscapeValue
       });
       if (this.openValue) {

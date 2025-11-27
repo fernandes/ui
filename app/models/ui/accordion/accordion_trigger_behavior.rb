@@ -9,7 +9,7 @@ module UI
     module AccordionTriggerBehavior
       # Base CSS classes for trigger button
       def trigger_base_classes
-        "flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline [&[data-state=open]>svg]:rotate-180"
+        "flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:underline [&[data-state=open]>svg]:rotate-180"
       end
 
       # Merge base classes with custom classes using TailwindMerge
