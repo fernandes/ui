@@ -10,7 +10,7 @@
 
     <div class="space-y-6">
       <!-- Basic Example -->
-      <div class="space-y-2">
+      <div id="phlex-basic" class="space-y-2">
         <h3 class="text-lg font-medium">Basic Context Menu</h3>
         <%= render UI::ContextMenu::ContextMenu.new do %>
           <%= render UI::ContextMenu::Trigger.new do %>
@@ -50,7 +50,7 @@
       </div>
 
       <!-- With Icons -->
-      <div class="space-y-2">
+      <div id="phlex-icons" class="space-y-2">
         <h3 class="text-lg font-medium">With Icons</h3>
         <%= render UI::ContextMenu::ContextMenu.new do %>
           <%= render UI::ContextMenu::Trigger.new do %>
@@ -87,7 +87,7 @@
 
     <div class="space-y-6">
       <!-- Basic Example -->
-      <div class="space-y-2">
+      <div id="erb-basic" class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
         <%= render "ui/context_menu/context_menu" do %>
           <%= render "ui/context_menu/context_menu_trigger" do %>
@@ -110,7 +110,7 @@
       </div>
 
       <!-- With Labels and Shortcuts -->
-      <div class="space-y-2">
+      <div id="erb-labels" class="space-y-2">
         <h3 class="text-lg font-medium">With Labels</h3>
         <%= render "ui/context_menu/context_menu" do %>
           <%= render "ui/context_menu/context_menu_trigger" do %>
@@ -146,7 +146,7 @@
 
     <div class="space-y-6">
       <!-- Basic Example -->
-      <div class="space-y-2">
+      <div id="vc-basic" class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
         <%= render(UI::ContextMenu::ContextMenuComponent.new) do %>
           <%= render(UI::ContextMenu::TriggerComponent.new) do %>
@@ -163,7 +163,7 @@
       </div>
 
       <!-- Complete Example -->
-      <div class="space-y-2">
+      <div id="vc-complete" class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
         <%= render(UI::ContextMenu::ContextMenuComponent.new) do %>
           <%= render(UI::ContextMenu::TriggerComponent.new) do %>

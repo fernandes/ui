@@ -12,7 +12,7 @@
       <!-- Basic Example (shadcn reference) -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
-        <%= render UI::Menubar::Menubar.new do %>
+        <%= render UI::Menubar::Menubar.new(id: "phlex-menubar") do %>
           <!-- File Menu -->
           <%= render UI::Menubar::Menu.new do %>
             <%= render UI::Menubar::Trigger.new { "File" } %>
@@ -123,7 +123,7 @@
       <!-- Complete Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
-        <%= render "ui/menubar/menubar" do %>
+        <%= render "ui/menubar/menubar", attributes: { id: "erb-menubar" } do %>
           <%# File Menu %>
           <%= render "ui/menubar/menu" do %>
             <%= render "ui/menubar/trigger" do %>File<% end %>
@@ -234,7 +234,7 @@
       <!-- Complete Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
-        <%= render UI::Menubar::MenubarComponent.new do |menubar| %>
+        <%= render UI::Menubar::MenubarComponent.new(id: "vc-menubar") do |menubar| %>
           <%# File Menu %>
           <%= render UI::Menubar::MenuComponent.new do %>
             <%= render(UI::Menubar::TriggerComponent.new) { "File" } %>

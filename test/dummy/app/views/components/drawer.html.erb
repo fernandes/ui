@@ -18,7 +18,7 @@
     <!-- Phlex -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">Phlex</h3>
-      <%= render UI::Drawer::Drawer.new do %>
+      <%= render UI::Drawer::Drawer.new(id: "drawer-default-phlex") do %>
         <%= render UI::Drawer::Trigger.new do %>
           Open Drawer (Phlex)
         <% end %>
@@ -48,7 +48,7 @@
     <!-- ERB -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ERB</h3>
-      <%= render "ui/drawer/drawer" do %>
+      <%= render "ui/drawer/drawer", attributes: { id: "drawer-default-erb" } do %>
         <%= render "ui/drawer/trigger" do %>
           Open Drawer (ERB)
         <% end %>
@@ -86,7 +86,7 @@
     <!-- ViewComponent -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ViewComponent</h3>
-      <%= render UI::Drawer::DrawerComponent.new do %>
+      <%= render UI::Drawer::DrawerComponent.new(id: "drawer-default-vc") do %>
         <%= render UI::Drawer::TriggerComponent.new do %>
           Open Drawer (ViewComponent)
         <% end %>
@@ -135,7 +135,7 @@
     <div class="space-y-2">
       <h3 class="text-lg font-medium">Phlex</h3>
       <div class="flex gap-4">
-        <%= render UI::Drawer::Drawer.new(direction: "top") do %>
+        <%= render UI::Drawer::Drawer.new(direction: "top", id: "drawer-direction-top-phlex") do %>
           <%= render UI::Drawer::Trigger.new do %>
             Top
           <% end %>
@@ -197,7 +197,7 @@
           <% end %>
         <% end %>
 
-        <%= render "ui/drawer/drawer", direction: "left" do %>
+        <%= render "ui/drawer/drawer", direction: "left", attributes: { id: "drawer-direction-left-erb" } do %>
           <%= render "ui/drawer/trigger" do %>
             Left
           <% end %>
@@ -264,7 +264,7 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Drawer::DrawerComponent.new(direction: "right") do %>
+        <%= render UI::Drawer::DrawerComponent.new(direction: "right", id: "drawer-direction-right-vc") do %>
           <%= render UI::Drawer::TriggerComponent.new do %>
             Right
           <% end %>
@@ -294,7 +294,7 @@
     <!-- Phlex -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">Phlex</h3>
-      <%= render UI::Drawer::Drawer.new(modal: false, snap_points: [0.25, 0.5, 1], fade_from_index: 0) do %>
+      <%= render UI::Drawer::Drawer.new(modal: false, snap_points: [0.25, 0.5, 1], fade_from_index: 0, id: "drawer-snap-points-phlex") do %>
         <%= render UI::Drawer::Trigger.new do %>
           Snap Points (Phlex)
         <% end %>
@@ -317,7 +317,7 @@
     <!-- ERB -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ERB</h3>
-      <%= render "ui/drawer/drawer", modal: false, snap_points: [0.25, 0.5, 1], fade_from_index: 0 do %>
+      <%= render "ui/drawer/drawer", modal: false, snap_points: [0.25, 0.5, 1], fade_from_index: 0, attributes: { id: "drawer-snap-points-erb" } do %>
         <%= render "ui/drawer/trigger" do %>
           Snap Points (ERB)
         <% end %>
@@ -344,7 +344,7 @@
     <!-- ViewComponent -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ViewComponent</h3>
-      <%= render UI::Drawer::DrawerComponent.new(modal: false, snap_points: [0.25, 0.5, 1], fade_from_index: 0) do %>
+      <%= render UI::Drawer::DrawerComponent.new(modal: false, snap_points: [0.25, 0.5, 1], fade_from_index: 0, id: "drawer-snap-points-vc") do %>
         <%= render UI::Drawer::TriggerComponent.new do %>
           Snap Points (VC)
         <% end %>
@@ -381,7 +381,7 @@
     <!-- Phlex -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">Phlex</h3>
-      <%= render UI::Drawer::Drawer.new(handle_only: true) do %>
+      <%= render UI::Drawer::Drawer.new(handle_only: true, id: "drawer-handle-only-phlex") do %>
         <%= render UI::Drawer::Trigger.new do %>
           Handle-Only (Phlex)
         <% end %>
@@ -405,7 +405,7 @@
     <!-- ERB -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ERB</h3>
-      <%= render "ui/drawer/drawer", handle_only: true do %>
+      <%= render "ui/drawer/drawer", handle_only: true, attributes: { id: "drawer-handle-only-erb" } do %>
         <%= render "ui/drawer/trigger" do %>
           Handle-Only (ERB)
         <% end %>
@@ -433,7 +433,7 @@
     <!-- ViewComponent -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ViewComponent</h3>
-      <%= render UI::Drawer::DrawerComponent.new(handle_only: true) do %>
+      <%= render UI::Drawer::DrawerComponent.new(handle_only: true, id: "drawer-handle-only-vc") do %>
         <%= render UI::Drawer::TriggerComponent.new do %>
           Handle-Only (VC)
         <% end %>
@@ -471,7 +471,7 @@
     <!-- Phlex -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">Phlex</h3>
-      <%= render UI::Drawer::Drawer.new(modal: false) do %>
+      <%= render UI::Drawer::Drawer.new(modal: false, id: "drawer-non-modal-phlex") do %>
         <%= render UI::Drawer::Trigger.new do %>
           Non-Modal (Phlex)
         <% end %>
@@ -492,7 +492,7 @@
     <!-- ERB -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ERB</h3>
-      <%= render "ui/drawer/drawer", modal: false do %>
+      <%= render "ui/drawer/drawer", modal: false, attributes: { id: "drawer-non-modal-erb" } do %>
         <%= render "ui/drawer/trigger" do %>
           Non-Modal (ERB)
         <% end %>
@@ -517,7 +517,7 @@
     <!-- ViewComponent -->
     <div class="space-y-2">
       <h3 class="text-lg font-medium">ViewComponent</h3>
-      <%= render UI::Drawer::DrawerComponent.new(modal: false) do %>
+      <%= render UI::Drawer::DrawerComponent.new(modal: false, id: "drawer-non-modal-vc") do %>
         <%= render UI::Drawer::TriggerComponent.new do %>
           Non-Modal (VC)
         <% end %>

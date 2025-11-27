@@ -2,6 +2,19 @@ module UI
   class Engine < ::Rails::Engine
     isolate_namespace UI
 
+    # Load Phlex and ViewComponent if available (development dependencies)
+    begin
+      require "phlex-rails"
+    rescue LoadError
+      # Phlex not available - Phlex components won't work
+    end
+
+    begin
+      require "view_component"
+    rescue LoadError
+      # ViewComponent not available - ViewComponent components won't work
+    end
+
     initializer "setup_inflections" do
       ActiveSupport::Inflector.inflections do |inflect|
         inflect.acronym "UI"

@@ -187,7 +187,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Popover</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/popover/popover" do %>
+          <%= render "ui/popover/popover", attributes: { id: "erb-basic-popover" } do %>
             <%= render "ui/popover/popover_trigger" do %>
               <%= render "ui/button/button", variant: :outline do %>
                 Open popover (ERB)
@@ -209,7 +209,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Different Placements</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render "ui/popover/popover", placement: "top" do %>
+          <%= render "ui/popover/popover", placement: "top", attributes: { id: "erb-top-popover" } do %>
             <%= render "ui/popover/popover_trigger" do %>
               <%= render "ui/button/button", variant: :outline, size: :sm do %>Top<% end %>
             <% end %>
@@ -218,7 +218,7 @@
             <% end %>
           <% end %>
 
-          <%= render "ui/popover/popover", placement: "bottom" do %>
+          <%= render "ui/popover/popover", placement: "bottom", attributes: { id: "erb-bottom-popover" } do %>
             <%= render "ui/popover/popover_trigger" do %>
               <%= render "ui/button/button", variant: :outline, size: :sm do %>Bottom<% end %>
             <% end %>
@@ -233,7 +233,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">With Form Controls</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/popover/popover" do %>
+          <%= render "ui/popover/popover", attributes: { id: "erb-form-popover" } do %>
             <%= render "ui/popover/popover_trigger" do %>
               <%= render "ui/button/button", variant: :outline do %>
                 Settings

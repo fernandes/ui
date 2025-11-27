@@ -23,7 +23,7 @@
       <div class="space-y-4">
         <h3 class="text-xl font-semibold">Basic Horizontal (shadcn demo)</h3>
         <p class="text-sm text-muted-foreground">The main example from shadcn/ui with nested panels.</p>
-        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "max-w-md rounded-lg border md:min-w-[450px]" do %>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "max-w-md rounded-lg border md:min-w-[450px]", attributes: { id: "erb-basic-horizontal" } do %>
           <%= render "ui/resizable/panel", default_size: 50 do %>
             <div class="flex h-[200px] items-center justify-center p-6">
               <span class="font-semibold">One</span>
@@ -52,7 +52,7 @@
       <div class="space-y-4">
         <h3 class="text-xl font-semibold">Vertical</h3>
         <p class="text-sm text-muted-foreground">Panels stacked vertically.</p>
-        <%= render "ui/resizable/panel_group", direction: "vertical", classes: "min-h-[200px] max-w-md rounded-lg border" do %>
+        <%= render "ui/resizable/panel_group", direction: "vertical", classes: "min-h-[200px] max-w-md rounded-lg border", attributes: { id: "erb-vertical" } do %>
           <%= render "ui/resizable/panel", default_size: 50 do %>
             <div class="flex h-full items-center justify-center p-6">
               <span class="font-semibold">One</span>
@@ -71,7 +71,7 @@
       <div class="space-y-4">
         <h3 class="text-xl font-semibold">Handle with Grip</h3>
         <p class="text-sm text-muted-foreground">Handle with visible grip icon for better visibility.</p>
-        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border" do %>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border", attributes: { id: "erb-handle-grip" } do %>
           <%= render "ui/resizable/panel", default_size: 50 do %>
             <div class="flex h-full items-center justify-center p-6">
               <span class="font-semibold">One</span>
@@ -90,7 +90,7 @@
       <div class="space-y-4">
         <h3 class="text-xl font-semibold">With Constraints</h3>
         <p class="text-sm text-muted-foreground">Panels with min_size: 20% and max_size: 80%.</p>
-        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border" do %>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[200px] max-w-md rounded-lg border", attributes: { id: "erb-with-constraints" } do %>
           <%= render "ui/resizable/panel", default_size: 50, min_size: 20, max_size: 80 do %>
             <div class="flex h-full items-center justify-center p-6 bg-muted/50">
               <span class="font-semibold text-sm">Min 20% / Max 80%</span>
@@ -109,7 +109,7 @@
       <div class="space-y-4">
         <h3 class="text-xl font-semibold">Sidebar Layout</h3>
         <p class="text-sm text-muted-foreground">A common sidebar + main content layout.</p>
-        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[300px] rounded-lg border" do %>
+        <%= render "ui/resizable/panel_group", direction: "horizontal", classes: "min-h-[300px] rounded-lg border", attributes: { id: "erb-sidebar" } do %>
           <%= render "ui/resizable/panel", default_size: 20, min_size: 15, max_size: 30 do %>
             <div class="flex h-full flex-col bg-muted/30 p-4">
               <span class="font-semibold mb-4">Sidebar</span>

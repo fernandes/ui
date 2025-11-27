@@ -43,7 +43,10 @@ module UI
       end
 
       def view_template(&block)
-        button(**switch_html_attributes.deep_merge(@attributes)) do
+        attrs = switch_html_attributes.deep_merge(@attributes)
+        attrs[:id] = @id if @id.present?
+
+        button(**attrs) do
           render_thumb
           render_hidden_input if @name.present?
         end

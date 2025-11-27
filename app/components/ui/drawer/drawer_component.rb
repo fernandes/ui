@@ -55,6 +55,7 @@ module UI
         handle_only: false,
         reposition_inputs: true,
         classes: "",
+        id: nil,
         attributes: {}
       )
         @open = open
@@ -68,12 +69,14 @@ module UI
         @handle_only = handle_only
         @reposition_inputs = reposition_inputs
         @classes = classes
+        @id = id
         @attributes = attributes
       end
 
       def call
         attrs = drawer_html_attributes
         attrs[:data] = attrs[:data].merge(@attributes.fetch(:data, {}))
+        attrs[:id] = @id if @id
 
         content_tag :div, content, **attrs.merge(@attributes.except(:data))
       end

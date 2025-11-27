@@ -11,10 +11,12 @@ module UI
     module InputOtpBehavior
       # Returns HTML attributes for the input OTP container element
       def input_otp_html_attributes
-        {
+        attrs = {
           class: input_otp_classes,
           data: input_otp_data_attributes
         }
+        attrs[:id] = @id if @id
+        attrs
       end
 
       # Returns combined CSS classes for the input OTP container

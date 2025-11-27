@@ -88,7 +88,7 @@
       <p class="text-sm text-muted-foreground">A disabled slider that cannot be interacted with.</p>
       <div class="max-w-md space-y-2">
         <label class="text-sm font-medium text-muted-foreground">Locked Setting: 50%</label>
-        <%= render "ui/slider/slider", default_value: [50], disabled: true do %>
+        <%= render "ui/slider/slider", default_value: [50], disabled: true, attributes: { id: "disabled-slider" } do %>
           <%= render "ui/slider/slider_track" do %>
             <%= render "ui/slider/slider_range" %>
           <% end %>
@@ -139,7 +139,7 @@
       <div class="flex gap-8">
         <div class="h-64 flex flex-col items-center gap-2">
           <label class="text-sm font-medium">Left</label>
-          <%= render "ui/slider/slider", default_value: [33], orientation: "vertical" do %>
+          <%= render "ui/slider/slider", default_value: [33], orientation: "vertical", attributes: { id: "vertical-slider-left" } do %>
             <%= render "ui/slider/slider_track" do %>
               <%= render "ui/slider/slider_range" %>
             <% end %>
@@ -148,7 +148,7 @@
         </div>
         <div class="h-64 flex flex-col items-center gap-2">
           <label class="text-sm font-medium">Center</label>
-          <%= render "ui/slider/slider", default_value: [67], orientation: "vertical" do %>
+          <%= render "ui/slider/slider", default_value: [67], orientation: "vertical", attributes: { id: "vertical-slider-center" } do %>
             <%= render "ui/slider/slider_track" do %>
               <%= render "ui/slider/slider_range" %>
             <% end %>
@@ -157,7 +157,7 @@
         </div>
         <div class="h-64 flex flex-col items-center gap-2">
           <label class="text-sm font-medium">Right</label>
-          <%= render "ui/slider/slider", default_value: [100], orientation: "vertical" do %>
+          <%= render "ui/slider/slider", default_value: [100], orientation: "vertical", attributes: { id: "vertical-slider-right" } do %>
             <%= render "ui/slider/slider_track" do %>
               <%= render "ui/slider/slider_range" %>
             <% end %>

@@ -16,7 +16,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="max-w-2xl">
-        <%= render "ui/accordion/accordion", classes: "w-full" do %>
+        <%= render "ui/accordion/accordion", classes: "w-full", attributes: { id: "basic-accordion" } do %>
           <%= render "ui/accordion/accordion_item", value: "erb-1" do %>
             <%= render "ui/accordion/accordion_trigger", content: "Is it accessible?" %>
             <%= render "ui/accordion/accordion_content", content: "Yes. It adheres to the WAI-ARIA design pattern." %>
@@ -115,7 +115,7 @@
       <h2 class="text-2xl font-semibold">Multiple Items Open (type: "multiple")</h2>
       <p class="text-sm text-muted-foreground">With type="multiple", you can have multiple accordion items open at the same time.</p>
       <div class="max-w-2xl">
-        <%= render "ui/accordion/accordion", classes: "w-full", type: "multiple" do %>
+        <%= render "ui/accordion/accordion", classes: "w-full", type: "multiple", attributes: { id: "multiple-accordion" } do %>
           <%= render "ui/accordion/accordion_item", value: "multi-1", initial_open: true do %>
             <%= render "ui/accordion/accordion_trigger", content: "What payment methods do you accept?" %>
             <%= render "ui/accordion/accordion_content" do %>

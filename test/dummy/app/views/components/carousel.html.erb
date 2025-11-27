@@ -18,7 +18,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs">
-      <%= render "ui/carousel/carousel" do %>
+      <%= render "ui/carousel/carousel", attributes: { id: "erb-basic-carousel" } do %>
         <%= render "ui/carousel/content" do %>
           <% 5.times do |i| %>
             <%= render "ui/carousel/item" do %>
@@ -46,7 +46,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-sm">
-      <%= render "ui/carousel/carousel" do %>
+      <%= render "ui/carousel/carousel", attributes: { id: "erb-sizes-carousel" } do %>
         <%= render "ui/carousel/content" do %>
           <% 5.times do |i| %>
             <%= render "ui/carousel/item", classes: "md:basis-1/2 lg:basis-1/3" do %>
@@ -74,7 +74,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs">
-      <%= render "ui/carousel/carousel", classes: "w-full max-w-sm" do %>
+      <%= render "ui/carousel/carousel", attributes: { id: "erb-spacing-carousel" }, classes: "w-full max-w-sm" do %>
         <%= render "ui/carousel/content", classes: "-ml-1" do %>
           <% 5.times do |i| %>
             <%= render "ui/carousel/item", classes: "pl-1" do %>
@@ -102,7 +102,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs py-16">
-      <%= render "ui/carousel/carousel", orientation: "vertical", classes: "w-full max-w-xs", opts: { align: "start" } do %>
+      <%= render "ui/carousel/carousel", attributes: { id: "erb-orientation-carousel" }, orientation: "vertical", classes: "w-full max-w-xs", opts: { align: "start" } do %>
         <%= render "ui/carousel/content", classes: "-mt-1 h-[200px]" do %>
           <% 5.times do |i| %>
             <%= render "ui/carousel/item", classes: "pt-1 md:basis-1/2" do %>
@@ -131,6 +131,7 @@
 
     <div class="mx-auto w-full max-w-xs">
       <%= render "ui/carousel/carousel",
+        attributes: { id: "erb-autoplay-carousel" },
         opts: { loop: true },
         plugins: [
           { name: "autoplay", options: { delay: 2000, stopOnInteraction: false } }
@@ -165,7 +166,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs">
-      <%= render UI::Carousel::Carousel.new do %>
+      <%= render UI::Carousel::Carousel.new(id: "phlex-basic-carousel") do %>
         <%= render UI::Carousel::Content.new do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::Item.new do %>
@@ -193,7 +194,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-sm">
-      <%= render UI::Carousel::Carousel.new do %>
+      <%= render UI::Carousel::Carousel.new(id: "phlex-sizes-carousel") do %>
         <%= render UI::Carousel::Content.new do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::Item.new(classes: "md:basis-1/2 lg:basis-1/3") do %>
@@ -221,7 +222,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs">
-      <%= render UI::Carousel::Carousel.new(classes: "w-full max-w-sm") do %>
+      <%= render UI::Carousel::Carousel.new(id: "phlex-spacing-carousel", classes: "w-full max-w-sm") do %>
         <%= render UI::Carousel::Content.new(classes: "-ml-1") do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::Item.new(classes: "pl-1") do %>
@@ -249,7 +250,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs py-16">
-      <%= render UI::Carousel::Carousel.new(orientation: "vertical", classes: "w-full max-w-xs", opts: { align: "start" }) do %>
+      <%= render UI::Carousel::Carousel.new(id: "phlex-orientation-carousel", orientation: "vertical", classes: "w-full max-w-xs", opts: { align: "start" }) do %>
         <%= render UI::Carousel::Content.new(classes: "-mt-1 h-[200px]") do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::Item.new(classes: "pt-1 md:basis-1/2") do %>
@@ -278,6 +279,7 @@
 
     <div class="mx-auto w-full max-w-xs">
       <%= render UI::Carousel::Carousel.new(
+        id: "phlex-autoplay-carousel",
         opts: { loop: true },
         plugins: [
           { name: "autoplay", options: { delay: 2000, stopOnInteraction: false } }
@@ -313,7 +315,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs">
-      <%= render UI::Carousel::CarouselComponent.new do %>
+      <%= render UI::Carousel::CarouselComponent.new(id: "vc-basic-carousel") do %>
         <%= render UI::Carousel::ContentComponent.new do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::ItemComponent.new do %>
@@ -341,7 +343,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-sm">
-      <%= render UI::Carousel::CarouselComponent.new do %>
+      <%= render UI::Carousel::CarouselComponent.new(id: "vc-sizes-carousel") do %>
         <%= render UI::Carousel::ContentComponent.new do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::ItemComponent.new(classes: "md:basis-1/2 lg:basis-1/3") do %>
@@ -369,7 +371,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs">
-      <%= render UI::Carousel::CarouselComponent.new(classes: "w-full max-w-sm") do %>
+      <%= render UI::Carousel::CarouselComponent.new(id: "vc-spacing-carousel", classes: "w-full max-w-sm") do %>
         <%= render UI::Carousel::ContentComponent.new(classes: "-ml-1") do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::ItemComponent.new(classes: "pl-1") do %>
@@ -397,7 +399,7 @@
     </div>
 
     <div class="mx-auto w-full max-w-xs py-16">
-      <%= render UI::Carousel::CarouselComponent.new(orientation: "vertical", classes: "w-full max-w-xs", opts: { align: "start" }) do %>
+      <%= render UI::Carousel::CarouselComponent.new(id: "vc-orientation-carousel", orientation: "vertical", classes: "w-full max-w-xs", opts: { align: "start" }) do %>
         <%= render UI::Carousel::ContentComponent.new(classes: "-mt-1 h-[200px]") do %>
           <% 5.times do |i| %>
             <%= render UI::Carousel::ItemComponent.new(classes: "pt-1 md:basis-1/2") do %>
@@ -426,6 +428,7 @@
 
     <div class="mx-auto w-full max-w-xs">
       <%= render UI::Carousel::CarouselComponent.new(
+        id: "vc-autoplay-carousel",
         opts: { loop: true },
         plugins: [
           { name: "autoplay", options: { delay: 2000, stopOnInteraction: false } }

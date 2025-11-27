@@ -147,12 +147,12 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Tooltip</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip/tooltip", attributes: { id: "basic-tooltip" } do %>
             <%= render "ui/tooltip/trigger" do %>
               Hover me (ERB)
             <% end %>
             <%= render "ui/tooltip/content" do %>
-              ERB partial tooltip
+              Add to library
             <% end %>
           <% end %>
         </div>
@@ -162,7 +162,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">With Button Content</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-with-button" } do %>
             <%= render "ui/tooltip/trigger" do %>
               <%= render "ui/button/button", variant: :outline do %>
                 Delete (ERB)
@@ -175,28 +175,45 @@
         </div>
       </div>
 
+      <!-- Destructive variant -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">Destructive Variant</h3>
+        <div class="flex items-center gap-4">
+          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-destructive" } do %>
+            <%= render "ui/tooltip/trigger" do %>
+              <%= render "ui/button/button", variant: :destructive do %>
+                Delete Permanently
+              <% end %>
+            <% end %>
+            <%= render "ui/tooltip/content" do %>
+              This action cannot be undone
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
       <!-- Different sides -->
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Tooltip Positioning</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-top" } do %>
             <%= render "ui/tooltip/trigger" do %>Top<% end %>
-            <%= render "ui/tooltip/content" do %>Top side<% end %>
+            <%= render "ui/tooltip/content" do %>Appears on top<% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-right" } do %>
             <%= render "ui/tooltip/trigger" do %>Right<% end %>
-            <%= render "ui/tooltip/content", side: "right" do %>Right side<% end %>
+            <%= render "ui/tooltip/content", side: "right" do %>Appears on right<% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-bottom" } do %>
             <%= render "ui/tooltip/trigger" do %>Bottom<% end %>
-            <%= render "ui/tooltip/content", side: "bottom" do %>Bottom side<% end %>
+            <%= render "ui/tooltip/content", side: "bottom" do %>Appears on bottom<% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-left" } do %>
             <%= render "ui/tooltip/trigger" do %>Left<% end %>
-            <%= render "ui/tooltip/content", side: "left" do %>Left side<% end %>
+            <%= render "ui/tooltip/content", side: "left" do %>Appears on left<% end %>
           <% end %>
         </div>
       </div>

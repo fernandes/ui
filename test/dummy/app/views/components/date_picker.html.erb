@@ -13,7 +13,7 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker" do %>
+        <%= render "ui/date_picker/date_picker", attributes: { id: "basic-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger", placeholder: "Pick a date" %>
         <% end %>
       </div>
@@ -36,7 +36,7 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker", label: "Date of birth" do %>
+        <%= render "ui/date_picker/date_picker", label: "Date of birth", attributes: { id: "labeled-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger", placeholder: "Select your birth date" %>
         <% end %>
       </div>
@@ -64,7 +64,8 @@
           <%= render "ui/date_picker/date_picker",
             name: "booking[date]",
             label: "Booking Date",
-            selected: Date.today + 7 do %>
+            selected: Date.today + 7,
+            attributes: { id: "form-date-picker" } do %>
             <%= render "ui/date_picker/date_picker_trigger",
               selected: Date.today + 7 %>
           <% end %>
@@ -95,7 +96,8 @@
       <div class="rounded-md border p-4">
         <%= render "ui/date_picker/date_picker",
           label: "Date of birth",
-          show_dropdowns: true do %>
+          show_dropdowns: true,
+          attributes: { id: "dropdowns-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger", placeholder: "Select date" %>
         <% end %>
       </div>
@@ -122,7 +124,8 @@
       <div class="rounded-md border p-4">
         <%= render "ui/date_picker/date_picker",
           mode: :range,
-          label: "Trip dates" do %>
+          label: "Trip dates",
+          attributes: { id: "range-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger",
             placeholder: "Select dates",
             classes: "w-[320px]" %>
@@ -153,7 +156,8 @@
         <%= render "ui/date_picker/date_picker",
           mode: :range,
           number_of_months: 2,
-          label: "Vacation dates" do %>
+          label: "Vacation dates",
+          attributes: { id: "range-multi-month-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger",
             placeholder: "Select vacation dates",
             classes: "w-[320px]" %>
@@ -182,7 +186,7 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker" do %>
+        <%= render "ui/date_picker/date_picker", attributes: { id: "calendar-icon-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger",
             placeholder: "Pick a date",
             icon: :calendar %>
@@ -211,7 +215,8 @@
         <%= render "ui/date_picker/date_picker",
           label: "Appointment (next 30 days)",
           min_date: Date.today,
-          max_date: Date.today + 30 do %>
+          max_date: Date.today + 30,
+          attributes: { id: "constrained-date-picker" } do %>
           <%= render "ui/date_picker/date_picker_trigger",
             placeholder: "Select appointment" %>
         <% end %>

@@ -21,7 +21,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new %>
+          <%= render UI::Calendar::Calendar.new(id: "basic-calendar") %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
@@ -39,7 +39,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(selected: Date.today) %>
+          <%= render UI::Calendar::Calendar.new(selected: Date.today, id: "selected-calendar") %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
@@ -59,7 +59,8 @@
         <div class="rounded-md border">
           <%= render UI::Calendar::Calendar.new(
             mode: :range,
-            selected: Date.today..(Date.today + 7)
+            selected: Date.today..(Date.today + 7),
+            id: "range-calendar"
           ) %>
         </div>
 
@@ -81,7 +82,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(number_of_months: 2) %>
+          <%= render UI::Calendar::Calendar.new(number_of_months: 2, id: "multiple-months-calendar") %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
@@ -171,7 +172,8 @@
         <div class="rounded-md border">
           <%= render UI::Calendar::Calendar.new(
             min_date: Date.today,
-            max_date: Date.today + 30.days
+            max_date: Date.today + 30.days,
+            id: "min-max-calendar"
           ) %>
         </div>
 
@@ -308,7 +310,7 @@
       <div class="flex flex-wrap gap-8">
         <%= form_with url: "#", method: :get, class: "space-y-4" do |f| %>
           <div class="rounded-md border">
-            <%= render UI::Calendar::Calendar.new(name: "booking_date", selected: Date.today) %>
+            <%= render UI::Calendar::Calendar.new(name: "booking_date", selected: Date.today, id: "form-calendar") %>
           </div>
           <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
             Submit Form

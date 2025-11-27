@@ -15,7 +15,7 @@
         Default sheet that slides in from the right side.
       </p>
 
-      <%= render "ui/sheet/sheet" do %>
+      <%= render "ui/sheet/sheet", attributes: { id: "erb-default-sheet" } do %>
         <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
           <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
             Open Sheet
@@ -68,7 +68,7 @@
 
       <div class="flex flex-wrap gap-4">
         <% %w[top right bottom left].each do |side| %>
-          <%= render "ui/sheet/sheet" do %>
+          <%= render "ui/sheet/sheet", attributes: { id: "erb-sheet-#{side}" } do %>
             <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
               <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
                 <%= side.capitalize %>
@@ -109,7 +109,7 @@
         Customize the sheet width using Tailwind classes.
       </p>
 
-      <%= render "ui/sheet/sheet" do %>
+      <%= render "ui/sheet/sheet", attributes: { id: "erb-wide-sheet" } do %>
         <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
           <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
             Wide Sheet
@@ -148,7 +148,7 @@
         Sheet without the built-in close button in the corner.
       </p>
 
-      <%= render "ui/sheet/sheet" do %>
+      <%= render "ui/sheet/sheet", attributes: { id: "erb-no-close-button-sheet" } do %>
         <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
           <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
             No X Button

@@ -15,7 +15,7 @@
     <!-- Phlex Implementation -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3" role="radiogroup" id="plan-group">
         <div class="flex items-center space-x-2">
           <%= render UI::RadioButton::RadioButton.new(id: "r1", name: "plan", value: "free", checked: true) %>
           <%= render UI::Label::Label.new(for: "r1") { "Free Plan" } %>
@@ -34,7 +34,7 @@
     <!-- ViewComponent Implementation -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3" role="radiogroup" id="size-group">
         <div class="flex items-center space-x-2">
           <%= render UI::RadioButton::RadioButtonComponent.new(id: "vc-r1", name: "size", value: "small") %>
           <%= render UI::Label::LabelComponent.new(for: "vc-r1") do %>Small<% end %>
@@ -53,7 +53,7 @@
     <!-- ERB Partial Implementation -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3" role="radiogroup" id="color-group">
         <div class="flex items-center space-x-2">
           <%= render "ui/radio_button/radio_button", id: "erb-r1", name: "color", value: "red" %>
           <%= render "ui/label/label", for: "erb-r1" do %>Red<% end %>
@@ -137,7 +137,7 @@
     <!-- Disabled State -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Disabled State (ERB)</h2>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3" role="radiogroup" id="disabled-group">
         <div class="flex items-center space-x-2">
           <%= render "ui/radio_button/radio_button", id: "disabled-1", name: "disabled-group", value: "1", checked: true %>
           <%= render "ui/label/label", for: "disabled-1" do %>Option 1 (selected)<% end %>

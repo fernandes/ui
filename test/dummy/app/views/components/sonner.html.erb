@@ -24,32 +24,37 @@
         <h3 class="text-sm font-medium text-muted-foreground">Toast Types</h3>
         <div class="flex flex-wrap items-center gap-4">
           <button
+            id="default-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { message: 'Event has been created', description: 'Sunday, December 03, 2023 at 9:00 AM' } }))"
           >Default</button>
 
           <button
+            id="success-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Profile updated', description: 'Your changes have been saved successfully.' } }))"
           >Success</button>
 
           <button
+            id="error-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'error', message: 'Error occurred', description: 'There was a problem with your request.' } }))"
           >Error</button>
 
           <button
+            id="info-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Did you know?', description: 'You can customize the position of toasts.' } }))"
           >Info</button>
 
           <button
+            id="warning-toast-btn"
             type="button"
-            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            class="inline-flex items-centers justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'warning', message: 'Warning', description: 'Your session will expire in 5 minutes.' } }))"
           >Warning</button>
         </div>
@@ -60,12 +65,14 @@
         <h3 class="text-sm font-medium text-muted-foreground">Simple Toast (no description)</h3>
         <div class="flex items-center gap-4">
           <button
+            id="copy-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Copied to clipboard!' } }))"
           >Copy</button>
 
           <button
+            id="save-fail-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'error', message: 'Failed to save' } }))"
@@ -78,12 +85,14 @@
         <h3 class="text-sm font-medium text-muted-foreground">Custom Duration</h3>
         <div class="flex items-center gap-4">
           <button
+            id="quick-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Quick toast', description: 'This disappears in 1 second', duration: 1000 } }))"
           >1 second</button>
 
           <button
+            id="long-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Long toast', description: 'This stays for 10 seconds', duration: 10000 } }))"
@@ -101,6 +110,7 @@
         <h3 class="text-sm font-medium text-muted-foreground">Using Custom Events</h3>
         <div class="flex items-center gap-4">
           <button
+            id="trigger-js-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Event from JS', description: 'Triggered via CustomEvent' } }))"
@@ -109,6 +119,7 @@
           </button>
 
           <button
+            id="action-toast-btn"
             type="button"
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
             onclick="document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'With Action', description: 'Click the button to undo', action: { label: 'Undo', event: 'undo:action' } } }))"

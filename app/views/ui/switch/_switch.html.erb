@@ -22,6 +22,7 @@
 
   extend UI::SwitchBehavior
   all_attributes = switch_html_attributes.deep_merge(@attributes)
+  all_attributes[:id] = @id if @id.present?
 %>
 <%= content_tag :button, all_attributes do %>
   <%= content_tag :span,

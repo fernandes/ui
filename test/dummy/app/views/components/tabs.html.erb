@@ -16,7 +16,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="max-w-2xl">
-        <%= render "ui/tabs/tabs", default_value: "account" do %>
+        <%= render "ui/tabs/tabs", default_value: "account", attributes: { id: "erb-tabs" } do %>
           <%= render "ui/tabs/tabs_list" do %>
             <%= render "ui/tabs/tabs_trigger", value: "account", content: "Account" %>
             <%= render "ui/tabs/tabs_trigger", value: "password", content: "Password" %>
@@ -45,7 +45,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::Tabs.new(default_value: "general") do %>
+        <%= render UI::Tabs::Tabs.new(default_value: "general", attributes: { id: "phlex-tabs" }) do %>
           <%= render UI::Tabs::List.new do %>
             <%= render UI::Tabs::Trigger.new(value: "general", default_value: "general") { "General" } %>
             <%= render UI::Tabs::Trigger.new(value: "security", default_value: "general") { "Security" } %>
@@ -83,7 +83,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::TabsComponent.new(default_value: "overview") do %>
+        <%= render UI::Tabs::TabsComponent.new(default_value: "overview", attributes: { id: "vc-tabs" }) do %>
           <%= render UI::Tabs::TabsListComponent.new do %>
             <%= render UI::Tabs::TabsTriggerComponent.new(value: "overview", default_value: "overview") do %>
               Overview
@@ -139,7 +139,7 @@
       <h2 class="text-2xl font-semibold">With Disabled Tab</h2>
       <p class="text-sm text-muted-foreground">Demonstrating disabled state for tabs that are not available.</p>
       <div class="max-w-2xl">
-        <%= render "ui/tabs/tabs", default_value: "available" do %>
+        <%= render "ui/tabs/tabs", default_value: "available", attributes: { id: "disabled-tabs" } do %>
           <%= render "ui/tabs/tabs_list" do %>
             <%= render "ui/tabs/tabs_trigger", value: "available", content: "Available" %>
             <%= render "ui/tabs/tabs_trigger", value: "disabled", disabled: true, content: "Disabled" %>
@@ -175,7 +175,7 @@
       <h2 class="text-2xl font-semibold">Manual Activation Mode</h2>
       <p class="text-sm text-muted-foreground">In manual mode, arrow keys only move focus. Press Enter or Space to activate.</p>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::Tabs.new(default_value: "tab1", activation_mode: "manual") do %>
+        <%= render UI::Tabs::Tabs.new(default_value: "tab1", activation_mode: "manual", attributes: { id: "manual-tabs" }) do %>
           <%= render UI::Tabs::List.new do %>
             <%= render UI::Tabs::Trigger.new(value: "tab1", default_value: "tab1") { "Tab 1" } %>
             <%= render UI::Tabs::Trigger.new(value: "tab2", default_value: "tab1") { "Tab 2" } %>

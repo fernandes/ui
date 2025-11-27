@@ -16,7 +16,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB - Single Selection (Default)</h2>
       <p class="text-sm text-muted-foreground">Only one item can be selected at a time</p>
-      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "default" do %>
+      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "default", attributes: { id: "single-default" } do %>
         <%= render "ui/toggle_group/item", value: "left" do %>
           <%= lucide_icon("align-left") %>
         <% end %>
@@ -33,7 +33,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB - Outline Variant</h2>
       <p class="text-sm text-muted-foreground">Formatting toolbar style</p>
-      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", value: "italic" do %>
+      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", value: "italic", attributes: { id: "single-outline" } do %>
         <%= render "ui/toggle_group/item", value: "bold" do %>
           <%= lucide_icon("bold") %>
         <% end %>
@@ -50,7 +50,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB - Multiple Selection</h2>
       <p class="text-sm text-muted-foreground">Multiple items can be selected simultaneously</p>
-      <%= render "ui/toggle_group/toggle_group", type: "multiple", variant: "outline", value: ["bold", "italic"] do %>
+      <%= render "ui/toggle_group/toggle_group", type: "multiple", variant: "outline", value: ["bold", "italic"], attributes: { id: "multiple-group" } do %>
         <%= render "ui/toggle_group/item", value: "bold" do %>
           <%= lucide_icon("bold") %>
           <span>Bold</span>
@@ -76,7 +76,7 @@
       <div class="space-y-4">
         <div>
           <p class="text-sm text-muted-foreground mb-2">Small</p>
-          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "sm" do %>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "sm", attributes: { id: "size-sm" } do %>
             <%= render "ui/toggle_group/item", value: "left" do %>
               <%= lucide_icon("align-left", class: "h-3 w-3") %>
             <% end %>
@@ -91,7 +91,7 @@
 
         <div>
           <p class="text-sm text-muted-foreground mb-2">Default</p>
-          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "default" do %>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "default", attributes: { id: "size-default" } do %>
             <%= render "ui/toggle_group/item", value: "left" do %>
               <%= lucide_icon("align-left") %>
             <% end %>
@@ -106,7 +106,7 @@
 
         <div>
           <p class="text-sm text-muted-foreground mb-2">Large</p>
-          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "lg" do %>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", size: "lg", attributes: { id: "size-lg" } do %>
             <%= render "ui/toggle_group/item", value: "left" do %>
               <%= lucide_icon("align-left", class: "h-5 w-5") %>
             <% end %>
@@ -125,7 +125,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Spacing (ERB)</h2>
       <p class="text-sm text-muted-foreground">Gap between items using spacing parameter</p>
-      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", spacing: 2 do %>
+      <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", spacing: 2, attributes: { id: "spacing-group" } do %>
         <%= render "ui/toggle_group/item", value: "left" do %>
           <%= lucide_icon("align-left") %>
         <% end %>
@@ -146,7 +146,7 @@
       <div class="space-y-4">
         <div>
           <p class="text-xs font-medium mb-2">Single Selection:</p>
-          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline" do %>
+          <%= render "ui/toggle_group/toggle_group", type: "single", variant: "outline", attributes: { id: "interactive-single" } do %>
             <%= render "ui/toggle_group/item", value: "1" do %>
               Option 1
             <% end %>
@@ -161,7 +161,7 @@
 
         <div>
           <p class="text-xs font-medium mb-2">Multiple Selection:</p>
-          <%= render "ui/toggle_group/toggle_group", type: "multiple", variant: "outline" do %>
+          <%= render "ui/toggle_group/toggle_group", type: "multiple", variant: "outline", attributes: { id: "interactive-multiple" } do %>
             <%= render "ui/toggle_group/item", value: "feature-a" do %>
               <%= lucide_icon("check-circle") %>
               Feature A

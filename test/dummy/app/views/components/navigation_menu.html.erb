@@ -11,7 +11,7 @@
     <div class="space-y-6">
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example (shadcn demo)</h3>
-        <%= render UI::NavigationMenu::NavigationMenu.new(viewport: false) do %>
+        <%= render UI::NavigationMenu::NavigationMenu.new(viewport: false, id: "phlex-nav") do %>
           <%= render UI::NavigationMenu::List.new(classes: "flex-wrap") do %>
             <%# Home Menu %>
             <%= render UI::NavigationMenu::Item.new do %>
@@ -234,7 +234,7 @@
     <div class="space-y-6">
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example (shadcn demo)</h3>
-        <%= render "ui/navigation_menu/navigation_menu", viewport: false do %>
+        <%= render "ui/navigation_menu/navigation_menu", viewport: false, id: "erb-nav" do %>
           <%= render "ui/navigation_menu/list", classes: "flex-wrap" do %>
             <%# Home Menu %>
             <%= render "ui/navigation_menu/item" do %>
@@ -411,7 +411,7 @@
     <div class="space-y-6">
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example (shadcn demo)</h3>
-        <%= render UI::NavigationMenu::NavigationMenuComponent.new(viewport: false) do %>
+        <%= render UI::NavigationMenu::NavigationMenuComponent.new(viewport: false, id: "vc-nav") do %>
           <%= render UI::NavigationMenu::ListComponent.new(classes: "flex-wrap") do %>
             <%# Home Menu %>
             <%= render UI::NavigationMenu::ItemComponent.new do %>

@@ -16,6 +16,7 @@ module UI
 
       def call
         attrs = switch_html_attributes.deep_merge(@attributes.except(:class))
+        attrs[:id] = @id if @id.present?
 
         # Merge Tailwind classes intelligently
         attrs[:class] = TailwindMerge::Merger.new.merge([

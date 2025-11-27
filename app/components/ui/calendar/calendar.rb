@@ -59,8 +59,7 @@ module UI
         use_native_select: true,
         name: nil,
         classes: "",
-        attributes: {},
-        **
+        **attributes
       )
         @mode = mode
         @selected = selected

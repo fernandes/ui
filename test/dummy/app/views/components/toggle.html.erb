@@ -16,13 +16,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(variant: "default") do %>
+        <%= render UI::Toggle::Toggle.new(variant: "default", id: "phlex-default") do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(variant: "outline") do %>
+        <%= render UI::Toggle::Toggle.new(variant: "outline", id: "phlex-outline") do %>
           <%= lucide_icon("bold") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(variant: "outline", pressed: true) do %>
+        <%= render UI::Toggle::Toggle.new(variant: "outline", pressed: true, id: "phlex-pressed") do %>
           <%= lucide_icon("underline") %>
         <% end %>
       </div>
@@ -64,13 +64,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Sizes (Phlex)</h2>
       <div class="flex flex-wrap items-center gap-4">
-        <%= render UI::Toggle::Toggle.new(size: "sm", variant: "outline") do %>
+        <%= render UI::Toggle::Toggle.new(size: "sm", variant: "outline", id: "phlex-size-sm") do %>
           <%= lucide_icon("align-left", class: "h-3 w-3") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(size: "default", variant: "outline") do %>
+        <%= render UI::Toggle::Toggle.new(size: "default", variant: "outline", id: "phlex-size-default") do %>
           <%= lucide_icon("align-center") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(size: "lg", variant: "outline") do %>
+        <%= render UI::Toggle::Toggle.new(size: "lg", variant: "outline", id: "phlex-size-lg") do %>
           <%= lucide_icon("align-right", class: "h-5 w-5") %>
         <% end %>
       </div>
@@ -99,10 +99,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Disabled State (Phlex)</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(disabled: true, variant: "outline") do %>
+        <%= render UI::Toggle::Toggle.new(disabled: true, variant: "outline", id: "phlex-disabled-released") do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(disabled: true, variant: "outline", pressed: true) do %>
+        <%= render UI::Toggle::Toggle.new(disabled: true, variant: "outline", pressed: true, id: "phlex-disabled-pressed") do %>
           <%= lucide_icon("bold") %>
         <% end %>
       </div>
@@ -202,7 +202,7 @@
       <h2 class="text-2xl font-semibold">State Demonstration</h2>
       <p class="text-sm text-muted-foreground">Click the toggles below to see the state change in action</p>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(variant: "outline") do %>
+        <%= render UI::Toggle::Toggle.new(variant: "outline", id: "keyboard-test") do %>
           <%= lucide_icon("italic") %>
           <span>Toggle Me</span>
         <% end %>

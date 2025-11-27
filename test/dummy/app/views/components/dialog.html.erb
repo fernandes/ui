@@ -5,6 +5,7 @@
       A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.
     </p>
 
+    <% if defined?(Phlex) %>
     <!-- Default Dialog -->
     <div class="space-y-4">
       <h2 class="text-2xl font-semibold">Default</h2>
@@ -12,7 +13,7 @@
         A basic dialog with form fields. Uses default button trigger (without asChild).
       </p>
 
-      <%= render UI::Dialog::Dialog.new(open: false, close_on_escape: true, close_on_overlay_click: true) do %>
+      <%= render UI::Dialog::Dialog.new(open: false, close_on_escape: true, close_on_overlay_click: true, attributes: { id: "default-dialog" }) do %>
         <%= render UI::Dialog::Trigger.new do %>
           Edit Profile
         <% end %>
@@ -56,7 +57,7 @@
         Using <code class="px-1 py-0.5 rounded bg-muted text-sm">as_child: true</code> to compose with custom Button component. No wrapper div!
       </p>
 
-      <%= render UI::Dialog::Dialog.new(open: false) do %>
+      <%= render UI::Dialog::Dialog.new(open: false, attributes: { id: "aschild-dialog" }) do %>
         <%= render UI::Dialog::Trigger.new(as_child: true) do |trigger_attrs| %>
           <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline) do %>
             Open with asChild
@@ -142,7 +143,7 @@
         This dialog only closes via the close button or Escape key.
       </p>
 
-      <%= render UI::Dialog::Dialog.new(open: false, close_on_overlay_click: false) do %>
+      <%= render UI::Dialog::Dialog.new(open: false, close_on_overlay_click: false, attributes: { id: "no-overlay-dialog" }) do %>
         <%= render UI::Button::Button.new(variant: :destructive, data: { action: "click->ui--dialog#open" }) do %>
           Delete Account
         <% end %>
@@ -170,6 +171,7 @@
         <% end %>
       <% end %>
     </div>
+    <% end %>
 
     <!-- ERB Section -->
     <div class="border-t pt-8 mt-8">
@@ -185,7 +187,7 @@
           A basic dialog using ERB partials.
         </p>
 
-        <%= render "ui/dialog/dialog" do %>
+        <%= render "ui/dialog/dialog", attributes: { id: "erb-default-dialog" } do %>
           <%= render "ui/dialog/trigger" do %>
             Open ERB Dialog
           <% end %>
@@ -225,7 +227,7 @@
           Using <code class="px-1 py-0.5 rounded bg-muted text-sm">as_child: true</code> with ERB partials.
         </p>
 
-        <%= render "ui/dialog/dialog" do %>
+        <%= render "ui/dialog/dialog", attributes: { id: "erb-aschild-dialog" }, close_on_overlay_click: false do %>
           <%= render "ui/dialog/trigger", as_child: true do |attrs| %>
             <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
               Open with asChild (ERB)
@@ -260,6 +262,7 @@
       </div>
     </div>
 
+    <% if defined?(ViewComponent) %>
     <!-- ViewComponent Section -->
     <div class="border-t pt-8 mt-8">
       <h2 class="text-3xl font-bold mb-6">ViewComponents</h2>
@@ -348,5 +351,6 @@
         <% end %>
       </div>
     </div>
+    <% end %>
   </div>
 </div>

@@ -15,7 +15,7 @@
     <!-- Basic Command - Phlex -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Command (Phlex)</h2>
-      <%= render UI::Command::Command.new(classes: "rounded-lg border shadow-md md:min-w-[450px]") do %>
+      <%= render UI::Command::Command.new(id: "phlex-basic-command", classes: "rounded-lg border shadow-md md:min-w-[450px]") do %>
         <%= render UI::Command::Input.new(placeholder: "Type a command or search...") %>
         <%= render UI::Command::List.new do %>
           <%= render UI::Command::Empty.new { "No results found." } %>
@@ -58,7 +58,7 @@
     <!-- Basic Command - ViewComponent -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Command (ViewComponent)</h2>
-      <%= render(UI::Command::CommandComponent.new(classes: "rounded-lg border shadow-md md:min-w-[450px]")) do %>
+      <%= render(UI::Command::CommandComponent.new(id: "vc-basic-command", classes: "rounded-lg border shadow-md md:min-w-[450px]")) do %>
         <%= render(UI::Command::InputComponent.new(placeholder: "Type a command or search...")) %>
         <%= render(UI::Command::ListComponent.new) do %>
           <%= render(UI::Command::EmptyComponent.new) { "No results found." } %>
@@ -96,7 +96,7 @@
     <!-- Basic Command - ERB -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Command (ERB)</h2>
-      <%= render "ui/command/command", classes: "rounded-lg border shadow-md md:min-w-[450px]" do %>
+      <%= render "ui/command/command", attributes: { id: "erb-basic-command" }, classes: "rounded-lg border shadow-md md:min-w-[450px]" do %>
         <%= render "ui/command/input", placeholder: "Type a command or search..." %>
         <%= render "ui/command/list" do %>
           <%= render "ui/command/empty", content: "No results found." %>
@@ -134,7 +134,7 @@
     <!-- Disabled Items -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Disabled Items</h2>
-      <%= render UI::Command::Command.new(classes: "rounded-lg border shadow-md md:min-w-[450px]") do %>
+      <%= render UI::Command::Command.new(id: "disabled-items-command", classes: "rounded-lg border shadow-md md:min-w-[450px]") do %>
         <%= render UI::Command::Input.new(placeholder: "Search features...") %>
         <%= render UI::Command::List.new do %>
           <%= render UI::Command::Empty.new { "No results found." } %>
@@ -172,7 +172,7 @@
         to open the command palette.
       </p>
 
-      <%= render UI::Command::Dialog.new(shortcut: "meta+j") do %>
+      <%= render UI::Command::Dialog.new(id: "phlex-command-dialog", shortcut: "meta+j") do %>
         <%= render UI::Command::Input.new(placeholder: "Type a command or search...") %>
         <%= render UI::Command::List.new do %>
           <%= render UI::Command::Empty.new { "No results found." } %>
@@ -222,7 +222,7 @@
         to open.
       </p>
 
-      <%= render(UI::Command::DialogComponent.new(shortcut: "ctrl+k")) do %>
+      <%= render(UI::Command::DialogComponent.new(id: "vc-command-dialog", shortcut: "ctrl+k")) do %>
         <%= render(UI::Command::InputComponent.new(placeholder: "Search...")) %>
         <%= render(UI::Command::ListComponent.new) do %>
           <%= render(UI::Command::EmptyComponent.new) { "No results found." } %>

@@ -3,7 +3,7 @@
   content ||= local_assigns.fetch(:content, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
-  @for_id = local_assigns.fetch(:for_id, nil)
+  @for_id = local_assigns.fetch(:for_id, nil) || local_assigns.fetch(:for, nil)
 
   # Extend behavior for shared logic
   extend UI::LabelBehavior

@@ -9,10 +9,10 @@
     </div>
 
     <!-- Basic Example -->
-    <div class="space-y-4">
+    <div class="space-y-4" id="basic-example">
       <h2 class="text-2xl font-semibold">Basic Example</h2>
       <div class="max-w-xs">
-        <%= render "ui/select/select", value: "apple" do %>
+        <%= render "ui/select/select", value: "apple", id: "fruits-select" do %>
           <%= render "ui/select/select_trigger", placeholder: "Select a fruit..." %>
           <%= render "ui/select/select_content" do %>
             <%= render "ui/select/select_item", value: "apple" do %>Apple<% end %>
@@ -39,7 +39,7 @@
       </ul>
 
       <div class="max-w-xs">
-        <%= render "ui/select/select", value: "america/new_york" do %>
+        <%= render "ui/select/select", value: "america/new_york", id: "timezone-select" do %>
           <%= render "ui/select/select_trigger", placeholder: "Select timezone..." %>
           <%= render "ui/select/select_content" do %>
             <%= render "ui/select/select_group" do %>
@@ -93,10 +93,10 @@
     </div>
 
     <!-- With Disabled Items -->
-    <div class="space-y-4">
+    <div class="space-y-4" id="disabled-items-example">
       <h2 class="text-2xl font-semibold">With Disabled Items</h2>
       <div class="max-w-xs">
-        <%= render "ui/select/select", value: "react" do %>
+        <%= render "ui/select/select", value: "react", id: "frameworks-select" do %>
           <%= render "ui/select/select_trigger", placeholder: "Select framework..." %>
           <%= render "ui/select/select_content" do %>
             <%= render "ui/select/select_item", value: "react" do %>React<% end %>
