@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { focusFirstElement } from "../utils/focus-trap-manager.js"
 
 // ResponsiveDialog controller
 // Manages switching between Dialog (desktop) and Drawer (mobile) at breakpoint
@@ -131,16 +132,10 @@ export default class extends Controller {
 
     if (!targetEl) return
 
-    // Find first focusable element in target component
-    const focusableElements = targetEl.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-
-    if (focusableElements.length > 0) {
-      setTimeout(() => {
-        focusableElements[0].focus()
-      }, 100) // Small delay to allow component to finish transitioning
-    }
+    // Use focus trap utility with delay for component transition
+    setTimeout(() => {
+      focusFirstElement(targetEl)
+    }, 100)
   }
 
   // ============================================================================

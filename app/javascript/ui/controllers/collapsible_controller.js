@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { syncExpandedState } from "../utils/state-manager.js"
 
 // Collapsible controller for expandable/collapsible content sections
 export default class extends Controller {
@@ -29,13 +30,14 @@ export default class extends Controller {
     // Update root element state
     this.element.dataset.state = state
 
-    // Update trigger
-    if (this.hasTriggerTarget) {
-      this.triggerTarget.dataset.state = state
-      this.triggerTarget.setAttribute("aria-expanded", isOpen)
-    }
+    // Update trigger and content using utility
+    syncExpandedState(
+      this.hasTriggerTarget ? this.triggerTarget : null,
+      null, // Don't use utility for content - we have custom height logic
+      isOpen
+    )
 
-    // Update content
+    // Update content with custom height animation
     if (this.hasContentTarget) {
       const content = this.contentTarget
       content.dataset.state = state

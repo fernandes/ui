@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { syncCheckedState } from "../utils/state-manager.js"
 
 // Switch controller for toggle switches
 //
@@ -57,16 +58,9 @@ export default class extends Controller {
   }
 
   updateState(isChecked, animate = true) {
-    // Update data-state attribute
-    this.element.setAttribute("data-state", isChecked ? "checked" : "unchecked")
-
-    // Update aria-checked for accessibility
-    this.element.setAttribute("aria-checked", isChecked)
-
-    // Update thumb if it exists
-    if (this.hasThumbTarget) {
-      this.thumbTarget.setAttribute("data-state", isChecked ? "checked" : "unchecked")
-    }
+    // Sync state on main element and thumb target
+    const additionalTargets = this.hasThumbTarget ? [this.thumbTarget] : []
+    syncCheckedState(this.element, isChecked, { additionalTargets })
 
     // Update hidden input if it exists (for form submission)
     const hiddenInput = this.element.querySelector('input[type="hidden"]')

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { setState } from "../utils/state-manager.js"
 
 // Hover Card controller for floating content on hover
 export default class extends Controller {
@@ -11,13 +12,10 @@ export default class extends Controller {
     closeDelay: { type: Number, default: 300 }
   }
 
-  constructor() {
-    super(...arguments)
+  connect() {
     this.showTimeout = null
     this.hideTimeout = null
-  }
 
-  connect() {
     // Position content as fixed to overlay on page
     if (this.hasContentTarget) {
       this.contentTarget.style.position = 'fixed'
@@ -35,7 +33,7 @@ export default class extends Controller {
       this.openValue = true
       this.contentTarget.classList.remove('invisible')
       this.contentTarget.classList.add('visible')
-      this.contentTarget.setAttribute('data-state', 'open')
+      setState(this.contentTarget, 'open')
       this.positionContent()
     }, this.openDelayValue)
   }
@@ -47,7 +45,7 @@ export default class extends Controller {
       this.openValue = false
       this.contentTarget.classList.remove('visible')
       this.contentTarget.classList.add('invisible')
-      this.contentTarget.setAttribute('data-state', 'closed')
+      setState(this.contentTarget, 'closed')
     }, this.closeDelayValue)
   }
 

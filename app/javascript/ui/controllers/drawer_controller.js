@@ -300,8 +300,6 @@ export default class extends Controller {
     // This ensures 100% snap point is always visible and accessible
     const MOBILE_THRESHOLD = 80
 
-    console.log('📏 Viewport size:', { height: viewportHeight, width: viewportWidth })
-
     let containerSize
     if (this.directionValue === "left" || this.directionValue === "right") {
       containerSize = viewportWidth
@@ -346,16 +344,6 @@ export default class extends Controller {
       yPosition = pixels
     }
 
-    console.log('📐 Snap point calculation:', {
-      snapIndex,
-      snapPoint,
-      containerSize,
-      pixels,
-      pixelsPercentage: `${(pixels / containerSize * 100).toFixed(1)}%`,
-      yPosition,
-      direction: this.directionValue
-    })
-
     return yPosition
   }
 
@@ -368,16 +356,6 @@ export default class extends Controller {
 
     const currentIndex = this.activeSnapPointValue >= 0 ? this.activeSnapPointValue : 0
     const currentY = delta
-
-    console.log('🎯 handleSnapPointRelease called:', {
-      currentIndex,
-      delta,
-      velocity,
-      velocityAbs: Math.abs(velocity),
-      threshold: this.VELOCITY_THRESHOLD,
-      isHighVelocity: Math.abs(velocity) > this.VELOCITY_THRESHOLD,
-      isClosingDirection: this.isClosingDirection(delta)
-    })
 
     // If at first snap point and dragging in closing direction
     if (currentIndex === 0 && this.isClosingDirection(delta)) {
@@ -407,19 +385,15 @@ export default class extends Controller {
       if (velocity > 0) {
         // Moving toward closed - go to previous snap point (lower index = more closed)
         targetIndex = Math.max(currentIndex - 1, 0)
-        console.log('⬇️ High velocity CLOSING: currentIndex', currentIndex, '→ targetIndex', targetIndex)
       } else {
         // Moving toward open - go to next snap point (higher index = more open)
         targetIndex = Math.min(currentIndex + 1, this.snapPointsValue.length - 1)
-        console.log('⬆️ High velocity OPENING: currentIndex', currentIndex, '→ targetIndex', targetIndex)
       }
     } else {
       // Low velocity - find closest snap point based on Y position
       targetIndex = this.findClosestSnapPointIndex(currentY)
-      console.log('🐌 Low velocity: using closest snap point, targetIndex', targetIndex)
     }
 
-    console.log('✅ Final targetIndex:', targetIndex)
     this.snapTo(targetIndex)
   }
 
@@ -476,12 +450,6 @@ export default class extends Controller {
       const targetTransform = this.getTransformForSnapPoint(snapY)
 
       if (animated) {
-        console.log('📍 snapTo (animated):', {
-          snapPointIndex,
-          currentTransform,
-          targetTransform,
-          duration: this.TRANSITIONS.DURATION
-        })
         this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
       }
 
@@ -741,20 +709,8 @@ export default class extends Controller {
     const fadeEndIndex = Math.min(fadeIndex + 1, this.snapPointsValue.length - 1)
     const fadeEndY = this.getSnapPointY(fadeEndIndex)
 
-    console.log('🔍 updateOverlayOpacity:', {
-      delta,
-      currentY,
-      fadeIndex,
-      fadeEndIndex,
-      fadeStartY,
-      fadeEndY,
-      'currentY <= fadeEndY?': currentY <= fadeEndY,
-      'fadeEndY < currentY <= fadeStartY?': currentY > fadeEndY && currentY <= fadeStartY
-    })
-
     // 1. MORE OPEN than fadeEndIndex (currentY < fadeEndY) - ALWAYS opacity = 1
     if (currentY < fadeEndY) {
-      console.log('✅ Setting opacity = 1 (more open than fadeEndIndex)')
       this.overlayTarget.style.opacity = "1"
       return
     }
@@ -764,13 +720,11 @@ export default class extends Controller {
       const range = fadeStartY - fadeEndY
       const progress = (fadeStartY - currentY) / range
       const finalOpacity = Math.min(1, Math.max(0, progress))
-      console.log('📈 Setting opacity =', finalOpacity, '(gradual fade)')
       this.overlayTarget.style.opacity = finalOpacity
       return
     }
 
     // 3. MORE CLOSED than fadeFromIndex (currentY > fadeStartY) - NO overlay
-    console.log('❌ Setting opacity = 0 (more closed than fadeFromIndex)')
     this.overlayTarget.style.opacity = "0"
   }
 
@@ -891,7 +845,6 @@ export default class extends Controller {
   }
 
   hide() {
-    console.log('🔒 hide() called - delegating to animateToClosedPosition()')
     // Simply delegate to animateToClosedPosition for consistent animation
     this.animateToClosedPosition()
   }
@@ -901,13 +854,6 @@ export default class extends Controller {
     if (this.hasContentTarget) {
       const closedPosition = this.getClosedPosition()
       const currentTransform = this.contentTarget.style.transform
-
-      console.log('🚪 animateToClosedPosition:', {
-        currentTransform,
-        closedPosition,
-        duration: this.TRANSITIONS.DURATION,
-        targetTransform: this.getTransformForDirection(closedPosition)
-      })
 
       // Apply transition for smooth animation
       this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`

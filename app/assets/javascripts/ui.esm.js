@@ -348,6 +348,58 @@ async function detectOverflow(state, options) {
   };
 }
 
+const arrow$1 = options => ({
+  name: "arrow",
+  options: options,
+  async fn(state) {
+    const {x: x, y: y, placement: placement, rects: rects, platform: platform, elements: elements, middlewareData: middlewareData} = state;
+    const {element: element, padding: padding = 0} = evaluate(options, state) || {};
+    if (element == null) {
+      return {};
+    }
+    const paddingObject = getPaddingObject(padding);
+    const coords = {
+      x: x,
+      y: y
+    };
+    const axis = getAlignmentAxis(placement);
+    const length = getAxisLength(axis);
+    const arrowDimensions = await platform.getDimensions(element);
+    const isYAxis = axis === "y";
+    const minProp = isYAxis ? "top" : "left";
+    const maxProp = isYAxis ? "bottom" : "right";
+    const clientProp = isYAxis ? "clientHeight" : "clientWidth";
+    const endDiff = rects.reference[length] + rects.reference[axis] - coords[axis] - rects.floating[length];
+    const startDiff = coords[axis] - rects.reference[axis];
+    const arrowOffsetParent = await (platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(element));
+    let clientSize = arrowOffsetParent ? arrowOffsetParent[clientProp] : 0;
+    if (!clientSize || !await (platform.isElement == null ? void 0 : platform.isElement(arrowOffsetParent))) {
+      clientSize = elements.floating[clientProp] || rects.floating[length];
+    }
+    const centerToReference = endDiff / 2 - startDiff / 2;
+    const largestPossiblePadding = clientSize / 2 - arrowDimensions[length] / 2 - 1;
+    const minPadding = min(paddingObject[minProp], largestPossiblePadding);
+    const maxPadding = min(paddingObject[maxProp], largestPossiblePadding);
+    const min$1 = minPadding;
+    const max = clientSize - arrowDimensions[length] - maxPadding;
+    const center = clientSize / 2 - arrowDimensions[length] / 2 + centerToReference;
+    const offset = clamp(min$1, center, max);
+    const shouldAddOffset = !middlewareData.arrow && getAlignment(placement) != null && center !== offset && rects.reference[length] / 2 - (center < min$1 ? minPadding : maxPadding) - arrowDimensions[length] / 2 < 0;
+    const alignmentOffset = shouldAddOffset ? center < min$1 ? center - min$1 : center - max : 0;
+    return {
+      [axis]: coords[axis] + alignmentOffset,
+      data: {
+        [axis]: offset,
+        centerOffset: center - offset - alignmentOffset,
+        ...shouldAddOffset && {
+          alignmentOffset: alignmentOffset
+        }
+      },
+      reset: shouldAddOffset
+    };
+  }
+});
+
 const flip$1 = function(options) {
   if (options === void 0) {
     options = {};
@@ -1392,6 +1444,8 @@ const flip = flip$1;
 
 const size = size$1;
 
+const arrow = arrow$1;
+
 const computePosition = (reference, floating, options) => {
   const cache = new Map;
   const mergedOptions = {
@@ -2134,6 +2188,48 @@ class DropdownController extends Controller {
   }
 }
 
+function setState(element, state, options = {}) {
+  if (!element) return;
+  element.setAttribute("data-state", state);
+  if (options.ariaAttribute) {
+    const ariaValue = options.ariaValue !== undefined ? options.ariaValue : state === "open" || state === "checked" || state === "on";
+    element.setAttribute(options.ariaAttribute, ariaValue.toString());
+  }
+}
+
+function syncCheckedState(element, checked, options = {}) {
+  const state = checked ? "checked" : "unchecked";
+  setState(element, state, {
+    ariaAttribute: "aria-checked",
+    ariaValue: checked
+  });
+  if (options.additionalTargets) {
+    options.additionalTargets.forEach(target => {
+      if (target) {
+        setState(target, state);
+      }
+    });
+  }
+}
+
+function syncPressedState(element, pressed, options = {}) {
+  const state = options.useOnOff ? pressed ? "on" : "off" : pressed ? "pressed" : "unpressed";
+  setState(element, state, {
+    ariaAttribute: "aria-pressed",
+    ariaValue: pressed
+  });
+}
+
+function syncExpandedState(trigger, content, expanded) {
+  const state = expanded ? "open" : "closed";
+  if (trigger) {
+    setState(trigger, state, {
+      ariaAttribute: "aria-expanded",
+      ariaValue: expanded
+    });
+  }
+}
+
 class AccordionController extends Controller {
   static targets=[ "item", "trigger", "content" ];
   static values={
@@ -2180,8 +2276,7 @@ class AccordionController extends Controller {
   updateItemState(item, trigger, content, isOpen) {
     const state = isOpen ? "open" : "closed";
     item.dataset.state = state;
-    trigger.dataset.state = state;
-    trigger.setAttribute("aria-expanded", isOpen);
+    syncExpandedState(trigger, null, isOpen);
     content.dataset.state = state;
     const h3 = trigger.parentElement;
     if (h3 && h3.tagName === "H3") {
@@ -2203,6 +2298,146 @@ class AccordionController extends Controller {
   }
 }
 
+function createEscapeKeyHandler(onEscape, options = {}) {
+  const {enabled: enabled = true, stopPropagation: stopPropagation = false, preventDefault: preventDefault = false} = options;
+  let handler = null;
+  let isAttached = false;
+  const keydownHandler = event => {
+    if (event.key === "Escape") {
+      if (stopPropagation) {
+        event.stopPropagation();
+      }
+      if (preventDefault) {
+        event.preventDefault();
+      }
+      onEscape(event);
+    }
+  };
+  return {
+    attach() {
+      if (!enabled || isAttached) return;
+      handler = keydownHandler;
+      document.addEventListener("keydown", handler);
+      isAttached = true;
+    },
+    detach() {
+      if (!isAttached || !handler) return;
+      document.removeEventListener("keydown", handler);
+      handler = null;
+      isAttached = false;
+    },
+    isAttached() {
+      return isAttached;
+    },
+    disable() {
+      if (handler) {
+        document.removeEventListener("keydown", handler);
+      }
+    },
+    enable() {
+      if (handler && isAttached) {
+        document.addEventListener("keydown", handler);
+      }
+    }
+  };
+}
+
+function onEscapeKeyWhen(onEscape, condition) {
+  const keydownHandler = event => {
+    if (event.key === "Escape" && condition()) {
+      onEscape(event);
+    }
+  };
+  document.addEventListener("keydown", keydownHandler);
+  return () => document.removeEventListener("keydown", keydownHandler);
+}
+
+const FOCUSABLE_SELECTOR = [ "button:not([disabled])", "[href]", "input:not([disabled])", "select:not([disabled])", "textarea:not([disabled])", '[tabindex]:not([tabindex="-1"])' ].join(", ");
+
+const INPUT_SELECTOR = 'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]), textarea';
+
+function getFocusableElements(container) {
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR));
+}
+
+function getFirstFocusable(container, options = {}) {
+  const elements = getFocusableElements(container);
+  if (options.skipInputs) {
+    const nonInput = elements.find(el => !el.matches(INPUT_SELECTOR));
+    return nonInput || elements[0] || null;
+  }
+  return elements[0] || null;
+}
+
+function isMobileDevice() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+function focusFirstElement(container, options = {}) {
+  const {mobileAware: mobileAware = true, preferredElement: preferredElement = null} = options;
+  if (preferredElement && container.contains(preferredElement)) {
+    preferredElement.focus();
+    return preferredElement;
+  }
+  const skipInputs = mobileAware && isMobileDevice();
+  const element = getFirstFocusable(container, {
+    skipInputs: skipInputs
+  });
+  if (element) {
+    element.focus();
+    return element;
+  }
+  return null;
+}
+
+let scrollLockCount = 0;
+
+let originalOverflow = "";
+
+let originalPaddingRight = "";
+
+function getScrollbarWidth() {
+  const scrollDiv = document.createElement("div");
+  scrollDiv.style.cssText = "width: 100px; height: 100px; overflow: scroll; position: absolute; top: -9999px;";
+  document.body.appendChild(scrollDiv);
+  const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+  document.body.removeChild(scrollDiv);
+  return scrollbarWidth;
+}
+
+function hasScrollbar() {
+  return document.documentElement.scrollHeight > document.documentElement.clientHeight;
+}
+
+function lockScroll(options = {}) {
+  const {reserveScrollBarGap: reserveScrollBarGap = true} = options;
+  scrollLockCount++;
+  if (scrollLockCount === 1) {
+    originalOverflow = document.body.style.overflow;
+    originalPaddingRight = document.body.style.paddingRight;
+    document.body.style.overflow = "hidden";
+    document.body.setAttribute("data-scroll-locked", "1");
+    if (reserveScrollBarGap && hasScrollbar()) {
+      const scrollbarWidth = getScrollbarWidth();
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+    }
+  }
+}
+
+function unlockScroll() {
+  scrollLockCount = Math.max(0, scrollLockCount - 1);
+  if (scrollLockCount === 0) {
+    document.body.style.overflow = originalOverflow;
+    document.body.style.paddingRight = originalPaddingRight;
+    document.body.removeAttribute("data-scroll-locked");
+    originalOverflow = "";
+    originalPaddingRight = "";
+  }
+}
+
 class AlertDialogController extends Controller {
   static targets=[ "container", "overlay", "content" ];
   static values={
@@ -2216,6 +2451,9 @@ class AlertDialogController extends Controller {
     }
   };
   connect() {
+    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+      enabled: this.closeOnEscapeValue
+    });
     if (this.openValue) {
       this.show();
     }
@@ -2229,24 +2467,14 @@ class AlertDialogController extends Controller {
     this.hide();
   }
   show() {
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "open");
-    }
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "open");
-    }
+    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+    targets.forEach(target => setState(target, "open"));
+    lockScroll();
     if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "open");
+      focusFirstElement(this.contentTarget);
     }
-    document.body.style.overflow = "hidden";
-    this.setupFocusTrap();
     if (this.closeOnEscapeValue) {
-      this.escapeHandler = e => {
-        if (e.key === "Escape") {
-          this.close();
-        }
-      };
-      document.addEventListener("keydown", this.escapeHandler);
+      this.escapeHandler.attach();
     }
     this.element.dispatchEvent(new CustomEvent("alertdialog:open", {
       bubbles: true,
@@ -2256,20 +2484,10 @@ class AlertDialogController extends Controller {
     }));
   }
   hide() {
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "closed");
-    }
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "closed");
-    }
-    if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "closed");
-    }
-    document.body.style.overflow = "";
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler);
-      this.escapeHandler = null;
-    }
+    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+    targets.forEach(target => setState(target, "closed"));
+    unlockScroll();
+    this.escapeHandler.detach();
     this.element.dispatchEvent(new CustomEvent("alertdialog:close", {
       bubbles: true,
       detail: {
@@ -2280,18 +2498,9 @@ class AlertDialogController extends Controller {
   preventOverlayClose(event) {
     event.stopPropagation();
   }
-  setupFocusTrap() {
-    if (!this.hasContentTarget) return;
-    const focusableElements = this.contentTarget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
-    }
-  }
   disconnect() {
-    document.body.style.overflow = "";
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler);
-    }
+    unlockScroll();
+    this.escapeHandler.detach();
   }
 }
 
@@ -2371,22 +2580,21 @@ class DialogController extends Controller {
     }
   };
   connect() {
+    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+      enabled: this.closeOnEscapeValue
+    });
     if (this.openValue) {
       this.show();
     } else {
-      if (this.hasContainerTarget) {
-        this.containerTarget.setAttribute("data-state", "closed");
-        this.containerTarget.setAttribute("data-initial", "");
-      }
-      if (this.hasOverlayTarget) {
-        this.overlayTarget.setAttribute("data-state", "closed");
-        this.overlayTarget.setAttribute("data-initial", "");
-      }
-      if (this.hasContentTarget) {
-        this.contentTarget.setAttribute("data-state", "closed");
-        this.contentTarget.setAttribute("data-initial", "");
-      }
+      this.setInitialClosedState();
     }
+  }
+  setInitialClosedState() {
+    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+    targets.forEach(target => {
+      setState(target, "closed");
+      target.setAttribute("data-initial", "");
+    });
   }
   open() {
     this.openValue = true;
@@ -2397,27 +2605,17 @@ class DialogController extends Controller {
     this.hide();
   }
   show() {
-    if (this.hasContainerTarget) {
-      this.containerTarget.removeAttribute("data-initial");
-      this.containerTarget.setAttribute("data-state", "open");
-    }
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.removeAttribute("data-initial");
-      this.overlayTarget.setAttribute("data-state", "open");
-    }
+    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+    targets.forEach(target => {
+      target.removeAttribute("data-initial");
+      setState(target, "open");
+    });
+    lockScroll();
     if (this.hasContentTarget) {
-      this.contentTarget.removeAttribute("data-initial");
-      this.contentTarget.setAttribute("data-state", "open");
+      focusFirstElement(this.contentTarget);
     }
-    document.body.style.overflow = "hidden";
-    this.setupFocusTrap();
     if (this.closeOnEscapeValue) {
-      this.escapeHandler = e => {
-        if (e.key === "Escape") {
-          this.close();
-        }
-      };
-      document.addEventListener("keydown", this.escapeHandler);
+      this.escapeHandler.attach();
     }
     this.element.dispatchEvent(new CustomEvent("dialog:open", {
       bubbles: true,
@@ -2427,20 +2625,12 @@ class DialogController extends Controller {
     }));
   }
   hide() {
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "closed");
-    }
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "closed");
-    }
-    if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "closed");
-    }
-    document.body.style.overflow = "";
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler);
-      this.escapeHandler = null;
-    }
+    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+    targets.forEach(target => {
+      setState(target, "closed");
+    });
+    unlockScroll();
+    this.escapeHandler.detach();
     this.element.dispatchEvent(new CustomEvent("dialog:close", {
       bubbles: true,
       detail: {
@@ -2453,18 +2643,9 @@ class DialogController extends Controller {
       this.close();
     }
   }
-  setupFocusTrap() {
-    if (!this.hasContentTarget) return;
-    const focusableElements = this.contentTarget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
-    }
-  }
   disconnect() {
-    document.body.style.overflow = "";
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler);
-    }
+    unlockScroll();
+    this.escapeHandler.detach();
   }
 }
 
@@ -2481,13 +2662,7 @@ class CheckboxController extends Controller {
     this.updateState();
   }
   updateState() {
-    if (this.element.checked) {
-      this.element.dataset.state = "checked";
-      this.element.setAttribute("aria-checked", "true");
-    } else {
-      this.element.dataset.state = "unchecked";
-      this.element.setAttribute("aria-checked", "false");
-    }
+    syncCheckedState(this.element, this.element.checked);
   }
 }
 
@@ -2517,10 +2692,7 @@ class CollapsibleController extends Controller {
   updateState(isOpen, animate = true) {
     const state = isOpen ? "open" : "closed";
     this.element.dataset.state = state;
-    if (this.hasTriggerTarget) {
-      this.triggerTarget.dataset.state = state;
-      this.triggerTarget.setAttribute("aria-expanded", isOpen);
-    }
+    syncExpandedState(this.hasTriggerTarget ? this.triggerTarget : null, null, isOpen);
     if (this.hasContentTarget) {
       const content = this.contentTarget;
       content.dataset.state = state;
@@ -3269,10 +3441,6 @@ class DrawerController extends Controller {
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     const MOBILE_THRESHOLD = 80;
-    console.log("📏 Viewport size:", {
-      height: viewportHeight,
-      width: viewportWidth
-    });
     let containerSize;
     if (this.directionValue === "left" || this.directionValue === "right") {
       containerSize = viewportWidth;
@@ -3301,15 +3469,6 @@ class DrawerController extends Controller {
     } else {
       yPosition = pixels;
     }
-    console.log("📐 Snap point calculation:", {
-      snapIndex: snapIndex,
-      snapPoint: snapPoint,
-      containerSize: containerSize,
-      pixels: pixels,
-      pixelsPercentage: `${(pixels / containerSize * 100).toFixed(1)}%`,
-      yPosition: yPosition,
-      direction: this.directionValue
-    });
     return yPosition;
   }
   handleSnapPointRelease(delta, velocity) {
@@ -3319,15 +3478,6 @@ class DrawerController extends Controller {
     }
     const currentIndex = this.activeSnapPointValue >= 0 ? this.activeSnapPointValue : 0;
     const currentY = delta;
-    console.log("🎯 handleSnapPointRelease called:", {
-      currentIndex: currentIndex,
-      delta: delta,
-      velocity: velocity,
-      velocityAbs: Math.abs(velocity),
-      threshold: this.VELOCITY_THRESHOLD,
-      isHighVelocity: Math.abs(velocity) > this.VELOCITY_THRESHOLD,
-      isClosingDirection: this.isClosingDirection(delta)
-    });
     if (currentIndex === 0 && this.isClosingDirection(delta)) {
       const firstSnapY = this.getSnapPointY(0);
       const isDraggedBeyondFirstSnap = this.directionValue === "bottom" || this.directionValue === "right" ? currentY > firstSnapY : currentY < firstSnapY;
@@ -3340,16 +3490,12 @@ class DrawerController extends Controller {
     if (Math.abs(velocity) > this.VELOCITY_THRESHOLD && !this.snapToSequentialPointValue) {
       if (velocity > 0) {
         targetIndex = Math.max(currentIndex - 1, 0);
-        console.log("⬇️ High velocity CLOSING: currentIndex", currentIndex, "→ targetIndex", targetIndex);
       } else {
         targetIndex = Math.min(currentIndex + 1, this.snapPointsValue.length - 1);
-        console.log("⬆️ High velocity OPENING: currentIndex", currentIndex, "→ targetIndex", targetIndex);
       }
     } else {
       targetIndex = this.findClosestSnapPointIndex(currentY);
-      console.log("🐌 Low velocity: using closest snap point, targetIndex", targetIndex);
     }
-    console.log("✅ Final targetIndex:", targetIndex);
     this.snapTo(targetIndex);
   }
   handleRegularRelease(delta, velocity) {
@@ -3387,15 +3533,9 @@ class DrawerController extends Controller {
     const snapPoint = this.snapPointsValue[snapPointIndex];
     const snapY = this.getSnapPointY(snapPointIndex);
     if (this.hasContentTarget) {
-      const currentTransform = this.contentTarget.style.transform;
+      this.contentTarget.style.transform;
       const targetTransform = this.getTransformForSnapPoint(snapY);
       if (animated) {
-        console.log("📍 snapTo (animated):", {
-          snapPointIndex: snapPointIndex,
-          currentTransform: currentTransform,
-          targetTransform: targetTransform,
-          duration: this.TRANSITIONS.DURATION
-        });
         this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
       }
       this.contentTarget.style.transform = targetTransform;
@@ -3584,18 +3724,7 @@ class DrawerController extends Controller {
     const fadeStartY = this.getSnapPointY(fadeIndex);
     const fadeEndIndex = Math.min(fadeIndex + 1, this.snapPointsValue.length - 1);
     const fadeEndY = this.getSnapPointY(fadeEndIndex);
-    console.log("🔍 updateOverlayOpacity:", {
-      delta: delta,
-      currentY: currentY,
-      fadeIndex: fadeIndex,
-      fadeEndIndex: fadeEndIndex,
-      fadeStartY: fadeStartY,
-      fadeEndY: fadeEndY,
-      "currentY <= fadeEndY?": currentY <= fadeEndY,
-      "fadeEndY < currentY <= fadeStartY?": currentY > fadeEndY && currentY <= fadeStartY
-    });
     if (currentY < fadeEndY) {
-      console.log("✅ Setting opacity = 1 (more open than fadeEndIndex)");
       this.overlayTarget.style.opacity = "1";
       return;
     }
@@ -3603,11 +3732,9 @@ class DrawerController extends Controller {
       const range = fadeStartY - fadeEndY;
       const progress = (fadeStartY - currentY) / range;
       const finalOpacity = Math.min(1, Math.max(0, progress));
-      console.log("📈 Setting opacity =", finalOpacity, "(gradual fade)");
       this.overlayTarget.style.opacity = finalOpacity;
       return;
     }
-    console.log("❌ Setting opacity = 0 (more closed than fadeFromIndex)");
     this.overlayTarget.style.opacity = "0";
   }
   updateOverlayOpacityForSnapPoint(snapPointIndex) {
@@ -3684,19 +3811,12 @@ class DrawerController extends Controller {
     }));
   }
   hide() {
-    console.log("🔒 hide() called - delegating to animateToClosedPosition()");
     this.animateToClosedPosition();
   }
   animateToClosedPosition() {
     if (this.hasContentTarget) {
       const closedPosition = this.getClosedPosition();
-      const currentTransform = this.contentTarget.style.transform;
-      console.log("🚪 animateToClosedPosition:", {
-        currentTransform: currentTransform,
-        closedPosition: closedPosition,
-        duration: this.TRANSITIONS.DURATION,
-        targetTransform: this.getTransformForDirection(closedPosition)
-      });
+      this.contentTarget.style.transform;
       this.contentTarget.style.transition = `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
       this.contentTarget.style.transform = this.getTransformForDirection(closedPosition);
       if (this.hasOverlayTarget) {
@@ -3819,12 +3939,9 @@ class HoverCardController extends Controller {
       default: 300
     }
   };
-  constructor() {
-    super(...arguments);
+  connect() {
     this.showTimeout = null;
     this.hideTimeout = null;
-  }
-  connect() {
     if (this.hasContentTarget) {
       this.contentTarget.style.position = "fixed";
     }
@@ -3838,7 +3955,7 @@ class HoverCardController extends Controller {
       this.openValue = true;
       this.contentTarget.classList.remove("invisible");
       this.contentTarget.classList.add("visible");
-      this.contentTarget.setAttribute("data-state", "open");
+      setState(this.contentTarget, "open");
       this.positionContent();
     }, this.openDelayValue);
   }
@@ -3848,7 +3965,7 @@ class HoverCardController extends Controller {
       this.openValue = false;
       this.contentTarget.classList.remove("visible");
       this.contentTarget.classList.add("invisible");
-      this.contentTarget.setAttribute("data-state", "closed");
+      setState(this.contentTarget, "closed");
     }, this.closeDelayValue);
   }
   keepOpen() {
@@ -4013,6 +4130,149 @@ class InputOtpController extends Controller {
   }
 }
 
+const DEFAULT_CONFIG = {
+  placement: "bottom",
+  offsetValue: 4,
+  flipEnabled: true,
+  shiftEnabled: true,
+  shiftPadding: 8,
+  arrowElement: null,
+  arrowPadding: 8,
+  strategy: "absolute",
+  ancestorScroll: true,
+  ancestorResize: true,
+  elementResize: true,
+  layoutShift: true,
+  animationFrame: false
+};
+
+function buildMiddleware(options) {
+  const middleware = [];
+  if (options.offsetValue > 0) {
+    middleware.push(offset(options.offsetValue));
+  }
+  if (options.flipEnabled) {
+    middleware.push(flip());
+  }
+  if (options.shiftEnabled) {
+    middleware.push(shift({
+      padding: options.shiftPadding
+    }));
+  }
+  if (options.arrowElement) {
+    middleware.push(arrow({
+      element: options.arrowElement,
+      padding: options.arrowPadding
+    }));
+  }
+  return middleware;
+}
+
+function applyPosition(content, position, options = {}) {
+  const {x: x, y: y, placement: placement, middlewareData: middlewareData} = position;
+  Object.assign(content.style, {
+    left: `${x}px`,
+    top: `${y}px`,
+    position: options.strategy || "absolute"
+  });
+  const [side, align] = placement.split("-");
+  content.setAttribute("data-side", side);
+  if (align) {
+    content.setAttribute("data-align", align);
+  }
+  if (options.arrowElement && middlewareData.arrow) {
+    const {x: arrowX, y: arrowY} = middlewareData.arrow;
+    const staticSide = {
+      top: "bottom",
+      right: "left",
+      bottom: "top",
+      left: "right"
+    }[side];
+    Object.assign(options.arrowElement.style, {
+      left: arrowX != null ? `${arrowX}px` : "",
+      top: arrowY != null ? `${arrowY}px` : "",
+      right: "",
+      bottom: "",
+      [staticSide]: "-4px"
+    });
+  }
+}
+
+function createPositioner(reference, floating, options = {}) {
+  const config = {
+    ...DEFAULT_CONFIG,
+    ...options
+  };
+  let cleanup = null;
+  let isActive = false;
+  const middleware = buildMiddleware(config);
+  const updatePosition = async () => {
+    const position = await computePosition(reference, floating, {
+      placement: config.placement,
+      middleware: middleware,
+      strategy: config.strategy
+    });
+    applyPosition(floating, position, {
+      strategy: config.strategy,
+      arrowElement: config.arrowElement
+    });
+    return position;
+  };
+  return {
+    start() {
+      if (isActive) return;
+      updatePosition();
+      cleanup = autoUpdate(reference, floating, updatePosition, {
+        ancestorScroll: config.ancestorScroll,
+        ancestorResize: config.ancestorResize,
+        elementResize: config.elementResize,
+        layoutShift: config.layoutShift,
+        animationFrame: config.animationFrame
+      });
+      isActive = true;
+    },
+    stop() {
+      if (!isActive) return;
+      if (cleanup) {
+        cleanup();
+        cleanup = null;
+      }
+      isActive = false;
+    },
+    async update() {
+      return updatePosition();
+    },
+    setPlacement(placement) {
+      config.placement = placement;
+      if (isActive) {
+        updatePosition();
+      }
+    },
+    setOffset(offsetValue) {
+      config.offsetValue = offsetValue;
+      middleware.length = 0;
+      middleware.push(...buildMiddleware(config));
+      if (isActive) {
+        updatePosition();
+      }
+    },
+    isActive() {
+      return isActive;
+    },
+    getConfig() {
+      return {
+        ...config
+      };
+    }
+  };
+}
+
+function getPlacementFromAttributes(element) {
+  const side = element.getAttribute("data-side") || "bottom";
+  const align = element.getAttribute("data-align");
+  return align ? `${side}-${align}` : side;
+}
+
 class TooltipController extends Controller {
   static targets=[ "trigger", "content" ];
   static values={
@@ -4025,15 +4285,11 @@ class TooltipController extends Controller {
       default: 0
     }
   };
-  constructor() {
-    super(...arguments);
-    this.cleanup = null;
+  connect() {
     this.hoverTimeout = null;
     this.isOpen = false;
-  }
-  connect() {
-    this.boundHandleEscape = this.handleEscape.bind(this);
-    document.addEventListener("keydown", this.boundHandleEscape);
+    this.positioner = null;
+    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.isOpen);
     if (this.hasContentTarget) {
       this.content = this.contentTarget;
       this.originalParent = this.content.parentNode;
@@ -4045,9 +4301,9 @@ class TooltipController extends Controller {
     }
   }
   disconnect() {
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
+    if (this.positioner) {
+      this.positioner.stop();
+      this.positioner = null;
     }
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
@@ -4060,7 +4316,9 @@ class TooltipController extends Controller {
         document.body.removeChild(this.content);
       }
     }
-    document.removeEventListener("keydown", this.boundHandleEscape);
+    if (this.cleanupEscape) {
+      this.cleanupEscape();
+    }
   }
   show() {
     if (this.hoverTimeout) {
@@ -4070,7 +4328,7 @@ class TooltipController extends Controller {
     this.hoverTimeout = setTimeout(() => {
       if (!this.content || !this.hasTriggerTarget) return;
       this.isOpen = true;
-      this.content.setAttribute("data-state", "open");
+      setState(this.content, "open");
       this.updatePosition();
     }, this.hoverDelayValue);
   }
@@ -4081,50 +4339,62 @@ class TooltipController extends Controller {
     }
     if (!this.content) return;
     this.isOpen = false;
-    this.content.setAttribute("data-state", "closed");
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
-    }
-  }
-  handleEscape(event) {
-    if (event.key === "Escape" && this.isOpen) {
-      this.hide();
+    setState(this.content, "closed");
+    if (this.positioner) {
+      this.positioner.stop();
     }
   }
   updatePosition() {
     if (!this.content || !this.hasTriggerTarget) return;
-    if (this.cleanup) {
-      this.cleanup();
-    }
-    const side = this.content.getAttribute("data-side") || "top";
-    const align = this.content.getAttribute("data-align") || "center";
-    const placement = align === "center" ? side : `${side}-${align}`;
-    const middleware = [ offset(this.sideOffsetValue), flip(), shift({
-      padding: 8
-    }) ];
-    this.cleanup = autoUpdate(this.triggerTarget, this.content, () => {
-      computePosition(this.triggerTarget, this.content, {
+    const placement = getPlacementFromAttributes(this.content);
+    if (!this.positioner) {
+      this.positioner = createPositioner(this.triggerTarget, this.content, {
         placement: placement,
-        middleware: middleware,
-        strategy: "absolute"
-      }).then(({x: x, y: y, placement: actualPlacement}) => {
-        Object.assign(this.content.style, {
-          position: "absolute",
-          left: `${x}px`,
-          top: `${y}px`
-        });
-        const actualSide = actualPlacement.split("-")[0];
-        this.content.setAttribute("data-side", actualSide);
+        offsetValue: this.sideOffsetValue
       });
-    }, {
-      ancestorScroll: true,
-      ancestorResize: true,
-      elementResize: true,
-      layoutShift: true,
-      animationFrame: true
-    });
+    } else {
+      this.positioner.setPlacement(placement);
+    }
+    this.positioner.start();
   }
+}
+
+function createClickOutsideHandler(elements, onClickOutside, options = {}) {
+  const {capture: capture = false, ignoreSelectors: ignoreSelectors = [], mousedown: mousedown = false} = options;
+  const elementsArray = Array.isArray(elements) ? elements : [ elements ];
+  let handler = null;
+  let isAttached = false;
+  const eventType = mousedown ? "mousedown" : "click";
+  const clickHandler = event => {
+    const target = event.target;
+    const isInside = elementsArray.some(element => element && element.contains(target));
+    if (isInside) return;
+    const isIgnored = ignoreSelectors.some(selector => target.closest(selector) !== null);
+    if (isIgnored) return;
+    onClickOutside(event);
+  };
+  return {
+    attach() {
+      if (isAttached) return;
+      handler = clickHandler;
+      document.addEventListener(eventType, handler, capture);
+      isAttached = true;
+    },
+    detach() {
+      if (!isAttached || !handler) return;
+      document.removeEventListener(eventType, handler, capture);
+      handler = null;
+      isAttached = false;
+    },
+    isAttached() {
+      return isAttached;
+    },
+    updateElements(newElements) {
+      elementsArray.length = 0;
+      const newArray = Array.isArray(newElements) ? newElements : [ newElements ];
+      elementsArray.push(...newArray);
+    }
+  };
 }
 
 class PopoverController extends Controller {
@@ -4151,39 +4421,39 @@ class PopoverController extends Controller {
       default: 200
     }
   };
-  constructor() {
-    super(...arguments);
-    this.cleanup = null;
-    this.hoverTimeout = null;
-  }
   connect() {
     console.log("placement", this.placementValue);
     if (!this.hasTriggerTarget || !this.hasContentTarget) {
       return;
     }
     if (!this.contentTarget.hasAttribute("data-state")) {
-      this.contentTarget.setAttribute("data-state", this.openValue ? "open" : "closed");
+      setState(this.contentTarget, this.openValue ? "open" : "closed");
     }
+    this.positioner = createPositioner(this.triggerTarget, this.contentTarget, {
+      placement: this.placementValue,
+      offsetValue: this.offsetValue
+    });
     if (this.triggerValue === "click") {
       this.setupClickTrigger();
     } else if (this.triggerValue === "hover") {
       this.setupHoverTrigger();
     }
-    this.boundHandleEscape = this.handleEscape.bind(this);
-    document.addEventListener("keydown", this.boundHandleEscape);
+    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.openValue);
   }
   disconnect() {
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
+    if (this.positioner) {
+      this.positioner.stop();
+      this.positioner = null;
     }
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
       this.hoverTimeout = null;
     }
-    document.removeEventListener("keydown", this.boundHandleEscape);
-    if (this.boundHandleClickOutside) {
-      document.removeEventListener("click", this.boundHandleClickOutside);
+    if (this.cleanupEscape) {
+      this.cleanupEscape();
+    }
+    if (this.clickOutsideHandler) {
+      this.clickOutsideHandler.detach();
     }
     if (this.boundHandleTriggerClick) {
       this.triggerTarget.removeEventListener("click", this.boundHandleTriggerClick);
@@ -4196,8 +4466,8 @@ class PopoverController extends Controller {
   setupClickTrigger() {
     this.boundHandleTriggerClick = this.toggle.bind(this);
     this.triggerTarget.addEventListener("click", this.boundHandleTriggerClick);
-    this.boundHandleClickOutside = this.handleClickOutside.bind(this);
-    document.addEventListener("click", this.boundHandleClickOutside);
+    this.clickOutsideHandler = createClickOutsideHandler(this.element, () => this.hide());
+    this.clickOutsideHandler.attach();
   }
   setupHoverTrigger() {
     this.boundHandleMouseEnter = this.handleMouseEnter.bind(this);
@@ -4216,8 +4486,10 @@ class PopoverController extends Controller {
   }
   show() {
     this.openValue = true;
-    this.contentTarget.setAttribute("data-state", "open");
-    this.updatePosition();
+    setState(this.contentTarget, "open");
+    if (this.positioner) {
+      this.positioner.start();
+    }
     this.element.dispatchEvent(new CustomEvent("popover:show", {
       bubbles: true,
       detail: {
@@ -4227,10 +4499,9 @@ class PopoverController extends Controller {
   }
   hide() {
     this.openValue = false;
-    this.contentTarget.setAttribute("data-state", "closed");
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
+    setState(this.contentTarget, "closed");
+    if (this.positioner) {
+      this.positioner.stop();
     }
     this.element.dispatchEvent(new CustomEvent("popover:hide", {
       bubbles: true,
@@ -4238,11 +4509,6 @@ class PopoverController extends Controller {
         popover: this
       }
     }));
-  }
-  handleClickOutside(event) {
-    if (!this.element.contains(event.target)) {
-      this.hide();
-    }
   }
   handleMouseEnter() {
     if (this.hoverTimeout) {
@@ -4258,44 +4524,6 @@ class PopoverController extends Controller {
       this.hoverTimeout = null;
     }
     this.hide();
-  }
-  handleEscape(event) {
-    if (event.key === "Escape" && this.openValue && this.hasContentTarget) {
-      this.hide();
-    }
-  }
-  updatePosition() {
-    if (!this.hasTriggerTarget || !this.hasContentTarget) return;
-    if (this.cleanup) {
-      this.cleanup();
-    }
-    const middleware = [];
-    if (this.offsetValue > 0) {
-      middleware.push(offset(this.offsetValue));
-    }
-    middleware.push(flip());
-    middleware.push(shift({
-      padding: 8
-    }));
-    this.cleanup = autoUpdate(this.triggerTarget, this.contentTarget, () => {
-      computePosition(this.triggerTarget, this.contentTarget, {
-        placement: this.placementValue,
-        middleware: middleware
-      }).then(({x: x, y: y, placement: placement, middlewareData: middlewareData}) => {
-        Object.assign(this.contentTarget.style, {
-          left: `${x}px`,
-          top: `${y}px`
-        });
-        const side = placement.split("-")[0];
-        this.contentTarget.setAttribute("data-side", side);
-      });
-    }, {
-      ancestorScroll: true,
-      ancestorResize: true,
-      elementResize: true,
-      layoutShift: true,
-      animationFrame: true
-    });
   }
 }
 
@@ -4385,12 +4613,9 @@ class ResponsiveDialogController extends Controller {
     const isDesktop = this.mediaQuery.matches;
     const targetEl = isDesktop ? this.dialogTarget : this.drawerTarget;
     if (!targetEl) return;
-    const focusableElements = targetEl.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (focusableElements.length > 0) {
-      setTimeout(() => {
-        focusableElements[0].focus();
-      }, 100);
-    }
+    setTimeout(() => {
+      focusFirstElement(targetEl);
+    }, 100);
   }
   get isDesktop() {
     return this.mediaQuery.matches;
@@ -5762,9 +5987,9 @@ class ToggleController extends Controller {
     this.updateState();
   }
   updateState() {
-    const state = this.pressedValue ? "on" : "off";
-    this.element.setAttribute("data-state", state);
-    this.element.setAttribute("aria-pressed", this.pressedValue.toString());
+    syncPressedState(this.element, this.pressedValue, {
+      useOnOff: true
+    });
   }
 }
 
@@ -5916,21 +6141,21 @@ class TabsController extends Controller {
     trigger.focus();
   }
   activateTrigger(trigger) {
-    trigger.dataset.state = "active";
+    setState(trigger, "active");
     trigger.setAttribute("aria-selected", "true");
     trigger.setAttribute("tabindex", "0");
   }
   deactivateTrigger(trigger) {
-    trigger.dataset.state = "inactive";
+    setState(trigger, "inactive");
     trigger.setAttribute("aria-selected", "false");
     trigger.setAttribute("tabindex", "-1");
   }
   showContent(content) {
-    content.dataset.state = "active";
+    setState(content, "active");
     content.removeAttribute("hidden");
   }
   hideContent(content) {
-    content.dataset.state = "inactive";
+    setState(content, "inactive");
     content.setAttribute("hidden", "");
   }
   handleKeyDown(event) {
@@ -6302,11 +6527,10 @@ class SwitchController extends Controller {
     }
   }
   updateState(isChecked, animate = true) {
-    this.element.setAttribute("data-state", isChecked ? "checked" : "unchecked");
-    this.element.setAttribute("aria-checked", isChecked);
-    if (this.hasThumbTarget) {
-      this.thumbTarget.setAttribute("data-state", isChecked ? "checked" : "unchecked");
-    }
+    const additionalTargets = this.hasThumbTarget ? [ this.thumbTarget ] : [];
+    syncCheckedState(this.element, isChecked, {
+      additionalTargets: additionalTargets
+    });
     const hiddenInput = this.element.querySelector('input[type="hidden"]');
     if (hiddenInput) {
       hiddenInput.value = isChecked ? "1" : "0";

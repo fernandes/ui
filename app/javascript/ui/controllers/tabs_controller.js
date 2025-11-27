@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { setState } from "../utils/state-manager.js"
 
 // Tabs controller for tabbed interface with keyboard navigation
 export default class extends Controller {
@@ -73,24 +74,24 @@ export default class extends Controller {
   }
 
   activateTrigger(trigger) {
-    trigger.dataset.state = "active"
+    setState(trigger, 'active')
     trigger.setAttribute("aria-selected", "true")
     trigger.setAttribute("tabindex", "0")
   }
 
   deactivateTrigger(trigger) {
-    trigger.dataset.state = "inactive"
+    setState(trigger, 'inactive')
     trigger.setAttribute("aria-selected", "false")
     trigger.setAttribute("tabindex", "-1")
   }
 
   showContent(content) {
-    content.dataset.state = "active"
+    setState(content, 'active')
     content.removeAttribute("hidden")
   }
 
   hideContent(content) {
-    content.dataset.state = "inactive"
+    setState(content, 'inactive')
     content.setAttribute("hidden", "")
   }
 

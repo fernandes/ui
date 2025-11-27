@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { syncExpandedState } from "../utils/state-manager.js"
 
 // Accordion controller for collapsible content sections
 export default class extends Controller {
@@ -56,10 +57,13 @@ export default class extends Controller {
   updateItemState(item, trigger, content, isOpen) {
     const state = isOpen ? "open" : "closed"
 
-    // Update all data-state attributes
+    // Update item data-state
     item.dataset.state = state
-    trigger.dataset.state = state
-    trigger.setAttribute("aria-expanded", isOpen)
+
+    // Update trigger using utility
+    syncExpandedState(trigger, null, isOpen)
+
+    // Update content state
     content.dataset.state = state
 
     // Update h3 wrapper state if it exists

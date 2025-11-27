@@ -1,4 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { setState } from "../utils/state-manager.js"
+import { createEscapeKeyHandler } from "../utils/escape-key-manager.js"
+import { focusFirstElement } from "../utils/focus-trap-manager.js"
+import { lockScroll, unlockScroll } from "../utils/scroll-lock-manager.js"
 
 // Dialog controller for general-purpose modal dialogs
 // Unlike AlertDialog, this DOES close when clicking overlay or pressing Escape
@@ -11,23 +15,30 @@ export default class extends Controller {
   }
 
   connect() {
+    // Setup escape key handler
+    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+      enabled: this.closeOnEscapeValue
+    })
+
     if (this.openValue) {
       this.show()
     } else {
-      // Set initial closed state with data-initial to prevent exit animations on page load
-      if (this.hasContainerTarget) {
-        this.containerTarget.setAttribute("data-state", "closed")
-        this.containerTarget.setAttribute("data-initial", "")
-      }
-      if (this.hasOverlayTarget) {
-        this.overlayTarget.setAttribute("data-state", "closed")
-        this.overlayTarget.setAttribute("data-initial", "")
-      }
-      if (this.hasContentTarget) {
-        this.contentTarget.setAttribute("data-state", "closed")
-        this.contentTarget.setAttribute("data-initial", "")
-      }
+      this.setInitialClosedState()
     }
+  }
+
+  setInitialClosedState() {
+    // Set initial closed state with data-initial to prevent exit animations on page load
+    const targets = [
+      this.hasContainerTarget ? this.containerTarget : null,
+      this.hasOverlayTarget ? this.overlayTarget : null,
+      this.hasContentTarget ? this.contentTarget : null
+    ].filter(Boolean)
+
+    targets.forEach(target => {
+      setState(target, 'closed')
+      target.setAttribute("data-initial", "")
+    })
   }
 
   open() {
@@ -41,33 +52,29 @@ export default class extends Controller {
   }
 
   show() {
-    // Set data-state to open for animations
-    // Remove data-initial to enable exit animations after first open
-    if (this.hasContainerTarget) {
-      this.containerTarget.removeAttribute("data-initial")
-      this.containerTarget.setAttribute("data-state", "open")
-    }
+    // Remove data-initial and set open state
+    const targets = [
+      this.hasContainerTarget ? this.containerTarget : null,
+      this.hasOverlayTarget ? this.overlayTarget : null,
+      this.hasContentTarget ? this.contentTarget : null
+    ].filter(Boolean)
 
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.removeAttribute("data-initial")
-      this.overlayTarget.setAttribute("data-state", "open")
-    }
+    targets.forEach(target => {
+      target.removeAttribute("data-initial")
+      setState(target, 'open')
+    })
+
+    // Lock body scroll
+    lockScroll()
+
+    // Setup focus trap
     if (this.hasContentTarget) {
-      this.contentTarget.removeAttribute("data-initial")
-      this.contentTarget.setAttribute("data-state", "open")
+      focusFirstElement(this.contentTarget)
     }
 
-    document.body.style.overflow = "hidden"
-
-    this.setupFocusTrap()
-
+    // Attach escape handler
     if (this.closeOnEscapeValue) {
-      this.escapeHandler = (e) => {
-        if (e.key === "Escape") {
-          this.close()
-        }
-      }
-      document.addEventListener("keydown", this.escapeHandler)
+      this.escapeHandler.attach()
     }
 
     this.element.dispatchEvent(new CustomEvent("dialog:open", {
@@ -77,26 +84,22 @@ export default class extends Controller {
   }
 
   hide() {
-    // Set data-state to closed to trigger exit animations
-    // CSS pointer-events-none and animations handle visibility
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "closed")
-    }
+    // Set closed state for exit animations
+    const targets = [
+      this.hasContainerTarget ? this.containerTarget : null,
+      this.hasOverlayTarget ? this.overlayTarget : null,
+      this.hasContentTarget ? this.contentTarget : null
+    ].filter(Boolean)
 
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "closed")
-    }
+    targets.forEach(target => {
+      setState(target, 'closed')
+    })
 
-    if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "closed")
-    }
+    // Unlock body scroll
+    unlockScroll()
 
-    document.body.style.overflow = ""
-
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler)
-      this.escapeHandler = null
-    }
+    // Detach escape handler
+    this.escapeHandler.detach()
 
     this.element.dispatchEvent(new CustomEvent("dialog:close", {
       bubbles: true,
@@ -111,22 +114,8 @@ export default class extends Controller {
     }
   }
 
-  setupFocusTrap() {
-    if (!this.hasContentTarget) return
-
-    const focusableElements = this.contentTarget.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus()
-    }
-  }
-
   disconnect() {
-    document.body.style.overflow = ""
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler)
-    }
+    unlockScroll()
+    this.escapeHandler.detach()
   }
 }

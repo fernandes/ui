@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
-import { computePosition, flip, offset, shift, arrow, autoUpdate } from "@floating-ui/dom"
+import { setState } from "../utils/state-manager.js"
+import { createPositioner, getPlacementFromAttributes } from "../utils/floating-ui-positioner.js"
+import { onEscapeKeyWhen } from "../utils/escape-key-manager.js"
 
 // Tooltip controller using Floating UI for positioning
 // Structure: Tooltip (root) > Trigger + Content
@@ -11,17 +13,13 @@ export default class extends Controller {
     hoverDelay: { type: Number, default: 0 }
   }
 
-  constructor() {
-    super(...arguments)
-    this.cleanup = null
+  connect() {
     this.hoverTimeout = null
     this.isOpen = false
-  }
+    this.positioner = null
 
-  connect() {
-    // Close on Escape key
-    this.boundHandleEscape = this.handleEscape.bind(this)
-    document.addEventListener('keydown', this.boundHandleEscape)
+    // Close on Escape key (only when open)
+    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.isOpen)
 
     // Store reference to content before moving it
     // Once we move it to body, Stimulus loses the target reference
@@ -39,10 +37,10 @@ export default class extends Controller {
   }
 
   disconnect() {
-    // Cleanup Floating UI auto-update
-    if (this.cleanup) {
-      this.cleanup()
-      this.cleanup = null
+    // Cleanup positioner
+    if (this.positioner) {
+      this.positioner.stop()
+      this.positioner = null
     }
 
     // Clear hover timeout
@@ -60,8 +58,10 @@ export default class extends Controller {
       }
     }
 
-    // Remove event listeners
-    document.removeEventListener('keydown', this.boundHandleEscape)
+    // Remove escape key listener
+    if (this.cleanupEscape) {
+      this.cleanupEscape()
+    }
   }
 
   show() {
@@ -76,7 +76,7 @@ export default class extends Controller {
       if (!this.content || !this.hasTriggerTarget) return
 
       this.isOpen = true
-      this.content.setAttribute('data-state', 'open')
+      setState(this.content, 'open')
 
       // Update position with Floating UI
       this.updatePosition()
@@ -93,69 +93,30 @@ export default class extends Controller {
     if (!this.content) return
 
     this.isOpen = false
-    this.content.setAttribute('data-state', 'closed')
+    setState(this.content, 'closed')
 
-    // Cleanup auto-update when hiding
-    if (this.cleanup) {
-      this.cleanup()
-      this.cleanup = null
-    }
-  }
-
-  handleEscape(event) {
-    if (event.key === 'Escape' && this.isOpen) {
-      this.hide()
+    // Cleanup positioner when hiding
+    if (this.positioner) {
+      this.positioner.stop()
     }
   }
 
   updatePosition() {
     if (!this.content || !this.hasTriggerTarget) return
 
-    // Cleanup previous auto-update if exists
-    if (this.cleanup) {
-      this.cleanup()
+    // Get placement from content data attributes
+    const placement = getPlacementFromAttributes(this.content)
+
+    // Create or update positioner
+    if (!this.positioner) {
+      this.positioner = createPositioner(this.triggerTarget, this.content, {
+        placement,
+        offsetValue: this.sideOffsetValue
+      })
+    } else {
+      this.positioner.setPlacement(placement)
     }
 
-    // Get placement from content data attributes
-    const side = this.content.getAttribute('data-side') || 'top'
-    const align = this.content.getAttribute('data-align') || 'center'
-    const placement = align === 'center' ? side : `${side}-${align}`
-
-    // Setup middleware
-    const middleware = [
-      offset(this.sideOffsetValue),
-      flip(),
-      shift({ padding: 8 })
-    ]
-
-    // Use autoUpdate to keep position synchronized
-    this.cleanup = autoUpdate(
-      this.triggerTarget,
-      this.content,
-      () => {
-        computePosition(this.triggerTarget, this.content, {
-          placement: placement,
-          middleware: middleware,
-          strategy: 'absolute'
-        }).then(({ x, y, placement: actualPlacement }) => {
-          Object.assign(this.content.style, {
-            position: 'absolute',
-            left: `${x}px`,
-            top: `${y}px`,
-          })
-
-          // Update data-side attribute based on actual placement
-          const actualSide = actualPlacement.split('-')[0]
-          this.content.setAttribute('data-side', actualSide)
-        })
-      },
-      {
-        ancestorScroll: true,
-        ancestorResize: true,
-        elementResize: true,
-        layoutShift: true,
-        animationFrame: true
-      }
-    )
+    this.positioner.start()
   }
 }

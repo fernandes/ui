@@ -1,4 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { setState } from "../utils/state-manager.js"
+import { createEscapeKeyHandler } from "../utils/escape-key-manager.js"
+import { focusFirstElement } from "../utils/focus-trap-manager.js"
+import { lockScroll, unlockScroll } from "../utils/scroll-lock-manager.js"
 
 // Alert Dialog controller for important confirmations
 // Similar to Dialog but requires explicit action (no click-outside to close)
@@ -10,6 +14,11 @@ export default class extends Controller {
   }
 
   connect() {
+    // Setup escape key handler
+    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
+      enabled: this.closeOnEscapeValue
+    })
+
     if (this.openValue) {
       this.show()
     }
@@ -26,30 +35,26 @@ export default class extends Controller {
   }
 
   show() {
-    // Set data-state to open for animations
-    // Never use .hidden - pointer-events and animations control visibility
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "open")
-    }
+    // Set open state on all targets
+    const targets = [
+      this.hasContainerTarget ? this.containerTarget : null,
+      this.hasOverlayTarget ? this.overlayTarget : null,
+      this.hasContentTarget ? this.contentTarget : null
+    ].filter(Boolean)
 
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "open")
-    }
+    targets.forEach(target => setState(target, 'open'))
+
+    // Lock body scroll
+    lockScroll()
+
+    // Setup focus trap
     if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "open")
+      focusFirstElement(this.contentTarget)
     }
 
-    document.body.style.overflow = "hidden"
-
-    this.setupFocusTrap()
-
+    // Attach escape handler
     if (this.closeOnEscapeValue) {
-      this.escapeHandler = (e) => {
-        if (e.key === "Escape") {
-          this.close()
-        }
-      }
-      document.addEventListener("keydown", this.escapeHandler)
+      this.escapeHandler.attach()
     }
 
     this.element.dispatchEvent(new CustomEvent("alertdialog:open", {
@@ -59,26 +64,20 @@ export default class extends Controller {
   }
 
   hide() {
-    // Set data-state to closed to trigger exit animations
-    // CSS pointer-events-none and animations handle visibility
-    if (this.hasContainerTarget) {
-      this.containerTarget.setAttribute("data-state", "closed")
-    }
+    // Set closed state on all targets
+    const targets = [
+      this.hasContainerTarget ? this.containerTarget : null,
+      this.hasOverlayTarget ? this.overlayTarget : null,
+      this.hasContentTarget ? this.contentTarget : null
+    ].filter(Boolean)
 
-    if (this.hasOverlayTarget) {
-      this.overlayTarget.setAttribute("data-state", "closed")
-    }
+    targets.forEach(target => setState(target, 'closed'))
 
-    if (this.hasContentTarget) {
-      this.contentTarget.setAttribute("data-state", "closed")
-    }
+    // Unlock body scroll
+    unlockScroll()
 
-    document.body.style.overflow = ""
-
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler)
-      this.escapeHandler = null
-    }
+    // Detach escape handler
+    this.escapeHandler.detach()
 
     this.element.dispatchEvent(new CustomEvent("alertdialog:close", {
       bubbles: true,
@@ -92,22 +91,8 @@ export default class extends Controller {
     event.stopPropagation()
   }
 
-  setupFocusTrap() {
-    if (!this.hasContentTarget) return
-
-    const focusableElements = this.contentTarget.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus()
-    }
-  }
-
   disconnect() {
-    document.body.style.overflow = ""
-    if (this.escapeHandler) {
-      document.removeEventListener("keydown", this.escapeHandler)
-    }
+    unlockScroll()
+    this.escapeHandler.detach()
   }
 }

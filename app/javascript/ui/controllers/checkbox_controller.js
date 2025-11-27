@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { syncCheckedState } from "../utils/state-manager.js"
 
 // Checkbox controller - syncs checked state with data-state attribute
 // This allows CSS selectors like data-[state=checked]:bg-blue-600 to work
@@ -20,13 +21,7 @@ export default class extends Controller {
   }
 
   updateState() {
-    // Sync checked state with data-state attribute
-    if (this.element.checked) {
-      this.element.dataset.state = 'checked'
-      this.element.setAttribute('aria-checked', 'true')
-    } else {
-      this.element.dataset.state = 'unchecked'
-      this.element.setAttribute('aria-checked', 'false')
-    }
+    // Sync checked state with data-state and aria-checked attributes
+    syncCheckedState(this.element, this.element.checked)
   }
 }

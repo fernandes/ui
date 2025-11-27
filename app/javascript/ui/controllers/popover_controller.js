@@ -1,5 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
-import { computePosition, flip, offset, shift, autoUpdate } from "@floating-ui/dom"
+import { setState } from "../utils/state-manager.js"
+import { createPositioner } from "../utils/floating-ui-positioner.js"
+import { onEscapeKeyWhen } from "../utils/escape-key-manager.js"
+import { createClickOutsideHandler } from "../utils/click-outside-manager.js"
 
 // Popover controller for floating content panels using Floating UI
 export default class extends Controller {
@@ -12,12 +15,6 @@ export default class extends Controller {
     hoverDelay: { type: Number, default: 200 }
   }
 
-  constructor() {
-    super(...arguments)
-    this.cleanup = null
-    this.hoverTimeout = null
-  }
-
   connect() {
     console.log("placement", this.placementValue)
     // Only setup if we have both targets
@@ -27,8 +24,14 @@ export default class extends Controller {
 
     // Set initial state attribute
     if (!this.contentTarget.hasAttribute('data-state')) {
-      this.contentTarget.setAttribute('data-state', this.openValue ? 'open' : 'closed')
+      setState(this.contentTarget, this.openValue ? 'open' : 'closed')
     }
+
+    // Setup positioner
+    this.positioner = createPositioner(this.triggerTarget, this.contentTarget, {
+      placement: this.placementValue,
+      offsetValue: this.offsetValue
+    })
 
     // Setup trigger-based interaction
     // "manual" mode means the popover is controlled programmatically
@@ -39,16 +42,15 @@ export default class extends Controller {
     }
     // If trigger is "manual", don't setup any automatic handlers
 
-    // Close on Escape key
-    this.boundHandleEscape = this.handleEscape.bind(this)
-    document.addEventListener('keydown', this.boundHandleEscape)
+    // Close on Escape key (only when open)
+    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.openValue)
   }
 
   disconnect() {
-    // Cleanup Floating UI auto-update
-    if (this.cleanup) {
-      this.cleanup()
-      this.cleanup = null
+    // Cleanup positioner
+    if (this.positioner) {
+      this.positioner.stop()
+      this.positioner = null
     }
 
     // Clear hover timeout
@@ -57,17 +59,22 @@ export default class extends Controller {
       this.hoverTimeout = null
     }
 
-    // Remove event listeners
-    document.removeEventListener('keydown', this.boundHandleEscape)
-
-    if (this.boundHandleClickOutside) {
-      document.removeEventListener('click', this.boundHandleClickOutside)
+    // Remove escape key listener
+    if (this.cleanupEscape) {
+      this.cleanupEscape()
     }
 
+    // Remove click outside handler
+    if (this.clickOutsideHandler) {
+      this.clickOutsideHandler.detach()
+    }
+
+    // Remove trigger click handler
     if (this.boundHandleTriggerClick) {
       this.triggerTarget.removeEventListener('click', this.boundHandleTriggerClick)
     }
 
+    // Remove hover handlers
     if (this.boundHandleMouseEnter) {
       this.triggerTarget.removeEventListener('mouseenter', this.boundHandleMouseEnter)
       this.element.removeEventListener('mouseleave', this.boundHandleMouseLeave)
@@ -78,8 +85,12 @@ export default class extends Controller {
     this.boundHandleTriggerClick = this.toggle.bind(this)
     this.triggerTarget.addEventListener('click', this.boundHandleTriggerClick)
 
-    this.boundHandleClickOutside = this.handleClickOutside.bind(this)
-    document.addEventListener('click', this.boundHandleClickOutside)
+    // Setup click outside handler using utility
+    this.clickOutsideHandler = createClickOutsideHandler(
+      this.element,
+      () => this.hide()
+    )
+    this.clickOutsideHandler.attach()
   }
 
   setupHoverTrigger() {
@@ -103,8 +114,12 @@ export default class extends Controller {
 
   show() {
     this.openValue = true
-    this.contentTarget.setAttribute('data-state', 'open')
-    this.updatePosition()
+    setState(this.contentTarget, 'open')
+
+    // Start positioning
+    if (this.positioner) {
+      this.positioner.start()
+    }
 
     // Dispatch custom event for other controllers to listen
     this.element.dispatchEvent(new CustomEvent('popover:show', {
@@ -115,12 +130,11 @@ export default class extends Controller {
 
   hide() {
     this.openValue = false
-    this.contentTarget.setAttribute('data-state', 'closed')
+    setState(this.contentTarget, 'closed')
 
-    // Cleanup auto-update when hiding
-    if (this.cleanup) {
-      this.cleanup()
-      this.cleanup = null
+    // Stop positioning when hiding
+    if (this.positioner) {
+      this.positioner.stop()
     }
 
     // Dispatch custom event for other controllers to listen
@@ -128,12 +142,6 @@ export default class extends Controller {
       bubbles: true,
       detail: { popover: this }
     }))
-  }
-
-  handleClickOutside(event) {
-    if (!this.element.contains(event.target)) {
-      this.hide()
-    }
   }
 
   handleMouseEnter() {
@@ -153,62 +161,5 @@ export default class extends Controller {
     }
 
     this.hide()
-  }
-
-  handleEscape(event) {
-    if (event.key === 'Escape' && this.openValue && this.hasContentTarget) {
-      this.hide()
-    }
-  }
-
-  updatePosition() {
-    if (!this.hasTriggerTarget || !this.hasContentTarget) return
-
-    // Cleanup previous auto-update if exists
-    if (this.cleanup) {
-      this.cleanup()
-    }
-
-    // Setup middleware based on configuration
-    const middleware = []
-
-    // Always add offset if specified
-    if (this.offsetValue > 0) {
-      middleware.push(offset(this.offsetValue))
-    }
-
-    // Add flip to automatically adjust placement when overflowing
-    middleware.push(flip())
-
-    // Add shift to keep popover in viewport
-    middleware.push(shift({ padding: 8 }))
-
-    // Use autoUpdate to keep position synchronized
-    this.cleanup = autoUpdate(
-      this.triggerTarget,
-      this.contentTarget,
-      () => {
-        computePosition(this.triggerTarget, this.contentTarget, {
-          placement: this.placementValue,
-          middleware: middleware
-        }).then(({ x, y, placement, middlewareData }) => {
-          Object.assign(this.contentTarget.style, {
-            left: `${x}px`,
-            top: `${y}px`,
-          })
-
-          // Update data-side attribute for CSS styling
-          const side = placement.split('-')[0]
-          this.contentTarget.setAttribute('data-side', side)
-        })
-      },
-      {
-        ancestorScroll: true,
-        ancestorResize: true,
-        elementResize: true,
-        layoutShift: true,
-        animationFrame: true
-      }
-    )
   }
 }

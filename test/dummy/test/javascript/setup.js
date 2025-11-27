@@ -2,9 +2,16 @@
 // Automatically loaded by Bun before running tests
 
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
+import { afterEach } from "bun:test"
+import { resetScrollLockState } from "../../../../app/javascript/ui/utils/scroll-lock-manager.js"
 
 // Register happy-dom globals (document, window, etc.)
 GlobalRegistrator.register();
+
+// Reset shared utility state between tests
+afterEach(() => {
+  resetScrollLockState()
+})
 
 // Mock Element.setPointerCapture and releasePointerCapture for happy-dom
 Element.prototype.setPointerCapture = Element.prototype.setPointerCapture || function() {}

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { syncPressedState } from "../utils/state-manager.js"
 
 /**
  * Toggle Controller
@@ -43,8 +44,6 @@ export default class extends Controller {
    * Update the button's state attributes
    */
   updateState() {
-    const state = this.pressedValue ? "on" : "off"
-    this.element.setAttribute("data-state", state)
-    this.element.setAttribute("aria-pressed", this.pressedValue.toString())
+    syncPressedState(this.element, this.pressedValue, { useOnOff: true })
   }
 }
