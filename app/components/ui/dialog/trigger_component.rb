@@ -14,9 +14,15 @@ module UI
     #   <% end %>
     class TriggerComponent < ViewComponent::Base
       # @param as_child [Boolean] merge attributes into child element
+      # @param variant [Symbol] button variant (when not using as_child)
+      # @param size [Symbol] button size (when not using as_child)
+      # @param classes [String] additional CSS classes
       # @param attributes [Hash] additional HTML attributes
-      def initialize(as_child: false, **attributes)
+      def initialize(as_child: false, variant: :outline, size: :default, classes: "", **attributes)
         @as_child = as_child
+        @variant = variant
+        @size = size
+        @classes = classes
         @attributes = attributes
       end
 
@@ -55,8 +61,13 @@ module UI
             content
           end
         else
-          # Default: render as button
-          content_tag :button, content, **trigger_attrs
+          # Default: render as Button component
+          render(UI::Button::ButtonComponent.new(
+            variant: @variant,
+            size: @size,
+            classes: @classes,
+            **trigger_attrs
+          ).with_content(content))
         end
       end
     end
