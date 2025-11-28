@@ -147,16 +147,24 @@ export default class extends Controller {
   triggerSelect(item) {
     const value = item.dataset.value || item.textContent.trim()
 
+    // Dispatch event for listeners to handle selection
     this.element.dispatchEvent(new CustomEvent("command:select", {
       bubbles: true,
       detail: { value, item }
     }))
 
-    // Also check for custom action on the item
-    const onSelect = item.dataset.onSelect
-    if (onSelect) {
-      eval(onSelect)
+    // If item has an href, navigate to it
+    const href = item.dataset.href
+    if (href) {
+      if (item.dataset.turbo === "false") {
+        window.location.href = href
+      } else {
+        Turbo.visit(href)
+      }
     }
+
+    // If item has a Stimulus action defined, it will be triggered automatically
+    // via data-action attribute on the item element
   }
 
   updateSelection() {

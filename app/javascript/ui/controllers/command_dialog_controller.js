@@ -12,16 +12,48 @@ export default class extends Controller {
     // Find the nested dialog controller
     this.dialogElement = this.element.querySelector("[data-controller*='ui--dialog']")
 
+    // Bind handlers
+    this.boundHandleDialogClose = this.handleDialogClose.bind(this)
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this)
+
     // Listen for dialog close events to clear input
-    this.element.addEventListener("dialog:close", this.handleDialogClose.bind(this))
+    this.element.addEventListener("dialog:close", this.boundHandleDialogClose)
+
+    // Listen for focus out to close when focus leaves the dialog
+    this.element.addEventListener("focusout", this.boundHandleFocusOut)
   }
 
   disconnect() {
-    this.element.removeEventListener("dialog:close", this.handleDialogClose.bind(this))
+    this.element.removeEventListener("dialog:close", this.boundHandleDialogClose)
+    this.element.removeEventListener("focusout", this.boundHandleFocusOut)
   }
 
   handleDialogClose() {
     this.clearInput()
+  }
+
+  handleFocusOut(event) {
+    // Check if the dialog is open
+    if (!this.dialogElement) return
+
+    const dialogController = this.application.getControllerForElementAndIdentifier(
+      this.dialogElement,
+      "ui--dialog"
+    )
+
+    if (!dialogController || !dialogController.openValue) return
+
+    // Use setTimeout to check relatedTarget after the focus has moved
+    // This is necessary because relatedTarget might be null during the transition
+    setTimeout(() => {
+      // Check if the new focused element is outside the dialog
+      const activeElement = document.activeElement
+      const dialogContent = this.dialogElement.querySelector("[data-ui--dialog-target='content']")
+
+      if (dialogContent && !dialogContent.contains(activeElement)) {
+        dialogController.close()
+      }
+    }, 0)
   }
 
   toggle(event) {

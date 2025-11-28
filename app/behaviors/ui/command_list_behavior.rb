@@ -10,7 +10,8 @@ require "tailwind_merge"
         {
           class: command_list_classes,
           data: command_list_data_attributes,
-          role: "listbox"
+          role: "listbox",
+          tabindex: "-1" # Not focusable via Tab - navigation is via arrows in combobox input
         }
       end
 
@@ -32,6 +33,6 @@ require "tailwind_merge"
       private
 
       def command_list_base_classes
-        "max-h-[300px] overflow-x-hidden overflow-y-auto"
+        "max-h-[300px] overflow-x-hidden overflow-y-auto outline-none"
       end
     end

@@ -3038,9 +3038,13 @@ class CommandController extends Controller {
         item: item
       }
     }));
-    const onSelect = item.dataset.onSelect;
-    if (onSelect) {
-      eval(onSelect);
+    const href = item.dataset.href;
+    if (href) {
+      if (item.dataset.turbo === "false") {
+        window.location.href = href;
+      } else {
+        Turbo.visit(href);
+      }
     }
   }
   updateSelection() {
@@ -3294,13 +3298,29 @@ class CommandDialogController extends Controller {
   };
   connect() {
     this.dialogElement = this.element.querySelector("[data-controller*='ui--dialog']");
-    this.element.addEventListener("dialog:close", this.handleDialogClose.bind(this));
+    this.boundHandleDialogClose = this.handleDialogClose.bind(this);
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this);
+    this.element.addEventListener("dialog:close", this.boundHandleDialogClose);
+    this.element.addEventListener("focusout", this.boundHandleFocusOut);
   }
   disconnect() {
-    this.element.removeEventListener("dialog:close", this.handleDialogClose.bind(this));
+    this.element.removeEventListener("dialog:close", this.boundHandleDialogClose);
+    this.element.removeEventListener("focusout", this.boundHandleFocusOut);
   }
   handleDialogClose() {
     this.clearInput();
+  }
+  handleFocusOut(event) {
+    if (!this.dialogElement) return;
+    const dialogController = this.application.getControllerForElementAndIdentifier(this.dialogElement, "ui--dialog");
+    if (!dialogController || !dialogController.openValue) return;
+    setTimeout(() => {
+      const activeElement = document.activeElement;
+      const dialogContent = this.dialogElement.querySelector("[data-ui--dialog-target='content']");
+      if (dialogContent && !dialogContent.contains(activeElement)) {
+        dialogController.close();
+      }
+    }, 0);
   }
   toggle(event) {
     event.preventDefault();
