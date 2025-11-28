@@ -1,0 +1,73 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2025-11-28
+
+### Added
+
+- Initial release of fernandes-ui
+- Rails UI component library with ERB, Phlex, and ViewComponent support
+- Built with Tailwind CSS 4 and Stimulus.js
+- Components include:
+  - Accordion
+  - Alert
+  - Alert Dialog
+  - Aspect Ratio
+  - Avatar
+  - Badge
+  - Breadcrumb
+  - Button
+  - Calendar
+  - Card
+  - Carousel
+  - Checkbox
+  - Collapsible
+  - Combobox
+  - Command
+  - Context Menu
+  - Date Picker
+  - Dialog
+  - Drawer
+  - Dropdown Menu
+  - Field (Form)
+  - Hover Card
+  - Input
+  - Input OTP
+  - Kbd (Keyboard)
+  - Label
+  - Menubar
+  - Navigation Menu
+  - Pagination
+  - Popover
+  - Progress
+  - Radio Group
+  - Resizable
+  - Responsive Dialog
+  - Scroll Area
+  - Select
+  - Separator
+  - Sheet
+  - Sidebar
+  - Skeleton
+  - Slider
+  - Sonner (Toast)
+  - Spinner
+  - Switch
+  - Table
+  - Tabs
+  - Textarea
+  - Toggle
+  - Toggle Group
+  - Tooltip
+- Automatic detection and conditional loading of Phlex (>= 2.0) and ViewComponent (>= 3.0)
+- Manual configuration via `UI.configure` block
+- JavaScript controllers for interactive components
+- CSS variables for theming
+- Support for Rails 6.0+
+- Support for both Importmaps and jsbundling-rails approaches
+
+[0.1.0]: https://github.com/fernandes/ui/releases/tag/v0.1.0

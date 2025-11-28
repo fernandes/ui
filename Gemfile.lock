@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    ui (0.1.0)
+    fernandes-ui (0.1.0)
       lucide-rails (~> 0.1)
-      rails (>= 6.0)
+      rails (>= 6.0, < 9.0)
       tailwind_merge (~> 0.13)
 
 GEM
@@ -346,6 +346,7 @@ PLATFORMS
 
 DEPENDENCIES
   capybara-playwright-driver
+  fernandes-ui!
   hotwire-spark
   importmap-rails
   jsbundling-rails
@@ -355,7 +356,6 @@ DEPENDENCIES
   rubocop-rails-omakase
   sqlite3
   turbo-rails
-  ui!
   view_component (~> 3.0)
 
 BUNDLED WITH

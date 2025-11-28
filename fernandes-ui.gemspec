@@ -1,29 +1,31 @@
 require_relative "lib/ui/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "ui"
+  spec.name        = "fernandes-ui"
   spec.version     = UI::VERSION
   spec.authors     = [ "Celso Fernandes" ]
-  spec.email       = [ "celso.fernandes@gmail.com" ]
-  spec.homepage    = "TODO"
-  spec.summary     = "TODO: Summary of UI."
-  spec.description = "TODO: Description of UI."
+  spec.email       = [ "fernandes@coding.com.br" ]
+  spec.homepage    = "https://ui.coding.com.br"
+  spec.summary     = "A Rails UI component library with ERB, Phlex, and ViewComponent support"
+  spec.description = "A comprehensive UI component library for Rails applications. Provides reusable components in three formats: ERB partials, Phlex components, and ViewComponents. Built with Tailwind CSS 4 and Stimulus.js."
   spec.license     = "MIT"
 
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the "allowed_push_host"
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+  spec.required_ruby_version = ">= 3.0"
 
-  spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata = {
+    "homepage_uri" => "https://ui.coding.com.br",
+    "source_code_uri" => "https://github.com/fernandes/ui",
+    "changelog_uri" => "https://github.com/fernandes/ui/blob/main/CHANGELOG.md",
+    "bug_tracker_uri" => "https://github.com/fernandes/ui/issues",
+    "rubygems_mfa_required" => "true"
+  }
 
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   end
 
-  # Core dependency - support Rails 6.0 and above
-  spec.add_dependency "rails", ">= 6.0"
+  # Core dependency - support Rails 6.0 through 8.x
+  spec.add_dependency "rails", ">= 6.0", "< 9.0"
   spec.add_dependency "tailwind_merge", "~> 0.13"
   spec.add_dependency "lucide-rails", "~> 0.1"
 
