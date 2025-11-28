@@ -44,11 +44,11 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Vertical Separator in Navigation</h3>
         <nav class="flex items-center space-x-4 text-sm">
-          <a href="#" class="hover:underline">Home</a>
+          <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto") { "Home" } %>
           <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-          <a href="#" class="hover:underline">About</a>
+          <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto") { "About" } %>
           <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-          <a href="#" class="hover:underline">Contact</a>
+          <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto") { "Contact" } %>
         </nav>
       </div>
 
@@ -135,11 +135,11 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Vertical Separator in Menu</h3>
         <div class="flex items-center space-x-4 text-sm">
-          <button type="button" class="hover:text-foreground/80">Settings</button>
+          <%= render "ui/button/button", variant: :ghost, size: :sm do %>Settings<% end %>
           <%= render "ui/separator/separator", orientation: :vertical, classes: "h-4" %>
-          <button type="button" class="hover:text-foreground/80">Profile</button>
+          <%= render "ui/button/button", variant: :ghost, size: :sm do %>Profile<% end %>
           <%= render "ui/separator/separator", orientation: :vertical, classes: "h-4" %>
-          <button type="button" class="hover:text-foreground/80">Logout</button>
+          <%= render "ui/button/button", variant: :ghost, size: :sm do %>Logout<% end %>
         </div>
       </div>
     </div>
@@ -185,9 +185,9 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Vertical Separator in Breadcrumb</h3>
         <div class="flex items-center space-x-2 text-sm">
-          <a href="#" class="hover:underline">Home</a>
+          <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0 h-auto")) { "Home" } %>
           <%= render UI::Separator::SeparatorComponent.new(orientation: :vertical, classes: "h-4") %>
-          <a href="#" class="hover:underline">Components</a>
+          <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0 h-auto")) { "Components" } %>
           <%= render UI::Separator::SeparatorComponent.new(orientation: :vertical, classes: "h-4") %>
           <span class="text-muted-foreground">Separator</span>
         </div>
@@ -221,8 +221,8 @@
           </div>
           <%= render UI::Separator::Separator.new %>
           <div class="flex gap-2">
-            <button class="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md">Save</button>
-            <button class="px-3 py-1.5 text-sm border rounded-md">Cancel</button>
+            <%= render UI::Button::Button.new(size: :sm) { "Save" } %>
+            <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Cancel" } %>
           </div>
         </div>
       </div>
@@ -234,11 +234,11 @@
           <div class="flex items-center justify-between">
             <span class="font-medium">Document.pdf</span>
             <div class="flex items-center gap-2 text-sm">
-              <button class="hover:text-primary">Download</button>
+              <%= render UI::Button::Button.new(variant: :ghost, size: :sm) { "Download" } %>
               <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-              <button class="hover:text-primary">Share</button>
+              <%= render UI::Button::Button.new(variant: :ghost, size: :sm) { "Share" } %>
               <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-              <button class="hover:text-destructive">Delete</button>
+              <%= render UI::Button::Button.new(variant: :ghost, size: :sm, classes: "text-destructive hover:text-destructive") { "Delete" } %>
             </div>
           </div>
         </div>
