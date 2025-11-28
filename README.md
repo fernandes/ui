@@ -61,20 +61,11 @@ UI.registerControllers(application)
 
 ### CSS (cssbundling-rails)
 
-For apps using cssbundling-rails, import the styles:
+For apps using cssbundling-rails, use the generators to get UI css copied and then imported automatically.
 
-```css
-@import "@fernandes/ui/styles";
-```
-
-This provides CSS variables for theming. You still need to configure Tailwind to scan the engine files:
-
-```css
-@import "tailwindcss";
-@import "@fernandes/ui/styles";
-
-/* Scan engine files in node_modules */
-@source "../../node_modules/@fernandes/ui/app/**/*.js";
+```bash
+rails generate ui:css
+rails generate ui:install
 ```
 
 ### CSS (Propshaft/Sprockets)

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fernandes-ui (0.1.0)
+    fernandes-ui (0.1.1)
       lucide-rails (~> 0.1)
       rails (>= 6.0, < 9.0)
       tailwind_merge (~> 0.13)
