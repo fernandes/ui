@@ -40,9 +40,9 @@
         <%= render UI::Field::FieldSetComponent.new do %>
           <%= render UI::Field::FieldGroupComponent.new do %>
             <%= render UI::Field::FieldComponent.new do %>
-              <%= render UI::Label::LabelComponent.new(for: "feedback-vc", data: { slot: "field-label" }) { "Feedback" } %>
+              <%= render(UI::Label::LabelComponent.new(for: "feedback-vc", data: { slot: "field-label" })) { "Feedback" } %>
               <textarea id="feedback-vc" placeholder="Your feedback helps us improve..." rows="4" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
-              <%= render UI::Field::FieldDescriptionComponent.new { "Share your thoughts about our service." } %>
+              <%= render(UI::Field::FieldDescriptionComponent.new) { "Share your thoughts about our service." } %>
             <% end %>
           <% end %>
         <% end %>
@@ -120,27 +120,27 @@
       <div class="w-full max-w-md">
         <%= render UI::Field::FieldGroupComponent.new do %>
           <%= render UI::Field::FieldSetComponent.new do %>
-            <%= render UI::Label::LabelComponent.new(data: { slot: "field-label" }) { "Responses" } %>
-            <%= render UI::Field::FieldDescriptionComponent.new { "Get notified when ChatGPT responds to requests that take time." } %>
+            <%= render(UI::Label::LabelComponent.new(data: { slot: "field-label" })) { "Responses" } %>
+            <%= render(UI::Field::FieldDescriptionComponent.new) { "Get notified when ChatGPT responds to requests that take time." } %>
             <%= render UI::Field::FieldGroupComponent.new(data: { slot: "checkbox-group" }) do %>
               <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
                 <%= render UI::Checkbox::CheckboxComponent.new(id: "push-responses", checked: true, disabled: true) %>
-                <%= render UI::Label::LabelComponent.new(for: "push-responses", classes: "font-normal", data: { slot: "field-label" }) { "Push notifications" } %>
+                <%= render(UI::Label::LabelComponent.new(for: "push-responses", classes: "font-normal", data: { slot: "field-label" })) { "Push notifications" } %>
               <% end %>
             <% end %>
           <% end %>
           <%= render UI::Field::FieldSeparatorComponent.new %>
           <%= render UI::Field::FieldSetComponent.new do %>
-            <%= render UI::Label::LabelComponent.new(data: { slot: "field-label" }) { "Tasks" } %>
-            <%= render UI::Field::FieldDescriptionComponent.new { "Get notified when tasks you've created have updates." } %>
+            <%= render(UI::Label::LabelComponent.new(data: { slot: "field-label" })) { "Tasks" } %>
+            <%= render(UI::Field::FieldDescriptionComponent.new) { "Get notified when tasks you've created have updates." } %>
             <%= render UI::Field::FieldGroupComponent.new(data: { slot: "checkbox-group" }) do %>
               <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
                 <%= render UI::Checkbox::CheckboxComponent.new(id: "push-tasks") %>
-                <%= render UI::Label::LabelComponent.new(for: "push-tasks", classes: "font-normal", data: { slot: "field-label" }) { "Push notifications" } %>
+                <%= render(UI::Label::LabelComponent.new(for: "push-tasks", classes: "font-normal", data: { slot: "field-label" })) { "Push notifications" } %>
               <% end %>
               <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
                 <%= render UI::Checkbox::CheckboxComponent.new(id: "email-tasks") %>
-                <%= render UI::Label::LabelComponent.new(for: "email-tasks", classes: "font-normal", data: { slot: "field-label" }) { "Email notifications" } %>
+                <%= render(UI::Label::LabelComponent.new(for: "email-tasks", classes: "font-normal", data: { slot: "field-label" })) { "Email notifications" } %>
               <% end %>
             <% end %>
           <% end %>
@@ -224,14 +224,14 @@
       <div class="w-full max-w-md">
         <%= render UI::Field::FieldGroupComponent.new do %>
           <%= render UI::Field::FieldSetComponent.new do %>
-            <%= render UI::Label::LabelComponent.new(for: "compute-environment-vc") { "Compute Environment" } %>
-            <%= render UI::Field::FieldDescriptionComponent.new { "Select the compute environment for your cluster." } %>
+            <%= render(UI::Label::LabelComponent.new(for: "compute-environment-vc")) { "Compute Environment" } %>
+            <%= render(UI::Field::FieldDescriptionComponent.new) { "Select the compute environment for your cluster." } %>
             <div class="space-y-2" role="radiogroup">
               <%= render UI::Label::LabelComponent.new(for: "kubernetes-vc-r2h", data: { slot: "field-label" }) do %>
                 <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
                   <%= render UI::Field::FieldContentComponent.new do %>
-                    <%= render UI::Field::FieldTitleComponent.new { "Kubernetes" } %>
-                    <%= render UI::Field::FieldDescriptionComponent.new { "Run GPU workloads on a K8s configured cluster." } %>
+                    <%= render(UI::Field::FieldTitleComponent.new) { "Kubernetes" } %>
+                    <%= render(UI::Field::FieldDescriptionComponent.new) { "Run GPU workloads on a K8s configured cluster." } %>
                   <% end %>
                   <%= render UI::RadioButton::RadioButtonComponent.new(name: "compute-environment", value: "kubernetes", id: "kubernetes-vc-r2h", checked: true) %>
                 <% end %>
@@ -239,8 +239,8 @@
               <%= render UI::Label::LabelComponent.new(for: "vm-vc-z4k", data: { slot: "field-label" }) do %>
                 <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
                   <%= render UI::Field::FieldContentComponent.new do %>
-                    <%= render UI::Field::FieldTitleComponent.new { "Virtual Machine" } %>
-                    <%= render UI::Field::FieldDescriptionComponent.new { "Access a VM configured cluster to run GPU workloads." } %>
+                    <%= render(UI::Field::FieldTitleComponent.new) { "Virtual Machine" } %>
+                    <%= render(UI::Field::FieldDescriptionComponent.new) { "Access a VM configured cluster to run GPU workloads." } %>
                   <% end %>
                   <%= render UI::RadioButton::RadioButtonComponent.new(name: "compute-environment", value: "vm", id: "vm-vc-z4k") %>
                 <% end %>
