@@ -1,7 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { setState } from "../utils/state-manager.js"
 import { createPositioner } from "../utils/floating-ui-positioner.js"
-import { onEscapeKeyWhen } from "../utils/escape-key-manager.js"
 import { createClickOutsideHandler } from "../utils/click-outside-manager.js"
 
 // Popover controller for floating content panels using Floating UI
@@ -16,7 +15,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("placement", this.placementValue)
     // Only setup if we have both targets
     if (!this.hasTriggerTarget || !this.hasContentTarget) {
       return
@@ -42,8 +40,12 @@ export default class extends Controller {
     }
     // If trigger is "manual", don't setup any automatic handlers
 
-    // Close on Escape key (only when open)
-    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.openValue)
+    // Bind handlers (but don't attach keydown yet - only when open)
+    this.boundHandleKeydown = this.handleKeydown.bind(this)
+
+    // Listen for focus leaving the popover
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this)
+    this.element.addEventListener('focusout', this.boundHandleFocusOut)
   }
 
   disconnect() {
@@ -59,10 +61,8 @@ export default class extends Controller {
       this.hoverTimeout = null
     }
 
-    // Remove escape key listener
-    if (this.cleanupEscape) {
-      this.cleanupEscape()
-    }
+    // Remove keydown listener (in case still attached)
+    this.teardownKeyboardNavigation()
 
     // Remove click outside handler
     if (this.clickOutsideHandler) {
@@ -78,6 +78,49 @@ export default class extends Controller {
     if (this.boundHandleMouseEnter) {
       this.triggerTarget.removeEventListener('mouseenter', this.boundHandleMouseEnter)
       this.element.removeEventListener('mouseleave', this.boundHandleMouseLeave)
+    }
+
+    // Remove focusout handler
+    if (this.boundHandleFocusOut) {
+      this.element.removeEventListener('focusout', this.boundHandleFocusOut)
+    }
+  }
+
+  setupKeyboardNavigation() {
+    document.addEventListener('keydown', this.boundHandleKeydown)
+  }
+
+  teardownKeyboardNavigation() {
+    if (this.boundHandleKeydown) {
+      document.removeEventListener('keydown', this.boundHandleKeydown)
+    }
+  }
+
+  handleFocusOut(event) {
+    // Don't do anything if popover is not open or if we're closing programmatically
+    if (!this.openValue || this.isClosing) return
+
+    // Check if focus is moving outside the popover element
+    // Use setTimeout to allow the new focus target to be set
+    setTimeout(() => {
+      const newFocusedElement = document.activeElement
+
+      if (newFocusedElement === document.body) {
+        return this.hide({returnFocus: true})
+      }
+
+      // If the new focused element is outside our popover, close without returning focus
+      if (!this.element.contains(newFocusedElement)) {
+        this.hide({ returnFocus: false })
+      }
+    }, 0)
+  }
+
+  handleKeydown(event) {
+    // Only handle Escape when popover is open
+    if (event.key === 'Escape' && this.openValue) {
+      event.preventDefault()
+      this.hide({ returnFocus: true })
     }
   }
 
@@ -113,13 +156,23 @@ export default class extends Controller {
   }
 
   show() {
+    // Store the element that triggered the popover (WAI-ARIA best practice)
+    // This ensures we can return focus to it when closing
+    this.triggerElementToFocus = this.findTriggerElementToFocus()
+
     this.openValue = true
     setState(this.contentTarget, 'open')
+
+    // Remove hidden class if present
+    this.contentTarget.classList.remove('hidden')
 
     // Start positioning
     if (this.positioner) {
       this.positioner.start()
     }
+
+    // Setup keyboard navigation
+    this.setupKeyboardNavigation()
 
     // Dispatch custom event for other controllers to listen
     this.element.dispatchEvent(new CustomEvent('popover:show', {
@@ -128,13 +181,52 @@ export default class extends Controller {
     }))
   }
 
-  hide() {
+  // Find the focusable element in the trigger area and store reference
+  findTriggerElementToFocus() {
+    if (!this.triggerTarget) return null
+
+    // Check if trigger itself is focusable
+    const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+
+    if (isFocusable) {
+      return this.triggerTarget
+    } else {
+      // Find first focusable element inside the trigger
+      return this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    }
+  }
+
+  hide(options = {}) {
+    const { returnFocus = false } = options
+
+    // Set flag to prevent handleFocusOut from interfering
+    this.isClosing = true
+
     this.openValue = false
     setState(this.contentTarget, 'closed')
+
+    // Also add hidden class like dropdown does for immediate hide
+    this.contentTarget.classList.add('hidden')
 
     // Stop positioning when hiding
     if (this.positioner) {
       this.positioner.stop()
+    }
+
+    // Teardown keyboard navigation
+    this.teardownKeyboardNavigation()
+
+    // Return focus to the stored trigger element (WAI-ARIA best practice)
+    // Use longer timeout for Firefox compatibility - allows browser to fully process close
+    if (returnFocus && this.triggerElementToFocus) {
+      setTimeout(() => {
+        if (this.triggerElementToFocus) {
+          this.triggerElementToFocus.focus()
+        }
+        this.isClosing = false
+      }, 100)
+    } else {
+      this.isClosing = false
     }
 
     // Dispatch custom event for other controllers to listen

@@ -39,6 +39,8 @@ module UI
           # Yield attributes to block - child must accept and apply them
           yield(trigger_attrs) if block_given?
         else
+          # Add tabindex for keyboard focus on non-focusable elements
+          trigger_attrs[:tabindex] ||= "0" if [:span, :div].include?(@tag)
           # Default: render as specified tag (span by default)
           public_send(@tag, **trigger_attrs, &block)
         end

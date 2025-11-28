@@ -11,9 +11,9 @@ module UI
     # @example Basic usage
     #   <%= render UI::HoverCard::TriggerComponent.new { "Hover me" } %>
     #
-    # @example With asChild - compose with Button
-    #   <%= render UI::HoverCard::TriggerComponent.new(as_child: true) do |attrs| %>
-    #     <%= render UI::Button::ButtonComponent.new(**attrs, variant: :link) { "@nextjs" } %>
+    # @example With asChild - compose with Button (yields attributes)
+    #   <%= render UI::HoverCard::TriggerComponent.new(as_child: true) do |trigger_attrs| %>
+    #     <%= render UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link) { "@nextjs" } %>
     #   <% end %>
     #
     # @example With custom tag
@@ -21,7 +21,7 @@ module UI
     class TriggerComponent < ViewComponent::Base
       include UI::HoverCard::HoverCardTriggerBehavior
 
-      # @param as_child [Boolean] If true, wraps content with data attributes
+      # @param as_child [Boolean] If true, yields attributes to block instead of wrapping
       # @param tag [Symbol] HTML tag to use for the trigger (default: :span)
       # @param classes [String] Additional CSS classes to merge
       # @param attributes [Hash] Additional HTML attributes
@@ -32,17 +32,25 @@ module UI
         @attributes = attributes
       end
 
-      def call
-        if @as_child
-          # Wrap content with data attributes
-          content_tag @tag, **trigger_html_attributes do
-            content
-          end
+      # Override render_in to pass trigger_attrs to block when as_child is true
+      def render_in(view_context, &block)
+        @view_context = view_context
+
+        if @as_child && block
+          # asChild pattern: call the block with trigger attributes
+          # Block should use these attrs on the actual trigger element
+          view_context.capture(trigger_html_attributes, &block)
         else
-          # Default: render with full styling
-          content_tag @tag, **trigger_html_attributes.merge(@attributes) do
-            content
-          end
+          super
+        end
+      end
+
+      def call
+        # Default: render with full styling and tabindex for keyboard focus
+        attrs = trigger_html_attributes.merge(@attributes)
+        attrs[:tabindex] ||= "0" if @tag == :span || @tag == :div
+        content_tag @tag, **attrs do
+          content
         end
       end
     end

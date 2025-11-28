@@ -10,6 +10,11 @@
 
   # Get HTML attributes from behavior
   trigger_attrs = trigger_html_attributes.deep_merge(@attributes)
+
+  # Add tabindex for keyboard focus on non-focusable elements
+  if [:span, :div].include?(@tag) && !trigger_attrs.key?(:tabindex)
+    trigger_attrs[:tabindex] = "0"
+  end
 -%>
 <% if @as_child %>
   <%# Yield attributes to block - child must accept and apply them %>

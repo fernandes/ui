@@ -34,9 +34,14 @@ module UI
 
       private
 
-      # Base classes applied to all hover card triggers - inline flex for proper alignment
+      # Base classes applied to all hover card triggers
+      # Includes inline-flex for alignment and focus ring for keyboard navigation
       def trigger_base_classes
-        "inline-flex"
+        [
+          "inline-flex",
+          "rounded-sm",
+          "outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+        ].join(" ")
       end
     end
   end

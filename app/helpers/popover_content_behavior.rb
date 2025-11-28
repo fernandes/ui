@@ -28,7 +28,7 @@ module PopoverContentBehavior
   def popover_content_data_attributes
     {
       ui__popover_target: "content",
-      state: "closed"
+      state: "closed",
     }
   end
 

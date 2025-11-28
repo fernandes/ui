@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { setState } from "../utils/state-manager.js"
 
 // Hover Card controller for floating content on hover
+// Supports both mouse hover and keyboard focus for accessibility
 export default class extends Controller {
   static targets = ["trigger", "content"]
   static values = {
@@ -20,10 +21,39 @@ export default class extends Controller {
     if (this.hasContentTarget) {
       this.contentTarget.style.position = 'fixed'
     }
+
+    // Setup focus/blur handlers on trigger for keyboard accessibility
+    if (this.hasTriggerTarget) {
+      this.boundHandleFocus = this.handleFocus.bind(this)
+      this.boundHandleBlur = this.handleBlur.bind(this)
+      this.triggerTarget.addEventListener('focus', this.boundHandleFocus)
+      this.triggerTarget.addEventListener('blur', this.boundHandleBlur)
+    }
   }
 
   disconnect() {
     this.clearTimeouts()
+
+    // Remove focus/blur handlers
+    if (this.hasTriggerTarget && this.boundHandleFocus) {
+      this.triggerTarget.removeEventListener('focus', this.boundHandleFocus)
+      this.triggerTarget.removeEventListener('blur', this.boundHandleBlur)
+    }
+  }
+
+  // Open on focus (for keyboard navigation)
+  handleFocus() {
+    this.show()
+  }
+
+  // Close on blur (when focus leaves trigger)
+  handleBlur(event) {
+    // Check if focus is moving to the content
+    // If so, don't hide yet
+    if (this.hasContentTarget && this.contentTarget.contains(event.relatedTarget)) {
+      return
+    }
+    this.hide()
   }
 
   show() {

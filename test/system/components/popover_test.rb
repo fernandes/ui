@@ -332,7 +332,7 @@ class PopoverTest < UI::SystemTestCase
 
   # === Positioning Edge Cases ===
 
-  test "opens multiple popovers independently" do
+  test "only one popover can be open at a time due to focus management" do
     popover1 = basic_popover
     popover2 = top_popover
 
@@ -345,14 +345,15 @@ class PopoverTest < UI::SystemTestCase
     assert popover1.open?
     assert popover2.closed?
 
-    # Close first with escape key (more reliable than clicking outside)
-    popover1.close_with_escape
-    assert popover1.closed?
+    # Opening second popover closes the first (focus leaves first popover)
+    popover2.trigger.click
+    sleep 0.2 # Wait for focus management to settle
 
-    # Open second popover
-    popover2.open
-    assert popover1.closed?
-    assert popover2.open?
+    # First popover should be closed (focus left it)
+    assert popover1.closed?, "First popover should close when clicking second trigger"
+
+    # Second popover should be open
+    assert popover2.open?, "Second popover should be open after clicking its trigger"
 
     # Clean up
     popover2.close_with_escape

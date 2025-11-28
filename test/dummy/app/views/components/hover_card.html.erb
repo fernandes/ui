@@ -62,8 +62,8 @@
     <div class="flex items-center gap-2">
       <span class="text-sm">Read more about</span>
       <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-        <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
-          <%= link_to "shadcn/ui", "https://ui.shadcn.com", class: "font-medium underline underline-offset-4" %>
+        <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+          <%= link_to "shadcn/ui", "https://ui.shadcn.com", **trigger_attrs, class: "font-medium underline underline-offset-4 rounded-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]" %>
         <% end %>
 
         <%= render(UI::HoverCard::ContentComponent.new(align: "start")) do %>
@@ -191,8 +191,8 @@
       <div class="flex flex-wrap gap-4">
         <%# User 1 %>
         <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
-            <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0")) do %>
+          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+            <%= render(UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
               @shadcn
             <% end %>
           <% end %>
@@ -223,8 +223,8 @@
 
         <%# User 2 %>
         <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
-            <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0")) do %>
+          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+            <%= render(UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
               @vercel
             <% end %>
           <% end %>
@@ -255,8 +255,8 @@
 
         <%# User 3 %>
         <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true, tag: :div)) do %>
-            <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0")) do %>
+          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+            <%= render(UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
               @github
             <% end %>
           <% end %>

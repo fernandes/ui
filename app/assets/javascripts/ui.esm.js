@@ -2379,7 +2379,7 @@ class AccordionController extends Controller {
   }
 }
 
-function createEscapeKeyHandler$1(onEscape, options = {}) {
+function createEscapeKeyHandler(onEscape, options = {}) {
   const {enabled: enabled = true, stopPropagation: stopPropagation = false, preventDefault: preventDefault = false} = options;
   let handler = null;
   let isAttached = false;
@@ -2424,7 +2424,7 @@ function createEscapeKeyHandler$1(onEscape, options = {}) {
 }
 
 function onEscapeKey(onEscape, options = {}) {
-  const handler = createEscapeKeyHandler$1(onEscape, options);
+  const handler = createEscapeKeyHandler(onEscape, options);
   handler.attach();
   return () => handler.detach();
 }
@@ -2541,7 +2541,7 @@ class AlertDialogController extends Controller {
     }
   };
   connect() {
-    this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
+    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
       enabled: this.closeOnEscapeValue
     });
     if (this.openValue) {
@@ -2670,7 +2670,7 @@ class DialogController extends Controller {
     }
   };
   connect() {
-    this.escapeHandler = createEscapeKeyHandler$1(() => this.close(), {
+    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
       enabled: this.closeOnEscapeValue
     });
     if (this.openValue) {
@@ -4023,9 +4023,28 @@ class HoverCardController extends Controller {
     if (this.hasContentTarget) {
       this.contentTarget.style.position = "fixed";
     }
+    if (this.hasTriggerTarget) {
+      this.boundHandleFocus = this.handleFocus.bind(this);
+      this.boundHandleBlur = this.handleBlur.bind(this);
+      this.triggerTarget.addEventListener("focus", this.boundHandleFocus);
+      this.triggerTarget.addEventListener("blur", this.boundHandleBlur);
+    }
   }
   disconnect() {
     this.clearTimeouts();
+    if (this.hasTriggerTarget && this.boundHandleFocus) {
+      this.triggerTarget.removeEventListener("focus", this.boundHandleFocus);
+      this.triggerTarget.removeEventListener("blur", this.boundHandleBlur);
+    }
+  }
+  handleFocus() {
+    this.show();
+  }
+  handleBlur(event) {
+    if (this.hasContentTarget && this.contentTarget.contains(event.relatedTarget)) {
+      return;
+    }
+    this.hide();
   }
   show() {
     this.clearTimeouts();
@@ -4500,7 +4519,6 @@ class PopoverController extends Controller {
     }
   };
   connect() {
-    console.log("placement", this.placementValue);
     if (!this.hasTriggerTarget || !this.hasContentTarget) {
       return;
     }
@@ -4516,7 +4534,9 @@ class PopoverController extends Controller {
     } else if (this.triggerValue === "hover") {
       this.setupHoverTrigger();
     }
-    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.openValue);
+    this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this);
+    this.element.addEventListener("focusout", this.boundHandleFocusOut);
   }
   disconnect() {
     if (this.positioner) {
@@ -4527,9 +4547,7 @@ class PopoverController extends Controller {
       clearTimeout(this.hoverTimeout);
       this.hoverTimeout = null;
     }
-    if (this.cleanupEscape) {
-      this.cleanupEscape();
-    }
+    this.teardownKeyboardNavigation();
     if (this.clickOutsideHandler) {
       this.clickOutsideHandler.detach();
     }
@@ -4539,6 +4557,41 @@ class PopoverController extends Controller {
     if (this.boundHandleMouseEnter) {
       this.triggerTarget.removeEventListener("mouseenter", this.boundHandleMouseEnter);
       this.element.removeEventListener("mouseleave", this.boundHandleMouseLeave);
+    }
+    if (this.boundHandleFocusOut) {
+      this.element.removeEventListener("focusout", this.boundHandleFocusOut);
+    }
+  }
+  setupKeyboardNavigation() {
+    document.addEventListener("keydown", this.boundHandleKeydown);
+  }
+  teardownKeyboardNavigation() {
+    if (this.boundHandleKeydown) {
+      document.removeEventListener("keydown", this.boundHandleKeydown);
+    }
+  }
+  handleFocusOut(event) {
+    if (!this.openValue || this.isClosing) return;
+    setTimeout(() => {
+      const newFocusedElement = document.activeElement;
+      if (newFocusedElement === document.body) {
+        return this.hide({
+          returnFocus: true
+        });
+      }
+      if (!this.element.contains(newFocusedElement)) {
+        this.hide({
+          returnFocus: false
+        });
+      }
+    }, 0);
+  }
+  handleKeydown(event) {
+    if (event.key === "Escape" && this.openValue) {
+      event.preventDefault();
+      this.hide({
+        returnFocus: true
+      });
     }
   }
   setupClickTrigger() {
@@ -4563,11 +4616,14 @@ class PopoverController extends Controller {
     }
   }
   show() {
+    this.triggerElementToFocus = this.findTriggerElementToFocus();
     this.openValue = true;
     setState(this.contentTarget, "open");
+    this.contentTarget.classList.remove("hidden");
     if (this.positioner) {
       this.positioner.start();
     }
+    this.setupKeyboardNavigation();
     this.element.dispatchEvent(new CustomEvent("popover:show", {
       bubbles: true,
       detail: {
@@ -4575,11 +4631,34 @@ class PopoverController extends Controller {
       }
     }));
   }
-  hide() {
+  findTriggerElementToFocus() {
+    if (!this.triggerTarget) return null;
+    const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (isFocusable) {
+      return this.triggerTarget;
+    } else {
+      return this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    }
+  }
+  hide(options = {}) {
+    const {returnFocus: returnFocus = false} = options;
+    this.isClosing = true;
     this.openValue = false;
     setState(this.contentTarget, "closed");
+    this.contentTarget.classList.add("hidden");
     if (this.positioner) {
       this.positioner.stop();
+    }
+    this.teardownKeyboardNavigation();
+    if (returnFocus && this.triggerElementToFocus) {
+      setTimeout(() => {
+        if (this.triggerElementToFocus) {
+          this.triggerElementToFocus.focus();
+        }
+        this.isClosing = false;
+      }, 100);
+    } else {
+      this.isClosing = false;
     }
     this.element.dispatchEvent(new CustomEvent("popover:hide", {
       bubbles: true,
