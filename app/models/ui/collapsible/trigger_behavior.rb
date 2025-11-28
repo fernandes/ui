@@ -35,7 +35,16 @@ module UI
 
       def collapsible_trigger_classes
         classes_value = respond_to?(:classes, true) ? classes : @classes
-        TailwindMerge::Merger.new.merge([TRIGGER_BASE_CLASSES, classes_value].compact.join(" "))
+        as_child_value = respond_to?(:as_child, true) ? as_child : @as_child
+
+        # Only apply base classes when NOT using as_child mode
+        # When as_child is true, the parent component provides its own styling
+        if as_child_value
+          return nil if classes_value.blank?
+          TailwindMerge::Merger.new.merge([classes_value].compact.join(" "))
+        else
+          TailwindMerge::Merger.new.merge([TRIGGER_BASE_CLASSES, classes_value].compact.join(" "))
+        end
       end
 
       def collapsible_trigger_data_attributes
