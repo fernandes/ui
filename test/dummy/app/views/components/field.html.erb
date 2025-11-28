@@ -96,17 +96,17 @@
           <%= render "ui/field/field_description" do %>
             Yearly and lifetime plans offer significant savings.
           <% end %>
-          <div data-controller="ui--radio-group" data-ui--radio-group-value-value="monthly">
+          <div class="space-y-2" role="radiogroup">
             <%= render "ui/field/field", orientation: "horizontal" do %>
-              <%= render "ui/radio_button/radio_button", value: "monthly", id: "plan-monthly-erb" %>
+              <%= render "ui/radio_button/radio_button", name: "subscription-plan", value: "monthly", id: "plan-monthly-erb", checked: true %>
               <%= render "ui/label/label", for_id: "plan-monthly-erb", content: "Monthly ($9.99/month)", classes: "font-normal", attributes: { data: { slot: "field-label" } } %>
             <% end %>
             <%= render "ui/field/field", orientation: "horizontal" do %>
-              <%= render "ui/radio_button/radio_button", value: "yearly", id: "plan-yearly-erb" %>
+              <%= render "ui/radio_button/radio_button", name: "subscription-plan", value: "yearly", id: "plan-yearly-erb" %>
               <%= render "ui/label/label", for_id: "plan-yearly-erb", content: "Yearly ($99.99/year)", classes: "font-normal", attributes: { data: { slot: "field-label" } } %>
             <% end %>
             <%= render "ui/field/field", orientation: "horizontal" do %>
-              <%= render "ui/radio_button/radio_button", value: "lifetime", id: "plan-lifetime-erb" %>
+              <%= render "ui/radio_button/radio_button", name: "subscription-plan", value: "lifetime", id: "plan-lifetime-erb" %>
               <%= render "ui/label/label", for_id: "plan-lifetime-erb", content: "Lifetime ($299.99)", classes: "font-normal", attributes: { data: { slot: "field-label" } } %>
             <% end %>
           </div>
@@ -226,14 +226,14 @@
           <%= render UI::Field::FieldSetComponent.new do %>
             <%= render UI::Label::LabelComponent.new(for: "compute-environment-vc") { "Compute Environment" } %>
             <%= render UI::Field::FieldDescriptionComponent.new { "Select the compute environment for your cluster." } %>
-            <div data-controller="ui--radio-group" data-ui--radio-group-value-value="kubernetes">
+            <div class="space-y-2" role="radiogroup">
               <%= render UI::Label::LabelComponent.new(for: "kubernetes-vc-r2h", data: { slot: "field-label" }) do %>
                 <%= render UI::Field::FieldComponent.new(orientation: "horizontal") do %>
                   <%= render UI::Field::FieldContentComponent.new do %>
                     <%= render UI::Field::FieldTitleComponent.new { "Kubernetes" } %>
                     <%= render UI::Field::FieldDescriptionComponent.new { "Run GPU workloads on a K8s configured cluster." } %>
                   <% end %>
-                  <%= render UI::RadioButton::RadioButtonComponent.new(value: "kubernetes", id: "kubernetes-vc-r2h") %>
+                  <%= render UI::RadioButton::RadioButtonComponent.new(name: "compute-environment", value: "kubernetes", id: "kubernetes-vc-r2h", checked: true) %>
                 <% end %>
               <% end %>
               <%= render UI::Label::LabelComponent.new(for: "vm-vc-z4k", data: { slot: "field-label" }) do %>
@@ -242,7 +242,7 @@
                     <%= render UI::Field::FieldTitleComponent.new { "Virtual Machine" } %>
                     <%= render UI::Field::FieldDescriptionComponent.new { "Access a VM configured cluster to run GPU workloads." } %>
                   <% end %>
-                  <%= render UI::RadioButton::RadioButtonComponent.new(value: "vm", id: "vm-vc-z4k") %>
+                  <%= render UI::RadioButton::RadioButtonComponent.new(name: "compute-environment", value: "vm", id: "vm-vc-z4k") %>
                 <% end %>
               <% end %>
             </div>
