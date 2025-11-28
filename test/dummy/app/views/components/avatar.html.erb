@@ -274,7 +274,7 @@
       <!-- Dropdown Trigger -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">As Button/Dropdown Trigger</h3>
-        <button class="flex items-center gap-2 rounded-full ring-offset-background transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-2 p-1">
+        <%= render(UI::Button::ButtonComponent.new(variant: :ghost, classes: "flex items-center gap-2 rounded-full p-1 h-auto")) do %>
           <%= render(UI::Avatar::AvatarComponent.new) do %>
             <%= render(UI::Avatar::ImageComponent.new(
               src: "https://avatars.githubusercontent.com/u/517743?s=256&v=4",
@@ -283,7 +283,7 @@
             <%= render(UI::Avatar::FallbackComponent.new) { "FF" } %>
           <% end %>
           <span class="pr-2">Celso Fernandes</span>
-        </button>
+        <% end %>
       </div>
     </div>
   </section>

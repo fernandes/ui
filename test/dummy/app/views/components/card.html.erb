@@ -85,7 +85,7 @@
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
                   <%= render UI::Label::Label.new(for: "password") { "Password" } %>
-                  <a href="#" class="text-sm text-muted-foreground hover:underline">Forgot your password?</a>
+                  <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto text-sm text-muted-foreground") { "Forgot your password?" } %>
                 </div>
                 <%= render UI::Input::Input.new(type: "password", id: "password") %>
               </div>
