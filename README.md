@@ -39,6 +39,13 @@ pin_all_from "ui/controllers", under: "ui/controllers"
 
 The gem automatically provides these pins via the engine.
 
+Then setup the JS controllers
+
+```javascript
+import { registerControllers } from "ui"
+registerControllers(application)
+```
+
 ### JavaScript (jsbundling-rails)
 
 For apps using Bun, esbuild, or Webpack:
