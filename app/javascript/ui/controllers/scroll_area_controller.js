@@ -45,6 +45,43 @@ export default class extends Controller {
     // Setup drag handlers
     this.boundHandlePointerMove = this.handlePointerMove.bind(this)
     this.boundHandlePointerUp = this.handlePointerUp.bind(this)
+
+    // Setup focus handlers for keyboard navigation
+    this.setupFocusHandlers()
+  }
+
+  setupFocusHandlers() {
+    if (!this.hasViewportTarget) return
+
+    this.boundHandleViewportFocus = this.handleViewportFocus.bind(this)
+    this.boundHandleViewportFocusOut = this.handleViewportFocusOut.bind(this)
+
+    this.viewportTarget.addEventListener('focus', this.boundHandleViewportFocus)
+    this.viewportTarget.addEventListener('focusout', this.boundHandleViewportFocusOut)
+  }
+
+  handleViewportFocus() {
+    // Show all scrollbars when viewport receives focus (keyboard navigation)
+    this.scrollbarTargets.forEach(scrollbar => {
+      // Clear any pending hide timer
+      const timer = this.hideTimers.get(scrollbar)
+      if (timer) {
+        clearTimeout(timer)
+        this.hideTimers.delete(scrollbar)
+      }
+      scrollbar.dataset.state = 'visible'
+    })
+  }
+
+  handleViewportFocusOut() {
+    // Hide scrollbars after delay when focus leaves viewport
+    this.scrollbarTargets.forEach(scrollbar => {
+      const timer = setTimeout(() => {
+        scrollbar.dataset.state = 'hidden'
+        this.hideTimers.delete(scrollbar)
+      }, this.scrollHideDelayValue)
+      this.hideTimers.set(scrollbar, timer)
+    })
   }
 
   applyViewportOverflow() {
@@ -566,6 +603,16 @@ export default class extends Controller {
     // Clean up drag listeners
     document.removeEventListener("pointermove", this.boundHandlePointerMove)
     document.removeEventListener("pointerup", this.boundHandlePointerUp)
+
+    // Clean up viewport focus handlers
+    if (this.hasViewportTarget) {
+      if (this.boundHandleViewportFocus) {
+        this.viewportTarget.removeEventListener('focus', this.boundHandleViewportFocus)
+      }
+      if (this.boundHandleViewportFocusOut) {
+        this.viewportTarget.removeEventListener('focusout', this.boundHandleViewportFocusOut)
+      }
+    }
 
     // Clear all timers
     this.hideTimers.forEach(timer => clearTimeout(timer))

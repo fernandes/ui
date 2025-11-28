@@ -171,6 +171,68 @@ module UI
       assert scroll_area.vertical_scrollbar_visible?
     end
 
+    # === Scrollbar Visibility (Keyboard Focus) ===
+
+    test "scrollbar shows on viewport focus" do
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
+
+      # Initially hidden
+      refute scroll_area.vertical_scrollbar_visible?
+
+      # Focus the viewport
+      scroll_area.focus_viewport
+
+      # Scrollbar should be visible
+      scroll_area.wait_for_scrollbar_visible(:vertical)
+      assert scroll_area.vertical_scrollbar_visible?
+    end
+
+    test "scrollbar hides on viewport focusout" do
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
+
+      # Focus and verify visible
+      scroll_area.focus_viewport
+      scroll_area.wait_for_scrollbar_visible(:vertical)
+      assert scroll_area.vertical_scrollbar_visible?
+
+      # Click outside to blur
+      scroll_area.blur_viewport
+
+      # Scrollbar should hide after delay
+      scroll_area.wait_for_scrollbar_hidden(:vertical)
+      refute scroll_area.vertical_scrollbar_visible?
+    end
+
+    test "scrollbar remains visible during keyboard navigation" do
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
+
+      # Focus and verify visible
+      scroll_area.focus_viewport
+      scroll_area.wait_for_scrollbar_visible(:vertical)
+
+      # Arrow down multiple times
+      3.times { scroll_area.scroll_down_with_arrow }
+
+      # Scrollbar should still be visible (focus still in viewport)
+      assert scroll_area.vertical_scrollbar_visible?
+    end
+
+    test "thumb position updates during keyboard navigation" do
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
+
+      scroll_area.focus_viewport
+      scroll_area.wait_for_scrollbar_visible(:vertical)
+
+      initial_ratio = scroll_area.vertical_thumb_position_ratio
+
+      # Scroll with arrow down
+      5.times { scroll_area.scroll_down_with_arrow }
+
+      # Thumb should have moved
+      new_ratio = scroll_area.vertical_thumb_position_ratio
+      assert new_ratio > initial_ratio, "Thumb should move down with arrow keys"
+    end
+
     # === Thumb Position Reflection ===
 
     test "thumb position reflects scroll position at top" do

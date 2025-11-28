@@ -472,6 +472,31 @@ module UI
         scroll_left.to_f / max_scroll_left
       end
 
+      # === Focus Helpers ===
+
+      # Focus the viewport element
+      def focus_viewport
+        viewport.click
+        sleep 0.05
+      end
+
+      # Check if viewport is currently focused
+      #
+      # @return [Boolean]
+      #
+      def viewport_focused?
+        page.evaluate_script(<<~JS)
+          document.activeElement === document.querySelector('##{node[:id]} [data-ui--scroll-area-target="viewport"]')
+        JS
+      end
+
+      # Remove focus from viewport by clicking outside
+      def blur_viewport
+        # Find the page title or body to click outside
+        page.find('h1').click
+        sleep 0.05
+      end
+
       # === Waiters ===
 
       # Wait for scroll position to reach a specific value

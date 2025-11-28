@@ -4659,6 +4659,33 @@
       this.setupScrollbarClickHandlers();
       this.boundHandlePointerMove = this.handlePointerMove.bind(this);
       this.boundHandlePointerUp = this.handlePointerUp.bind(this);
+      this.setupFocusHandlers();
+    }
+    setupFocusHandlers() {
+      if (!this.hasViewportTarget) return;
+      this.boundHandleViewportFocus = this.handleViewportFocus.bind(this);
+      this.boundHandleViewportFocusOut = this.handleViewportFocusOut.bind(this);
+      this.viewportTarget.addEventListener("focus", this.boundHandleViewportFocus);
+      this.viewportTarget.addEventListener("focusout", this.boundHandleViewportFocusOut);
+    }
+    handleViewportFocus() {
+      this.scrollbarTargets.forEach(scrollbar => {
+        const timer = this.hideTimers.get(scrollbar);
+        if (timer) {
+          clearTimeout(timer);
+          this.hideTimers.delete(scrollbar);
+        }
+        scrollbar.dataset.state = "visible";
+      });
+    }
+    handleViewportFocusOut() {
+      this.scrollbarTargets.forEach(scrollbar => {
+        const timer = setTimeout(() => {
+          scrollbar.dataset.state = "hidden";
+          this.hideTimers.delete(scrollbar);
+        }, this.scrollHideDelayValue);
+        this.hideTimers.set(scrollbar, timer);
+      });
     }
     applyViewportOverflow() {
       if (!this.hasViewportTarget) return;
@@ -5058,6 +5085,14 @@
       }
       document.removeEventListener("pointermove", this.boundHandlePointerMove);
       document.removeEventListener("pointerup", this.boundHandlePointerUp);
+      if (this.hasViewportTarget) {
+        if (this.boundHandleViewportFocus) {
+          this.viewportTarget.removeEventListener("focus", this.boundHandleViewportFocus);
+        }
+        if (this.boundHandleViewportFocusOut) {
+          this.viewportTarget.removeEventListener("focusout", this.boundHandleViewportFocusOut);
+        }
+      }
       this.hideTimers.forEach(timer => clearTimeout(timer));
       this.hideTimers.clear();
       this.scrollEndTimers.forEach(timer => clearTimeout(timer));

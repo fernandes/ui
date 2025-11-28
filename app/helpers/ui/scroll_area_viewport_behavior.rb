@@ -10,6 +10,7 @@ module UI::ScrollAreaViewportBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     {
       class: scroll_area_viewport_classes,
+      tabindex: 0,
       data: {
         slot: "scroll-area-viewport",
         ui_scroll_area_viewport: true
