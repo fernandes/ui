@@ -2,6 +2,10 @@ module UI
   class Engine < ::Rails::Engine
     isolate_namespace UI
 
+    # Configure autoload paths for organized structure
+    config.autoload_paths << root.join("app/behaviors")
+    config.autoload_paths << root.join("app/view_components")
+
     # Load Phlex and ViewComponent if available (development dependencies)
     begin
       require "phlex-rails"
