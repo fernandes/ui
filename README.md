@@ -14,85 +14,102 @@ A Rails engine providing a component library with Tailwind CSS 4 support. Design
 
 ## Installation
 
-Add this line to your application's Gemfile:
+### Ruby Gem
+
+Add to your Gemfile:
 
 ```ruby
-gem "ui"
+gem "fernandes-ui"
 ```
 
-And then execute:
+Then run:
 
 ```bash
 bundle install
-rails generate ui:install
 ```
 
-The installer will automatically detect your asset pipeline and configure the engine appropriately.
+### JavaScript (Importmaps)
+
+For Rails 7+ with importmaps, pin the engine in `config/importmap.rb`:
+
+```ruby
+pin "ui", to: "ui.esm.js", preload: true
+pin_all_from "ui/controllers", under: "ui/controllers"
+```
+
+The gem automatically provides these pins via the engine.
+
+### JavaScript (jsbundling-rails)
+
+For apps using Bun, esbuild, or Webpack:
+
+```bash
+bun add @fernandes/ui
+# or
+npm install @fernandes/ui
+```
+
+Then import in your JavaScript:
+
+```javascript
+import { Application } from "@hotwired/stimulus"
+import * as UI from "@fernandes/ui"
+
+const application = Application.start()
+UI.registerControllers(application)
+```
+
+### CSS (cssbundling-rails)
+
+For apps using cssbundling-rails, import the styles:
+
+```css
+@import "@fernandes/ui/styles";
+```
+
+This provides CSS variables for theming. You still need to configure Tailwind to scan the engine files:
+
+```css
+@import "tailwindcss";
+@import "@fernandes/ui/styles";
+
+/* Scan engine files in node_modules */
+@source "../../node_modules/@fernandes/ui/app/**/*.js";
+```
+
+### CSS (Propshaft/Sprockets)
+
+For apps using asset pipeline without bundler, import in your Tailwind config:
+
+```css
+@import "tailwindcss";
+@import "ui/application.css";
+
+/* Scan bundled gem files */
+@source "../../../.bundle/ruby/*/gems/fernandes-ui-*/app/**/*.{erb,rb,js}";
+```
 
 ## Usage
 
-The UI Engine provides CSS variables, Stimulus controllers, and components. You configure Tailwind CSS in your application, and the installer does this automatically.
-
-### JavaScript Integration
-
-The engine supports two approaches for JavaScript integration:
-
-#### **Option 1: Importmaps (Rails 8 Default, Zero-Build)**
-
-The engine automatically configures importmap pins. Just import and use:
-
-```javascript
-// app/javascript/application.js
-import { Application } from "@hotwired/stimulus"
-import * as UI from "ui"
-
-const application = Application.start()
-
-// Register all UI controllers
-UI.registerControllers(application)
-
-console.log("UI Engine version:", UI.version)
-```
-
-#### **Option 2: JavaScript Bundlers (Bun, esbuild, Webpack)**
-
-Install the engine as an npm package:
-
-```bash
-bun add @ui/engine
-# or
-npm install @ui/engine
-```
-
-Then import in your bundled JavaScript:
-
-```javascript
-// app/javascript/application.js
-import { Application } from "@hotwired/stimulus"
-import * as UI from "@ui/engine"
-
-const application = Application.start()
-
-// Register all UI controllers
-UI.registerControllers(application)
-```
+The UI Engine provides CSS variables, Stimulus controllers, and components. You configure Tailwind CSS in your application to scan the engine files.
 
 ### Selective Controller Import
 
 You can import only the controllers you need for better performance and tree-shaking:
 
-#### **Import Individual Controllers from Main Module**
+#### **Import Individual Controllers**
 
 ```javascript
+// With jsbundling-rails
 import { Application } from "@hotwired/stimulus"
-import { HelloController, DropdownController } from "ui"
+import { HelloController, DropdownController } from "@fernandes/ui"
 
 const application = Application.start()
 application.register("ui--hello", HelloController)
 application.register("ui--dropdown", DropdownController)
 ```
 
-#### **Import Directly from Controller Files (Importmap)**
+#### **Import from Controller Files (Importmaps)**
 
 ```javascript
 import { Application } from "@hotwired/stimulus"
@@ -106,23 +123,22 @@ application.register("ui--hello", HelloController)
 
 ```javascript
 import { Application } from "@hotwired/stimulus"
-import { HelloController, registerControllersInto } from "ui"
+import { HelloController, registerControllersInto } from "@fernandes/ui"
 
 const application = Application.start()
 
 // Register only specific controllers
 registerControllersInto(application, {
   "ui--hello": HelloController
-  // Don't register DropdownController
 })
 ```
 
 ### Benefits of Selective Import
 
-✅ **Tree-shaking** - Bundlers eliminate unused code
-✅ **Flexibility** - Choose exactly what to import
-✅ **Performance** - Load only what you need
-✅ **Compatibility** - Works with both importmaps and bundlers
+- **Tree-shaking** - Bundlers eliminate unused code
+- **Flexibility** - Choose exactly what to import
+- **Performance** - Load only what you need
+- **Compatibility** - Works with both importmaps and bundlers
 
 ## Available Components
 
@@ -235,19 +251,24 @@ bun run build:css:prod
 ```
 app/
 ├── assets/
-│   └── stylesheets/ui/
-│       └── application.css     # CSS variables (shipped with gem)
+│   ├── stylesheets/ui/
+│   │   └── application.css     # CSS variables (shipped with gem)
+│   └── javascripts/
+│       ├── ui.js               # UMD bundle
+│       └── ui.esm.js           # ESM bundle
 ├── behaviors/ui/               # Shared behavior modules (always loaded)
 │   ├── button_behavior.rb
 │   └── ...
-├── components/ui/              # Phlex components (loaded if phlex-rails available)
+├── components/ui/              # Phlex components (loaded if phlex-rails >= 2.0)
 │   ├── button.rb
 │   └── ...
-├── view_components/ui/         # ViewComponents (loaded if view_component available)
+├── view_components/ui/         # ViewComponents (loaded if view_component >= 3.0)
 │   ├── button_component.rb
 │   └── ...
 ├── javascript/ui/
-│   └── index.js                # JavaScript entry point
+│   ├── index.js                # JavaScript entry point
+│   ├── controllers/            # Stimulus controllers
+│   └── utils/                  # Utility modules
 ├── views/ui/                   # ERB partials (always available)
 │   ├── _button.html.erb
 │   └── ...
@@ -257,17 +278,9 @@ config/
 └── importmap.rb                # Importmap pins for JS modules
 
 lib/
-├── generators/ui/install/
-│   ├── install_generator.rb   # Installation generator
-│   └── templates/             # Templates for host app setup
 └── ui/
-    ├── configuration.rb       # UI.configure settings
-    └── engine.rb              # Engine configuration
-
-test/dummy/                     # Test application
-├── app/assets/stylesheets/
-│   └── application.tailwind.css  # Tailwind config (NOT in engine!)
-└── package.json               # Tailwind CLI (NOT in engine!)
+    ├── configuration.rb        # UI.configure settings
+    └── engine.rb               # Engine configuration
 ```
 
 ## Component Formats
@@ -356,7 +369,7 @@ This approach:
 
 ## Tailwind CSS 4 Configuration
 
-Your application (not the engine) configures Tailwind. The generator creates `app/assets/stylesheets/application.tailwind.css`:
+Your application (not the engine) configures Tailwind. Create `app/assets/stylesheets/application.tailwind.css`:
 
 ```css
 @import "tailwindcss";
@@ -366,12 +379,8 @@ Your application (not the engine) configures Tailwind. The generator creates `ap
 @source "../../javascript/**/*.js";
 @source "../../views/**/*.erb";
 
-/* Scan ENGINE files for Tailwind classes */
-@source "../../../../../app/javascript/**/*.js";  /* If local gem */
-@source "../../../../../app/views/**/*.erb";      /* If local gem */
-
-/* Or scan bundled gem (adjust path as needed) */
-@source "../../../.bundle/ruby/*/gems/ui-*/app/**/*.{erb,rb,js}";
+/* Scan bundled gem files */
+@source "../../../.bundle/ruby/*/gems/fernandes-ui-*/app/**/*.{erb,rb,js}";
 
 @theme {
   /* Customize using engine variables */

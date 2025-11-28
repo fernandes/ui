@@ -24,11 +24,9 @@
   },
   "description": "UI Engine - Rails component library with Tailwind CSS",
   "files": [
-    "app/assets/stylesheets/**/*",
-    "app/assets/javascripts/**/*",
-    "app/javascript/**/*",
-    "app/views/**/*",
-    "app/components/**/*"
+    "app/assets/javascripts/**/*.js",
+    "app/assets/stylesheets/**/*.css",
+    "app/javascript/**/*.js"
   ],
   "keywords": [
     "rails",
