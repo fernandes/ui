@@ -237,11 +237,21 @@ app/
 ├── assets/
 │   └── stylesheets/ui/
 │       └── application.css     # CSS variables (shipped with gem)
+├── behaviors/ui/               # Shared behavior modules (always loaded)
+│   ├── button_behavior.rb
+│   └── ...
+├── components/ui/              # Phlex components (loaded if phlex-rails available)
+│   ├── button.rb
+│   └── ...
+├── view_components/ui/         # ViewComponents (loaded if view_component available)
+│   ├── button_component.rb
+│   └── ...
 ├── javascript/ui/
 │   └── index.js                # JavaScript entry point
-├── views/ui/                   # Engine views (scanned by host Tailwind)
-├── controllers/ui/             # Engine controllers
-└── components/ui/              # Ruby components (optional)
+├── views/ui/                   # ERB partials (always available)
+│   ├── _button.html.erb
+│   └── ...
+└── controllers/ui/             # Engine controllers
 
 config/
 └── importmap.rb                # Importmap pins for JS modules
@@ -251,12 +261,83 @@ lib/
 │   ├── install_generator.rb   # Installation generator
 │   └── templates/             # Templates for host app setup
 └── ui/
+    ├── configuration.rb       # UI.configure settings
     └── engine.rb              # Engine configuration
 
 test/dummy/                     # Test application
 ├── app/assets/stylesheets/
 │   └── application.tailwind.css  # Tailwind config (NOT in engine!)
 └── package.json               # Tailwind CLI (NOT in engine!)
+```
+
+## Component Formats
+
+The engine supports three component formats:
+
+| Format | Directory | Required Gem | Description |
+|--------|-----------|--------------|-------------|
+| **ERB Partials** | `app/views/ui/` | None | Always available, uses Behaviors |
+| **Phlex** | `app/components/ui/` | `phlex-rails` >= 2.0 | Ruby-first components |
+| **ViewComponent** | `app/view_components/ui/` | `view_component` >= 3.0 | GitHub's ViewComponent |
+
+### Automatic Loading
+
+By default, the engine automatically detects which gems are available and loads the appropriate components:
+
+- **Behaviors** (`app/behaviors/ui/`) - Always loaded (required for ERB)
+- **Phlex** - Loaded if `phlex-rails` gem is present and version >= 2.0.0
+- **ViewComponent** - Loaded if `view_component` gem is present and version >= 3.0.0
+
+### Manual Configuration
+
+You can override automatic detection by configuring before Rails loads. Add to `config/application.rb` **before** `Bundler.require`:
+
+```ruby
+# config/application.rb
+require_relative "boot"
+
+# Configure UI before Bundler.require loads the engine
+require "ui/configuration"
+UI.configure do |c|
+  c.enable_phlex = true           # Force enable (skip version check)
+  c.enable_view_component = false # Force disable (don't load even if gem exists)
+end
+
+require "rails/all"
+Bundler.require(*Rails.groups)
+# ...
+```
+
+#### Configuration Options
+
+| Value | Behavior |
+|-------|----------|
+| `nil` (default) | Auto-detect: loads if gem available AND version meets minimum |
+| `true` | Force enable: loads if gem available (ignores version check) |
+| `false` | Force disable: never loads, even if gem is available |
+
+#### Use Cases
+
+**Force Enable** - Testing with unsupported gem versions:
+```ruby
+UI.configure do |c|
+  c.enable_phlex = true  # Use Phlex even if version < 2.0
+end
+```
+
+**Force Disable** - Legacy gems in app that shouldn't be used:
+```ruby
+UI.configure do |c|
+  c.enable_view_component = false  # Don't load even though gem exists
+end
+```
+
+**ERB Only** - Minimal setup without optional dependencies:
+```ruby
+UI.configure do |c|
+  c.enable_phlex = false
+  c.enable_view_component = false
+end
 ```
 
 ## Architecture: Why Tailwind Config Lives in Host App

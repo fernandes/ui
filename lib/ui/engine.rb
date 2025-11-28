@@ -1,22 +1,100 @@
+require_relative "configuration"
+
 module UI
   class Engine < ::Rails::Engine
     isolate_namespace UI
 
-    # Configure autoload paths for organized structure
-    config.autoload_paths << root.join("app/behaviors")
-    config.autoload_paths << root.join("app/view_components")
+    # ==========================================================================
+    # Optional Dependencies
+    # ==========================================================================
+    # Loading behavior is controlled by UI.configuration:
+    #   - nil (default): auto-detect based on gem availability and version
+    #   - true: force enable (skip version check, useful for testing)
+    #   - false: force disable (don't load even if gem is available)
+    #
+    # Minimum version requirements (for auto-detect):
+    #   - phlex: >= 2.0.0
+    #   - view_component: >= 3.0.0
 
-    # Load Phlex and ViewComponent if available (development dependencies)
-    begin
-      require "phlex-rails"
-    rescue LoadError
-      # Phlex not available - Phlex components won't work
+    PHLEX_MIN_VERSION = Gem::Version.new("2.0.0")
+    VIEW_COMPONENT_MIN_VERSION = Gem::Version.new("3.0.0")
+
+    # Determine if Phlex should be loaded
+    phlex_enabled = case UI.configuration.enable_phlex
+    when true
+      # Force enable - try to load without version check
+      begin
+        require "phlex-rails"
+        true
+      rescue LoadError
+        warn "[UI] Phlex force-enabled but gem not found. Phlex components won't be loaded."
+        false
+      end
+    when false
+      # Force disable
+      false
+    else
+      # Auto-detect (nil)
+      begin
+        require "phlex-rails"
+        phlex_spec = Gem.loaded_specs["phlex"]
+        if phlex_spec && phlex_spec.version >= PHLEX_MIN_VERSION
+          true
+        else
+          version = phlex_spec&.version || "unknown"
+          warn "[UI] Phlex #{version} found, but >= #{PHLEX_MIN_VERSION} is required. Phlex components won't be loaded."
+          false
+        end
+      rescue LoadError
+        false
+      end
     end
 
-    begin
-      require "view_component"
-    rescue LoadError
-      # ViewComponent not available - ViewComponent components won't work
+    # Determine if ViewComponent should be loaded
+    view_component_enabled = case UI.configuration.enable_view_component
+    when true
+      # Force enable - try to load without version check
+      begin
+        require "view_component"
+        true
+      rescue LoadError
+        warn "[UI] ViewComponent force-enabled but gem not found. ViewComponents won't be loaded."
+        false
+      end
+    when false
+      # Force disable
+      false
+    else
+      # Auto-detect (nil)
+      begin
+        require "view_component"
+        vc_spec = Gem.loaded_specs["view_component"]
+        if vc_spec && vc_spec.version >= VIEW_COMPONENT_MIN_VERSION
+          true
+        else
+          version = vc_spec&.version || "unknown"
+          warn "[UI] ViewComponent #{version} found, but >= #{VIEW_COMPONENT_MIN_VERSION} is required. ViewComponents won't be loaded."
+          false
+        end
+      rescue LoadError
+        false
+      end
+    end
+
+    # ==========================================================================
+    # Autoload Paths Configuration
+    # ==========================================================================
+    # Behaviors are always loaded (required for ERB partials)
+    config.autoload_paths << root.join("app/behaviors")
+
+    # Phlex components
+    if phlex_enabled
+      config.autoload_paths << root.join("app/components")
+    end
+
+    # ViewComponents
+    if view_component_enabled
+      config.autoload_paths << root.join("app/view_components")
     end
 
     initializer "setup_inflections" do
