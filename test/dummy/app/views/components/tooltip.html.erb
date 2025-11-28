@@ -164,9 +164,7 @@
         <div class="flex items-center gap-4">
           <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-with-button" } do %>
             <%= render "ui/tooltip/trigger" do %>
-              <%= render "ui/button/button", variant: :outline do %>
-                Delete (ERB)
-              <% end %>
+              Delete (ERB)
             <% end %>
             <%= render "ui/tooltip/content" do %>
               Delete this item
@@ -181,9 +179,7 @@
         <div class="flex items-center gap-4">
           <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-destructive" } do %>
             <%= render "ui/tooltip/trigger" do %>
-              <%= render "ui/button/button", variant: :destructive do %>
-                Delete Permanently
-              <% end %>
+              Delete Permanently
             <% end %>
             <%= render "ui/tooltip/content" do %>
               This action cannot be undone
@@ -291,9 +287,7 @@
         <div class="flex items-center gap-4">
           <%= render UI::Tooltip::TooltipComponent.new do %>
             <%= render UI::Tooltip::TriggerComponent.new do %>
-              <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
-                Save Draft
-              <% end %>
+              Save Draft
             <% end %>
             <%= render UI::Tooltip::ContentComponent.new do %>
               Save your work as a draft

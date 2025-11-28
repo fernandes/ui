@@ -19,17 +19,9 @@ module UI
       def call
         trigger_attrs = tooltip_trigger_html_attributes.merge(@attributes.except(:data))
 
-        if @as_child
-          # asChild mode: yield attributes to block
-          # The caller is responsible for rendering an element with these attributes
-          content_tag :template, nil, data: { trigger_attrs: trigger_attrs.to_json } do
-            content
-          end
-        else
-          # Default mode: render as button
-          content_tag :button, **trigger_attrs do
-            content
-          end
+        # Default mode: render as button with proper styling
+        content_tag :button, **trigger_attrs do
+          content
         end
       end
     end
