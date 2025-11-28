@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Typography::InlineCodeBehavior
+  extend UI::InlineCodeBehavior
   all_attributes = inline_code_html_attributes.merge(@attributes)
 %>
 <%= content_tag :code, all_attributes do %>

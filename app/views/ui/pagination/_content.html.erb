@@ -1,0 +1,14 @@
+<%# PaginationContent - shadcn/ui inspired component for Rails %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::PaginationContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = content_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

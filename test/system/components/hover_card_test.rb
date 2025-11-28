@@ -10,7 +10,7 @@ class HoverCardTest < UI::SystemTestCase
     # === Basic Functionality ===
 
     test "opens hover card on hover" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       assert hover_card.hidden?, "Hover card should be hidden initially"
 
@@ -21,7 +21,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "closes hover card on mouse leave" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
       assert hover_card.visible?
@@ -33,7 +33,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "displays content when open" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
 
@@ -44,7 +44,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "trigger shows correct text" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       assert_equal "@nextjs", hover_card.trigger_text
     end
@@ -52,7 +52,7 @@ class HoverCardTest < UI::SystemTestCase
     # === Hover Behavior ===
 
     test "keeps hover card open when hovering over content" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
       assert hover_card.visible?
@@ -66,7 +66,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "closes after delay when mouse leaves" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
       assert hover_card.visible?
@@ -86,24 +86,24 @@ class HoverCardTest < UI::SystemTestCase
     test "positions content with correct alignment" do
       within("#alignment-hover-cards") do
         # Test start alignment
-        start_card = all_elements(UI::Testing::HoverCardElement).first
+        start_card = all_elements(UI::TestingHoverCardElement).first
         start_card.show
         assert_equal "start", start_card.align, "First card should have start alignment"
 
         # Test center alignment (default)
-        center_card = all_elements(UI::Testing::HoverCardElement)[1]
+        center_card = all_elements(UI::TestingHoverCardElement)[1]
         center_card.show
         assert_equal "center", center_card.align, "Second card should have center alignment"
 
         # Test end alignment
-        end_card = all_elements(UI::Testing::HoverCardElement).last
+        end_card = all_elements(UI::TestingHoverCardElement).last
         end_card.show
         assert_equal "end", end_card.align, "Third card should have end alignment"
       end
     end
 
     test "shows positioning side attribute" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
 
@@ -114,7 +114,7 @@ class HoverCardTest < UI::SystemTestCase
     # === asChild Pattern ===
 
     test "works with asChild and Button component" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       # Trigger should be a button when using asChild with Button
       trigger = hover_card.trigger
@@ -125,7 +125,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "works with asChild and custom link" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#link-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#link-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
 
@@ -136,7 +136,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "works without asChild pattern" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#default-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#default-hover-card [data-controller='ui--hover-card']")
 
       # Trigger should be a span when not using asChild
       trigger = hover_card.trigger
@@ -153,14 +153,14 @@ class HoverCardTest < UI::SystemTestCase
 
     test "can open multiple hover cards independently" do
       within("#basic-hover-card") do
-        card1 = find_element(UI::Testing::HoverCardElement)
+        card1 = find_element(UI::TestingHoverCardElement)
         card1.show
         assert card1.visible?
 
         within_window(open_new_window) do
           visit_component("hover_card")
           within("#link-hover-card") do
-            card2 = find_element(UI::Testing::HoverCardElement)
+            card2 = find_element(UI::TestingHoverCardElement)
             card2.show
             assert card2.visible?
           end
@@ -171,7 +171,7 @@ class HoverCardTest < UI::SystemTestCase
     # === State Management ===
 
     test "data-state reflects current state" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       # Initially closed
       assert hover_card.closed?, "Should be closed initially"
@@ -190,7 +190,7 @@ class HoverCardTest < UI::SystemTestCase
     # === Accessibility ===
 
     test "content is focusable and accessible" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       hover_card.show
 
@@ -202,7 +202,7 @@ class HoverCardTest < UI::SystemTestCase
     end
 
     test "maintains hover on rapid mouse movements" do
-      hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+      hover_card = find_element(UI::TestingHoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
 
       # Hover trigger
       hover_card.trigger.hover

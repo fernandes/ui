@@ -1,0 +1,15 @@
+<%# Popover Trigger - Button or element that triggers the popover %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::PopoverTriggerBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = popover_trigger_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

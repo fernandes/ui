@@ -10,7 +10,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend UI::InputOtp::InputOtpSeparatorBehavior
+  extend UI::InputOtpSeparatorBehavior
 
   # Get HTML attributes from behavior
   separator_attrs = input_otp_separator_html_attributes.deep_merge(@attributes)

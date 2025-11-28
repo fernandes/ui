@@ -1,0 +1,16 @@
+<%# Breadcrumb Link Component - Clickable breadcrumb link %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @href = local_assigns.fetch(:href, "#")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::BreadcrumbLinkBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = breadcrumb_link_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :a, all_attributes do %>
+  <%= content || yield %>
+<% end %>

@@ -8,7 +8,7 @@
   @align_offset = local_assigns.fetch(:align_offset, -4)
 
   # Extend behavior for shared logic
-  extend UI::Menubar::MenubarContentBehavior
+  extend UI::MenubarContentBehavior
 
   # Get HTML attributes from behavior
   all_attributes = menubar_content_html_attributes.deep_merge(@attributes)

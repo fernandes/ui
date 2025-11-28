@@ -10,39 +10,39 @@ class ToggleGroupTest < UI::SystemTestCase
   # Helper methods to get different toggle group instances
 
   def single_default_group
-    find_element(UI::Testing::ToggleGroupElement, "#single-default")
+    find_element(UI::TestingToggleGroupElement, "#single-default")
   end
 
   def single_outline_group
-    find_element(UI::Testing::ToggleGroupElement, "#single-outline")
+    find_element(UI::TestingToggleGroupElement, "#single-outline")
   end
 
   def multiple_group
-    find_element(UI::Testing::ToggleGroupElement, "#multiple-group")
+    find_element(UI::TestingToggleGroupElement, "#multiple-group")
   end
 
   def size_sm_group
-    find_element(UI::Testing::ToggleGroupElement, "#size-sm")
+    find_element(UI::TestingToggleGroupElement, "#size-sm")
   end
 
   def size_default_group
-    find_element(UI::Testing::ToggleGroupElement, "#size-default")
+    find_element(UI::TestingToggleGroupElement, "#size-default")
   end
 
   def size_lg_group
-    find_element(UI::Testing::ToggleGroupElement, "#size-lg")
+    find_element(UI::TestingToggleGroupElement, "#size-lg")
   end
 
   def spacing_group
-    find_element(UI::Testing::ToggleGroupElement, "#spacing-group")
+    find_element(UI::TestingToggleGroupElement, "#spacing-group")
   end
 
   def interactive_single_group
-    find_element(UI::Testing::ToggleGroupElement, "#interactive-single")
+    find_element(UI::TestingToggleGroupElement, "#interactive-single")
   end
 
   def interactive_multiple_group
-    find_element(UI::Testing::ToggleGroupElement, "#interactive-multiple")
+    find_element(UI::TestingToggleGroupElement, "#interactive-multiple")
   end
 
   # === Single Selection Tests ===

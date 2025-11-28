@@ -17,14 +17,14 @@
       <h2 class="text-2xl font-semibold">Basic Switches (Phlex)</h2>
       <div class="flex flex-col gap-4">
         <div class="flex items-center space-x-2">
-          <%= render UI::Switch::Switch.new(id: "phlex-airplane-mode") %>
+          <%= render UI::Switch.new(id: "phlex-airplane-mode") %>
           <label for="phlex-airplane-mode" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Airplane Mode
           </label>
         </div>
 
         <div class="flex items-center space-x-2">
-          <%= render UI::Switch::Switch.new(checked: true, id: "phlex-notifications") %>
+          <%= render UI::Switch.new(checked: true, id: "phlex-notifications") %>
           <label for="phlex-notifications" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Notifications (checked by default)
           </label>
@@ -37,14 +37,14 @@
       <h2 class="text-2xl font-semibold">Disabled States (ViewComponent)</h2>
       <div class="flex flex-col gap-4">
         <div class="flex items-center space-x-2">
-          <%= render UI::Switch::SwitchComponent.new(disabled: true, id: "vc-disabled-off") %>
+          <%= render UI::SwitchComponent.new(disabled: true, id: "vc-disabled-off") %>
           <label for="vc-disabled-off" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Disabled (off)
           </label>
         </div>
 
         <div class="flex items-center space-x-2">
-          <%= render UI::Switch::SwitchComponent.new(checked: true, disabled: true, id: "vc-disabled-on") %>
+          <%= render UI::SwitchComponent.new(checked: true, disabled: true, id: "vc-disabled-on") %>
           <label for="vc-disabled-on" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Disabled (on)
           </label>
@@ -58,7 +58,7 @@
       <%= form_with url: "#", method: :post, class: "space-y-4" do |f| %>
         <div class="flex flex-col gap-4">
           <div class="flex items-center space-x-2">
-            <%= render "ui/switch/switch",
+            <%= render "ui/switch",
               name: "settings[marketing]",
               id: "marketing",
               checked: true
@@ -69,7 +69,7 @@
           </div>
 
           <div class="flex items-center space-x-2">
-            <%= render "ui/switch/switch",
+            <%= render "ui/switch",
               name: "settings[security]",
               id: "security",
               checked: false
@@ -80,7 +80,7 @@
           </div>
 
           <div class="flex items-center space-x-2">
-            <%= render "ui/switch/switch",
+            <%= render "ui/switch",
               name: "settings[social]",
               id: "social",
               checked: true
@@ -91,7 +91,7 @@
           </div>
         </div>
 
-        <%= render UI::Button::Button.new(type: "submit") { "Save preferences" } %>
+        <%= render UI::Button.new(type: "submit") { "Save preferences" } %>
       <% end %>
     </section>
 
@@ -107,7 +107,7 @@
                 Receive notifications about your account activity
               </div>
             </div>
-            <%= render UI::Switch::Switch.new(checked: true, id: "panel-notifications") %>
+            <%= render UI::Switch.new(checked: true, id: "panel-notifications") %>
           </div>
 
           <div class="flex flex-row items-center justify-between">
@@ -117,7 +117,7 @@
                 Add an extra layer of security to your account
               </div>
             </div>
-            <%= render UI::Switch::SwitchComponent.new(id: "panel-2fa") %>
+            <%= render UI::SwitchComponent.new(id: "panel-2fa") %>
           </div>
 
           <div class="flex flex-row items-center justify-between">
@@ -127,7 +127,7 @@
                 Use dark theme across the application
               </div>
             </div>
-            <%= render "ui/switch/switch", id: "panel-dark-mode", checked: false %>
+            <%= render "ui/switch", id: "panel-dark-mode", checked: false %>
           </div>
         </div>
       </div>
@@ -138,12 +138,12 @@
       <h2 class="text-2xl font-semibold">Custom Styling (Phlex)</h2>
       <div class="flex flex-col gap-4">
         <div class="flex items-center space-x-2">
-          <%= render UI::Switch::Switch.new(id: "scaled", classes: "scale-125") %>
+          <%= render UI::Switch.new(id: "scaled", classes: "scale-125") %>
           <label for="scaled" class="text-sm font-medium">Scaled (125%)</label>
         </div>
 
         <div class="flex items-center space-x-2">
-          <%= render UI::Switch::Switch.new(id: "small-scaled", classes: "scale-75") %>
+          <%= render UI::Switch.new(id: "small-scaled", classes: "scale-75") %>
           <label for="small-scaled" class="text-sm font-medium">Small scaled (75%)</label>
         </div>
       </div>
@@ -173,7 +173,7 @@
           </tbody>
         </table>
         <div class="mt-4 flex items-center space-x-2">
-          <%= render UI::Switch::Switch.new(id: "keyboard-test") %>
+          <%= render UI::Switch.new(id: "keyboard-test") %>
           <label for="keyboard-test" class="text-sm font-medium">
             Focus me and press Space or Enter
           </label>

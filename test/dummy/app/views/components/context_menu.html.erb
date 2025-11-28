@@ -12,38 +12,38 @@
       <!-- Basic Example -->
       <div id="phlex-basic" class="space-y-2">
         <h3 class="text-lg font-medium">Basic Context Menu</h3>
-        <%= render UI::ContextMenu::ContextMenu.new do %>
-          <%= render UI::ContextMenu::Trigger.new do %>
+        <%= render UI::ContextMenu.new do %>
+          <%= render UI::ContextMenuTrigger.new do %>
             Right click here
           <% end %>
 
-          <%= render UI::ContextMenu::Content.new(classes: "w-64") do %>
-            <%= render UI::ContextMenu::Item.new do %>
+          <%= render UI::ContextMenuContent.new(classes: "w-64") do %>
+            <%= render UI::ContextMenuItem.new do %>
               Back
-              <%= render UI::ContextMenu::Shortcut.new { "⌘[" } %>
+              <%= render UI::ContextMenuShortcut.new { "⌘[" } %>
             <% end %>
-            <%= render UI::ContextMenu::Item.new(data: { disabled: true }) do %>
+            <%= render UI::ContextMenuItem.new(data: { disabled: true }) do %>
               Forward
-              <%= render UI::ContextMenu::Shortcut.new { "⌘]" } %>
+              <%= render UI::ContextMenuShortcut.new { "⌘]" } %>
             <% end %>
-            <%= render UI::ContextMenu::Item.new do %>
+            <%= render UI::ContextMenuItem.new do %>
               Reload
-              <%= render UI::ContextMenu::Shortcut.new { "⌘R" } %>
+              <%= render UI::ContextMenuShortcut.new { "⌘R" } %>
             <% end %>
-            <%= render UI::ContextMenu::Separator.new %>
-            <%= render UI::ContextMenu::CheckboxItem.new(checked: true) do %>
+            <%= render UI::ContextMenuSeparator.new %>
+            <%= render UI::ContextMenuCheckboxItem.new(checked: true) do %>
               Show Bookmarks Bar
-              <%= render UI::ContextMenu::Shortcut.new { "⌘⇧B" } %>
+              <%= render UI::ContextMenuShortcut.new { "⌘⇧B" } %>
             <% end %>
-            <%= render UI::ContextMenu::CheckboxItem.new do %>
+            <%= render UI::ContextMenuCheckboxItem.new do %>
               Show Full URLs
             <% end %>
-            <%= render UI::ContextMenu::Separator.new %>
-            <%= render UI::ContextMenu::RadioGroup.new do %>
-              <%= render UI::ContextMenu::Label.new(inset: true) { "People" } %>
-              <%= render UI::ContextMenu::Separator.new %>
-              <%= render UI::ContextMenu::RadioItem.new(checked: true) { "Pedro Duarte" } %>
-              <%= render UI::ContextMenu::RadioItem.new { "Colm Tuite" } %>
+            <%= render UI::ContextMenuSeparator.new %>
+            <%= render UI::ContextMenuRadioGroup.new do %>
+              <%= render UI::ContextMenuLabel.new(inset: true) { "People" } %>
+              <%= render UI::ContextMenuSeparator.new %>
+              <%= render UI::ContextMenuRadioItem.new(checked: true) { "Pedro Duarte" } %>
+              <%= render UI::ContextMenuRadioItem.new { "Colm Tuite" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -52,26 +52,26 @@
       <!-- With Icons -->
       <div id="phlex-icons" class="space-y-2">
         <h3 class="text-lg font-medium">With Icons</h3>
-        <%= render UI::ContextMenu::ContextMenu.new do %>
-          <%= render UI::ContextMenu::Trigger.new do %>
+        <%= render UI::ContextMenu.new do %>
+          <%= render UI::ContextMenuTrigger.new do %>
             Right click for actions
           <% end %>
 
-          <%= render UI::ContextMenu::Content.new(classes: "w-48") do %>
-            <%= render UI::ContextMenu::Item.new do %>
+          <%= render UI::ContextMenuContent.new(classes: "w-48") do %>
+            <%= render UI::ContextMenuItem.new do %>
               <%= lucide_icon("copy") %>
               Copy
             <% end %>
-            <%= render UI::ContextMenu::Item.new do %>
+            <%= render UI::ContextMenuItem.new do %>
               <%= lucide_icon("scissors") %>
               Cut
             <% end %>
-            <%= render UI::ContextMenu::Item.new do %>
+            <%= render UI::ContextMenuItem.new do %>
               <%= lucide_icon("clipboard") %>
               Paste
             <% end %>
-            <%= render UI::ContextMenu::Separator.new %>
-            <%= render UI::ContextMenu::Item.new(variant: "destructive") do %>
+            <%= render UI::ContextMenuSeparator.new %>
+            <%= render UI::ContextMenuItem.new(variant: "destructive") do %>
               <%= lucide_icon("trash") %>
               Delete
             <% end %>
@@ -89,20 +89,20 @@
       <!-- Basic Example -->
       <div id="erb-basic" class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
-        <%= render "ui/context_menu/context_menu" do %>
-          <%= render "ui/context_menu/context_menu_trigger" do %>
+        <%= render "ui/context_menu" do %>
+          <%= render "ui/context_menu/trigger" do %>
             Right click this area
           <% end %>
 
-          <%= render "ui/context_menu/context_menu_content", classes: "w-48" do %>
-            <%= render "ui/context_menu/context_menu_item" do %>
+          <%= render "ui/context_menu/content", classes: "w-48" do %>
+            <%= render "ui/context_menu/item" do %>
               Edit
             <% end %>
-            <%= render "ui/context_menu/context_menu_item" do %>
+            <%= render "ui/context_menu/item" do %>
               Duplicate
             <% end %>
-            <%= render "ui/context_menu/context_menu_separator" %>
-            <%= render "ui/context_menu/context_menu_item", variant: "destructive" do %>
+            <%= render "ui/context_menu/separator" %>
+            <%= render "ui/context_menu/item", variant: "destructive" do %>
               Delete
             <% end %>
           <% end %>
@@ -112,25 +112,25 @@
       <!-- With Labels and Shortcuts -->
       <div id="erb-labels" class="space-y-2">
         <h3 class="text-lg font-medium">With Labels</h3>
-        <%= render "ui/context_menu/context_menu" do %>
-          <%= render "ui/context_menu/context_menu_trigger" do %>
+        <%= render "ui/context_menu" do %>
+          <%= render "ui/context_menu/trigger" do %>
             Right click for file options
           <% end %>
 
-          <%= render "ui/context_menu/context_menu_content", classes: "w-56" do %>
-            <%= render "ui/context_menu/context_menu_label" do %>
+          <%= render "ui/context_menu/content", classes: "w-56" do %>
+            <%= render "ui/context_menu/label" do %>
               File
             <% end %>
-            <%= render "ui/context_menu/context_menu_separator" %>
-            <%= render "ui/context_menu/context_menu_item" do %>
+            <%= render "ui/context_menu/separator" %>
+            <%= render "ui/context_menu/item" do %>
               New File
-              <%= render "ui/context_menu/context_menu_shortcut" do %>
+              <%= render "ui/context_menu/shortcut" do %>
                 ⌘N
               <% end %>
             <% end %>
-            <%= render "ui/context_menu/context_menu_item" do %>
+            <%= render "ui/context_menu/item" do %>
               Save
-              <%= render "ui/context_menu/context_menu_shortcut" do %>
+              <%= render "ui/context_menu/shortcut" do %>
                 ⌘S
               <% end %>
             <% end %>
@@ -148,16 +148,16 @@
       <!-- Basic Example -->
       <div id="vc-basic" class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
-        <%= render(UI::ContextMenu::ContextMenuComponent.new) do %>
-          <%= render(UI::ContextMenu::TriggerComponent.new) do %>
+        <%= render(UI::ContextMenuComponent.new) do %>
+          <%= render(UI::ContextMenuTriggerComponent.new) do %>
             Right click this box
           <% end %>
 
-          <%= render(UI::ContextMenu::ContentComponent.new(classes: "w-48")) do %>
-            <%= render(UI::ContextMenu::ItemComponent.new) { "New Tab" } %>
-            <%= render(UI::ContextMenu::ItemComponent.new) { "New Window" } %>
-            <%= render(UI::ContextMenu::SeparatorComponent.new) %>
-            <%= render(UI::ContextMenu::ItemComponent.new) { "Settings" } %>
+          <%= render(UI::ContextMenuContentComponent.new(classes: "w-48")) do %>
+            <%= render(UI::ContextMenuItemComponent.new) { "New Tab" } %>
+            <%= render(UI::ContextMenuItemComponent.new) { "New Window" } %>
+            <%= render(UI::ContextMenuSeparatorComponent.new) %>
+            <%= render(UI::ContextMenuItemComponent.new) { "Settings" } %>
           <% end %>
         <% end %>
       </div>
@@ -165,18 +165,18 @@
       <!-- Complete Example -->
       <div id="vc-complete" class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
-        <%= render(UI::ContextMenu::ContextMenuComponent.new) do %>
-          <%= render(UI::ContextMenu::TriggerComponent.new) do %>
+        <%= render(UI::ContextMenuComponent.new) do %>
+          <%= render(UI::ContextMenuTriggerComponent.new) do %>
             Right click for complete menu
           <% end %>
 
-          <%= render(UI::ContextMenu::ContentComponent.new(classes: "w-56")) do %>
-            <%= render(UI::ContextMenu::LabelComponent.new) { "My Account" } %>
-            <%= render(UI::ContextMenu::SeparatorComponent.new) %>
-            <%= render(UI::ContextMenu::ItemComponent.new) { "Profile" } %>
-            <%= render(UI::ContextMenu::ItemComponent.new) { "Team" } %>
-            <%= render(UI::ContextMenu::SeparatorComponent.new) %>
-            <%= render(UI::ContextMenu::ItemComponent.new(variant: "destructive")) { "Delete Account" } %>
+          <%= render(UI::ContextMenuContentComponent.new(classes: "w-56")) do %>
+            <%= render(UI::ContextMenuLabelComponent.new) { "My Account" } %>
+            <%= render(UI::ContextMenuSeparatorComponent.new) %>
+            <%= render(UI::ContextMenuItemComponent.new) { "Profile" } %>
+            <%= render(UI::ContextMenuItemComponent.new) { "Team" } %>
+            <%= render(UI::ContextMenuSeparatorComponent.new) %>
+            <%= render(UI::ContextMenuItemComponent.new(variant: "destructive")) { "Delete Account" } %>
           <% end %>
         <% end %>
       </div>

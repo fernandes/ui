@@ -20,11 +20,11 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Popover</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::Popover.new do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Open popover" } %>
+          <%= render UI::Popover.new do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Open popover" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <div class="grid gap-4">
                 <div class="space-y-2">
                   <h4 class="font-medium leading-none">Dimensions</h4>
@@ -32,12 +32,12 @@
                 </div>
                 <div class="grid gap-2">
                   <div class="grid grid-cols-3 items-center gap-4">
-                    <%= render UI::Label::Label.new(for: "width") { "Width" } %>
-                    <%= render UI::Input::Input.new(id: "width", value: "100%", classes: "col-span-2 h-8") %>
+                    <%= render UI::Label.new(for: "width") { "Width" } %>
+                    <%= render UI::Input.new(id: "width", value: "100%", classes: "col-span-2 h-8") %>
                   </div>
                   <div class="grid grid-cols-3 items-center gap-4">
-                    <%= render UI::Label::Label.new(for: "height") { "Height" } %>
-                    <%= render UI::Input::Input.new(id: "height", value: "25px", classes: "col-span-2 h-8") %>
+                    <%= render UI::Label.new(for: "height") { "Height" } %>
+                    <%= render UI::Input.new(id: "height", value: "25px", classes: "col-span-2 h-8") %>
                   </div>
                 </div>
               </div>
@@ -50,38 +50,38 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Different Placements</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render UI::Popover::Popover.new(placement: "top") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "Top" } %>
+          <%= render UI::Popover.new(placement: "top") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "Top" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Top placement</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new(placement: "right") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "Right" } %>
+          <%= render UI::Popover.new(placement: "right") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "Right" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Right placement</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new(placement: "bottom") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "Bottom" } %>
+          <%= render UI::Popover.new(placement: "bottom") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "Bottom" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Bottom placement</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new(placement: "left") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "Left" } %>
+          <%= render UI::Popover.new(placement: "left") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "Left" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Left placement</p>
             <% end %>
           <% end %>
@@ -92,29 +92,29 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Alignment Variations</h3>
         <div class="flex items-center gap-4 justify-center p-8">
-          <%= render UI::Popover::Popover.new(placement: "bottom-start") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "Start" } %>
+          <%= render UI::Popover.new(placement: "bottom-start") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "Start" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Start aligned</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new(placement: "bottom") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "Center" } %>
+          <%= render UI::Popover.new(placement: "bottom") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "Center" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Center aligned</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new(placement: "bottom-end") do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) { "End" } %>
+          <%= render UI::Popover.new(placement: "bottom-end") do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) { "End" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">End aligned</p>
             <% end %>
           <% end %>
@@ -125,20 +125,20 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Custom Offset</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::Popover.new(offset: 4) do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Default (4px)" } %>
+          <%= render UI::Popover.new(offset: 4) do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Default (4px)" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">4px from trigger</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new(offset: 16) do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Large (16px)" } %>
+          <%= render UI::Popover.new(offset: 16) do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Large (16px)" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">16px from trigger</p>
             <% end %>
           <% end %>
@@ -149,29 +149,29 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Custom Width</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::Popover.new do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Default (w-72)" } %>
+          <%= render UI::Popover.new do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Default (w-72)" } %>
             <% end %>
-            <%= render UI::Popover::Content.new do %>
+            <%= render UI::PopoverContent.new do %>
               <p class="text-sm">Default width (18rem)</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Wide (w-96)" } %>
+          <%= render UI::Popover.new do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Wide (w-96)" } %>
             <% end %>
-            <%= render UI::Popover::Content.new(classes: "w-96") do %>
+            <%= render UI::PopoverContent.new(classes: "w-96") do %>
               <p class="text-sm">Wide width (24rem)</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Popover.new do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Narrow (w-48)" } %>
+          <%= render UI::Popover.new do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Narrow (w-48)" } %>
             <% end %>
-            <%= render UI::Popover::Content.new(classes: "w-48") do %>
+            <%= render UI::PopoverContent.new(classes: "w-48") do %>
               <p class="text-sm">Narrow</p>
             <% end %>
           <% end %>
@@ -187,13 +187,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Popover</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/popover/popover", attributes: { id: "erb-basic-popover" } do %>
-            <%= render "ui/popover/popover_trigger" do %>
-              <%= render "ui/button/button", variant: :outline do %>
+          <%= render "ui/popover", attributes: { id: "erb-basic-popover" } do %>
+            <%= render "ui/popover/trigger" do %>
+              <%= render "ui/button", variant: :outline do %>
                 Open popover (ERB)
               <% end %>
             <% end %>
-            <%= render "ui/popover/popover_content" do %>
+            <%= render "ui/popover/content" do %>
               <div class="grid gap-4">
                 <div class="space-y-2">
                   <h4 class="font-medium leading-none">Information</h4>
@@ -209,20 +209,20 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Different Placements</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render "ui/popover/popover", placement: "top", attributes: { id: "erb-top-popover" } do %>
-            <%= render "ui/popover/popover_trigger" do %>
-              <%= render "ui/button/button", variant: :outline, size: :sm do %>Top<% end %>
+          <%= render "ui/popover", placement: "top", attributes: { id: "erb-top-popover" } do %>
+            <%= render "ui/popover/trigger" do %>
+              <%= render "ui/button", variant: :outline, size: :sm do %>Top<% end %>
             <% end %>
-            <%= render "ui/popover/popover_content" do %>
+            <%= render "ui/popover/content" do %>
               <p class="text-sm">Top placement</p>
             <% end %>
           <% end %>
 
-          <%= render "ui/popover/popover", placement: "bottom", attributes: { id: "erb-bottom-popover" } do %>
-            <%= render "ui/popover/popover_trigger" do %>
-              <%= render "ui/button/button", variant: :outline, size: :sm do %>Bottom<% end %>
+          <%= render "ui/popover", placement: "bottom", attributes: { id: "erb-bottom-popover" } do %>
+            <%= render "ui/popover/trigger" do %>
+              <%= render "ui/button", variant: :outline, size: :sm do %>Bottom<% end %>
             <% end %>
-            <%= render "ui/popover/popover_content" do %>
+            <%= render "ui/popover/content" do %>
               <p class="text-sm">Bottom placement</p>
             <% end %>
           <% end %>
@@ -233,13 +233,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">With Form Controls</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/popover/popover", attributes: { id: "erb-form-popover" } do %>
-            <%= render "ui/popover/popover_trigger" do %>
-              <%= render "ui/button/button", variant: :outline do %>
+          <%= render "ui/popover", attributes: { id: "erb-form-popover" } do %>
+            <%= render "ui/popover/trigger" do %>
+              <%= render "ui/button", variant: :outline do %>
                 Settings
               <% end %>
             <% end %>
-            <%= render "ui/popover/popover_content", classes: "w-80" do %>
+            <%= render "ui/popover/content", classes: "w-80" do %>
               <div class="grid gap-4">
                 <div class="space-y-2">
                   <h4 class="font-medium leading-none">Settings</h4>
@@ -247,12 +247,12 @@
                 </div>
                 <div class="grid gap-2">
                   <div class="grid grid-cols-3 items-center gap-4">
-                    <%= render "ui/label/label", for: "name" do %>Name<% end %>
-                    <%= render "ui/input/input", id: "name", value: "John Doe", classes: "col-span-2 h-8" %>
+                    <%= render "ui/label", for: "name" do %>Name<% end %>
+                    <%= render "ui/input", id: "name", value: "John Doe", classes: "col-span-2 h-8" %>
                   </div>
                   <div class="grid grid-cols-3 items-center gap-4">
-                    <%= render "ui/label/label", for: "email" do %>Email<% end %>
-                    <%= render "ui/input/input", id: "email", type: "email", value: "john@example.com", classes: "col-span-2 h-8" %>
+                    <%= render "ui/label", for: "email" do %>Email<% end %>
+                    <%= render "ui/input", id: "email", type: "email", value: "john@example.com", classes: "col-span-2 h-8" %>
                   </div>
                 </div>
               </div>
@@ -270,13 +270,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Popover</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::PopoverComponent.new do %>
-            <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-              <%= render UI::Button::ButtonComponent.new(variant: "outline") do %>
+          <%= render UI::PopoverComponent.new do %>
+            <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+              <%= render UI::ButtonComponent.new(variant: "outline") do %>
                 Open popover (VC)
               <% end %>
             <% end %>
-            <%= render UI::Popover::ContentComponent.new do %>
+            <%= render UI::PopoverContentComponent.new do %>
               <div class="grid gap-4">
                 <div class="space-y-2">
                   <h4 class="font-medium leading-none">ViewComponent</h4>
@@ -292,20 +292,20 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Different Placements</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render UI::Popover::PopoverComponent.new(placement: "top") do %>
-            <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-              <%= render UI::Button::ButtonComponent.new(variant: "outline", size: "sm") do %>Top<% end %>
+          <%= render UI::PopoverComponent.new(placement: "top") do %>
+            <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+              <%= render UI::ButtonComponent.new(variant: "outline", size: "sm") do %>Top<% end %>
             <% end %>
-            <%= render UI::Popover::ContentComponent.new do %>
+            <%= render UI::PopoverContentComponent.new do %>
               <p class="text-sm">Top placement</p>
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::PopoverComponent.new(placement: "right") do %>
-            <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-              <%= render UI::Button::ButtonComponent.new(variant: "outline", size: "sm") do %>Right<% end %>
+          <%= render UI::PopoverComponent.new(placement: "right") do %>
+            <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+              <%= render UI::ButtonComponent.new(variant: "outline", size: "sm") do %>Right<% end %>
             <% end %>
-            <%= render UI::Popover::ContentComponent.new do %>
+            <%= render UI::PopoverContentComponent.new do %>
               <p class="text-sm">Right placement</p>
             <% end %>
           <% end %>
@@ -316,13 +316,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Custom Content</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::PopoverComponent.new do %>
-            <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-              <%= render UI::Button::ButtonComponent.new(variant: "outline") do %>
+          <%= render UI::PopoverComponent.new do %>
+            <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+              <%= render UI::ButtonComponent.new(variant: "outline") do %>
                 User Profile
               <% end %>
             <% end %>
-            <%= render UI::Popover::ContentComponent.new(classes: "w-80") do %>
+            <%= render UI::PopoverContentComponent.new(classes: "w-80") do %>
               <div class="flex gap-4">
                 <div class="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                   JD
@@ -331,10 +331,10 @@
                   <h4 class="text-sm font-semibold">John Doe</h4>
                   <p class="text-sm text-muted-foreground">john@example.com</p>
                   <div class="flex items-center pt-2 gap-2">
-                    <%= render UI::Button::ButtonComponent.new(size: "sm", variant: "outline") do %>
+                    <%= render UI::ButtonComponent.new(size: "sm", variant: "outline") do %>
                       View Profile
                     <% end %>
-                    <%= render UI::Button::ButtonComponent.new(size: "sm", variant: "outline") do %>
+                    <%= render UI::ButtonComponent.new(size: "sm", variant: "outline") do %>
                       Logout
                     <% end %>
                   </div>
@@ -354,14 +354,14 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Date Range Picker (Phlex)</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::Popover.new do %>
-            <%= render UI::Popover::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline, classes: "w-80 justify-start text-left font-normal") do %>
+          <%= render UI::Popover.new do %>
+            <%= render UI::PopoverTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline, classes: "w-80 justify-start text-left font-normal") do %>
                 <span class="mr-2">📅</span>
                 <span>Pick a date range</span>
               <% end %>
             <% end %>
-            <%= render UI::Popover::Content.new(classes: "w-auto p-0") do %>
+            <%= render UI::PopoverContent.new(classes: "w-auto p-0") do %>
               <div class="p-4">
                 <p class="text-sm text-muted-foreground">Calendar component would go here</p>
               </div>
@@ -374,14 +374,14 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Color Picker (ERB)</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/popover/popover" do %>
-            <%= render "ui/popover/popover_trigger" do %>
-              <%= render "ui/button/button", variant: :outline, classes: "w-48 justify-start" do %>
+          <%= render "ui/popover" do %>
+            <%= render "ui/popover/trigger" do %>
+              <%= render "ui/button", variant: :outline, classes: "w-48 justify-start" do %>
                 <div class="w-4 h-4 rounded mr-2 bg-blue-500"></div>
                 <span>#3080ff</span>
               <% end %>
             <% end %>
-            <%= render "ui/popover/popover_content", classes: "w-64" do %>
+            <%= render "ui/popover/content", classes: "w-64" do %>
               <div class="space-y-2">
                 <h4 class="font-medium text-sm mb-2">Pick a color</h4>
                 <div class="grid grid-cols-5 gap-2">
@@ -399,28 +399,28 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Share Button (ViewComponent)</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Popover::PopoverComponent.new do %>
-            <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-              <%= render UI::Button::ButtonComponent.new(variant: "outline") do %>
+          <%= render UI::PopoverComponent.new do %>
+            <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+              <%= render UI::ButtonComponent.new(variant: "outline") do %>
                 Share
               <% end %>
             <% end %>
-            <%= render UI::Popover::ContentComponent.new(classes: "w-72") do %>
+            <%= render UI::PopoverContentComponent.new(classes: "w-72") do %>
               <div class="space-y-4">
                 <div class="space-y-2">
                   <h4 class="font-medium text-sm">Share this page</h4>
                   <p class="text-sm text-muted-foreground">Anyone with the link can view this page.</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <%= render UI::Input::InputComponent.new(value: "https://example.com/page", readonly: true, classes: "flex-1") %>
-                  <%= render UI::Button::ButtonComponent.new(size: "sm") do %>Copy<% end %>
+                  <%= render UI::InputComponent.new(value: "https://example.com/page", readonly: true, classes: "flex-1") %>
+                  <%= render UI::ButtonComponent.new(size: "sm") do %>Copy<% end %>
                 </div>
                 <div class="border-t pt-4">
                   <p class="text-sm text-muted-foreground mb-2">Share via</p>
                   <div class="flex gap-2">
-                    <%= render UI::Button::ButtonComponent.new(variant: "outline", size: "sm") do %>Twitter<% end %>
-                    <%= render UI::Button::ButtonComponent.new(variant: "outline", size: "sm") do %>Facebook<% end %>
-                    <%= render UI::Button::ButtonComponent.new(variant: "outline", size: "sm") do %>Email<% end %>
+                    <%= render UI::ButtonComponent.new(variant: "outline", size: "sm") do %>Twitter<% end %>
+                    <%= render UI::ButtonComponent.new(variant: "outline", size: "sm") do %>Facebook<% end %>
+                    <%= render UI::ButtonComponent.new(variant: "outline", size: "sm") do %>Email<% end %>
                   </div>
                 </div>
               </div>

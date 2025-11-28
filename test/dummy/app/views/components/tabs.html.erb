@@ -16,12 +16,12 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="max-w-2xl">
-        <%= render "ui/tabs/tabs", default_value: "account", attributes: { id: "erb-tabs" } do %>
-          <%= render "ui/tabs/tabs_list" do %>
-            <%= render "ui/tabs/tabs_trigger", value: "account", content: "Account" %>
-            <%= render "ui/tabs/tabs_trigger", value: "password", content: "Password" %>
+        <%= render "ui/tabs", default_value: "account", attributes: { id: "erb-tabs" } do %>
+          <%= render "ui/tabs/list" do %>
+            <%= render "ui/tabs/trigger", value: "account", content: "Account" %>
+            <%= render "ui/tabs/trigger", value: "password", content: "Password" %>
           <% end %>
-          <%= render "ui/tabs/tabs_content", value: "account" do %>
+          <%= render "ui/tabs/content", value: "account" do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Account</h3>
               <p class="text-sm text-muted-foreground">
@@ -29,7 +29,7 @@
               </p>
             </div>
           <% end %>
-          <%= render "ui/tabs/tabs_content", value: "password" do %>
+          <%= render "ui/tabs/content", value: "password" do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Password</h3>
               <p class="text-sm text-muted-foreground">
@@ -45,13 +45,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::Tabs.new(default_value: "general", attributes: { id: "phlex-tabs" }) do %>
-          <%= render UI::Tabs::List.new do %>
-            <%= render UI::Tabs::Trigger.new(value: "general", default_value: "general") { "General" } %>
-            <%= render UI::Tabs::Trigger.new(value: "security", default_value: "general") { "Security" } %>
-            <%= render UI::Tabs::Trigger.new(value: "integrations", default_value: "general") { "Integrations" } %>
+        <%= render UI::Tabs.new(default_value: "general", attributes: { id: "phlex-tabs" }) do %>
+          <%= render UI::TabsList.new do %>
+            <%= render UI::TabsTrigger.new(value: "general", default_value: "general") { "General" } %>
+            <%= render UI::TabsTrigger.new(value: "security", default_value: "general") { "Security" } %>
+            <%= render UI::TabsTrigger.new(value: "integrations", default_value: "general") { "Integrations" } %>
           <% end %>
-          <%= render UI::Tabs::Content.new(value: "general", default_value: "general") do %>
+          <%= render UI::TabsContent.new(value: "general", default_value: "general") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">General Settings</h3>
               <p class="text-sm text-muted-foreground">
@@ -59,7 +59,7 @@
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::Content.new(value: "security", default_value: "general") do %>
+          <%= render UI::TabsContent.new(value: "security", default_value: "general") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Security Settings</h3>
               <p class="text-sm text-muted-foreground">
@@ -67,7 +67,7 @@
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::Content.new(value: "integrations", default_value: "general") do %>
+          <%= render UI::TabsContent.new(value: "integrations", default_value: "general") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Integrations</h3>
               <p class="text-sm text-muted-foreground">
@@ -83,22 +83,22 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::TabsComponent.new(default_value: "overview", attributes: { id: "vc-tabs" }) do %>
-          <%= render UI::Tabs::TabsListComponent.new do %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "overview", default_value: "overview") do %>
+        <%= render UI::TabsComponent.new(default_value: "overview", attributes: { id: "vc-tabs" }) do %>
+          <%= render UI::TabsListComponent.new do %>
+            <%= render UI::TabsTriggerComponent.new(value: "overview", default_value: "overview") do %>
               Overview
             <% end %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "analytics", default_value: "overview") do %>
+            <%= render UI::TabsTriggerComponent.new(value: "analytics", default_value: "overview") do %>
               Analytics
             <% end %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "reports", default_value: "overview") do %>
+            <%= render UI::TabsTriggerComponent.new(value: "reports", default_value: "overview") do %>
               Reports
             <% end %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "notifications", default_value: "overview") do %>
+            <%= render UI::TabsTriggerComponent.new(value: "notifications", default_value: "overview") do %>
               Notifications
             <% end %>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "overview", default_value: "overview") do %>
+          <%= render UI::TabsContentComponent.new(value: "overview", default_value: "overview") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Overview</h3>
               <p class="text-sm text-muted-foreground">
@@ -106,7 +106,7 @@
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "analytics", default_value: "overview") do %>
+          <%= render UI::TabsContentComponent.new(value: "analytics", default_value: "overview") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Analytics</h3>
               <p class="text-sm text-muted-foreground">
@@ -114,7 +114,7 @@
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "reports", default_value: "overview") do %>
+          <%= render UI::TabsContentComponent.new(value: "reports", default_value: "overview") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Reports</h3>
               <p class="text-sm text-muted-foreground">
@@ -122,7 +122,7 @@
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "notifications", default_value: "overview") do %>
+          <%= render UI::TabsContentComponent.new(value: "notifications", default_value: "overview") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Notifications</h3>
               <p class="text-sm text-muted-foreground">
@@ -139,27 +139,27 @@
       <h2 class="text-2xl font-semibold">With Disabled Tab</h2>
       <p class="text-sm text-muted-foreground">Demonstrating disabled state for tabs that are not available.</p>
       <div class="max-w-2xl">
-        <%= render "ui/tabs/tabs", default_value: "available", attributes: { id: "disabled-tabs" } do %>
-          <%= render "ui/tabs/tabs_list" do %>
-            <%= render "ui/tabs/tabs_trigger", value: "available", content: "Available" %>
-            <%= render "ui/tabs/tabs_trigger", value: "disabled", disabled: true, content: "Disabled" %>
-            <%= render "ui/tabs/tabs_trigger", value: "coming-soon", disabled: true, content: "Coming Soon" %>
+        <%= render "ui/tabs", default_value: "available", attributes: { id: "disabled-tabs" } do %>
+          <%= render "ui/tabs/list" do %>
+            <%= render "ui/tabs/trigger", value: "available", content: "Available" %>
+            <%= render "ui/tabs/trigger", value: "disabled", disabled: true, content: "Disabled" %>
+            <%= render "ui/tabs/trigger", value: "coming-soon", disabled: true, content: "Coming Soon" %>
           <% end %>
-          <%= render "ui/tabs/tabs_content", value: "available" do %>
+          <%= render "ui/tabs/content", value: "available" do %>
             <div class="space-y-4 p-4">
               <p class="text-sm text-muted-foreground">
                 This tab is available and can be selected.
               </p>
             </div>
           <% end %>
-          <%= render "ui/tabs/tabs_content", value: "disabled" do %>
+          <%= render "ui/tabs/content", value: "disabled" do %>
             <div class="space-y-4 p-4">
               <p class="text-sm text-muted-foreground">
                 This content is not accessible because the tab is disabled.
               </p>
             </div>
           <% end %>
-          <%= render "ui/tabs/tabs_content", value: "coming-soon" do %>
+          <%= render "ui/tabs/content", value: "coming-soon" do %>
             <div class="space-y-4 p-4">
               <p class="text-sm text-muted-foreground">
                 This feature is coming soon.
@@ -175,27 +175,27 @@
       <h2 class="text-2xl font-semibold">Manual Activation Mode</h2>
       <p class="text-sm text-muted-foreground">In manual mode, arrow keys only move focus. Press Enter or Space to activate.</p>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::Tabs.new(default_value: "tab1", activation_mode: "manual", attributes: { id: "manual-tabs" }) do %>
-          <%= render UI::Tabs::List.new do %>
-            <%= render UI::Tabs::Trigger.new(value: "tab1", default_value: "tab1") { "Tab 1" } %>
-            <%= render UI::Tabs::Trigger.new(value: "tab2", default_value: "tab1") { "Tab 2" } %>
-            <%= render UI::Tabs::Trigger.new(value: "tab3", default_value: "tab1") { "Tab 3" } %>
+        <%= render UI::Tabs.new(default_value: "tab1", activation_mode: "manual", attributes: { id: "manual-tabs" }) do %>
+          <%= render UI::TabsList.new do %>
+            <%= render UI::TabsTrigger.new(value: "tab1", default_value: "tab1") { "Tab 1" } %>
+            <%= render UI::TabsTrigger.new(value: "tab2", default_value: "tab1") { "Tab 2" } %>
+            <%= render UI::TabsTrigger.new(value: "tab3", default_value: "tab1") { "Tab 3" } %>
           <% end %>
-          <%= render UI::Tabs::Content.new(value: "tab1", default_value: "tab1") do %>
+          <%= render UI::TabsContent.new(value: "tab1", default_value: "tab1") do %>
             <div class="space-y-4 p-4">
               <p class="text-sm text-muted-foreground">
                 Content for tab 1. Try using arrow keys to focus tabs, then press Enter to activate.
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::Content.new(value: "tab2", default_value: "tab1") do %>
+          <%= render UI::TabsContent.new(value: "tab2", default_value: "tab1") do %>
             <div class="space-y-4 p-4">
               <p class="text-sm text-muted-foreground">
                 Content for tab 2. Notice how arrow keys don't automatically switch tabs in manual mode.
               </p>
             </div>
           <% end %>
-          <%= render UI::Tabs::Content.new(value: "tab3", default_value: "tab1") do %>
+          <%= render UI::TabsContent.new(value: "tab3", default_value: "tab1") do %>
             <div class="space-y-4 p-4">
               <p class="text-sm text-muted-foreground">
                 Content for tab 3. This gives users more control over navigation.
@@ -210,19 +210,19 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Rich Content</h2>
       <div class="max-w-2xl">
-        <%= render UI::Tabs::TabsComponent.new(default_value: "features") do %>
-          <%= render UI::Tabs::TabsListComponent.new do %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "features", default_value: "features") do %>
+        <%= render UI::TabsComponent.new(default_value: "features") do %>
+          <%= render UI::TabsListComponent.new do %>
+            <%= render UI::TabsTriggerComponent.new(value: "features", default_value: "features") do %>
               Features
             <% end %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "keyboard", default_value: "features") do %>
+            <%= render UI::TabsTriggerComponent.new(value: "keyboard", default_value: "features") do %>
               Keyboard Nav
             <% end %>
-            <%= render UI::Tabs::TabsTriggerComponent.new(value: "accessibility", default_value: "features") do %>
+            <%= render UI::TabsTriggerComponent.new(value: "accessibility", default_value: "features") do %>
               Accessibility
             <% end %>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "features", default_value: "features") do %>
+          <%= render UI::TabsContentComponent.new(value: "features", default_value: "features") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Features</h3>
               <ul class="list-disc list-inside space-y-2 text-sm text-muted-foreground">
@@ -235,7 +235,7 @@
               </ul>
             </div>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "keyboard", default_value: "features") do %>
+          <%= render UI::TabsContentComponent.new(value: "keyboard", default_value: "features") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Keyboard Navigation</h3>
               <div class="space-y-2">
@@ -249,7 +249,7 @@
               </div>
             </div>
           <% end %>
-          <%= render UI::Tabs::TabsContentComponent.new(value: "accessibility", default_value: "features") do %>
+          <%= render UI::TabsContentComponent.new(value: "accessibility", default_value: "features") do %>
             <div class="space-y-4 p-4">
               <h3 class="text-lg font-medium">Accessibility</h3>
               <div class="space-y-2">

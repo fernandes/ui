@@ -8,7 +8,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.except(:classes)
 
-  extend UI::ButtonGroup::TextBehavior
+  extend UI::ButtonGroupTextBehavior
   all_attributes = text_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :div, all_attributes do %>

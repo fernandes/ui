@@ -12,7 +12,7 @@
 #   <%= render "ui/combobox/wrapper", value: "" do |combobox_attrs| %>
 #     <%= render "ui/popover/popover", **combobox_attrs, placement: "bottom-start" do %>
 #       <%= render "ui/popover/popover_trigger", as_child: true do |trigger_attrs| %>
-#         <%= render "ui/button/button", **trigger_attrs do %>
+#         <%= render "ui/button", **trigger_attrs do %>
 #           <span data-ui--combobox-target="text">Select framework...</span>
 #         <% end %>
 #       <% end %>

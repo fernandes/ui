@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Command::EmptyBehavior
+  extend UI::CommandEmptyBehavior
   all_attributes = command_empty_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :div, all_attributes do %>

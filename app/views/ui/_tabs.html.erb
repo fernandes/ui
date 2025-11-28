@@ -1,0 +1,23 @@
+<%# Tabs Component - Root container for tabbed interface %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @default_value = local_assigns.fetch(:default_value, "")
+  @orientation = local_assigns.fetch(:orientation, "horizontal")
+  @activation_mode = local_assigns.fetch(:activation_mode, "automatic")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Store context for child components
+  @_tabs_default_value = @default_value
+  @_tabs_orientation = @orientation
+
+  # Extend behavior for shared logic
+  extend UI::TabsBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = tabs_html_attributes.deep_merge(@attributes.except(:data))
+  all_attributes[:data] = tabs_html_attributes[:data].merge(@attributes.fetch(:data, {}))
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

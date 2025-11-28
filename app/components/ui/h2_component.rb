@@ -9,7 +9,7 @@ module UI
     end
 
     def call
-      extend UI::Typography::H2Behavior
+      extend UI::H2Behavior
 
       attrs = h2_html_attributes
 

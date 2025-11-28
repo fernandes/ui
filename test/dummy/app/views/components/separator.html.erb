@@ -19,12 +19,12 @@
               An open-source UI component library.
             </p>
           </div>
-          <%= render UI::Separator::Separator.new(classes: "my-4") %>
+          <%= render UI::Separator.new(classes: "my-4") %>
           <div class="flex h-5 items-center space-x-4 text-sm">
             <div>Blog</div>
-            <%= render UI::Separator::Separator.new(orientation: :vertical) %>
+            <%= render UI::Separator.new(orientation: :vertical) %>
             <div>Docs</div>
-            <%= render UI::Separator::Separator.new(orientation: :vertical) %>
+            <%= render UI::Separator.new(orientation: :vertical) %>
             <div>Source</div>
           </div>
         </div>
@@ -35,7 +35,7 @@
         <h3 class="text-lg font-medium">Horizontal Separator (Default)</h3>
         <div class="max-w-md">
           <p class="text-sm">Content above the separator</p>
-          <%= render UI::Separator::Separator.new(classes: "my-4") %>
+          <%= render UI::Separator.new(classes: "my-4") %>
           <p class="text-sm">Content below the separator</p>
         </div>
       </div>
@@ -44,11 +44,11 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Vertical Separator in Navigation</h3>
         <nav class="flex items-center space-x-4 text-sm">
-          <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto") { "Home" } %>
-          <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-          <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto") { "About" } %>
-          <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-          <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto") { "Contact" } %>
+          <%= render UI::Button.new(variant: :link, classes: "px-0 h-auto") { "Home" } %>
+          <%= render UI::Separator.new(orientation: :vertical, classes: "h-4") %>
+          <%= render UI::Button.new(variant: :link, classes: "px-0 h-auto") { "About" } %>
+          <%= render UI::Separator.new(orientation: :vertical, classes: "h-4") %>
+          <%= render UI::Button.new(variant: :link, classes: "px-0 h-auto") { "Contact" } %>
         </nav>
       </div>
 
@@ -56,9 +56,9 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Custom Styling</h3>
         <div class="max-w-md space-y-4">
-          <%= render UI::Separator::Separator.new(classes: "my-4 bg-red-500") %>
-          <%= render UI::Separator::Separator.new(classes: "my-4 bg-blue-500 h-0.5") %>
-          <%= render UI::Separator::Separator.new(classes: "my-4 bg-gradient-to-r from-transparent via-foreground to-transparent") %>
+          <%= render UI::Separator.new(classes: "my-4 bg-red-500") %>
+          <%= render UI::Separator.new(classes: "my-4 bg-blue-500 h-0.5") %>
+          <%= render UI::Separator.new(classes: "my-4 bg-gradient-to-r from-transparent via-foreground to-transparent") %>
         </div>
       </div>
 
@@ -67,7 +67,7 @@
         <h3 class="text-lg font-medium">Semantic Separator (decorative: false)</h3>
         <div class="max-w-md">
           <p class="text-sm">This separator has semantic meaning for screen readers</p>
-          <%= render UI::Separator::Separator.new(decorative: false, classes: "my-4") %>
+          <%= render UI::Separator.new(decorative: false, classes: "my-4") %>
           <p class="text-sm">Screen readers will announce this separation</p>
         </div>
       </div>
@@ -80,12 +80,12 @@
             <p class="font-medium">Item 1</p>
             <p class="text-sm text-muted-foreground">Description for item 1</p>
           </div>
-          <%= render UI::Separator::Separator.new %>
+          <%= render UI::Separator.new %>
           <div class="p-2 hover:bg-muted rounded">
             <p class="font-medium">Item 2</p>
             <p class="text-sm text-muted-foreground">Description for item 2</p>
           </div>
-          <%= render UI::Separator::Separator.new %>
+          <%= render UI::Separator.new %>
           <div class="p-2 hover:bg-muted rounded">
             <p class="font-medium">Item 3</p>
             <p class="text-sm text-muted-foreground">Description for item 3</p>
@@ -110,12 +110,12 @@
               Beautifully designed components.
             </p>
           </div>
-          <%= render "ui/separator/separator", classes: "my-4" %>
+          <%= render "ui/separator", classes: "my-4" %>
           <div class="flex h-5 items-center space-x-4 text-sm">
             <div>Examples</div>
-            <%= render "ui/separator/separator", orientation: :vertical %>
+            <%= render "ui/separator", orientation: :vertical %>
             <div>Themes</div>
-            <%= render "ui/separator/separator", orientation: :vertical %>
+            <%= render "ui/separator", orientation: :vertical %>
             <div>GitHub</div>
           </div>
         </div>
@@ -126,7 +126,7 @@
         <h3 class="text-lg font-medium">Horizontal Separator</h3>
         <div class="max-w-md">
           <p class="text-sm">Content above</p>
-          <%= render "ui/separator/separator", classes: "my-4" %>
+          <%= render "ui/separator", classes: "my-4" %>
           <p class="text-sm">Content below</p>
         </div>
       </div>
@@ -135,11 +135,11 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Vertical Separator in Menu</h3>
         <div class="flex items-center space-x-4 text-sm">
-          <%= render "ui/button/button", variant: :ghost, size: :sm do %>Settings<% end %>
-          <%= render "ui/separator/separator", orientation: :vertical, classes: "h-4" %>
-          <%= render "ui/button/button", variant: :ghost, size: :sm do %>Profile<% end %>
-          <%= render "ui/separator/separator", orientation: :vertical, classes: "h-4" %>
-          <%= render "ui/button/button", variant: :ghost, size: :sm do %>Logout<% end %>
+          <%= render "ui/button", variant: :ghost, size: :sm do %>Settings<% end %>
+          <%= render "ui/separator", orientation: :vertical, classes: "h-4" %>
+          <%= render "ui/button", variant: :ghost, size: :sm do %>Profile<% end %>
+          <%= render "ui/separator", orientation: :vertical, classes: "h-4" %>
+          <%= render "ui/button", variant: :ghost, size: :sm do %>Logout<% end %>
         </div>
       </div>
     </div>
@@ -160,12 +160,12 @@
               A framework for building reusable components.
             </p>
           </div>
-          <%= render UI::Separator::SeparatorComponent.new(classes: "my-4") %>
+          <%= render UI::SeparatorComponent.new(classes: "my-4") %>
           <div class="flex h-5 items-center space-x-4 text-sm">
             <div>Guide</div>
-            <%= render UI::Separator::SeparatorComponent.new(orientation: :vertical) %>
+            <%= render UI::SeparatorComponent.new(orientation: :vertical) %>
             <div>API</div>
-            <%= render UI::Separator::SeparatorComponent.new(orientation: :vertical) %>
+            <%= render UI::SeparatorComponent.new(orientation: :vertical) %>
             <div>Examples</div>
           </div>
         </div>
@@ -176,7 +176,7 @@
         <h3 class="text-lg font-medium">Horizontal Separator</h3>
         <div class="max-w-md">
           <p class="text-sm">First section</p>
-          <%= render UI::Separator::SeparatorComponent.new(classes: "my-4") %>
+          <%= render UI::SeparatorComponent.new(classes: "my-4") %>
           <p class="text-sm">Second section</p>
         </div>
       </div>
@@ -185,10 +185,10 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Vertical Separator in Breadcrumb</h3>
         <div class="flex items-center space-x-2 text-sm">
-          <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0 h-auto")) { "Home" } %>
-          <%= render UI::Separator::SeparatorComponent.new(orientation: :vertical, classes: "h-4") %>
-          <%= render(UI::Button::ButtonComponent.new(variant: :link, classes: "px-0 h-auto")) { "Components" } %>
-          <%= render UI::Separator::SeparatorComponent.new(orientation: :vertical, classes: "h-4") %>
+          <%= render(UI::ButtonComponent.new(variant: :link, classes: "px-0 h-auto")) { "Home" } %>
+          <%= render UI::SeparatorComponent.new(orientation: :vertical, classes: "h-4") %>
+          <%= render(UI::ButtonComponent.new(variant: :link, classes: "px-0 h-auto")) { "Components" } %>
+          <%= render UI::SeparatorComponent.new(orientation: :vertical, classes: "h-4") %>
           <span class="text-muted-foreground">Separator</span>
         </div>
       </div>
@@ -208,7 +208,7 @@
             <h4 class="font-medium">User Profile</h4>
             <p class="text-sm text-muted-foreground">Manage your profile information</p>
           </div>
-          <%= render UI::Separator::Separator.new %>
+          <%= render UI::Separator.new %>
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
               <span class="text-muted-foreground">Name</span>
@@ -219,10 +219,10 @@
               <span class="font-medium">john@example.com</span>
             </div>
           </div>
-          <%= render UI::Separator::Separator.new %>
+          <%= render UI::Separator.new %>
           <div class="flex gap-2">
-            <%= render UI::Button::Button.new(size: :sm) { "Save" } %>
-            <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Cancel" } %>
+            <%= render UI::Button.new(size: :sm) { "Save" } %>
+            <%= render UI::Button.new(variant: :outline, size: :sm) { "Cancel" } %>
           </div>
         </div>
       </div>
@@ -234,11 +234,11 @@
           <div class="flex items-center justify-between">
             <span class="font-medium">Document.pdf</span>
             <div class="flex items-center gap-2 text-sm">
-              <%= render UI::Button::Button.new(variant: :ghost, size: :sm) { "Download" } %>
-              <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-              <%= render UI::Button::Button.new(variant: :ghost, size: :sm) { "Share" } %>
-              <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "h-4") %>
-              <%= render UI::Button::Button.new(variant: :ghost, size: :sm, classes: "text-destructive hover:text-destructive") { "Delete" } %>
+              <%= render UI::Button.new(variant: :ghost, size: :sm) { "Download" } %>
+              <%= render UI::Separator.new(orientation: :vertical, classes: "h-4") %>
+              <%= render UI::Button.new(variant: :ghost, size: :sm) { "Share" } %>
+              <%= render UI::Separator.new(orientation: :vertical, classes: "h-4") %>
+              <%= render UI::Button.new(variant: :ghost, size: :sm, classes: "text-destructive hover:text-destructive") { "Delete" } %>
             </div>
           </div>
         </div>

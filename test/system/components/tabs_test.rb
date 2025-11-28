@@ -10,23 +10,23 @@ class TabsTest < UI::SystemTestCase
   # Helper methods to get different tabs instances
 
   def erb_tabs
-    find_element(UI::Testing::TabsElement, "#erb-tabs")
+    find_element(UI::TestingTabsElement, "#erb-tabs")
   end
 
   def phlex_tabs
-    find_element(UI::Testing::TabsElement, "#phlex-tabs")
+    find_element(UI::TestingTabsElement, "#phlex-tabs")
   end
 
   def vc_tabs
-    find_element(UI::Testing::TabsElement, "#vc-tabs")
+    find_element(UI::TestingTabsElement, "#vc-tabs")
   end
 
   def disabled_tabs
-    find_element(UI::Testing::TabsElement, "#disabled-tabs")
+    find_element(UI::TestingTabsElement, "#disabled-tabs")
   end
 
   def manual_tabs
-    find_element(UI::Testing::TabsElement, "#manual-tabs")
+    find_element(UI::TestingTabsElement, "#manual-tabs")
   end
 
   # === Basic Interaction Tests ===

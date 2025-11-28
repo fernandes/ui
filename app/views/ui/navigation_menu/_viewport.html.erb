@@ -3,7 +3,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::NavigationMenu::ViewportBehavior
+  extend UI::NavigationMenuViewportBehavior
 
   wrapper_attributes = navigation_menu_viewport_wrapper_html_attributes
   viewport_attributes = navigation_menu_viewport_html_attributes.deep_merge(@attributes)

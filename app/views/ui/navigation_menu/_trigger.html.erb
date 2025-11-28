@@ -5,7 +5,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::NavigationMenu::TriggerBehavior
+  extend UI::NavigationMenuTriggerBehavior
 
   all_attributes = navigation_menu_trigger_html_attributes.deep_merge(@attributes)
 

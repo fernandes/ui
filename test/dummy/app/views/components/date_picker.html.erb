@@ -13,14 +13,14 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker", attributes: { id: "basic-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger", placeholder: "Pick a date" %>
+        <%= render "ui/date_picker", attributes: { id: "basic-date-picker" } do %>
+          <%= render "ui/date_picker/trigger", placeholder: "Pick a date" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker" do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker" do %&gt;
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Pick a date" %&gt;
 &lt;% end %&gt;</p>
       </div>
@@ -36,15 +36,15 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker", label: "Date of birth", attributes: { id: "labeled-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger", placeholder: "Select your birth date" %>
+        <%= render "ui/date_picker", label: "Date of birth", attributes: { id: "labeled-date-picker" } do %>
+          <%= render "ui/date_picker/trigger", placeholder: "Select your birth date" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   label: "Date of birth" do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Select your birth date" %&gt;
 &lt;% end %&gt;</p>
       </div>
@@ -61,24 +61,24 @@
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
         <%= form_with url: "#", method: :get, local: true, class: "space-y-4" do |f| %>
-          <%= render "ui/date_picker/date_picker",
+          <%= render "ui/date_picker",
             name: "booking[date]",
             label: "Booking Date",
             selected: Date.today + 7,
             attributes: { id: "form-date-picker" } do %>
-            <%= render "ui/date_picker/date_picker_trigger",
+            <%= render "ui/date_picker/trigger",
               selected: Date.today + 7 %>
           <% end %>
-          <%= render "ui/button/button", type: "submit", content: "Submit" %>
+          <%= render "ui/button", type: "submit", content: "Submit" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   name: "booking[date]",
   label: "Booking Date",
   selected: Date.today + 7 do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     selected: Date.today + 7 %&gt;
 &lt;% end %&gt;</p>
       </div>
@@ -94,19 +94,19 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker",
+        <%= render "ui/date_picker",
           label: "Date of birth",
           show_dropdowns: true,
           attributes: { id: "dropdowns-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger", placeholder: "Select date" %>
+          <%= render "ui/date_picker/trigger", placeholder: "Select date" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   label: "Date of birth",
   show_dropdowns: true do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Select date" %&gt;
 &lt;% end %&gt;</p>
       </div>
@@ -122,21 +122,21 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker",
+        <%= render "ui/date_picker",
           mode: :range,
           label: "Trip dates",
           attributes: { id: "range-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger",
+          <%= render "ui/date_picker/trigger",
             placeholder: "Select dates",
             classes: "w-[320px]" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   mode: :range,
   label: "Trip dates" do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Select dates",
     classes: "w-[320px]" %&gt;
 &lt;% end %&gt;</p>
@@ -153,23 +153,23 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker",
+        <%= render "ui/date_picker",
           mode: :range,
           number_of_months: 2,
           label: "Vacation dates",
           attributes: { id: "range-multi-month-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger",
+          <%= render "ui/date_picker/trigger",
             placeholder: "Select vacation dates",
             classes: "w-[320px]" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   mode: :range,
   number_of_months: 2,
   label: "Vacation dates" do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Select vacation dates",
     classes: "w-[320px]" %&gt;
 &lt;% end %&gt;</p>
@@ -186,16 +186,16 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker", attributes: { id: "calendar-icon-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger",
+        <%= render "ui/date_picker", attributes: { id: "calendar-icon-date-picker" } do %>
+          <%= render "ui/date_picker/trigger",
             placeholder: "Pick a date",
             icon: :calendar %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker" do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker" do %&gt;
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Pick a date",
     icon: :calendar %&gt;
 &lt;% end %&gt;</p>
@@ -212,22 +212,22 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker",
+        <%= render "ui/date_picker",
           label: "Appointment (next 30 days)",
           min_date: Date.today,
           max_date: Date.today + 30,
           attributes: { id: "constrained-date-picker" } do %>
-          <%= render "ui/date_picker/date_picker_trigger",
+          <%= render "ui/date_picker/trigger",
             placeholder: "Select appointment" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   label: "Appointment (next 30 days)",
   min_date: Date.today,
   max_date: Date.today + 30 do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Select appointment" %&gt;
 &lt;% end %&gt;</p>
       </div>
@@ -243,13 +243,13 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render UI::DatePicker::DatePicker.new(label: "Event date") do |dp| %>
+        <%= render UI::DatePicker.new(label: "Event date") do |dp| %>
           <% dp.trigger(placeholder: "Select event date") %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::DatePicker::DatePicker.new(
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::DatePicker.new(
   label: "Event date"
 ) do |dp| %&gt;
   &lt;% dp.trigger(placeholder: "Select event date") %&gt;
@@ -267,19 +267,19 @@
 
     <div class="flex flex-wrap gap-8">
       <div class="rounded-md border p-4">
-        <%= render "ui/date_picker/date_picker",
+        <%= render "ui/date_picker",
           locale: "pt-BR",
           label: "Data de nascimento" do %>
-          <%= render "ui/date_picker/date_picker_trigger",
+          <%= render "ui/date_picker/trigger",
             placeholder: "Selecione uma data" %>
         <% end %>
       </div>
 
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker/date_picker",
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   locale: "pt-BR",
   label: "Data de nascimento" do %&gt;
-  &lt;%= render "ui/date_picker/date_picker_trigger",
+  &lt;%= render "ui/date_picker/trigger",
     placeholder: "Selecione uma data" %&gt;
 &lt;% end %&gt;</p>
       </div>

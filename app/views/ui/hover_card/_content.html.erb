@@ -6,7 +6,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend UI::HoverCard::HoverCardContentBehavior
+  extend UI::HoverCardContentBehavior
 
   # Get HTML attributes from behavior
   all_attributes = content_html_attributes.deep_merge(@attributes)

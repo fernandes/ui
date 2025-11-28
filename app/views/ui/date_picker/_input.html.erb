@@ -1,0 +1,47 @@
+<%#
+  DatePicker Input component (ERB)
+  An input field with calendar button for date picker.
+
+  @param placeholder [String] Placeholder text (default: "Select date")
+  @param value [String] Initial input value
+  @param id [String] Input ID for label association
+  @param classes [String] Additional CSS classes for input
+  @param icon_classes [String] Additional CSS classes for icon button
+  @param attributes [Hash] Additional HTML attributes
+
+  Basic usage:
+    render "ui/date_picker/date_picker_input", placeholder: "June 01, 2025"
+%>
+<%
+  @placeholder = local_assigns.fetch(:placeholder, "Select date")
+  @value = local_assigns.fetch(:value, "")
+  @id = local_assigns.fetch(:id, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @icon_classes = local_assigns.fetch(:icon_classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::DatePickerInputBehavior
+
+  input_attributes = date_picker_input_html_attributes.deep_merge(@attributes.except(:data))
+  input_attributes[:id] = @id if @id
+  if @attributes[:data]
+    input_attributes[:data] = input_attributes[:data].merge(@attributes[:data])
+  end
+-%>
+<div class="relative flex gap-2">
+  <%= tag.input **input_attributes %>
+  <button
+    type="button"
+    class="<%= date_picker_icon_button_classes %>"
+    data-ui--datepicker-target="trigger"
+    data-ui--popover-target="trigger"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 opacity-50">
+      <path d="M8 2v4"/>
+      <path d="M16 2v4"/>
+      <rect width="18" height="18" x="3" y="4" rx="2"/>
+      <path d="M3 10h18"/>
+    </svg>
+    <span class="sr-only">Select date</span>
+  </button>
+</div>

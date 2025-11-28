@@ -33,6 +33,6 @@
   @visible_toasts = local_assigns.fetch(:visible_toasts, 3)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
-  extend UI::Sonner::ToasterBehavior
+  extend UI::SonnerToasterBehavior
 -%>
 <%= content_tag :ol, "", **toaster_html_attributes %>

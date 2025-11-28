@@ -10,7 +10,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::Table::CaptionBehavior
+  extend UI::TableCaptionBehavior
   all_attributes = caption_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :caption, all_attributes do %>

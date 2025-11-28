@@ -16,11 +16,11 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="grid gap-4 max-w-sm">
-        <%= render UI::Input::Input.new(type: "text", placeholder: "Enter text...") %>
-        <%= render UI::Input::Input.new(type: "email", placeholder: "john@example.com") %>
-        <%= render UI::Input::Input.new(type: "password", placeholder: "Enter password") %>
-        <%= render UI::Input::Input.new(type: "text", value: "Pre-filled value") %>
-        <%= render UI::Input::Input.new(type: "text", placeholder: "Readonly", readonly: true, value: "Read-only value") %>
+        <%= render UI::Input.new(type: "text", placeholder: "Enter text...") %>
+        <%= render UI::Input.new(type: "email", placeholder: "john@example.com") %>
+        <%= render UI::Input.new(type: "password", placeholder: "Enter password") %>
+        <%= render UI::Input.new(type: "text", value: "Pre-filled value") %>
+        <%= render UI::Input.new(type: "text", placeholder: "Readonly", readonly: true, value: "Read-only value") %>
       </div>
     </section>
 
@@ -28,11 +28,11 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="grid gap-4 max-w-sm">
-        <%= render UI::Input::InputComponent.new(type: "text", placeholder: "Enter text...") %>
-        <%= render UI::Input::InputComponent.new(type: "email", placeholder: "john@example.com") %>
-        <%= render UI::Input::InputComponent.new(type: "password", placeholder: "Enter password") %>
-        <%= render UI::Input::InputComponent.new(type: "number", placeholder: "Enter number") %>
-        <%= render UI::Input::InputComponent.new(type: "date") %>
+        <%= render UI::InputComponent.new(type: "text", placeholder: "Enter text...") %>
+        <%= render UI::InputComponent.new(type: "email", placeholder: "john@example.com") %>
+        <%= render UI::InputComponent.new(type: "password", placeholder: "Enter password") %>
+        <%= render UI::InputComponent.new(type: "number", placeholder: "Enter number") %>
+        <%= render UI::InputComponent.new(type: "date") %>
       </div>
     </section>
 
@@ -40,10 +40,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="grid gap-4 max-w-sm">
-        <%= render "ui/input/input", type: "text", placeholder: "Enter text..." %>
-        <%= render "ui/input/input", type: "search", placeholder: "Search..." %>
-        <%= render "ui/input/input", type: "tel", placeholder: "Phone number" %>
-        <%= render "ui/input/input", type: "url", placeholder: "https://example.com" %>
+        <%= render "ui/input", type: "text", placeholder: "Enter text..." %>
+        <%= render "ui/input", type: "search", placeholder: "Search..." %>
+        <%= render "ui/input", type: "tel", placeholder: "Phone number" %>
+        <%= render "ui/input", type: "url", placeholder: "https://example.com" %>
       </div>
     </section>
 
@@ -52,16 +52,16 @@
       <h2 class="text-2xl font-semibold">With Label (Phlex)</h2>
       <div class="grid gap-6 max-w-sm">
         <div class="grid w-full max-w-sm items-center gap-1.5">
-          <%= render UI::Label::Label.new(for: "email") { "Email" } %>
-          <%= render UI::Input::Input.new(
+          <%= render UI::Label.new(for: "email") { "Email" } %>
+          <%= render UI::Input.new(
             type: "email",
             id: "email",
             placeholder: "Email"
           ) %>
         </div>
         <div class="grid w-full max-w-sm items-center gap-1.5">
-          <%= render UI::Label::Label.new(for: "username") { "Username" } %>
-          <%= render UI::Input::Input.new(
+          <%= render UI::Label.new(for: "username") { "Username" } %>
+          <%= render UI::Input.new(
             type: "text",
             id: "username",
             placeholder: "Username"
@@ -79,7 +79,7 @@
       <div class="grid gap-4 max-w-sm">
         <div>
           <label class="text-sm font-medium mb-2 block">Valid Input</label>
-          <%= render UI::Input::InputComponent.new(
+          <%= render UI::InputComponent.new(
             type: "email",
             placeholder: "valid@example.com",
             value: "valid@example.com"
@@ -87,7 +87,7 @@
         </div>
         <div>
           <label class="text-sm font-medium mb-2 block">Invalid Input</label>
-          <%= render UI::Input::InputComponent.new(
+          <%= render UI::InputComponent.new(
             type: "email",
             placeholder: "Email",
             value: "invalid-email",
@@ -102,8 +102,8 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Custom Styling (ERB)</h2>
       <div class="grid gap-4">
-        <%= render "ui/input/input", type: "text", placeholder: "Full width", classes: "w-full" %>
-        <%= render "ui/input/input", type: "text", placeholder: "Max width 300px", classes: "max-w-[300px]" %>
+        <%= render "ui/input", type: "text", placeholder: "Full width", classes: "w-full" %>
+        <%= render "ui/input", type: "text", placeholder: "Max width 300px", classes: "max-w-[300px]" %>
       </div>
     </section>
 
@@ -112,18 +112,18 @@
       <h2 class="text-2xl font-semibold">Form Example (Phlex)</h2>
       <form class="grid gap-4 max-w-sm">
         <div class="grid gap-2">
-          <%= render UI::Label::Label.new(for: "first-name") { "First name" } %>
-          <%= render UI::Input::Input.new(id: "first-name", type: "text", placeholder: "John") %>
+          <%= render UI::Label.new(for: "first-name") { "First name" } %>
+          <%= render UI::Input.new(id: "first-name", type: "text", placeholder: "John") %>
         </div>
         <div class="grid gap-2">
-          <%= render UI::Label::Label.new(for: "last-name") { "Last name" } %>
-          <%= render UI::Input::Input.new(id: "last-name", type: "text", placeholder: "Doe") %>
+          <%= render UI::Label.new(for: "last-name") { "Last name" } %>
+          <%= render UI::Input.new(id: "last-name", type: "text", placeholder: "Doe") %>
         </div>
         <div class="grid gap-2">
-          <%= render UI::Label::Label.new(for: "form-email") { "Email" } %>
-          <%= render UI::Input::Input.new(id: "form-email", type: "email", placeholder: "john@example.com") %>
+          <%= render UI::Label.new(for: "form-email") { "Email" } %>
+          <%= render UI::Input.new(id: "form-email", type: "email", placeholder: "john@example.com") %>
         </div>
-        <%= render UI::Button::Button.new(type: "submit") { "Submit" } %>
+        <%= render UI::Button.new(type: "submit") { "Submit" } %>
       </form>
     </section>
 

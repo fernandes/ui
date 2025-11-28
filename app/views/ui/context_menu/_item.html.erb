@@ -1,0 +1,19 @@
+<%# Context Menu Item Component - Individual menu item %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @href = local_assigns.fetch(:href, nil)
+  @inset = local_assigns.fetch(:inset, false)
+  @variant = local_assigns.fetch(:variant, "default")
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::ContextMenuItemBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = context_menu_item_html_attributes.deep_merge(@attributes)
+  tag_name = @href ? :a : :div
+-%>
+<%= content_tag tag_name, all_attributes do %>
+  <%= content || yield %>
+<% end %>

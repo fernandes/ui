@@ -12,7 +12,7 @@
       <h2 class="text-2xl font-semibold">Default</h2>
       <p class="text-sm text-muted-foreground">A standard progress bar at 60% completion.</p>
     </div>
-    <%= render UI::Progress::Progress.new(value: 60) %>
+    <%= render UI::Progress.new(value: 60) %>
   </div>
 
   <%# Example 2: Different Values (ViewComponent) %>
@@ -27,7 +27,7 @@
           <span class="text-muted-foreground">Starting</span>
           <span class="font-medium">0%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 0) %>
+        <%= render UI::ProgressComponent.new(value: 0) %>
       </div>
 
       <div class="space-y-2">
@@ -35,7 +35,7 @@
           <span class="text-muted-foreground">In Progress</span>
           <span class="font-medium">33%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 33) %>
+        <%= render UI::ProgressComponent.new(value: 33) %>
       </div>
 
       <div class="space-y-2">
@@ -43,7 +43,7 @@
           <span class="text-muted-foreground">Half Way</span>
           <span class="font-medium">50%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 50) %>
+        <%= render UI::ProgressComponent.new(value: 50) %>
       </div>
 
       <div class="space-y-2">
@@ -51,7 +51,7 @@
           <span class="text-muted-foreground">Almost Done</span>
           <span class="font-medium">85%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 85) %>
+        <%= render UI::ProgressComponent.new(value: 85) %>
       </div>
 
       <div class="space-y-2">
@@ -59,7 +59,7 @@
           <span class="text-muted-foreground">Complete</span>
           <span class="font-medium">100%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 100) %>
+        <%= render UI::ProgressComponent.new(value: 100) %>
       </div>
     </div>
   </div>
@@ -73,22 +73,22 @@
     <div class="space-y-4">
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">Small (h-1)</p>
-        <%= render "ui/progress/progress", value: 60, classes: "h-1" %>
+        <%= render "ui/progress", value: 60, classes: "h-1" %>
       </div>
 
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">Default (h-2)</p>
-        <%= render "ui/progress/progress", value: 60 %>
+        <%= render "ui/progress", value: 60 %>
       </div>
 
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">Medium (h-3)</p>
-        <%= render "ui/progress/progress", value: 60, classes: "h-3" %>
+        <%= render "ui/progress", value: 60, classes: "h-3" %>
       </div>
 
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">Large (h-4)</p>
-        <%= render "ui/progress/progress", value: 60, classes: "h-4" %>
+        <%= render "ui/progress", value: 60, classes: "h-4" %>
       </div>
     </div>
   </div>
@@ -102,17 +102,17 @@
     <div class="space-y-4">
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">25% width container</p>
-        <%= render UI::Progress::Progress.new(value: 60, classes: "w-1/4") %>
+        <%= render UI::Progress.new(value: 60, classes: "w-1/4") %>
       </div>
 
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">50% width container</p>
-        <%= render UI::Progress::Progress.new(value: 60, classes: "w-1/2") %>
+        <%= render UI::Progress.new(value: 60, classes: "w-1/2") %>
       </div>
 
       <div class="space-y-2">
         <p class="text-sm text-muted-foreground">75% width container</p>
-        <%= render UI::Progress::Progress.new(value: 60, classes: "w-3/4") %>
+        <%= render UI::Progress.new(value: 60, classes: "w-3/4") %>
       </div>
     </div>
   </div>
@@ -132,7 +132,7 @@
           </div>
           <span class="text-sm font-medium">30%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 30) %>
+        <%= render UI::ProgressComponent.new(value: 30) %>
       </div>
 
       <div class="space-y-3">
@@ -143,7 +143,7 @@
           </div>
           <span class="text-sm font-medium">76%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 76) %>
+        <%= render UI::ProgressComponent.new(value: 76) %>
       </div>
 
       <div class="space-y-3">
@@ -154,7 +154,7 @@
           </div>
           <span class="text-sm font-medium text-green-600">100%</span>
         </div>
-        <%= render UI::Progress::ProgressComponent.new(value: 100) %>
+        <%= render UI::ProgressComponent.new(value: 100) %>
       </div>
     </div>
   </div>

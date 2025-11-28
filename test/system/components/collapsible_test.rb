@@ -9,22 +9,22 @@ class CollapsibleTest < UI::SystemTestCase
 
   # Helper to get the basic collapsible
   def basic_collapsible
-    find_element(UI::Testing::CollapsibleElement, "#basic-collapsible")
+    find_element(UI::TestingCollapsibleElement, "#basic-collapsible")
   end
 
   # Helper to get the initially open collapsible
   def open_collapsible
-    find_element(UI::Testing::CollapsibleElement, "#open-collapsible")
+    find_element(UI::TestingCollapsibleElement, "#open-collapsible")
   end
 
   # Helper to get the ERB collapsible
   def erb_collapsible
-    find_element(UI::Testing::CollapsibleElement, "#erb-collapsible")
+    find_element(UI::TestingCollapsibleElement, "#erb-collapsible")
   end
 
   # Helper to get the card collapsible
   def card_collapsible
-    find_element(UI::Testing::CollapsibleElement, "#card-collapsible")
+    find_element(UI::TestingCollapsibleElement, "#card-collapsible")
   end
 
   # === Basic Interaction Tests ===

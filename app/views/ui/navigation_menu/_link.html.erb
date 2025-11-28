@@ -14,7 +14,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::NavigationMenu::LinkBehavior
+  extend UI::NavigationMenuLinkBehavior
 
   # Build link attributes
   base_attrs = navigation_menu_link_html_attributes

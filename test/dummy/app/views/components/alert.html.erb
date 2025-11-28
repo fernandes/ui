@@ -18,52 +18,52 @@
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Default Variant</h3>
-        <%= render UI::Alert::Alert.new do %>
+        <%= render UI::Alert.new do %>
           <%= lucide_icon("circle-check") %>
-          <%= render UI::Alert::Title.new { "Success" } %>
-          <%= render UI::Alert::Description.new { "Your changes have been saved successfully." } %>
+          <%= render UI::AlertTitle.new { "Success" } %>
+          <%= render UI::AlertDescription.new { "Your changes have been saved successfully." } %>
         <% end %>
       </div>
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Destructive Variant</h3>
-        <%= render UI::Alert::Alert.new(variant: :destructive) do %>
+        <%= render UI::Alert.new(variant: :destructive) do %>
           <%= lucide_icon("circle-alert") %>
-          <%= render UI::Alert::Title.new { "Error" } %>
-          <%= render UI::Alert::Description.new { "Your session has expired. Please log in again." } %>
+          <%= render UI::AlertTitle.new { "Error" } %>
+          <%= render UI::AlertDescription.new { "Your session has expired. Please log in again." } %>
         <% end %>
       </div>
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Without Icon</h3>
-        <%= render UI::Alert::Alert.new do %>
-          <%= render UI::Alert::Title.new { "Heads up!" } %>
-          <%= render UI::Alert::Description.new { "You can add components to your app using the CLI." } %>
+        <%= render UI::Alert.new do %>
+          <%= render UI::AlertTitle.new { "Heads up!" } %>
+          <%= render UI::AlertDescription.new { "You can add components to your app using the CLI." } %>
         <% end %>
       </div>
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Without Title</h3>
-        <%= render UI::Alert::Alert.new do %>
-          <%= render UI::Alert::Description.new { "This is a simple notification without a title." } %>
+        <%= render UI::Alert.new do %>
+          <%= render UI::AlertDescription.new { "This is a simple notification without a title." } %>
         <% end %>
       </div>
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Warning</h3>
-        <%= render UI::Alert::Alert.new(variant: :destructive) do %>
+        <%= render UI::Alert.new(variant: :destructive) do %>
           <%= lucide_icon("triangle-alert") %>
-          <%= render UI::Alert::Title.new { "Warning" } %>
-          <%= render UI::Alert::Description.new { "This action cannot be undone. Please proceed with caution." } %>
+          <%= render UI::AlertTitle.new { "Warning" } %>
+          <%= render UI::AlertDescription.new { "This action cannot be undone. Please proceed with caution." } %>
         <% end %>
       </div>
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Info</h3>
-        <%= render UI::Alert::Alert.new do %>
+        <%= render UI::Alert.new do %>
           <%= lucide_icon("info") %>
-          <%= render UI::Alert::Title.new { "Did you know?" } %>
-          <%= render UI::Alert::Description.new { "You can use keyboard shortcuts to navigate faster through the application." } %>
+          <%= render UI::AlertTitle.new { "Did you know?" } %>
+          <%= render UI::AlertDescription.new { "You can use keyboard shortcuts to navigate faster through the application." } %>
         <% end %>
       </div>
     </section>
@@ -74,19 +74,19 @@
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Default Variant</h3>
-        <%= render(UI::Alert::AlertComponent.new) do %>
+        <%= render(UI::AlertComponent.new) do %>
           <%= lucide_icon("circle-check") %>
-          <%= render(UI::Alert::TitleComponent.new) { "Success" } %>
-          <%= render(UI::Alert::DescriptionComponent.new) { "Your operation completed successfully." } %>
+          <%= render(UI::AlertTitleComponent.new) { "Success" } %>
+          <%= render(UI::AlertDescriptionComponent.new) { "Your operation completed successfully." } %>
         <% end %>
       </div>
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Destructive Variant</h3>
-        <%= render(UI::Alert::AlertComponent.new(variant: :destructive)) do %>
+        <%= render(UI::AlertComponent.new(variant: :destructive)) do %>
           <%= lucide_icon("circle-alert") %>
-          <%= render(UI::Alert::TitleComponent.new) { "Error" } %>
-          <%= render(UI::Alert::DescriptionComponent.new) { "An error occurred while processing your request." } %>
+          <%= render(UI::AlertTitleComponent.new) { "Error" } %>
+          <%= render(UI::AlertDescriptionComponent.new) { "An error occurred while processing your request." } %>
         <% end %>
       </div>
     </section>
@@ -97,7 +97,7 @@
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Default Variant</h3>
-        <%= render "ui/alert/alert", variant: :default do %>
+        <%= render "ui/alert", variant: :default do %>
           <%= lucide_icon("circle-check") %>
           <%= render "ui/alert/title" do %>Success<% end %>
           <%= render "ui/alert/description" do %>Your settings have been updated.<% end %>
@@ -106,7 +106,7 @@
 
       <div class="space-y-4">
         <h3 class="text-xl font-medium">Destructive Variant</h3>
-        <%= render "ui/alert/alert", variant: :destructive do %>
+        <%= render "ui/alert", variant: :destructive do %>
           <%= lucide_icon("circle-alert") %>
           <%= render "ui/alert/title" do %>Error<% end %>
           <%= render "ui/alert/description" do %>Failed to save your changes. Please try again.<% end %>
@@ -118,18 +118,18 @@
     <section class="space-y-6">
       <h2 class="text-2xl font-semibold border-b pb-2">All Variants Together</h2>
       <div class="space-y-4">
-        <%= render UI::Alert::Alert.new do %>
-          <%= render UI::Alert::Title.new { "Information" } %>
-          <%= render UI::Alert::Description.new { "This is a default informational alert." } %>
+        <%= render UI::Alert.new do %>
+          <%= render UI::AlertTitle.new { "Information" } %>
+          <%= render UI::AlertDescription.new { "This is a default informational alert." } %>
         <% end %>
 
-        <%= render UI::Alert::Alert.new(variant: :destructive) do %>
-          <%= render UI::Alert::Title.new { "Critical" } %>
-          <%= render UI::Alert::Description.new { "This is a destructive/error alert." } %>
+        <%= render UI::Alert.new(variant: :destructive) do %>
+          <%= render UI::AlertTitle.new { "Critical" } %>
+          <%= render UI::AlertDescription.new { "This is a destructive/error alert." } %>
         <% end %>
 
-        <%= render UI::Alert::Alert.new do %>
-          <%= render UI::Alert::Description.new { "Simple message without title." } %>
+        <%= render UI::Alert.new do %>
+          <%= render UI::AlertDescription.new { "Simple message without title." } %>
         <% end %>
       </div>
     </section>
@@ -138,16 +138,16 @@
     <section class="space-y-6">
       <h2 class="text-2xl font-semibold border-b pb-2">Custom Styling</h2>
       <div class="space-y-4">
-        <%= render UI::Alert::Alert.new(classes: "border-blue-500 bg-blue-50 dark:bg-blue-950/20") do %>
+        <%= render UI::Alert.new(classes: "border-blue-500 bg-blue-50 dark:bg-blue-950/20") do %>
           <%= lucide_icon("info", class: "text-blue-600") %>
-          <%= render UI::Alert::Title.new(classes: "text-blue-900 dark:text-blue-100") { "Custom Blue Alert" } %>
-          <%= render UI::Alert::Description.new(classes: "text-blue-700 dark:text-blue-300") { "This alert uses custom Tailwind classes for blue styling." } %>
+          <%= render UI::AlertTitle.new(classes: "text-blue-900 dark:text-blue-100") { "Custom Blue Alert" } %>
+          <%= render UI::AlertDescription.new(classes: "text-blue-700 dark:text-blue-300") { "This alert uses custom Tailwind classes for blue styling." } %>
         <% end %>
 
-        <%= render UI::Alert::Alert.new(classes: "border-green-500 bg-green-50 dark:bg-green-950/20") do %>
+        <%= render UI::Alert.new(classes: "border-green-500 bg-green-50 dark:bg-green-950/20") do %>
           <%= lucide_icon("circle-check", class: "text-green-600") %>
-          <%= render UI::Alert::Title.new(classes: "text-green-900 dark:text-green-100") { "Custom Green Alert" } %>
-          <%= render UI::Alert::Description.new(classes: "text-green-700 dark:text-green-300") { "This alert uses custom Tailwind classes for success green styling." } %>
+          <%= render UI::AlertTitle.new(classes: "text-green-900 dark:text-green-100") { "Custom Green Alert" } %>
+          <%= render UI::AlertDescription.new(classes: "text-green-700 dark:text-green-300") { "This alert uses custom Tailwind classes for success green styling." } %>
         <% end %>
       </div>
     </section>

@@ -11,7 +11,7 @@ module UI
     # === Basic Interaction Tests ===
 
     test "opens context menu via right-click" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       assert menu.closed?, "Menu should start closed"
 
@@ -22,7 +22,7 @@ module UI
     end
 
     test "closes context menu with escape key" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       assert menu.open?
@@ -33,7 +33,7 @@ module UI
     end
 
     test "closes context menu when clicking outside" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       assert menu.open?
@@ -45,7 +45,7 @@ module UI
     end
 
     test "can click menu items" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       menu.select_item("Back")
@@ -59,7 +59,7 @@ module UI
     # === Item Tests ===
 
     test "lists all menu items" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -69,7 +69,7 @@ module UI
     end
 
     test "checks if menu has specific items" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -80,7 +80,7 @@ module UI
     end
 
     test "counts menu items correctly" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -90,7 +90,7 @@ module UI
     # === Disabled Items Tests ===
 
     test "renders disabled items with correct styling" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -110,7 +110,7 @@ module UI
     # === Checkbox Items Tests ===
 
     test "renders checkbox items with correct initial state" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -122,7 +122,7 @@ module UI
     end
 
     test "checkbox items can be clicked" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -137,7 +137,7 @@ module UI
     # === Radio Items Tests ===
 
     test "renders radio items with correct initial state" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -147,7 +147,7 @@ module UI
     end
 
     test "radio items can be clicked" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -161,7 +161,7 @@ module UI
     # === Separator Tests ===
 
     test "counts separators correctly" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -171,7 +171,7 @@ module UI
     # === Shortcut Display Tests ===
 
     test "displays shortcuts for items" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -186,7 +186,7 @@ module UI
     # === Keyboard Navigation Tests ===
 
     test "navigates items with arrow keys" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       sleep 0.2 # Wait for initial focus
@@ -211,7 +211,7 @@ module UI
     end
 
     test "activates item with enter key" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       sleep 0.2
@@ -225,7 +225,7 @@ module UI
     end
 
     test "wraps around when navigating past last item" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       sleep 0.2
@@ -243,7 +243,7 @@ module UI
     end
 
     test "wraps around when navigating before first item" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#erb-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       sleep 0.2
@@ -260,7 +260,7 @@ module UI
     # === ARIA Attributes Tests ===
 
     test "trigger renders correctly" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       # Trigger should exist and have the correct data target
       assert menu.trigger, "Trigger should exist"
@@ -268,7 +268,7 @@ module UI
     end
 
     test "content has correct role" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -278,7 +278,7 @@ module UI
     # === Icons Test ===
 
     test "renders menu items with icons" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-icons [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-icons [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -291,7 +291,7 @@ module UI
     # === Destructive Variant Test ===
 
     test "renders destructive variant items" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#phlex-icons [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#phlex-icons [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 
@@ -305,7 +305,7 @@ module UI
     # === ViewComponent Tests ===
 
     test "works with ViewComponent implementation" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#vc-basic [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#vc-basic [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
       assert menu.open?
@@ -322,7 +322,7 @@ module UI
     end
 
     test "ViewComponent complete example has all features" do
-      menu = find_element(UI::Testing::ContextMenuElement, "#vc-complete [data-controller='ui--context-menu']")
+      menu = find_element(UI::TestingContextMenuElement, "#vc-complete [data-controller='ui--context-menu']")
 
       menu.open_via_right_click
 

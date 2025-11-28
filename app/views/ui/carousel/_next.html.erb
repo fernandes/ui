@@ -4,10 +4,10 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::Carousel::CarouselNextBehavior
+  extend UI::CarouselNextBehavior
   all_attributes = carousel_next_html_attributes
 %>
-<%= render "ui/button/button", attributes: all_attributes, classes: carousel_next_classes, variant: :ghost, size: :icon do %>
+<%= render "ui/button", attributes: all_attributes, classes: carousel_next_classes, variant: :ghost, size: :icon do %>
   <%= lucide_icon("arrow-right", class: "size-4") %>
   <span class="sr-only">Next slide</span>
 <% end %>

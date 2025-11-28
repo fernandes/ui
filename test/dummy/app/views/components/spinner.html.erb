@@ -20,14 +20,14 @@
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
           <div class="p-6 border rounded-lg">
-            <%= render UI::Spinner::Spinner.new %>
+            <%= render UI::Spinner.new %>
           </div>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
           <div class="p-6 border rounded-lg">
-            <%= render UI::Spinner::SpinnerComponent.new %>
+            <%= render UI::SpinnerComponent.new %>
           </div>
         </div>
 
@@ -48,20 +48,20 @@
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
           <div class="p-6 border rounded-lg flex items-center gap-6">
-            <%= render UI::Spinner::Spinner.new(size: "sm") %>
-            <%= render UI::Spinner::Spinner.new(size: "default") %>
-            <%= render UI::Spinner::Spinner.new(size: "lg") %>
-            <%= render UI::Spinner::Spinner.new(size: "xl") %>
+            <%= render UI::Spinner.new(size: "sm") %>
+            <%= render UI::Spinner.new(size: "default") %>
+            <%= render UI::Spinner.new(size: "lg") %>
+            <%= render UI::Spinner.new(size: "xl") %>
           </div>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
           <div class="p-6 border rounded-lg flex items-center gap-6">
-            <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
-            <%= render UI::Spinner::SpinnerComponent.new(size: "default") %>
-            <%= render UI::Spinner::SpinnerComponent.new(size: "lg") %>
-            <%= render UI::Spinner::SpinnerComponent.new(size: "xl") %>
+            <%= render UI::SpinnerComponent.new(size: "sm") %>
+            <%= render UI::SpinnerComponent.new(size: "default") %>
+            <%= render UI::SpinnerComponent.new(size: "lg") %>
+            <%= render UI::SpinnerComponent.new(size: "xl") %>
           </div>
         </div>
 
@@ -85,22 +85,22 @@
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
           <div class="p-6 border rounded-lg flex items-center gap-6">
-            <%= render UI::Spinner::Spinner.new(classes: "text-primary") %>
-            <%= render UI::Spinner::Spinner.new(classes: "text-blue-500") %>
-            <%= render UI::Spinner::Spinner.new(classes: "text-green-500") %>
-            <%= render UI::Spinner::Spinner.new(classes: "text-red-500") %>
-            <%= render UI::Spinner::Spinner.new(classes: "text-yellow-500") %>
+            <%= render UI::Spinner.new(classes: "text-primary") %>
+            <%= render UI::Spinner.new(classes: "text-blue-500") %>
+            <%= render UI::Spinner.new(classes: "text-green-500") %>
+            <%= render UI::Spinner.new(classes: "text-red-500") %>
+            <%= render UI::Spinner.new(classes: "text-yellow-500") %>
           </div>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
           <div class="p-6 border rounded-lg flex items-center gap-6">
-            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-primary") %>
-            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-blue-500") %>
-            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-green-500") %>
-            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-red-500") %>
-            <%= render UI::Spinner::SpinnerComponent.new(classes: "text-yellow-500") %>
+            <%= render UI::SpinnerComponent.new(classes: "text-primary") %>
+            <%= render UI::SpinnerComponent.new(classes: "text-blue-500") %>
+            <%= render UI::SpinnerComponent.new(classes: "text-green-500") %>
+            <%= render UI::SpinnerComponent.new(classes: "text-red-500") %>
+            <%= render UI::SpinnerComponent.new(classes: "text-yellow-500") %>
           </div>
         </div>
 
@@ -125,16 +125,16 @@
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
           <div class="p-6 border rounded-lg flex items-center gap-4">
-            <%= render UI::Button::Button.new(disabled: true) do %>
-              <%= render UI::Spinner::Spinner.new(size: "sm") %>
+            <%= render UI::Button.new(disabled: true) do %>
+              <%= render UI::Spinner.new(size: "sm") %>
               <span class="ml-2">Loading...</span>
             <% end %>
-            <%= render UI::Button::Button.new(variant: "secondary", disabled: true) do %>
-              <%= render UI::Spinner::Spinner.new(size: "sm") %>
+            <%= render UI::Button.new(variant: "secondary", disabled: true) do %>
+              <%= render UI::Spinner.new(size: "sm") %>
               <span class="ml-2">Please wait</span>
             <% end %>
-            <%= render UI::Button::Button.new(variant: "outline", disabled: true) do %>
-              <%= render UI::Spinner::Spinner.new(size: "sm") %>
+            <%= render UI::Button.new(variant: "outline", disabled: true) do %>
+              <%= render UI::Spinner.new(size: "sm") %>
               <span class="ml-2">Processing</span>
             <% end %>
           </div>
@@ -143,16 +143,16 @@
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
           <div class="p-6 border rounded-lg flex items-center gap-4">
-            <%= render UI::Button::ButtonComponent.new(disabled: true) do %>
-              <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+            <%= render UI::ButtonComponent.new(disabled: true) do %>
+              <%= render UI::SpinnerComponent.new(size: "sm") %>
               <span class="ml-2">Loading...</span>
             <% end %>
-            <%= render UI::Button::ButtonComponent.new(variant: "secondary", disabled: true) do %>
-              <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+            <%= render UI::ButtonComponent.new(variant: "secondary", disabled: true) do %>
+              <%= render UI::SpinnerComponent.new(size: "sm") %>
               <span class="ml-2">Please wait</span>
             <% end %>
-            <%= render UI::Button::ButtonComponent.new(variant: "outline", disabled: true) do %>
-              <%= render UI::Spinner::SpinnerComponent.new(size: "sm") %>
+            <%= render UI::ButtonComponent.new(variant: "outline", disabled: true) do %>
+              <%= render UI::SpinnerComponent.new(size: "sm") %>
               <span class="ml-2">Processing</span>
             <% end %>
           </div>
@@ -187,7 +187,7 @@
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
           <div class="p-6 border rounded-lg">
             <div class="flex items-center gap-3">
-              <%= render UI::Spinner::Spinner.new %>
+              <%= render UI::Spinner.new %>
               <span>Processing payment...</span>
             </div>
           </div>
@@ -197,7 +197,7 @@
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
           <div class="p-6 border rounded-lg">
             <div class="flex items-center gap-3">
-              <%= render UI::Spinner::SpinnerComponent.new %>
+              <%= render UI::SpinnerComponent.new %>
               <span>Processing payment...</span>
             </div>
           </div>
@@ -224,7 +224,7 @@
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
           <div class="p-6 border rounded-lg">
             <div class="flex flex-col items-center justify-center gap-4 p-8">
-              <%= render UI::Spinner::Spinner.new(size: "lg") %>
+              <%= render UI::Spinner.new(size: "lg") %>
               <div class="text-center">
                 <div class="font-medium">Processing your request</div>
                 <p class="text-sm text-muted-foreground">Please wait while we process your request.</p>
@@ -237,7 +237,7 @@
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
           <div class="p-6 border rounded-lg">
             <div class="flex flex-col items-center justify-center gap-4 p-8">
-              <%= render UI::Spinner::SpinnerComponent.new(size: "lg") %>
+              <%= render UI::SpinnerComponent.new(size: "lg") %>
               <div class="text-center">
                 <div class="font-medium">Processing your request</div>
                 <p class="text-sm text-muted-foreground">Please wait while we process your request.</p>

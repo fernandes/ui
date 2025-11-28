@@ -4,7 +4,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend UI::Tooltip::TooltipTriggerBehavior
+  extend UI::TooltipTriggerBehavior
 
   # Get HTML attributes from behavior
   trigger_attrs = tooltip_trigger_html_attributes.deep_merge(@attributes)

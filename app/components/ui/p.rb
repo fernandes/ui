@@ -8,7 +8,7 @@ module UI
     end
 
     def view_template(&block)
-      extend UI::Typography::PBehavior
+      extend UI::PBehavior
       p(**p_html_attributes.merge(@attributes), &block)
     end
   end

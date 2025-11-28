@@ -16,12 +16,12 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Button::Button.new(variant: "default") { "Default" } %>
-        <%= render UI::Button::Button.new(variant: "secondary") { "Secondary" } %>
-        <%= render UI::Button::Button.new(variant: "destructive") { "Destructive" } %>
-        <%= render UI::Button::Button.new(variant: "outline") { "Outline" } %>
-        <%= render UI::Button::Button.new(variant: "ghost") { "Ghost" } %>
-        <%= render UI::Button::Button.new(variant: "link") { "Link" } %>
+        <%= render UI::Button.new(variant: "default") { "Default" } %>
+        <%= render UI::Button.new(variant: "secondary") { "Secondary" } %>
+        <%= render UI::Button.new(variant: "destructive") { "Destructive" } %>
+        <%= render UI::Button.new(variant: "outline") { "Outline" } %>
+        <%= render UI::Button.new(variant: "ghost") { "Ghost" } %>
+        <%= render UI::Button.new(variant: "link") { "Link" } %>
       </div>
     </section>
 
@@ -29,12 +29,12 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render(UI::Button::ButtonComponent.new(variant: "default")) { "Default" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "secondary")) { "Secondary" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "destructive")) { "Destructive" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "outline")) { "Outline" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "ghost")) { "Ghost" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "link")) { "Link" } %>
+        <%= render(UI::ButtonComponent.new(variant: "default")) { "Default" } %>
+        <%= render(UI::ButtonComponent.new(variant: "secondary")) { "Secondary" } %>
+        <%= render(UI::ButtonComponent.new(variant: "destructive")) { "Destructive" } %>
+        <%= render(UI::ButtonComponent.new(variant: "outline")) { "Outline" } %>
+        <%= render(UI::ButtonComponent.new(variant: "ghost")) { "Ghost" } %>
+        <%= render(UI::ButtonComponent.new(variant: "link")) { "Link" } %>
       </div>
     </section>
 
@@ -55,10 +55,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Sizes (Phlex)</h2>
       <div class="flex flex-wrap items-center gap-4">
-        <%= render UI::Button::Button.new(size: "sm") { "Small" } %>
-        <%= render UI::Button::Button.new(size: "default") { "Default" } %>
-        <%= render UI::Button::Button.new(size: "lg") { "Large" } %>
-        <%= render UI::Button::Button.new(size: "icon", variant: "outline") do %>
+        <%= render UI::Button.new(size: "sm") { "Small" } %>
+        <%= render UI::Button.new(size: "default") { "Default" } %>
+        <%= render UI::Button.new(size: "lg") { "Large" } %>
+        <%= render UI::Button.new(size: "icon", variant: "outline") do %>
           <%= lucide_icon("chevron-right") %>
         <% end %>
       </div>
@@ -68,13 +68,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Disabled State (ViewComponent)</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render(UI::Button::ButtonComponent.new(disabled: true)) { "Disabled Default" } %>
-        <%= render UI::Button::ButtonComponent.new(disabled: true) do %>
+        <%= render(UI::ButtonComponent.new(disabled: true)) { "Disabled Default" } %>
+        <%= render UI::ButtonComponent.new(disabled: true) do %>
           Disabled Default
         <% end %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "secondary", disabled: true)) { "Disabled Secondary" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "destructive", disabled: true)) { "Disabled Destructive" } %>
-        <%= render(UI::Button::ButtonComponent.new(variant: "outline", disabled: true)) { "Disabled Outline" } %>
+        <%= render(UI::ButtonComponent.new(variant: "secondary", disabled: true)) { "Disabled Secondary" } %>
+        <%= render(UI::ButtonComponent.new(variant: "destructive", disabled: true)) { "Disabled Destructive" } %>
+        <%= render(UI::ButtonComponent.new(variant: "outline", disabled: true)) { "Disabled Outline" } %>
       </div>
     </section>
 

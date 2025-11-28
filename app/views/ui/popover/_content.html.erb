@@ -1,0 +1,14 @@
+<%# Popover Content - The floating content panel %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::PopoverContentBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = popover_content_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

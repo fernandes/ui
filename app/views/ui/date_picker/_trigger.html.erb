@@ -1,0 +1,53 @@
+<%#
+  DatePicker Trigger component (ERB)
+  A button that triggers the date picker popover.
+
+  @param placeholder [String] Placeholder text when no date selected (default: "Select date")
+  @param selected [Date, Range, Array] Currently selected date(s) for display
+  @param icon [Symbol] Icon to show: :chevron (default), :calendar, or :none
+  @param classes [String] Additional CSS classes
+  @param attributes [Hash] Additional HTML attributes
+
+  Basic usage:
+    render "ui/date_picker/date_picker_trigger", placeholder: "Pick a date"
+
+  With calendar icon:
+    render "ui/date_picker/date_picker_trigger", icon: :calendar
+%>
+<%
+  @placeholder = local_assigns.fetch(:placeholder, "Select date")
+  @selected = local_assigns.fetch(:selected, nil)
+  @icon = local_assigns.fetch(:icon, :chevron)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  extend UI::DatePickerTriggerBehavior
+
+  all_attributes = date_picker_trigger_html_attributes.deep_merge(@attributes.except(:data))
+  if @attributes[:data]
+    all_attributes[:data] = all_attributes[:data].merge(@attributes[:data])
+  end
+
+  # Generate initial display text
+  display_text = if @selected.nil?
+    @placeholder
+  elsif @selected.is_a?(Date)
+    @selected.strftime("%B %d, %Y")
+  elsif @selected.is_a?(Range)
+    "#{@selected.begin.strftime('%B %d, %Y')} - #{@selected.end.strftime('%B %d, %Y')}"
+  elsif @selected.is_a?(Array) && @selected.any?
+    @selected.length == 1 ? @selected.first.strftime("%B %d, %Y") : "#{@selected.length} dates selected"
+  else
+    @placeholder
+  end
+-%>
+<%= content_tag :button, all_attributes do %>
+  <span data-ui--datepicker-target="label" class="text-left truncate flex-1 <%= 'text-muted-foreground' if @selected.nil? %>">
+    <%= display_text %>
+  </span>
+  <% if @icon == :chevron %>
+    <%= chevron_down_icon %>
+  <% elsif @icon == :calendar %>
+    <%= calendar_icon %>
+  <% end %>
+<% end %>

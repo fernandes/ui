@@ -8,7 +8,7 @@
   @disabled = local_assigns.fetch(:disabled, false)
 
   # Extend behavior for shared logic
-  extend UI::Menubar::MenubarRadioItemBehavior
+  extend UI::MenubarRadioItemBehavior
 
   # Get HTML attributes from behavior
   all_attributes = menubar_radio_item_html_attributes.deep_merge(@attributes)

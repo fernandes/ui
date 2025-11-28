@@ -6,7 +6,7 @@
   @inset = local_assigns.fetch(:inset, false)
 
   # Extend behavior for shared logic
-  extend UI::Menubar::MenubarLabelBehavior
+  extend UI::MenubarLabelBehavior
 
   # Get HTML attributes from behavior
   all_attributes = menubar_label_html_attributes.deep_merge(@attributes)

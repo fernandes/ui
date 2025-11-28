@@ -20,7 +20,7 @@ module UI
     #   sheet.close_button.click
     #
     # @example Testing different sides
-    #   sheet = find_element(UI::Testing::SheetElement, "#sheet-top")
+    #   sheet = find_element(UI::TestingSheetElement, "#sheet-top")
     #   sheet.open
     #   assert sheet.slide_from?(:top)
     #

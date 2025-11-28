@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Command::ShortcutBehavior
+  extend UI::CommandShortcutBehavior
   all_attributes = command_shortcut_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :span, all_attributes do %>

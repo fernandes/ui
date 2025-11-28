@@ -1,0 +1,14 @@
+<%# Dropdown Menu Sub Component - Container for submenu %>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::DropdownMenuSubBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = dropdown_menu_sub_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

@@ -1,16 +1,38 @@
-<%# Button Component - shadcn/ui inspired button for Rails %>
 <%
-  content ||= local_assigns.fetch(:content, nil)
-  @classes = local_assigns.fetch(:classes, "")
-  @attributes = local_assigns.fetch(:attributes, {})
+  # Button - ERB Partial
+  #
+  # A versatile button component with multiple variants and sizes.
+  # Uses ButtonBehavior module for shared styling logic.
+  #
+  # @param content [String] Button text content (alternative to using block)
+  # @param variant [String] Visual style variant (default, destructive, outline, secondary, ghost, link)
+  # @param size [String] Size variant (default, sm, lg, icon, icon-sm, icon-lg)
+  # @param type [String] Button type attribute (button, submit, reset)
+  # @param disabled [Boolean] Whether the button is disabled
+  # @param classes [String] Additional CSS classes to merge
+  # @param attributes [Hash] Additional HTML attributes
+
   @variant = local_assigns.fetch(:variant, "default")
-  @disabled = local_assigns.fetch(:disabled, nil)
   @size = local_assigns.fetch(:size, "default")
   @type = local_assigns.fetch(:type, "button")
+  @disabled = local_assigns.fetch(:disabled, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  content_param = local_assigns.fetch(:content, nil)
 
-  # Extend behavior for shared logic
-  extend ::UI::ButtonBehavior
+  extend UI::ButtonBehavior
+  base_attrs = button_html_attributes
+
+  # Merge classes using TailwindMerge to properly combine button classes with passed attributes
+  merged_class = TailwindMerge::Merger.new.merge([
+    base_attrs[:class],
+    @attributes[:class]
+  ].compact.join(" "))
+
+  # Deep merge other attributes, then set the merged class
+  all_attributes = base_attrs.deep_merge(@attributes.except(:class))
+  all_attributes[:class] = merged_class
 %>
-<%= render_button do %>
-  <%= content || yield %>
+<%= content_tag :button, all_attributes do %>
+  <%= content_param || yield %>
 <% end %>

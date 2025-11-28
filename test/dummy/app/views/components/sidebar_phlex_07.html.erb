@@ -9,15 +9,15 @@
   - User footer with avatar
 %>
 
-<%= render UI::Sidebar::SidebarProvider.new(open: true, collapsible: :icon) do %>
-  <%= render UI::Sidebar::Sidebar.new(side: :left, variant: :sidebar) do %>
+<%= render UI::SidebarProvider.new(open: true, collapsible: :icon) do %>
+  <%= render UI::Sidebar.new(side: :left, variant: :sidebar) do %>
     <%# Header with company selector dropdown %>
-    <%= render UI::Sidebar::Header.new do %>
-      <%= render UI::Sidebar::Menu.new do %>
-        <%= render UI::DropdownMenu::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
-          <%= render UI::Sidebar::MenuItem.new(**dropdown_attrs) do %>
-            <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-              <%= render UI::Sidebar::MenuButton.new(size: :lg, classes: "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground", **trigger_attrs) do %>
+    <%= render UI::SidebarHeader.new do %>
+      <%= render UI::SidebarMenu.new do %>
+        <%= render UI::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
+          <%= render UI::SidebarMenuItem.new(**dropdown_attrs) do %>
+            <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+              <%= render UI::SidebarMenuButton.new(size: :lg, classes: "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground", **trigger_attrs) do %>
                 <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <%= lucide_icon("gallery-vertical-end", class: "size-4") %>
                 </div>
@@ -28,31 +28,31 @@
                 <%= lucide_icon("chevrons-up-down", class: "ml-auto") %>
               <% end %>
             <% end %>
-            <%= render UI::DropdownMenu::Content.new(classes: "w-(--ui-dropdown-menu-trigger-width) min-w-56 rounded-lg", side_offset: 4) do %>
-              <%= render UI::DropdownMenu::Label.new(classes: "text-muted-foreground text-xs") { "Teams" } %>
-              <%= render UI::DropdownMenu::Item.new(classes: "gap-2 p-2") do %>
+            <%= render UI::DropdownMenuContent.new(classes: "w-(--ui-dropdown-menu-trigger-width) min-w-56 rounded-lg", side_offset: 4) do %>
+              <%= render UI::DropdownMenuLabel.new(classes: "text-muted-foreground text-xs") { "Teams" } %>
+              <%= render UI::DropdownMenuItem.new(classes: "gap-2 p-2") do %>
                 <div class="flex size-6 items-center justify-center rounded-sm border">
                   <%= lucide_icon("gallery-vertical-end", class: "size-4 shrink-0") %>
                 </div>
                 Acme Inc
-                <%= render UI::DropdownMenu::Shortcut.new { "⌘1" } %>
+                <%= render UI::DropdownMenuShortcut.new { "⌘1" } %>
               <% end %>
-              <%= render UI::DropdownMenu::Item.new(classes: "gap-2 p-2") do %>
+              <%= render UI::DropdownMenuItem.new(classes: "gap-2 p-2") do %>
                 <div class="flex size-6 items-center justify-center rounded-sm border">
                   <%= lucide_icon("audio-waveform", class: "size-4 shrink-0") %>
                 </div>
                 Acme Corp.
-                <%= render UI::DropdownMenu::Shortcut.new { "⌘2" } %>
+                <%= render UI::DropdownMenuShortcut.new { "⌘2" } %>
               <% end %>
-              <%= render UI::DropdownMenu::Item.new(classes: "gap-2 p-2") do %>
+              <%= render UI::DropdownMenuItem.new(classes: "gap-2 p-2") do %>
                 <div class="flex size-6 items-center justify-center rounded-sm border">
                   <%= lucide_icon("command", class: "size-4 shrink-0") %>
                 </div>
                 Evil Corp.
-                <%= render UI::DropdownMenu::Shortcut.new { "⌘3" } %>
+                <%= render UI::DropdownMenuShortcut.new { "⌘3" } %>
               <% end %>
-              <%= render UI::DropdownMenu::Separator.new %>
-              <%= render UI::DropdownMenu::Item.new(classes: "gap-2 p-2") do %>
+              <%= render UI::DropdownMenuSeparator.new %>
+              <%= render UI::DropdownMenuItem.new(classes: "gap-2 p-2") do %>
                 <div class="flex size-6 items-center justify-center rounded-md border bg-background">
                   <%= lucide_icon("plus", class: "size-4") %>
                 </div>
@@ -65,40 +65,40 @@
     <% end %>
 
     <%# Main content area %>
-    <%= render UI::Sidebar::Content.new do %>
+    <%= render UI::SidebarContent.new do %>
       <%# Platform group with collapsible items %>
-      <%= render UI::Sidebar::Group.new do %>
-        <%= render UI::Sidebar::GroupLabel.new { "Platform" } %>
-        <%= render UI::Sidebar::GroupContent.new do %>
-          <%= render UI::Sidebar::Menu.new do %>
+      <%= render UI::SidebarGroup.new do %>
+        <%= render UI::SidebarGroupLabel.new { "Platform" } %>
+        <%= render UI::SidebarGroupContent.new do %>
+          <%= render UI::SidebarMenu.new do %>
             <%# Playground - collapsible with submenu %>
-            <%= render UI::Collapsible::Collapsible.new(open: true) do %>
-              <%= render UI::Sidebar::MenuItem.new do %>
-                <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-                  <%= render UI::Sidebar::MenuButton.new(**trigger_attrs) do %>
+            <%= render UI::Collapsible.new(open: true) do %>
+              <%= render UI::SidebarMenuItem.new do %>
+                <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+                  <%= render UI::SidebarMenuButton.new(**trigger_attrs) do %>
                     <%= lucide_icon("square-terminal", class: "size-4") %>
                     <span>Playground</span>
                     <%= lucide_icon("chevron-right", class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90") %>
                   <% end %>
                 <% end %>
-                <%= render UI::Collapsible::Content.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
-                  <%= render UI::Sidebar::MenuSub.new do %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new(as_child: true) do |attrs| %>
+                <%= render UI::CollapsibleContent.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
+                  <%= render UI::SidebarMenuSub.new do %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new(as_child: true) do |attrs| %>
                         <a href="#" class="<%= attrs[:class] %>" data-slot="<%= attrs[:data][:slot] %>">
                           <span>History</span>
                         </a>
                       <% end %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new(as_child: true) do |attrs| %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new(as_child: true) do |attrs| %>
                         <a href="#" class="<%= attrs[:class] %>" data-slot="<%= attrs[:data][:slot] %>">
                           <span>Starred</span>
                         </a>
                       <% end %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new(as_child: true) do |attrs| %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new(as_child: true) do |attrs| %>
                         <a href="#" class="<%= attrs[:class] %>" data-slot="<%= attrs[:data][:slot] %>">
                           <span>Settings</span>
                         </a>
@@ -110,25 +110,25 @@
             <% end %>
 
             <%# Models - collapsible %>
-            <%= render UI::Collapsible::Collapsible.new(open: false) do %>
-              <%= render UI::Sidebar::MenuItem.new do %>
-                <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-                  <%= render UI::Sidebar::MenuButton.new(**trigger_attrs) do %>
+            <%= render UI::Collapsible.new(open: false) do %>
+              <%= render UI::SidebarMenuItem.new do %>
+                <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+                  <%= render UI::SidebarMenuButton.new(**trigger_attrs) do %>
                     <%= lucide_icon("bot", class: "size-4") %>
                     <span>Models</span>
                     <%= lucide_icon("chevron-right", class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90") %>
                   <% end %>
                 <% end %>
-                <%= render UI::Collapsible::Content.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
-                  <%= render UI::Sidebar::MenuSub.new do %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Genesis" } %>
+                <%= render UI::CollapsibleContent.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
+                  <%= render UI::SidebarMenuSub.new do %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Genesis" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Explorer" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Explorer" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Quantum" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Quantum" } %>
                     <% end %>
                   <% end %>
                 <% end %>
@@ -136,28 +136,28 @@
             <% end %>
 
             <%# Documentation - collapsible %>
-            <%= render UI::Collapsible::Collapsible.new(open: false) do %>
-              <%= render UI::Sidebar::MenuItem.new do %>
-                <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-                  <%= render UI::Sidebar::MenuButton.new(**trigger_attrs) do %>
+            <%= render UI::Collapsible.new(open: false) do %>
+              <%= render UI::SidebarMenuItem.new do %>
+                <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+                  <%= render UI::SidebarMenuButton.new(**trigger_attrs) do %>
                     <%= lucide_icon("book-open", class: "size-4") %>
                     <span>Documentation</span>
                     <%= lucide_icon("chevron-right", class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90") %>
                   <% end %>
                 <% end %>
-                <%= render UI::Collapsible::Content.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
-                  <%= render UI::Sidebar::MenuSub.new do %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Introduction" } %>
+                <%= render UI::CollapsibleContent.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
+                  <%= render UI::SidebarMenuSub.new do %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Introduction" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Get Started" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Get Started" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Tutorials" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Tutorials" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Changelog" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Changelog" } %>
                     <% end %>
                   <% end %>
                 <% end %>
@@ -165,28 +165,28 @@
             <% end %>
 
             <%# Settings - collapsible %>
-            <%= render UI::Collapsible::Collapsible.new(open: false) do %>
-              <%= render UI::Sidebar::MenuItem.new do %>
-                <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-                  <%= render UI::Sidebar::MenuButton.new(**trigger_attrs) do %>
+            <%= render UI::Collapsible.new(open: false) do %>
+              <%= render UI::SidebarMenuItem.new do %>
+                <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+                  <%= render UI::SidebarMenuButton.new(**trigger_attrs) do %>
                     <%= lucide_icon("settings-2", class: "size-4") %>
                     <span>Settings</span>
                     <%= lucide_icon("chevron-right", class: "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90") %>
                   <% end %>
                 <% end %>
-                <%= render UI::Collapsible::Content.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
-                  <%= render UI::Sidebar::MenuSub.new do %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "General" } %>
+                <%= render UI::CollapsibleContent.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
+                  <%= render UI::SidebarMenuSub.new do %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "General" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Team" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Team" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Billing" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Billing" } %>
                     <% end %>
-                    <%= render UI::Sidebar::MenuSubItem.new do %>
-                      <%= render UI::Sidebar::MenuSubButton.new { "Limits" } %>
+                    <%= render UI::SidebarMenuSubItem.new do %>
+                      <%= render UI::SidebarMenuSubButton.new { "Limits" } %>
                     <% end %>
                   <% end %>
                 <% end %>
@@ -197,35 +197,35 @@
       <% end %>
 
       <%# Projects group - hidden in icon mode when collapsed %>
-      <%= render UI::Sidebar::Group.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
-        <%= render UI::Sidebar::GroupLabel.new { "Projects" } %>
-        <%= render UI::Sidebar::GroupContent.new do %>
-          <%= render UI::Sidebar::Menu.new do %>
-            <%= render UI::Sidebar::MenuItem.new do %>
-              <%= render UI::Sidebar::MenuButton.new(as_child: true) do |attrs| %>
+      <%= render UI::SidebarGroup.new(classes: "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden") do %>
+        <%= render UI::SidebarGroupLabel.new { "Projects" } %>
+        <%= render UI::SidebarGroupContent.new do %>
+          <%= render UI::SidebarMenu.new do %>
+            <%= render UI::SidebarMenuItem.new do %>
+              <%= render UI::SidebarMenuButton.new(as_child: true) do |attrs| %>
                 <a href="#" class="<%= attrs[:class] %>" data-slot="<%= attrs[:data][:slot] %>">
                   <%= lucide_icon("frame", class: "size-4") %>
                   <span>Design Engineering</span>
                 </a>
               <% end %>
-              <%= render UI::DropdownMenu::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
+              <%= render UI::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
                 <%= tag.span class: "contents", **dropdown_attrs do %>
-                  <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-                    <%= render UI::Sidebar::MenuAction.new(show_on_hover: true, **trigger_attrs) do %>
+                  <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+                    <%= render UI::SidebarMenuAction.new(show_on_hover: true, **trigger_attrs) do %>
                       <%= lucide_icon("ellipsis", class: "size-4") %>
                     <% end %>
                   <% end %>
-                  <%= render UI::DropdownMenu::Content.new(classes: "min-w-48 rounded-lg", side_offset: 8) do %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                  <%= render UI::DropdownMenuContent.new(classes: "min-w-48 rounded-lg", side_offset: 8) do %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("folder", class: "size-4 text-muted-foreground") %>
                       <span>View Project</span>
                     <% end %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("forward", class: "size-4 text-muted-foreground") %>
                       <span>Share Project</span>
                     <% end %>
-                    <%= render UI::DropdownMenu::Separator.new %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                    <%= render UI::DropdownMenuSeparator.new %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("trash-2", class: "size-4 text-muted-foreground") %>
                       <span>Delete Project</span>
                     <% end %>
@@ -234,31 +234,31 @@
               <% end %>
             <% end %>
 
-            <%= render UI::Sidebar::MenuItem.new do %>
-              <%= render UI::Sidebar::MenuButton.new(as_child: true) do |attrs| %>
+            <%= render UI::SidebarMenuItem.new do %>
+              <%= render UI::SidebarMenuButton.new(as_child: true) do |attrs| %>
                 <a href="#" class="<%= attrs[:class] %>" data-slot="<%= attrs[:data][:slot] %>">
                   <%= lucide_icon("pie-chart", class: "size-4") %>
                   <span>Sales & Marketing</span>
                 </a>
               <% end %>
-              <%= render UI::DropdownMenu::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
+              <%= render UI::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
                 <%= tag.span class: "contents", **dropdown_attrs do %>
-                  <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-                    <%= render UI::Sidebar::MenuAction.new(show_on_hover: true, **trigger_attrs) do %>
+                  <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+                    <%= render UI::SidebarMenuAction.new(show_on_hover: true, **trigger_attrs) do %>
                       <%= lucide_icon("ellipsis", class: "size-4") %>
                     <% end %>
                   <% end %>
-                  <%= render UI::DropdownMenu::Content.new(classes: "min-w-48 rounded-lg", side_offset: 8) do %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                  <%= render UI::DropdownMenuContent.new(classes: "min-w-48 rounded-lg", side_offset: 8) do %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("folder", class: "size-4 text-muted-foreground") %>
                       <span>View Project</span>
                     <% end %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("forward", class: "size-4 text-muted-foreground") %>
                       <span>Share Project</span>
                     <% end %>
-                    <%= render UI::DropdownMenu::Separator.new %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                    <%= render UI::DropdownMenuSeparator.new %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("trash-2", class: "size-4 text-muted-foreground") %>
                       <span>Delete Project</span>
                     <% end %>
@@ -267,31 +267,31 @@
               <% end %>
             <% end %>
 
-            <%= render UI::Sidebar::MenuItem.new do %>
-              <%= render UI::Sidebar::MenuButton.new(as_child: true) do |attrs| %>
+            <%= render UI::SidebarMenuItem.new do %>
+              <%= render UI::SidebarMenuButton.new(as_child: true) do |attrs| %>
                 <a href="#" class="<%= attrs[:class] %>" data-slot="<%= attrs[:data][:slot] %>">
                   <%= lucide_icon("map", class: "size-4") %>
                   <span>Travel</span>
                 </a>
               <% end %>
-              <%= render UI::DropdownMenu::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
+              <%= render UI::DropdownMenu.new(as_child: true, placement: "right-start") do |dropdown_attrs| %>
                 <%= tag.span class: "contents", **dropdown_attrs do %>
-                  <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-                    <%= render UI::Sidebar::MenuAction.new(show_on_hover: true, **trigger_attrs) do %>
+                  <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+                    <%= render UI::SidebarMenuAction.new(show_on_hover: true, **trigger_attrs) do %>
                       <%= lucide_icon("ellipsis", class: "size-4") %>
                     <% end %>
                   <% end %>
-                  <%= render UI::DropdownMenu::Content.new(classes: "min-w-48 rounded-lg", side_offset: 8) do %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                  <%= render UI::DropdownMenuContent.new(classes: "min-w-48 rounded-lg", side_offset: 8) do %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("folder", class: "size-4 text-muted-foreground") %>
                       <span>View Project</span>
                     <% end %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("forward", class: "size-4 text-muted-foreground") %>
                       <span>Share Project</span>
                     <% end %>
-                    <%= render UI::DropdownMenu::Separator.new %>
-                    <%= render UI::DropdownMenu::Item.new do %>
+                    <%= render UI::DropdownMenuSeparator.new %>
+                    <%= render UI::DropdownMenuItem.new do %>
                       <%= lucide_icon("trash-2", class: "size-4 text-muted-foreground") %>
                       <span>Delete Project</span>
                     <% end %>
@@ -300,8 +300,8 @@
               <% end %>
             <% end %>
 
-            <%= render UI::Sidebar::MenuItem.new do %>
-              <%= render UI::Sidebar::MenuButton.new(classes: "text-sidebar-foreground/70") do %>
+            <%= render UI::SidebarMenuItem.new do %>
+              <%= render UI::SidebarMenuButton.new(classes: "text-sidebar-foreground/70") do %>
                 <%= lucide_icon("ellipsis", class: "size-4") %>
                 <span>More</span>
               <% end %>
@@ -312,15 +312,15 @@
     <% end %>
 
     <%# Footer with user info %>
-    <%= render UI::Sidebar::Footer.new do %>
-      <%= render UI::Sidebar::Menu.new do %>
-        <%= render UI::DropdownMenu::DropdownMenu.new(as_child: true, placement: "top") do |dropdown_attrs| %>
-          <%= render UI::Sidebar::MenuItem.new(**dropdown_attrs) do %>
-            <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-              <%= render UI::Sidebar::MenuButton.new(size: :lg, classes: "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground", **trigger_attrs) do %>
-                <%= render UI::Avatar::Avatar.new(classes: "h-8 w-8 rounded-lg") do %>
-                  <%= render UI::Avatar::Image.new(src: "https://github.com/shadcn.png", alt: "shadcn") %>
-                  <%= render UI::Avatar::Fallback.new(classes: "rounded-lg") { "CN" } %>
+    <%= render UI::SidebarFooter.new do %>
+      <%= render UI::SidebarMenu.new do %>
+        <%= render UI::DropdownMenu.new(as_child: true, placement: "top") do |dropdown_attrs| %>
+          <%= render UI::SidebarMenuItem.new(**dropdown_attrs) do %>
+            <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+              <%= render UI::SidebarMenuButton.new(size: :lg, classes: "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground", **trigger_attrs) do %>
+                <%= render UI::Avatar.new(classes: "h-8 w-8 rounded-lg") do %>
+                  <%= render UI::AvatarImage.new(src: "https://github.com/shadcn.png", alt: "shadcn") %>
+                  <%= render UI::AvatarFallback.new(classes: "rounded-lg") { "CN" } %>
                 <% end %>
                 <div class="grid flex-1 text-left text-sm leading-tight">
                   <span class="truncate font-medium">shadcn</span>
@@ -329,12 +329,12 @@
                 <%= lucide_icon("chevrons-up-down", class: "ml-auto size-4") %>
               <% end %>
             <% end %>
-            <%= render UI::DropdownMenu::Content.new(classes: "w-(--ui-dropdown-menu-trigger-width) min-w-56 rounded-lg", side_offset: 4) do %>
-              <%= render UI::DropdownMenu::Label.new(classes: "p-0 font-normal") do %>
+            <%= render UI::DropdownMenuContent.new(classes: "w-(--ui-dropdown-menu-trigger-width) min-w-56 rounded-lg", side_offset: 4) do %>
+              <%= render UI::DropdownMenuLabel.new(classes: "p-0 font-normal") do %>
                 <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <%= render UI::Avatar::Avatar.new(classes: "h-8 w-8 rounded-lg") do %>
-                    <%= render UI::Avatar::Image.new(src: "https://github.com/shadcn.png", alt: "shadcn") %>
-                    <%= render UI::Avatar::Fallback.new(classes: "rounded-lg") { "CN" } %>
+                  <%= render UI::Avatar.new(classes: "h-8 w-8 rounded-lg") do %>
+                    <%= render UI::AvatarImage.new(src: "https://github.com/shadcn.png", alt: "shadcn") %>
+                    <%= render UI::AvatarFallback.new(classes: "rounded-lg") { "CN" } %>
                   <% end %>
                   <div class="grid flex-1 text-left text-sm leading-tight">
                     <span class="truncate font-medium">shadcn</span>
@@ -342,26 +342,26 @@
                   </div>
                 </div>
               <% end %>
-              <%= render UI::DropdownMenu::Separator.new %>
-              <%= render UI::DropdownMenu::Item.new do %>
+              <%= render UI::DropdownMenuSeparator.new %>
+              <%= render UI::DropdownMenuItem.new do %>
                 <%= lucide_icon("sparkles", class: "size-4") %>
                 Upgrade to Pro
               <% end %>
-              <%= render UI::DropdownMenu::Separator.new %>
-              <%= render UI::DropdownMenu::Item.new do %>
+              <%= render UI::DropdownMenuSeparator.new %>
+              <%= render UI::DropdownMenuItem.new do %>
                 <%= lucide_icon("badge-check", class: "size-4") %>
                 Account
               <% end %>
-              <%= render UI::DropdownMenu::Item.new do %>
+              <%= render UI::DropdownMenuItem.new do %>
                 <%= lucide_icon("credit-card", class: "size-4") %>
                 Billing
               <% end %>
-              <%= render UI::DropdownMenu::Item.new do %>
+              <%= render UI::DropdownMenuItem.new do %>
                 <%= lucide_icon("bell", class: "size-4") %>
                 Notifications
               <% end %>
-              <%= render UI::DropdownMenu::Separator.new %>
-              <%= render UI::DropdownMenu::Item.new do %>
+              <%= render UI::DropdownMenuSeparator.new %>
+              <%= render UI::DropdownMenuItem.new do %>
                 <%= lucide_icon("log-out", class: "size-4") %>
                 Log out
               <% end %>
@@ -372,23 +372,23 @@
     <% end %>
 
     <%# Rail for toggle %>
-    <%= render UI::Sidebar::Rail.new %>
+    <%= render UI::SidebarRail.new %>
   <% end %>
 
   <%# Main content area (SidebarInset) %>
-  <%= render UI::Sidebar::SidebarInset.new do %>
+  <%= render UI::SidebarInset.new do %>
     <header class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       <div class="flex items-center gap-2 px-4">
-        <%= render UI::Sidebar::Trigger.new(classes: "-ml-1") %>
-        <%= render UI::Separator::Separator.new(orientation: :vertical, classes: "mr-2 data-[orientation=vertical]:h-4") %>
-        <%= render UI::Breadcrumb::Breadcrumb.new do %>
-          <%= render UI::Breadcrumb::List.new do %>
-            <%= render UI::Breadcrumb::Item.new(classes: "hidden md:block") do %>
-              <%= render UI::Breadcrumb::Link.new(href: "#") { "Building Your Application" } %>
+        <%= render UI::SidebarTrigger.new(classes: "-ml-1") %>
+        <%= render UI::Separator.new(orientation: :vertical, classes: "mr-2 data-[orientation=vertical]:h-4") %>
+        <%= render UI::Breadcrumb.new do %>
+          <%= render UI::BreadcrumbList.new do %>
+            <%= render UI::BreadcrumbItem.new(classes: "hidden md:block") do %>
+              <%= render UI::BreadcrumbLink.new(href: "#") { "Building Your Application" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new(classes: "hidden md:block") %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Page.new { "Data Fetching" } %>
+            <%= render UI::BreadcrumbSeparator.new(classes: "hidden md:block") %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbPage.new { "Data Fetching" } %>
             <% end %>
           <% end %>
         <% end %>

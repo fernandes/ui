@@ -9,22 +9,22 @@ class PopoverTest < UI::SystemTestCase
 
   # Helper to get the ERB basic popover by ID
   def basic_popover
-    find_element(UI::Testing::PopoverElement, "#erb-basic-popover")
+    find_element(UI::TestingPopoverElement, "#erb-basic-popover")
   end
 
   # Helper to get the ERB top placement popover by ID
   def top_popover
-    find_element(UI::Testing::PopoverElement, "#erb-top-popover")
+    find_element(UI::TestingPopoverElement, "#erb-top-popover")
   end
 
   # Helper to get the ERB bottom placement popover by ID
   def bottom_popover
-    find_element(UI::Testing::PopoverElement, "#erb-bottom-popover")
+    find_element(UI::TestingPopoverElement, "#erb-bottom-popover")
   end
 
   # Helper to get the ERB form popover by ID
   def form_popover
-    find_element(UI::Testing::PopoverElement, "#erb-form-popover")
+    find_element(UI::TestingPopoverElement, "#erb-form-popover")
   end
 
   # === Basic Interaction Tests ===

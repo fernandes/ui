@@ -12,7 +12,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::Command::GroupBehavior
+  extend UI::CommandGroupBehavior
   all_attributes = command_group_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :div, all_attributes do %>

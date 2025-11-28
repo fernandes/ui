@@ -11,22 +11,22 @@ class RadioGroupTest < UI::SystemTestCase
 
   # Helper to get the Phlex plan radio group
   def plan_group
-    find_element(UI::Testing::RadioGroupElement, "#plan-group")
+    find_element(UI::TestingRadioGroupElement, "#plan-group")
   end
 
   # Helper to get the ViewComponent size radio group
   def size_group
-    find_element(UI::Testing::RadioGroupElement, "#size-group")
+    find_element(UI::TestingRadioGroupElement, "#size-group")
   end
 
   # Helper to get the ERB color radio group
   def color_group
-    find_element(UI::Testing::RadioGroupElement, "#color-group")
+    find_element(UI::TestingRadioGroupElement, "#color-group")
   end
 
   # Helper to get the disabled radio group
   def disabled_group
-    find_element(UI::Testing::RadioGroupElement, "#disabled-group")
+    find_element(UI::TestingRadioGroupElement, "#disabled-group")
   end
 
   # === Basic Interaction Tests ===

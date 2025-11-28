@@ -15,11 +15,11 @@
     <!-- Basic Example - Phlex -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Example (Phlex)</h2>
-      <%= render UI::Collapsible::Collapsible.new(id: "basic-collapsible", classes: "w-[350px] space-y-2") do %>
+      <%= render UI::Collapsible.new(id: "basic-collapsible", classes: "w-[350px] space-y-2") do %>
         <div class="flex items-center justify-between space-x-4 px-4">
           <h4 class="text-sm font-semibold">@peduarte starred 3 repositories</h4>
-          <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(**trigger_attrs, variant: :ghost, size: :sm, classes: "w-9 p-0") do %>
+          <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(**trigger_attrs, variant: :ghost, size: :sm, classes: "w-9 p-0") do %>
               <%= lucide_icon("chevrons-up-down", class: "h-4 w-4") %>
               <span class="sr-only">Toggle</span>
             <% end %>
@@ -28,7 +28,7 @@
         <div class="rounded-md border px-4 py-3 font-mono text-sm">
           @radix-ui/primitives
         </div>
-        <%= render UI::Collapsible::Content.new(classes: "space-y-2") do %>
+        <%= render UI::CollapsibleContent.new(classes: "space-y-2") do %>
           <div class="rounded-md border px-4 py-3 font-mono text-sm">
             @radix-ui/colors
           </div>
@@ -42,10 +42,10 @@
     <!-- Basic Example - ViewComponent -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Example (ViewComponent)</h2>
-      <%= render(UI::Collapsible::CollapsibleComponent.new(classes: "w-[350px] space-y-2")) do %>
+      <%= render(UI::CollapsibleComponent.new(classes: "w-[350px] space-y-2")) do %>
         <div class="flex items-center justify-between space-x-4 px-4">
           <h4 class="text-sm font-semibold">@peduarte starred 3 repositories</h4>
-          <%= render(UI::Button::ButtonComponent.new(variant: :ghost, size: :sm, classes: "w-9 p-0", data: { slot: "collapsible-trigger", "ui--collapsible-target": "trigger", action: "click->ui--collapsible#toggle" })) do %>
+          <%= render(UI::ButtonComponent.new(variant: :ghost, size: :sm, classes: "w-9 p-0", data: { slot: "collapsible-trigger", "ui--collapsible-target": "trigger", action: "click->ui--collapsible#toggle" })) do %>
             <%= lucide_icon("chevrons-up-down", class: "h-4 w-4") %>
             <span class="sr-only">Toggle</span>
           <% end %>
@@ -53,7 +53,7 @@
         <div class="rounded-md border px-4 py-3 font-mono text-sm">
           @radix-ui/primitives
         </div>
-        <%= render(UI::Collapsible::ContentComponent.new(classes: "space-y-2")) do %>
+        <%= render(UI::CollapsibleContentComponent.new(classes: "space-y-2")) do %>
           <div class="rounded-md border px-4 py-3 font-mono text-sm">
             @radix-ui/colors
           </div>
@@ -67,7 +67,7 @@
     <!-- Basic Example - ERB -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Example (ERB)</h2>
-      <%= render "ui/collapsible/collapsible", attributes: { id: "erb-collapsible" }, classes: "w-[350px] space-y-2" do %>
+      <%= render "ui/collapsible", attributes: { id: "erb-collapsible" }, classes: "w-[350px] space-y-2" do %>
         <div class="flex items-center justify-between space-x-4 px-4">
           <h4 class="text-sm font-semibold">@peduarte starred 3 repositories</h4>
           <%= render "ui/collapsible/trigger" do %>
@@ -92,17 +92,17 @@
     <!-- Initially Open -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Initially Open</h2>
-      <%= render UI::Collapsible::Collapsible.new(id: "open-collapsible", open: true, classes: "w-[350px] space-y-2") do %>
+      <%= render UI::Collapsible.new(id: "open-collapsible", open: true, classes: "w-[350px] space-y-2") do %>
         <div class="flex items-center justify-between space-x-4 px-4">
           <h4 class="text-sm font-semibold">Favorite Frameworks</h4>
-          <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(**trigger_attrs, variant: :ghost, size: :sm, classes: "w-9 p-0") do %>
+          <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(**trigger_attrs, variant: :ghost, size: :sm, classes: "w-9 p-0") do %>
               <%= lucide_icon("chevrons-up-down", class: "h-4 w-4") %>
               <span class="sr-only">Toggle</span>
             <% end %>
           <% end %>
         </div>
-        <%= render UI::Collapsible::Content.new(classes: "space-y-2") do %>
+        <%= render UI::CollapsibleContent.new(classes: "space-y-2") do %>
           <div class="rounded-md border px-4 py-3 font-mono text-sm">
             Ruby on Rails
           </div>
@@ -120,48 +120,48 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Multiple Collapsibles</h2>
       <div class="w-[350px] space-y-4">
-        <%= render UI::Collapsible::Collapsible.new(classes: "space-y-2") do %>
+        <%= render UI::Collapsible.new(classes: "space-y-2") do %>
           <div class="flex items-center justify-between px-4">
             <h4 class="text-sm font-semibold">Section 1: Introduction</h4>
-            <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-              <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline, size: :sm) do %>
+            <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+              <%= render UI::Button.new(**trigger_attrs, variant: :outline, size: :sm) do %>
                 <%= lucide_icon("plus", class: "h-4 w-4") %>
               <% end %>
             <% end %>
           </div>
-          <%= render UI::Collapsible::Content.new do %>
+          <%= render UI::CollapsibleContent.new do %>
             <div class="rounded-md border bg-muted px-4 py-3 text-sm">
               This is the introduction section. It contains preliminary information about the topic at hand.
             </div>
           <% end %>
         <% end %>
 
-        <%= render UI::Collapsible::Collapsible.new(classes: "space-y-2") do %>
+        <%= render UI::Collapsible.new(classes: "space-y-2") do %>
           <div class="flex items-center justify-between px-4">
             <h4 class="text-sm font-semibold">Section 2: Details</h4>
-            <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-              <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline, size: :sm) do %>
+            <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+              <%= render UI::Button.new(**trigger_attrs, variant: :outline, size: :sm) do %>
                 <%= lucide_icon("plus", class: "h-4 w-4") %>
               <% end %>
             <% end %>
           </div>
-          <%= render UI::Collapsible::Content.new do %>
+          <%= render UI::CollapsibleContent.new do %>
             <div class="rounded-md border bg-muted px-4 py-3 text-sm">
               This section provides detailed information. You can include longer content here with multiple paragraphs.
             </div>
           <% end %>
         <% end %>
 
-        <%= render UI::Collapsible::Collapsible.new(classes: "space-y-2") do %>
+        <%= render UI::Collapsible.new(classes: "space-y-2") do %>
           <div class="flex items-center justify-between px-4">
             <h4 class="text-sm font-semibold">Section 3: Conclusion</h4>
-            <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-              <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline, size: :sm) do %>
+            <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+              <%= render UI::Button.new(**trigger_attrs, variant: :outline, size: :sm) do %>
                 <%= lucide_icon("plus", class: "h-4 w-4") %>
               <% end %>
             <% end %>
           </div>
-          <%= render UI::Collapsible::Content.new do %>
+          <%= render UI::CollapsibleContent.new do %>
             <div class="rounded-md border bg-muted px-4 py-3 text-sm">
               The conclusion wraps up all the key points discussed in the previous sections.
             </div>
@@ -173,33 +173,33 @@
     <!-- With Card -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Card</h2>
-      <%= render UI::Card::Card.new(classes: "w-[350px]") do %>
-        <%= render UI::Collapsible::Collapsible.new(id: "card-collapsible") do %>
-          <%= render UI::Card::Header.new do %>
+      <%= render UI::Card.new(classes: "w-[350px]") do %>
+        <%= render UI::Collapsible.new(id: "card-collapsible") do %>
+          <%= render UI::CardHeader.new do %>
             <div class="flex items-center justify-between">
-              <%= render UI::Card::Title.new { "Notifications" } %>
-              <%= render UI::Collapsible::Trigger.new(as_child: true) do |trigger_attrs| %>
-                <%= render UI::Button::Button.new(**trigger_attrs, variant: :ghost, size: :icon) do %>
+              <%= render UI::CardTitle.new { "Notifications" } %>
+              <%= render UI::CollapsibleTrigger.new(as_child: true) do |trigger_attrs| %>
+                <%= render UI::Button.new(**trigger_attrs, variant: :ghost, size: :icon) do %>
                   <%= lucide_icon("chevron-down", class: "h-4 w-4 transition-transform data-[state=open]:rotate-180") %>
                 <% end %>
               <% end %>
             </div>
-            <%= render UI::Card::Description.new { "Manage your notification preferences." } %>
+            <%= render UI::CardDescription.new { "Manage your notification preferences." } %>
           <% end %>
-          <%= render UI::Collapsible::Content.new do %>
-            <%= render UI::Card::Content.new do %>
+          <%= render UI::CollapsibleContent.new do %>
+            <%= render UI::CardContent.new do %>
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <span class="text-sm">Push Notifications</span>
-                  <%= render UI::Checkbox::Checkbox.new(checked: true) %>
+                  <%= render UI::Checkbox.new(checked: true) %>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-sm">Email Notifications</span>
-                  <%= render UI::Checkbox::Checkbox.new(checked: true) %>
+                  <%= render UI::Checkbox.new(checked: true) %>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-sm">SMS Notifications</span>
-                  <%= render UI::Checkbox::Checkbox.new %>
+                  <%= render UI::Checkbox.new %>
                 </div>
               </div>
             <% end %>

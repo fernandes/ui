@@ -18,17 +18,17 @@
       <p class="text-sm text-muted-foreground">A simple slider with one thumb for selecting a single value.</p>
       <div class="max-w-md space-y-2">
         <label class="text-sm font-medium">Volume: <span id="volume-value">33</span>%</label>
-        <%= render "ui/slider/slider",
+        <%= render "ui/slider",
           default_value: [33],
           max: 100,
           step: 1,
           attributes: {
             id: "volume-slider"
           } do %>
-          <%= render "ui/slider/slider_track" do %>
-            <%= render "ui/slider/slider_range" %>
+          <%= render "ui/slider/track" do %>
+            <%= render "ui/slider/range" %>
           <% end %>
-          <%= render "ui/slider/slider_thumb" %>
+          <%= render "ui/slider/thumb" %>
         <% end %>
       </div>
     </section>
@@ -42,12 +42,12 @@
           <span>Min: $<span id="price-min">25</span></span>
           <span>Max: $<span id="price-max">75</span></span>
         </div>
-        <%= render "ui/slider/slider", default_value: [25, 75], max: 100, attributes: { id: "price-slider" } do %>
-          <%= render "ui/slider/slider_track" do %>
-            <%= render "ui/slider/slider_range" %>
+        <%= render "ui/slider", default_value: [25, 75], max: 100, attributes: { id: "price-slider" } do %>
+          <%= render "ui/slider/track" do %>
+            <%= render "ui/slider/range" %>
           <% end %>
-          <%= render "ui/slider/slider_thumb" %>
-          <%= render "ui/slider/slider_thumb" %>
+          <%= render "ui/slider/thumb" %>
+          <%= render "ui/slider/thumb" %>
         <% end %>
       </div>
     </section>
@@ -58,11 +58,11 @@
       <p class="text-sm text-muted-foreground">Slider with step=10 for coarse control.</p>
       <div class="max-w-md space-y-2">
         <label class="text-sm font-medium">Brightness: <span id="brightness-value">50</span>%</label>
-        <%= render UI::Slider::SliderComponent.new(default_value: [50], max: 100, step: 10, attributes: { id: "brightness-slider" }) do %>
-          <%= render UI::Slider::SliderTrackComponent.new do %>
-            <%= render UI::Slider::SliderRangeComponent.new %>
+        <%= render UI::SliderComponent.new(default_value: [50], max: 100, step: 10, attributes: { id: "brightness-slider" }) do %>
+          <%= render UI::SliderTrackComponent.new do %>
+            <%= render UI::SliderRangeComponent.new %>
           <% end %>
-          <%= render UI::Slider::SliderThumbComponent.new %>
+          <%= render UI::SliderThumbComponent.new %>
         <% end %>
       </div>
     </section>
@@ -73,11 +73,11 @@
       <p class="text-sm text-muted-foreground">Slider with range from -50 to 50, starting at 0.</p>
       <div class="max-w-md space-y-2">
         <label class="text-sm font-medium">Balance: <span id="balance-value">0</span></label>
-        <%= render UI::Slider::SliderComponent.new(default_value: [0], min: -50, max: 50, step: 5, center_point: 0, attributes: { id: "balance-slider" }) do %>
-          <%= render UI::Slider::SliderTrackComponent.new do %>
-            <%= render UI::Slider::SliderRangeComponent.new %>
+        <%= render UI::SliderComponent.new(default_value: [0], min: -50, max: 50, step: 5, center_point: 0, attributes: { id: "balance-slider" }) do %>
+          <%= render UI::SliderTrackComponent.new do %>
+            <%= render UI::SliderRangeComponent.new %>
           <% end %>
-          <%= render UI::Slider::SliderThumbComponent.new %>
+          <%= render UI::SliderThumbComponent.new %>
         <% end %>
       </div>
     </section>
@@ -88,11 +88,11 @@
       <p class="text-sm text-muted-foreground">A disabled slider that cannot be interacted with.</p>
       <div class="max-w-md space-y-2">
         <label class="text-sm font-medium text-muted-foreground">Locked Setting: 50%</label>
-        <%= render "ui/slider/slider", default_value: [50], disabled: true, attributes: { id: "disabled-slider" } do %>
-          <%= render "ui/slider/slider_track" do %>
-            <%= render "ui/slider/slider_range" %>
+        <%= render "ui/slider", default_value: [50], disabled: true, attributes: { id: "disabled-slider" } do %>
+          <%= render "ui/slider/track" do %>
+            <%= render "ui/slider/range" %>
           <% end %>
-          <%= render "ui/slider/slider_thumb", disabled: true %>
+          <%= render "ui/slider/thumb", disabled: true %>
         <% end %>
       </div>
     </section>
@@ -104,29 +104,29 @@
       <div class="space-y-6">
         <div class="space-y-2">
           <label class="text-sm font-medium">Small (w-[200px])</label>
-          <%= render UI::Slider::SliderComponent.new(default_value: [33], classes: "w-[200px]") do %>
-            <%= render UI::Slider::SliderTrackComponent.new do %>
-              <%= render UI::Slider::SliderRangeComponent.new %>
+          <%= render UI::SliderComponent.new(default_value: [33], classes: "w-[200px]") do %>
+            <%= render UI::SliderTrackComponent.new do %>
+              <%= render UI::SliderRangeComponent.new %>
             <% end %>
-            <%= render UI::Slider::SliderThumbComponent.new %>
+            <%= render UI::SliderThumbComponent.new %>
           <% end %>
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium">Medium (w-[400px])</label>
-          <%= render UI::Slider::SliderComponent.new(default_value: [50], classes: "w-[400px]") do %>
-            <%= render UI::Slider::SliderTrackComponent.new do %>
-              <%= render UI::Slider::SliderRangeComponent.new %>
+          <%= render UI::SliderComponent.new(default_value: [50], classes: "w-[400px]") do %>
+            <%= render UI::SliderTrackComponent.new do %>
+              <%= render UI::SliderRangeComponent.new %>
             <% end %>
-            <%= render UI::Slider::SliderThumbComponent.new %>
+            <%= render UI::SliderThumbComponent.new %>
           <% end %>
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium">Large (w-[600px])</label>
-          <%= render UI::Slider::SliderComponent.new(default_value: [67], classes: "w-[600px]") do %>
-            <%= render UI::Slider::SliderTrackComponent.new do %>
-              <%= render UI::Slider::SliderRangeComponent.new %>
+          <%= render UI::SliderComponent.new(default_value: [67], classes: "w-[600px]") do %>
+            <%= render UI::SliderTrackComponent.new do %>
+              <%= render UI::SliderRangeComponent.new %>
             <% end %>
-            <%= render UI::Slider::SliderThumbComponent.new %>
+            <%= render UI::SliderThumbComponent.new %>
           <% end %>
         </div>
       </div>
@@ -139,29 +139,29 @@
       <div class="flex gap-8">
         <div class="h-64 flex flex-col items-center gap-2">
           <label class="text-sm font-medium">Left</label>
-          <%= render "ui/slider/slider", default_value: [33], orientation: "vertical", attributes: { id: "vertical-slider-left" } do %>
-            <%= render "ui/slider/slider_track" do %>
-              <%= render "ui/slider/slider_range" %>
+          <%= render "ui/slider", default_value: [33], orientation: "vertical", attributes: { id: "vertical-slider-left" } do %>
+            <%= render "ui/slider/track" do %>
+              <%= render "ui/slider/range" %>
             <% end %>
-            <%= render "ui/slider/slider_thumb" %>
+            <%= render "ui/slider/thumb" %>
           <% end %>
         </div>
         <div class="h-64 flex flex-col items-center gap-2">
           <label class="text-sm font-medium">Center</label>
-          <%= render "ui/slider/slider", default_value: [67], orientation: "vertical", attributes: { id: "vertical-slider-center" } do %>
-            <%= render "ui/slider/slider_track" do %>
-              <%= render "ui/slider/slider_range" %>
+          <%= render "ui/slider", default_value: [67], orientation: "vertical", attributes: { id: "vertical-slider-center" } do %>
+            <%= render "ui/slider/track" do %>
+              <%= render "ui/slider/range" %>
             <% end %>
-            <%= render "ui/slider/slider_thumb" %>
+            <%= render "ui/slider/thumb" %>
           <% end %>
         </div>
         <div class="h-64 flex flex-col items-center gap-2">
           <label class="text-sm font-medium">Right</label>
-          <%= render "ui/slider/slider", default_value: [100], orientation: "vertical", attributes: { id: "vertical-slider-right" } do %>
-            <%= render "ui/slider/slider_track" do %>
-              <%= render "ui/slider/slider_range" %>
+          <%= render "ui/slider", default_value: [100], orientation: "vertical", attributes: { id: "vertical-slider-right" } do %>
+            <%= render "ui/slider/track" do %>
+              <%= render "ui/slider/range" %>
             <% end %>
-            <%= render "ui/slider/slider_thumb" %>
+            <%= render "ui/slider/thumb" %>
           <% end %>
         </div>
       </div>

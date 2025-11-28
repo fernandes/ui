@@ -6,7 +6,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend ::UI::Dialog::DialogOverlayBehavior
+  extend UI::DialogOverlayBehavior
 
   # Get HTML attributes from behavior
   container_attrs = dialog_overlay_container_html_attributes.deep_merge(@attributes.except(:data))

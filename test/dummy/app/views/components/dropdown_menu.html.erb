@@ -12,34 +12,34 @@
       <!-- Basic Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Dropdown</h3>
-        <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "Open Menu" } %>
+        <%= render UI::DropdownMenu.new do %>
+          <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(variant: :outline, **trigger_attrs) { "Open Menu" } %>
           <% end %>
 
-          <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
-            <%= render UI::DropdownMenu::Label.new { "My Account" } %>
-            <%= render UI::DropdownMenu::Separator.new %>
-            <%= render UI::DropdownMenu::Item.new do %>
+          <%= render UI::DropdownMenuContent.new(classes: "w-56") do %>
+            <%= render UI::DropdownMenuLabel.new { "My Account" } %>
+            <%= render UI::DropdownMenuSeparator.new %>
+            <%= render UI::DropdownMenuItem.new do %>
               <%= lucide_icon("user") %>
               Profile
-              <%= render UI::DropdownMenu::Shortcut.new { "⇧⌘P" } %>
+              <%= render UI::DropdownMenuShortcut.new { "⇧⌘P" } %>
             <% end %>
-            <%= render UI::DropdownMenu::Item.new do %>
+            <%= render UI::DropdownMenuItem.new do %>
               <%= lucide_icon("credit-card") %>
               Billing
-              <%= render UI::DropdownMenu::Shortcut.new { "⌘B" } %>
+              <%= render UI::DropdownMenuShortcut.new { "⌘B" } %>
             <% end %>
-            <%= render UI::DropdownMenu::Item.new do %>
+            <%= render UI::DropdownMenuItem.new do %>
               <%= lucide_icon("settings") %>
               Settings
-              <%= render UI::DropdownMenu::Shortcut.new { "⌘S" } %>
+              <%= render UI::DropdownMenuShortcut.new { "⌘S" } %>
             <% end %>
-            <%= render UI::DropdownMenu::Separator.new %>
-            <%= render UI::DropdownMenu::Item.new do %>
+            <%= render UI::DropdownMenuSeparator.new %>
+            <%= render UI::DropdownMenuItem.new do %>
               <%= lucide_icon("log-out") %>
               Log out
-              <%= render UI::DropdownMenu::Shortcut.new { "⇧⌘Q" } %>
+              <%= render UI::DropdownMenuShortcut.new { "⇧⌘Q" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -48,17 +48,17 @@
       <!-- With Checkboxes -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Checkboxes</h3>
-        <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "View Options" } %>
+        <%= render UI::DropdownMenu.new do %>
+          <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(variant: :outline, **trigger_attrs) { "View Options" } %>
           <% end %>
 
-          <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
-            <%= render UI::DropdownMenu::Label.new { "Appearance" } %>
-            <%= render UI::DropdownMenu::Separator.new %>
-            <%= render UI::DropdownMenu::CheckboxItem.new(checked: true) { "Status Bar" } %>
-            <%= render UI::DropdownMenu::CheckboxItem.new(checked: false) { "Activity Bar" } %>
-            <%= render UI::DropdownMenu::CheckboxItem.new(checked: true) { "Panel" } %>
+          <%= render UI::DropdownMenuContent.new(classes: "w-56") do %>
+            <%= render UI::DropdownMenuLabel.new { "Appearance" } %>
+            <%= render UI::DropdownMenuSeparator.new %>
+            <%= render UI::DropdownMenuCheckboxItem.new(checked: true) { "Status Bar" } %>
+            <%= render UI::DropdownMenuCheckboxItem.new(checked: false) { "Activity Bar" } %>
+            <%= render UI::DropdownMenuCheckboxItem.new(checked: true) { "Panel" } %>
           <% end %>
         <% end %>
       </div>
@@ -66,18 +66,18 @@
       <!-- With Radio Group -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Radio Group</h3>
-        <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "Panel Position" } %>
+        <%= render UI::DropdownMenu.new do %>
+          <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(variant: :outline, **trigger_attrs) { "Panel Position" } %>
           <% end %>
 
-          <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
-            <%= render UI::DropdownMenu::Label.new { "Position" } %>
-            <%= render UI::DropdownMenu::Separator.new %>
-            <%= render UI::DropdownMenu::RadioGroup.new do %>
-              <%= render UI::DropdownMenu::RadioItem.new(value: "top") { "Top" } %>
-              <%= render UI::DropdownMenu::RadioItem.new(value: "bottom", checked: true) { "Bottom" } %>
-              <%= render UI::DropdownMenu::RadioItem.new(value: "right") { "Right" } %>
+          <%= render UI::DropdownMenuContent.new(classes: "w-56") do %>
+            <%= render UI::DropdownMenuLabel.new { "Position" } %>
+            <%= render UI::DropdownMenuSeparator.new %>
+            <%= render UI::DropdownMenuRadioGroup.new do %>
+              <%= render UI::DropdownMenuRadioItem.new(value: "top") { "Top" } %>
+              <%= render UI::DropdownMenuRadioItem.new(value: "bottom", checked: true) { "Bottom" } %>
+              <%= render UI::DropdownMenuRadioItem.new(value: "right") { "Right" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -86,32 +86,32 @@
       <!-- With Submenu -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Submenu</h3>
-        <%= render UI::DropdownMenu::DropdownMenu.new do %>
-          <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(variant: :outline, **trigger_attrs) { "More Options" } %>
+        <%= render UI::DropdownMenu.new do %>
+          <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(variant: :outline, **trigger_attrs) { "More Options" } %>
           <% end %>
 
-          <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
-            <%= render UI::DropdownMenu::Item.new do %>
+          <%= render UI::DropdownMenuContent.new(classes: "w-56") do %>
+            <%= render UI::DropdownMenuItem.new do %>
               <%= lucide_icon("mail") %>
               Email
             <% end %>
-            <%= render UI::DropdownMenu::Item.new do %>
+            <%= render UI::DropdownMenuItem.new do %>
               <%= lucide_icon("message-square") %>
               Message
             <% end %>
-            <%= render UI::DropdownMenu::Separator.new %>
-            <%= render UI::DropdownMenu::Sub.new do %>
-              <%= render UI::DropdownMenu::SubTrigger.new do %>
+            <%= render UI::DropdownMenuSeparator.new %>
+            <%= render UI::DropdownMenuSub.new do %>
+              <%= render UI::DropdownMenuSubTrigger.new do %>
                 <%= lucide_icon("plus-circle") %>
                 More Tools
               <% end %>
-              <%= render UI::DropdownMenu::SubContent.new do %>
-                <%= render UI::DropdownMenu::Item.new { "Save Page As..." } %>
-                <%= render UI::DropdownMenu::Item.new { "Create Shortcut..." } %>
-                <%= render UI::DropdownMenu::Item.new { "Name Window..." } %>
-                <%= render UI::DropdownMenu::Separator.new %>
-                <%= render UI::DropdownMenu::Item.new { "Developer Tools" } %>
+              <%= render UI::DropdownMenuSubContent.new do %>
+                <%= render UI::DropdownMenuItem.new { "Save Page As..." } %>
+                <%= render UI::DropdownMenuItem.new { "Create Shortcut..." } %>
+                <%= render UI::DropdownMenuItem.new { "Name Window..." } %>
+                <%= render UI::DropdownMenuSeparator.new %>
+                <%= render UI::DropdownMenuItem.new { "Developer Tools" } %>
               <% end %>
             <% end %>
           <% end %>
@@ -128,22 +128,22 @@
       <!-- Basic Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
-        <%= render "ui/dropdown_menu/dropdown_menu" do %>
-          <%= render "ui/dropdown_menu/dropdown_menu_trigger", as_child: true do |trigger_attrs| %>
-            <%= render "ui/button/button", variant: :outline, attributes: trigger_attrs do %>
+        <%= render "ui/dropdown_menu" do %>
+          <%= render "ui/dropdown_menu/trigger", as_child: true do |trigger_attrs| %>
+            <%= render "ui/button", variant: :outline, attributes: trigger_attrs do %>
               Actions
             <% end %>
           <% end %>
 
-          <%= render "ui/dropdown_menu/dropdown_menu_content", classes: "w-48" do %>
-            <%= render "ui/dropdown_menu/dropdown_menu_item" do %>
+          <%= render "ui/dropdown_menu/content", classes: "w-48" do %>
+            <%= render "ui/dropdown_menu/item" do %>
               Edit
             <% end %>
-            <%= render "ui/dropdown_menu/dropdown_menu_item" do %>
+            <%= render "ui/dropdown_menu/item" do %>
               Duplicate
             <% end %>
-            <%= render "ui/dropdown_menu/dropdown_menu_separator" %>
-            <%= render "ui/dropdown_menu/dropdown_menu_item", variant: "destructive" do %>
+            <%= render "ui/dropdown_menu/separator" %>
+            <%= render "ui/dropdown_menu/item", variant: "destructive" do %>
               Delete
             <% end %>
           <% end %>
@@ -153,33 +153,33 @@
       <!-- With Labels and Shortcuts -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Labels</h3>
-        <%= render "ui/dropdown_menu/dropdown_menu" do %>
-          <%= render "ui/dropdown_menu/dropdown_menu_trigger", as_child: true do |trigger_attrs| %>
-            <%= render "ui/button/button", variant: :outline, attributes: trigger_attrs do %>
+        <%= render "ui/dropdown_menu" do %>
+          <%= render "ui/dropdown_menu/trigger", as_child: true do |trigger_attrs| %>
+            <%= render "ui/button", variant: :outline, attributes: trigger_attrs do %>
               File Menu
             <% end %>
           <% end %>
 
-          <%= render "ui/dropdown_menu/dropdown_menu_content", classes: "w-56" do %>
-            <%= render "ui/dropdown_menu/dropdown_menu_label" do %>
+          <%= render "ui/dropdown_menu/content", classes: "w-56" do %>
+            <%= render "ui/dropdown_menu/label" do %>
               File
             <% end %>
-            <%= render "ui/dropdown_menu/dropdown_menu_separator" %>
-            <%= render "ui/dropdown_menu/dropdown_menu_item" do %>
+            <%= render "ui/dropdown_menu/separator" %>
+            <%= render "ui/dropdown_menu/item" do %>
               New File
-              <%= render "ui/dropdown_menu/dropdown_menu_shortcut" do %>
+              <%= render "ui/dropdown_menu/shortcut" do %>
                 ⌘N
               <% end %>
             <% end %>
-            <%= render "ui/dropdown_menu/dropdown_menu_item" do %>
+            <%= render "ui/dropdown_menu/item" do %>
               Save
-              <%= render "ui/dropdown_menu/dropdown_menu_shortcut" do %>
+              <%= render "ui/dropdown_menu/shortcut" do %>
                 ⌘S
               <% end %>
             <% end %>
-            <%= render "ui/dropdown_menu/dropdown_menu_item" do %>
+            <%= render "ui/dropdown_menu/item" do %>
               Save As...
-              <%= render "ui/dropdown_menu/dropdown_menu_shortcut" do %>
+              <%= render "ui/dropdown_menu/shortcut" do %>
                 ⇧⌘S
               <% end %>
             <% end %>
@@ -197,16 +197,16 @@
       <!-- Basic Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Menu</h3>
-        <%= render(UI::DropdownMenu::DropdownMenuComponent.new) do %>
-          <%= render(UI::DropdownMenu::TriggerComponent.new(as_child: true)) do %>
-            <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Open" } %>
+        <%= render(UI::DropdownMenuComponent.new) do %>
+          <%= render(UI::DropdownMenuTriggerComponent.new(as_child: true)) do %>
+            <%= render(UI::ButtonComponent.new(variant: :outline)) { "Open" } %>
           <% end %>
 
-          <%= render(UI::DropdownMenu::ContentComponent.new(classes: "w-48")) do %>
-            <%= render(UI::DropdownMenu::ItemComponent.new) { "New Tab" } %>
-            <%= render(UI::DropdownMenu::ItemComponent.new) { "New Window" } %>
-            <%= render(UI::DropdownMenu::SeparatorComponent.new) %>
-            <%= render(UI::DropdownMenu::ItemComponent.new) { "Settings" } %>
+          <%= render(UI::DropdownMenuContentComponent.new(classes: "w-48")) do %>
+            <%= render(UI::DropdownMenuItemComponent.new) { "New Tab" } %>
+            <%= render(UI::DropdownMenuItemComponent.new) { "New Window" } %>
+            <%= render(UI::DropdownMenuSeparatorComponent.new) %>
+            <%= render(UI::DropdownMenuItemComponent.new) { "Settings" } %>
           <% end %>
         <% end %>
       </div>
@@ -214,18 +214,18 @@
       <!-- With All Features -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Complete Example</h3>
-        <%= render(UI::DropdownMenu::DropdownMenuComponent.new) do %>
-          <%= render(UI::DropdownMenu::TriggerComponent.new(as_child: true)) do %>
-            <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Complete Menu" } %>
+        <%= render(UI::DropdownMenuComponent.new) do %>
+          <%= render(UI::DropdownMenuTriggerComponent.new(as_child: true)) do %>
+            <%= render(UI::ButtonComponent.new(variant: :outline)) { "Complete Menu" } %>
           <% end %>
 
-          <%= render(UI::DropdownMenu::ContentComponent.new(classes: "w-56")) do %>
-            <%= render(UI::DropdownMenu::LabelComponent.new) { "My Account" } %>
-            <%= render(UI::DropdownMenu::SeparatorComponent.new) %>
-            <%= render(UI::DropdownMenu::ItemComponent.new) { "Profile" } %>
-            <%= render(UI::DropdownMenu::ItemComponent.new) { "Team" } %>
-            <%= render(UI::DropdownMenu::SeparatorComponent.new) %>
-            <%= render(UI::DropdownMenu::ItemComponent.new(variant: "destructive")) { "Delete Account" } %>
+          <%= render(UI::DropdownMenuContentComponent.new(classes: "w-56")) do %>
+            <%= render(UI::DropdownMenuLabelComponent.new) { "My Account" } %>
+            <%= render(UI::DropdownMenuSeparatorComponent.new) %>
+            <%= render(UI::DropdownMenuItemComponent.new) { "Profile" } %>
+            <%= render(UI::DropdownMenuItemComponent.new) { "Team" } %>
+            <%= render(UI::DropdownMenuSeparatorComponent.new) %>
+            <%= render(UI::DropdownMenuItemComponent.new(variant: "destructive")) { "Delete Account" } %>
           <% end %>
         <% end %>
       </div>

@@ -1,0 +1,20 @@
+<%
+  orientation ||= :horizontal
+  decorative = true if !defined?(decorative)
+  classes ||= ""
+
+  # Instance variables for behavior module
+  @orientation = orientation
+  @decorative = decorative
+  @classes = classes
+
+  # Include behavior module
+  extend UI::SeparatorBehavior
+
+  # Get HTML attributes from behavior
+  attrs = separator_html_attributes
+  all_classes = attrs[:class]
+  data_attrs = attrs[:data]
+  role_attr = attrs[:role]
+  aria_orientation_attr = attrs[:"aria-orientation"]
+%><div class="<%= all_classes %>" data-slot="<%= data_attrs[:slot] %>" data-orientation="<%= data_attrs[:orientation] %>"<% if role_attr %> role="<%= role_attr %>"<% end %><% if aria_orientation_attr %> aria-orientation="<%= aria_orientation_attr %>"<% end %>></div>

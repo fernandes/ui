@@ -14,13 +14,13 @@
     </div>
     <div class="rounded-lg border bg-card p-6">
       <div class="flex flex-wrap items-center gap-4">
-        <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
-        <%= render UI::Kbd::Kbd.new { "Shift" } %>
-        <%= render UI::Kbd::Kbd.new { "Alt" } %>
-        <%= render UI::Kbd::Kbd.new { "Esc" } %>
-        <%= render UI::Kbd::Kbd.new { "Enter" } %>
-        <%= render UI::Kbd::Kbd.new { "Tab" } %>
-        <%= render UI::Kbd::Kbd.new { "Space" } %>
+        <%= render UI::Kbd.new { "Ctrl" } %>
+        <%= render UI::Kbd.new { "Shift" } %>
+        <%= render UI::Kbd.new { "Alt" } %>
+        <%= render UI::Kbd.new { "Esc" } %>
+        <%= render UI::Kbd.new { "Enter" } %>
+        <%= render UI::Kbd.new { "Tab" } %>
+        <%= render UI::Kbd.new { "Space" } %>
       </div>
     </div>
   </div>
@@ -33,14 +33,14 @@
     </div>
     <div class="rounded-lg border bg-card p-6">
       <div class="flex flex-wrap items-center gap-4">
-        <%= render(UI::Kbd::KbdComponent.new) { "⌘" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⌃" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⌥" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⇧" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⏎" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⌫" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⎋" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "⇥" } %>
+        <%= render(UI::KbdComponent.new) { "⌘" } %>
+        <%= render(UI::KbdComponent.new) { "⌃" } %>
+        <%= render(UI::KbdComponent.new) { "⌥" } %>
+        <%= render(UI::KbdComponent.new) { "⇧" } %>
+        <%= render(UI::KbdComponent.new) { "⏎" } %>
+        <%= render(UI::KbdComponent.new) { "⌫" } %>
+        <%= render(UI::KbdComponent.new) { "⎋" } %>
+        <%= render(UI::KbdComponent.new) { "⇥" } %>
       </div>
     </div>
   </div>
@@ -54,28 +54,28 @@
     <div class="rounded-lg border bg-card p-6">
       <div class="flex flex-wrap items-center gap-4">
         <%= render "ui/kbd/group" do %>
-          <%= render "ui/kbd/kbd", content: "Ctrl" %>
+          <%= render "ui/kbd", content: "Ctrl" %>
           +
-          <%= render "ui/kbd/kbd", content: "C" %>
+          <%= render "ui/kbd", content: "C" %>
         <% end %>
 
         <%= render "ui/kbd/group" do %>
-          <%= render "ui/kbd/kbd", content: "⌘" %>
-          <%= render "ui/kbd/kbd", content: "K" %>
+          <%= render "ui/kbd", content: "⌘" %>
+          <%= render "ui/kbd", content: "K" %>
         <% end %>
 
         <%= render "ui/kbd/group" do %>
-          <%= render "ui/kbd/kbd", content: "⇧" %>
-          <%= render "ui/kbd/kbd", content: "⌘" %>
-          <%= render "ui/kbd/kbd", content: "P" %>
+          <%= render "ui/kbd", content: "⇧" %>
+          <%= render "ui/kbd", content: "⌘" %>
+          <%= render "ui/kbd", content: "P" %>
         <% end %>
 
         <%= render "ui/kbd/group" do %>
-          <%= render "ui/kbd/kbd", content: "Ctrl" %>
+          <%= render "ui/kbd", content: "Ctrl" %>
           +
-          <%= render "ui/kbd/kbd", content: "Alt" %>
+          <%= render "ui/kbd", content: "Alt" %>
           +
-          <%= render "ui/kbd/kbd", content: "Del" %>
+          <%= render "ui/kbd", content: "Del" %>
         <% end %>
       </div>
     </div>
@@ -89,20 +89,20 @@
     </div>
     <div class="rounded-lg border bg-card p-6">
       <div class="flex flex-wrap items-center gap-4">
-        <%= render UI::Button::Button.new(variant: :outline, size: :sm, classes: "pr-2") do %>
-          Accept <%= render UI::Kbd::Kbd.new { "⏎" } %>
+        <%= render UI::Button.new(variant: :outline, size: :sm, classes: "pr-2") do %>
+          Accept <%= render UI::Kbd.new { "⏎" } %>
         <% end %>
 
-        <%= render UI::Button::Button.new(variant: :outline, size: :sm) do %>
-          <%= render UI::Kbd::Kbd.new { "Esc" } %>
+        <%= render UI::Button.new(variant: :outline, size: :sm) do %>
+          <%= render UI::Kbd.new { "Esc" } %>
           Cancel
         <% end %>
 
-        <%= render UI::Button::Button.new(variant: :outline, size: :sm) do %>
+        <%= render UI::Button.new(variant: :outline, size: :sm) do %>
           Save
-          <%= render UI::Kbd::Group.new do %>
-            <%= render UI::Kbd::Kbd.new { "⌘" } %>
-            <%= render UI::Kbd::Kbd.new { "S" } %>
+          <%= render UI::KbdGroup.new do %>
+            <%= render UI::Kbd.new { "⌘" } %>
+            <%= render UI::Kbd.new { "S" } %>
           <% end %>
         <% end %>
       </div>
@@ -119,26 +119,26 @@
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-sm">Next page</span>
-          <%= render(UI::Kbd::KbdComponent.new) { "→" } %>
+          <%= render(UI::KbdComponent.new) { "→" } %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm">Previous page</span>
-          <%= render(UI::Kbd::KbdComponent.new) { "←" } %>
+          <%= render(UI::KbdComponent.new) { "←" } %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm">Go to top</span>
-          <%= render(UI::Kbd::GroupComponent.new) do %>
-            <%= render(UI::Kbd::KbdComponent.new) { "Ctrl" } %>
+          <%= render(UI::KbdGroupComponent.new) do %>
+            <%= render(UI::KbdComponent.new) { "Ctrl" } %>
             +
-            <%= render(UI::Kbd::KbdComponent.new) { "Home" } %>
+            <%= render(UI::KbdComponent.new) { "Home" } %>
           <% end %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm">Go to bottom</span>
-          <%= render(UI::Kbd::GroupComponent.new) do %>
-            <%= render(UI::Kbd::KbdComponent.new) { "Ctrl" } %>
+          <%= render(UI::KbdGroupComponent.new) do %>
+            <%= render(UI::KbdComponent.new) { "Ctrl" } %>
             +
-            <%= render(UI::Kbd::KbdComponent.new) { "End" } %>
+            <%= render(UI::KbdComponent.new) { "End" } %>
           <% end %>
         </div>
       </div>
@@ -156,32 +156,32 @@
         <div class="flex items-center justify-between">
           <span class="text-sm">Open command palette</span>
           <%= render "ui/kbd/group" do %>
-            <%= render "ui/kbd/kbd", content: "⌘" %>
-            <%= render "ui/kbd/kbd", content: "K" %>
+            <%= render "ui/kbd", content: "⌘" %>
+            <%= render "ui/kbd", content: "K" %>
           <% end %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm">Search</span>
           <%= render "ui/kbd/group" do %>
-            <%= render "ui/kbd/kbd", content: "Ctrl" %>
+            <%= render "ui/kbd", content: "Ctrl" %>
             +
-            <%= render "ui/kbd/kbd", content: "F" %>
+            <%= render "ui/kbd", content: "F" %>
           <% end %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm">New file</span>
           <%= render "ui/kbd/group" do %>
-            <%= render "ui/kbd/kbd", content: "Ctrl" %>
+            <%= render "ui/kbd", content: "Ctrl" %>
             +
-            <%= render "ui/kbd/kbd", content: "N" %>
+            <%= render "ui/kbd", content: "N" %>
           <% end %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm">Save</span>
           <%= render "ui/kbd/group" do %>
-            <%= render "ui/kbd/kbd", content: "Ctrl" %>
+            <%= render "ui/kbd", content: "Ctrl" %>
             +
-            <%= render "ui/kbd/kbd", content: "S" %>
+            <%= render "ui/kbd", content: "S" %>
           <% end %>
         </div>
       </div>
@@ -198,26 +198,26 @@
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-sm font-bold">Bold</span>
-          <%= render UI::Kbd::Group.new do %>
-            <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+          <%= render UI::KbdGroup.new do %>
+            <%= render UI::Kbd.new { "Ctrl" } %>
             +
-            <%= render UI::Kbd::Kbd.new { "B" } %>
+            <%= render UI::Kbd.new { "B" } %>
           <% end %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm italic">Italic</span>
-          <%= render UI::Kbd::Group.new do %>
-            <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+          <%= render UI::KbdGroup.new do %>
+            <%= render UI::Kbd.new { "Ctrl" } %>
             +
-            <%= render UI::Kbd::Kbd.new { "I" } %>
+            <%= render UI::Kbd.new { "I" } %>
           <% end %>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm underline">Underline</span>
-          <%= render UI::Kbd::Group.new do %>
-            <%= render UI::Kbd::Kbd.new { "Ctrl" } %>
+          <%= render UI::KbdGroup.new do %>
+            <%= render UI::Kbd.new { "Ctrl" } %>
             +
-            <%= render UI::Kbd::Kbd.new { "U" } %>
+            <%= render UI::Kbd.new { "U" } %>
           <% end %>
         </div>
       </div>
@@ -232,9 +232,9 @@
     </div>
     <div class="rounded-lg border bg-card p-6">
       <div class="flex items-center gap-4">
-        <%= render(UI::Kbd::KbdComponent.new(classes: "text-[10px] h-4 min-w-4")) { "Sm" } %>
-        <%= render(UI::Kbd::KbdComponent.new) { "Md" } %>
-        <%= render(UI::Kbd::KbdComponent.new(classes: "text-sm h-6 min-w-6")) { "Lg" } %>
+        <%= render(UI::KbdComponent.new(classes: "text-[10px] h-4 min-w-4")) { "Sm" } %>
+        <%= render(UI::KbdComponent.new) { "Md" } %>
+        <%= render(UI::KbdComponent.new(classes: "text-sm h-6 min-w-6")) { "Lg" } %>
       </div>
     </div>
   </div>
@@ -247,10 +247,10 @@
     </div>
     <div class="rounded-lg border bg-card p-6">
       <div class="flex flex-wrap items-center gap-4">
-        <%= render "ui/kbd/kbd", content: "Default" %>
-        <%= render "ui/kbd/kbd", classes: "bg-accent text-accent-foreground", content: "Accent" %>
-        <%= render "ui/kbd/kbd", classes: "bg-primary text-primary-foreground", content: "Primary" %>
-        <%= render "ui/kbd/kbd", classes: "bg-destructive/10 text-destructive", content: "Destructive" %>
+        <%= render "ui/kbd", content: "Default" %>
+        <%= render "ui/kbd", classes: "bg-accent text-accent-foreground", content: "Accent" %>
+        <%= render "ui/kbd", classes: "bg-primary text-primary-foreground", content: "Primary" %>
+        <%= render "ui/kbd", classes: "bg-destructive/10 text-destructive", content: "Destructive" %>
       </div>
     </div>
   </div>
@@ -264,12 +264,12 @@
     <div class="rounded-lg border bg-card p-6">
       <div class="flex flex-col items-center gap-2">
         <div>
-          <%= render UI::Kbd::Kbd.new { "↑" } %>
+          <%= render UI::Kbd.new { "↑" } %>
         </div>
         <div class="flex items-center gap-2">
-          <%= render "ui/kbd/kbd", content: "←" %>
-          <%= render(UI::Kbd::KbdComponent.new) { "↓" } %>
-          <%= render "ui/kbd/kbd", content: "→" %>
+          <%= render "ui/kbd", content: "←" %>
+          <%= render(UI::KbdComponent.new) { "↓" } %>
+          <%= render "ui/kbd", content: "→" %>
         </div>
       </div>
     </div>

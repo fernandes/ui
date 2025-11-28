@@ -11,32 +11,32 @@ class SliderTest < UI::SystemTestCase
 
   # Helper to get the volume slider (single thumb, default value 33)
   def volume_slider
-    find_element(UI::Testing::SliderElement, "#volume-slider")
+    find_element(UI::TestingSliderElement, "#volume-slider")
   end
 
   # Helper to get the price range slider (two thumbs, default [25, 75])
   def price_slider
-    find_element(UI::Testing::SliderElement, "#price-slider")
+    find_element(UI::TestingSliderElement, "#price-slider")
   end
 
   # Helper to get the brightness slider (step=10, default value 50)
   def brightness_slider
-    find_element(UI::Testing::SliderElement, "#brightness-slider")
+    find_element(UI::TestingSliderElement, "#brightness-slider")
   end
 
   # Helper to get the balance slider (min=-50, max=50, default value 0)
   def balance_slider
-    find_element(UI::Testing::SliderElement, "#balance-slider")
+    find_element(UI::TestingSliderElement, "#balance-slider")
   end
 
   # Helper to get the disabled slider
   def disabled_slider
-    find_element(UI::Testing::SliderElement, "#disabled-slider")
+    find_element(UI::TestingSliderElement, "#disabled-slider")
   end
 
   # Helper to get first vertical slider
   def vertical_slider
-    find_element(UI::Testing::SliderElement, "#vertical-slider-left")
+    find_element(UI::TestingSliderElement, "#vertical-slider-left")
   end
 
   # === Initial State Tests ===

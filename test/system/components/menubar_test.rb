@@ -9,7 +9,7 @@ class MenubarTest < UI::SystemTestCase
 
   # Helper to get the menubar element
   def menubar(selector = "#phlex-menubar")
-    UI::Testing::MenubarElement.new(find(selector))
+    UI::TestingMenubarElement.new(find(selector))
   end
 
   # === Basic Interaction Tests ===

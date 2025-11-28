@@ -6,7 +6,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Carousel::CarouselContentBehavior
+  extend UI::CarouselContentBehavior
   all_attributes = carousel_content_html_attributes
 %>
 <%= content_tag :div, all_attributes do %>

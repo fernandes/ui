@@ -13,10 +13,10 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Variants</h3>
         <div class="flex flex-wrap items-center gap-2">
-          <%= render UI::Badge::Badge.new { "Default" } %>
-          <%= render UI::Badge::Badge.new(variant: :secondary) { "Secondary" } %>
-          <%= render UI::Badge::Badge.new(variant: :destructive) { "Destructive" } %>
-          <%= render UI::Badge::Badge.new(variant: :outline) { "Outline" } %>
+          <%= render UI::Badge.new { "Default" } %>
+          <%= render UI::Badge.new(variant: :secondary) { "Secondary" } %>
+          <%= render UI::Badge.new(variant: :destructive) { "Destructive" } %>
+          <%= render UI::Badge.new(variant: :outline) { "Outline" } %>
         </div>
       </div>
 
@@ -24,14 +24,14 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Icon</h3>
         <div class="flex flex-wrap items-center gap-2">
-          <%= render UI::Badge::Badge.new(variant: :secondary, classes: "bg-blue-500 text-white dark:bg-blue-600") do %>
+          <%= render UI::Badge.new(variant: :secondary, classes: "bg-blue-500 text-white dark:bg-blue-600") do %>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
             </svg>
             Verified
           <% end %>
 
-          <%= render UI::Badge::Badge.new(variant: :secondary) do %>
+          <%= render UI::Badge.new(variant: :secondary) do %>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
             </svg>
@@ -45,7 +45,7 @@
         <h3 class="text-lg font-medium">As Link</h3>
         <div class="flex flex-wrap items-center gap-2">
           <%= link_to "/notifications", class: "no-underline" do %>
-            <%= render UI::Badge::Badge.new(classes: "h-5 min-w-5") { "5" } %>
+            <%= render UI::Badge.new(classes: "h-5 min-w-5") { "5" } %>
           <% end %>
         </div>
       </div>
@@ -55,7 +55,7 @@
         <h3 class="text-lg font-medium">Notification Count</h3>
         <div class="flex items-center gap-2">
           <span>Inbox</span>
-          <%= render UI::Badge::Badge.new(classes: "h-5 min-w-5 font-mono tabular-nums") { "12" } %>
+          <%= render UI::Badge.new(classes: "h-5 min-w-5 font-mono tabular-nums") { "12" } %>
         </div>
       </div>
     </div>
@@ -70,16 +70,16 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Variants</h3>
         <div class="flex flex-wrap items-center gap-2">
-          <%= render "ui/badge/badge" do %>
+          <%= render "ui/badge" do %>
             Default
           <% end %>
-          <%= render "ui/badge/badge", variant: :secondary do %>
+          <%= render "ui/badge", variant: :secondary do %>
             Secondary
           <% end %>
-          <%= render "ui/badge/badge", variant: :destructive do %>
+          <%= render "ui/badge", variant: :destructive do %>
             Destructive
           <% end %>
-          <%= render "ui/badge/badge", variant: :outline do %>
+          <%= render "ui/badge", variant: :outline do %>
             Outline
           <% end %>
         </div>
@@ -89,16 +89,16 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Status Indicators</h3>
         <div class="flex flex-wrap gap-2">
-          <%= render "ui/badge/badge", variant: :default do %>
+          <%= render "ui/badge", variant: :default do %>
             Active
           <% end %>
-          <%= render "ui/badge/badge", variant: :secondary do %>
+          <%= render "ui/badge", variant: :secondary do %>
             Pending
           <% end %>
-          <%= render "ui/badge/badge", variant: :outline do %>
+          <%= render "ui/badge", variant: :outline do %>
             Draft
           <% end %>
-          <%= render "ui/badge/badge", variant: :destructive do %>
+          <%= render "ui/badge", variant: :destructive do %>
             Archived
           <% end %>
         </div>
@@ -109,7 +109,7 @@
         <h3 class="text-lg font-medium">Category Tags</h3>
         <div class="flex flex-wrap gap-2">
           <% ["React", "TypeScript", "Tailwind", "Next.js"].each do |tag| %>
-            <%= render "ui/badge/badge", variant: :outline do %>
+            <%= render "ui/badge", variant: :outline do %>
               <%= tag %>
             <% end %>
           <% end %>
@@ -122,7 +122,7 @@
         <div class="rounded-lg border bg-card p-4 max-w-md">
           <div class="flex items-center justify-between">
             <h3 class="font-semibold">Project Name</h3>
-            <%= render "ui/badge/badge", variant: :default do %>
+            <%= render "ui/badge", variant: :default do %>
               In Progress
             <% end %>
           </div>
@@ -141,10 +141,10 @@
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Variants</h3>
         <div class="flex flex-wrap items-center gap-2">
-          <%= render(UI::Badge::BadgeComponent.new) { "Default" } %>
-          <%= render(UI::Badge::BadgeComponent.new(variant: :secondary)) { "Secondary" } %>
-          <%= render(UI::Badge::BadgeComponent.new(variant: :destructive)) { "Destructive" } %>
-          <%= render(UI::Badge::BadgeComponent.new(variant: :outline)) { "Outline" } %>
+          <%= render(UI::BadgeComponent.new) { "Default" } %>
+          <%= render(UI::BadgeComponent.new(variant: :secondary)) { "Secondary" } %>
+          <%= render(UI::BadgeComponent.new(variant: :destructive)) { "Destructive" } %>
+          <%= render(UI::BadgeComponent.new(variant: :outline)) { "Outline" } %>
         </div>
       </div>
 
@@ -154,15 +154,15 @@
         <div class="space-y-2">
           <div class="flex items-center gap-2">
             <span>Celso Fernandes</span>
-            <%= render(UI::Badge::BadgeComponent.new(variant: :default, classes: "text-[10px]")) { "Owner" } %>
+            <%= render(UI::BadgeComponent.new(variant: :default, classes: "text-[10px]")) { "Owner" } %>
           </div>
           <div class="flex items-center gap-2">
             <span>John Doe</span>
-            <%= render(UI::Badge::BadgeComponent.new(variant: :secondary, classes: "text-[10px]")) { "Admin" } %>
+            <%= render(UI::BadgeComponent.new(variant: :secondary, classes: "text-[10px]")) { "Admin" } %>
           </div>
           <div class="flex items-center gap-2">
             <span>Jane Smith</span>
-            <%= render(UI::Badge::BadgeComponent.new(variant: :outline, classes: "text-[10px]")) { "Member" } %>
+            <%= render(UI::BadgeComponent.new(variant: :outline, classes: "text-[10px]")) { "Member" } %>
           </div>
         </div>
       </div>
@@ -172,9 +172,9 @@
         <h3 class="text-lg font-medium">Badge Group</h3>
         <div class="flex flex-wrap items-center gap-2">
           <span class="text-sm font-medium">Tags:</span>
-          <%= render(UI::Badge::BadgeComponent.new(variant: :secondary)) { "Design" } %>
-          <%= render(UI::Badge::BadgeComponent.new(variant: :secondary)) { "Development" } %>
-          <%= render(UI::Badge::BadgeComponent.new(variant: :secondary)) { "Marketing" } %>
+          <%= render(UI::BadgeComponent.new(variant: :secondary)) { "Design" } %>
+          <%= render(UI::BadgeComponent.new(variant: :secondary)) { "Development" } %>
+          <%= render(UI::BadgeComponent.new(variant: :secondary)) { "Marketing" } %>
         </div>
       </div>
 
@@ -186,7 +186,7 @@
           <div class="size-10 rounded-full bg-muted"></div>
 
           <%# Badge notification %>
-          <%= render(UI::Badge::BadgeComponent.new(
+          <%= render(UI::BadgeComponent.new(
             classes: "absolute -top-1 -right-1 h-5 min-w-5 p-0 text-[10px]"
           )) { "3" } %>
         </div>
@@ -202,15 +202,15 @@
         <div>
           <h4 class="text-sm font-medium mb-2">Default</h4>
           <div class="flex flex-wrap gap-2">
-            <%= render UI::Badge::Badge.new(variant: :default) { "Badge" } %>
-            <%= render UI::Badge::Badge.new(variant: :default) do %>
+            <%= render UI::Badge.new(variant: :default) { "Badge" } %>
+            <%= render UI::Badge.new(variant: :default) do %>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
               </svg>
               With Icon
             <% end %>
             <%= link_to "#", class: "no-underline" do %>
-              <%= render UI::Badge::Badge.new(variant: :default) { "As Link" } %>
+              <%= render UI::Badge.new(variant: :default) { "As Link" } %>
             <% end %>
           </div>
         </div>
@@ -218,15 +218,15 @@
         <div>
           <h4 class="text-sm font-medium mb-2">Secondary</h4>
           <div class="flex flex-wrap gap-2">
-            <%= render UI::Badge::Badge.new(variant: :secondary) { "Badge" } %>
-            <%= render UI::Badge::Badge.new(variant: :secondary) do %>
+            <%= render UI::Badge.new(variant: :secondary) { "Badge" } %>
+            <%= render UI::Badge.new(variant: :secondary) do %>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
               </svg>
               With Icon
             <% end %>
             <%= link_to "#", class: "no-underline" do %>
-              <%= render UI::Badge::Badge.new(variant: :secondary) { "As Link" } %>
+              <%= render UI::Badge.new(variant: :secondary) { "As Link" } %>
             <% end %>
           </div>
         </div>
@@ -234,15 +234,15 @@
         <div>
           <h4 class="text-sm font-medium mb-2">Destructive</h4>
           <div class="flex flex-wrap gap-2">
-            <%= render UI::Badge::Badge.new(variant: :destructive) { "Badge" } %>
-            <%= render UI::Badge::Badge.new(variant: :destructive) do %>
+            <%= render UI::Badge.new(variant: :destructive) { "Badge" } %>
+            <%= render UI::Badge.new(variant: :destructive) do %>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
               </svg>
               With Icon
             <% end %>
             <%= link_to "#", class: "no-underline" do %>
-              <%= render UI::Badge::Badge.new(variant: :destructive) { "As Link" } %>
+              <%= render UI::Badge.new(variant: :destructive) { "As Link" } %>
             <% end %>
           </div>
         </div>
@@ -250,15 +250,15 @@
         <div>
           <h4 class="text-sm font-medium mb-2">Outline</h4>
           <div class="flex flex-wrap gap-2">
-            <%= render UI::Badge::Badge.new(variant: :outline) { "Badge" } %>
-            <%= render UI::Badge::Badge.new(variant: :outline) do %>
+            <%= render UI::Badge.new(variant: :outline) { "Badge" } %>
+            <%= render UI::Badge.new(variant: :outline) do %>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
               </svg>
               With Icon
             <% end %>
             <%= link_to "#", class: "no-underline" do %>
-              <%= render UI::Badge::Badge.new(variant: :outline) { "As Link" } %>
+              <%= render UI::Badge.new(variant: :outline) { "As Link" } %>
             <% end %>
           </div>
         </div>

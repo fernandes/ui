@@ -5,6 +5,7 @@
   "description": "Dummy app for testing UI Engine",
   "packageManager": "bun@latest",
   "scripts": {
+    "build": "bun run build:js && bun run build:css",
     "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css",
     "build:css:watch": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
     "build:css:prod": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",

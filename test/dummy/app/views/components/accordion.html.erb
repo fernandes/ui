@@ -16,18 +16,18 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="max-w-2xl">
-        <%= render "ui/accordion/accordion", classes: "w-full", attributes: { id: "basic-accordion" } do %>
-          <%= render "ui/accordion/accordion_item", value: "erb-1" do %>
-            <%= render "ui/accordion/accordion_trigger", content: "Is it accessible?" %>
-            <%= render "ui/accordion/accordion_content", content: "Yes. It adheres to the WAI-ARIA design pattern." %>
+        <%= render "ui/accordion", classes: "w-full", attributes: { id: "basic-accordion" } do %>
+          <%= render "ui/accordion/item", value: "erb-1" do %>
+            <%= render "ui/accordion/trigger", content: "Is it accessible?" %>
+            <%= render "ui/accordion/content", content: "Yes. It adheres to the WAI-ARIA design pattern." %>
           <% end %>
-          <%= render "ui/accordion/accordion_item", value: "erb-2" do %>
-            <%= render "ui/accordion/accordion_trigger", content: "Is it styled?" %>
-            <%= render "ui/accordion/accordion_content", content: "Yes. It comes with default styles that match shadcn/ui design system." %>
+          <%= render "ui/accordion/item", value: "erb-2" do %>
+            <%= render "ui/accordion/trigger", content: "Is it styled?" %>
+            <%= render "ui/accordion/content", content: "Yes. It comes with default styles that match shadcn/ui design system." %>
           <% end %>
-          <%= render "ui/accordion/accordion_item", value: "erb-3" do %>
-            <%= render "ui/accordion/accordion_trigger", content: "Is it animated?" %>
-            <%= render "ui/accordion/accordion_content" do %>
+          <%= render "ui/accordion/item", value: "erb-3" do %>
+            <%= render "ui/accordion/trigger", content: "Is it animated?" %>
+            <%= render "ui/accordion/content" do %>
               <p>Yes! It features smooth transitions when expanding and collapsing sections.</p>
             <% end %>
           <% end %>
@@ -39,18 +39,18 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="max-w-2xl">
-        <%= render UI::Accordion::Accordion.new(classes: "w-full") do %>
-          <%= render UI::Accordion::Item.new(value: "phlex-1") do %>
-            <%= render UI::Accordion::Trigger.new { "What is Phlex?" } %>
-            <%= render UI::Accordion::Content.new { "Phlex is a framework for building fast, reusable, object-oriented views in pure Ruby." } %>
+        <%= render UI::Accordion.new(classes: "w-full") do %>
+          <%= render UI::AccordionItem.new(value: "phlex-1") do %>
+            <%= render UI::AccordionTrigger.new { "What is Phlex?" } %>
+            <%= render UI::AccordionContent.new { "Phlex is a framework for building fast, reusable, object-oriented views in pure Ruby." } %>
           <% end %>
-          <%= render UI::Accordion::Item.new(value: "phlex-2") do %>
-            <%= render UI::Accordion::Trigger.new { "Why use Phlex?" } %>
-            <%= render UI::Accordion::Content.new { "Phlex provides type safety, performance, and a clean object-oriented API for building components." } %>
+          <%= render UI::AccordionItem.new(value: "phlex-2") do %>
+            <%= render UI::AccordionTrigger.new { "Why use Phlex?" } %>
+            <%= render UI::AccordionContent.new { "Phlex provides type safety, performance, and a clean object-oriented API for building components." } %>
           <% end %>
-          <%= render UI::Accordion::Item.new(value: "phlex-3") do %>
-            <%= render UI::Accordion::Trigger.new { "How does it work?" } %>
-            <%= render UI::Accordion::Content.new do %>
+          <%= render UI::AccordionItem.new(value: "phlex-3") do %>
+            <%= render UI::AccordionTrigger.new { "How does it work?" } %>
+            <%= render UI::AccordionContent.new do %>
               <p>Phlex components are Ruby classes that generate HTML efficiently at runtime.</p>
             <% end %>
           <% end %>
@@ -62,28 +62,28 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="max-w-2xl">
-        <%= render UI::Accordion::AccordionComponent.new(classes: "w-full") do %>
-          <%= render UI::Accordion::AccordionItemComponent.new(value: "vc-1") do %>
-            <%= render UI::Accordion::AccordionTriggerComponent.new do %>
+        <%= render UI::AccordionComponent.new(classes: "w-full") do %>
+          <%= render UI::AccordionItemComponent.new(value: "vc-1") do %>
+            <%= render UI::AccordionTriggerComponent.new do %>
               What is ViewComponent?
             <% end %>
-            <%= render UI::Accordion::AccordionContentComponent.new do %>
+            <%= render UI::AccordionContentComponent.new do %>
               ViewComponent is a framework for building reusable, testable & encapsulated view components in Ruby on Rails.
             <% end %>
           <% end %>
-          <%= render UI::Accordion::AccordionItemComponent.new(value: "vc-2") do %>
-            <%= render UI::Accordion::AccordionTriggerComponent.new do %>
+          <%= render UI::AccordionItemComponent.new(value: "vc-2") do %>
+            <%= render UI::AccordionTriggerComponent.new do %>
               Why use ViewComponent?
             <% end %>
-            <%= render UI::Accordion::AccordionContentComponent.new do %>
+            <%= render UI::AccordionContentComponent.new do %>
               ViewComponent provides better performance, testability, and a clear component structure for your Rails views.
             <% end %>
           <% end %>
-          <%= render UI::Accordion::AccordionItemComponent.new(value: "vc-3") do %>
-            <%= render UI::Accordion::AccordionTriggerComponent.new do %>
+          <%= render UI::AccordionItemComponent.new(value: "vc-3") do %>
+            <%= render UI::AccordionTriggerComponent.new do %>
               How does it work?
             <% end %>
-            <%= render UI::Accordion::AccordionContentComponent.new do %>
+            <%= render UI::AccordionContentComponent.new do %>
               <p>ViewComponents are Ruby classes with template files that render into your Rails views.</p>
             <% end %>
           <% end %>
@@ -95,16 +95,16 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Initially Open Item</h2>
       <div class="max-w-2xl">
-        <%= render UI::Accordion::Accordion.new(classes: "w-full") do %>
-          <%= render UI::Accordion::Item.new(value: "open-1", initial_open: true) do %>
-            <%= render UI::Accordion::Trigger.new(item_value: "open-1", initial_open: true) { "Getting Started" } %>
-            <%= render UI::Accordion::Content.new(item_value: "open-1", initial_open: true) do %>
+        <%= render UI::Accordion.new(classes: "w-full") do %>
+          <%= render UI::AccordionItem.new(value: "open-1", initial_open: true) do %>
+            <%= render UI::AccordionTrigger.new(item_value: "open-1", initial_open: true) { "Getting Started" } %>
+            <%= render UI::AccordionContent.new(item_value: "open-1", initial_open: true) do %>
               <p class="text-sm text-muted-foreground">This accordion item starts in the open state. Notice how it's already expanded when the page loads.</p>
             <% end %>
           <% end %>
-          <%= render UI::Accordion::Item.new(value: "open-2") do %>
-            <%= render UI::Accordion::Trigger.new(item_value: "open-2") { "Advanced Usage" } %>
-            <%= render UI::Accordion::Content.new(item_value: "open-2") { "Learn about advanced features and customization options." } %>
+          <%= render UI::AccordionItem.new(value: "open-2") do %>
+            <%= render UI::AccordionTrigger.new(item_value: "open-2") { "Advanced Usage" } %>
+            <%= render UI::AccordionContent.new(item_value: "open-2") { "Learn about advanced features and customization options." } %>
           <% end %>
         <% end %>
       </div>
@@ -115,22 +115,22 @@
       <h2 class="text-2xl font-semibold">Multiple Items Open (type: "multiple")</h2>
       <p class="text-sm text-muted-foreground">With type="multiple", you can have multiple accordion items open at the same time.</p>
       <div class="max-w-2xl">
-        <%= render "ui/accordion/accordion", classes: "w-full", type: "multiple", attributes: { id: "multiple-accordion" } do %>
-          <%= render "ui/accordion/accordion_item", value: "multi-1", initial_open: true do %>
-            <%= render "ui/accordion/accordion_trigger", content: "What payment methods do you accept?" %>
-            <%= render "ui/accordion/accordion_content" do %>
+        <%= render "ui/accordion", classes: "w-full", type: "multiple", attributes: { id: "multiple-accordion" } do %>
+          <%= render "ui/accordion/item", value: "multi-1", initial_open: true do %>
+            <%= render "ui/accordion/trigger", content: "What payment methods do you accept?" %>
+            <%= render "ui/accordion/content" do %>
               <p class="text-sm text-muted-foreground">We accept all major credit cards, PayPal, and bank transfers for enterprise customers.</p>
             <% end %>
           <% end %>
-          <%= render "ui/accordion/accordion_item", value: "multi-2", initial_open: true do %>
-            <%= render "ui/accordion/accordion_trigger", content: "How long does shipping take?" %>
-            <%= render "ui/accordion/accordion_content" do %>
+          <%= render "ui/accordion/item", value: "multi-2", initial_open: true do %>
+            <%= render "ui/accordion/trigger", content: "How long does shipping take?" %>
+            <%= render "ui/accordion/content" do %>
               <p class="text-sm text-muted-foreground">Standard shipping takes 3-5 business days. Express shipping is available for next-day delivery.</p>
             <% end %>
           <% end %>
-          <%= render "ui/accordion/accordion_item", value: "multi-3" do %>
-            <%= render "ui/accordion/accordion_trigger", content: "What is your return policy?" %>
-            <%= render "ui/accordion/accordion_content" do %>
+          <%= render "ui/accordion/item", value: "multi-3" do %>
+            <%= render "ui/accordion/trigger", content: "What is your return policy?" %>
+            <%= render "ui/accordion/content" do %>
               <p class="text-sm text-muted-foreground">We offer a 30-day money-back guarantee on all products. Items must be returned in original condition.</p>
             <% end %>
           <% end %>
@@ -142,10 +142,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Rich Content</h2>
       <div class="max-w-2xl">
-        <%= render UI::Accordion::AccordionComponent.new(classes: "w-full") do %>
-          <%= render UI::Accordion::AccordionItemComponent.new(value: "rich-1") do %>
-            <%= render UI::Accordion::AccordionTriggerComponent.new { "Features" } %>
-            <%= render UI::Accordion::AccordionContentComponent.new do %>
+        <%= render UI::AccordionComponent.new(classes: "w-full") do %>
+          <%= render UI::AccordionItemComponent.new(value: "rich-1") do %>
+            <%= render UI::AccordionTriggerComponent.new { "Features" } %>
+            <%= render UI::AccordionContentComponent.new do %>
               <ul class="list-disc list-inside space-y-2 text-sm text-muted-foreground">
                 <li>Fully accessible with ARIA attributes</li>
                 <li>Keyboard navigation support</li>
@@ -155,9 +155,9 @@
               </ul>
             <% end %>
           <% end %>
-          <%= render UI::Accordion::AccordionItemComponent.new(value: "rich-2") do %>
-            <%= render UI::Accordion::AccordionTriggerComponent.new { "Technical Details" } %>
-            <%= render UI::Accordion::AccordionContentComponent.new do %>
+          <%= render UI::AccordionItemComponent.new(value: "rich-2") do %>
+            <%= render UI::AccordionTriggerComponent.new { "Technical Details" } %>
+            <%= render UI::AccordionContentComponent.new do %>
               <div class="space-y-2">
                 <p class="text-sm font-medium">Built with modern web technologies</p>
                 <p class="text-sm text-muted-foreground">Uses Stimulus.js for behavior, Tailwind CSS for styling, and follows WAI-ARIA best practices.</p>

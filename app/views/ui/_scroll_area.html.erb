@@ -1,0 +1,60 @@
+<%# ScrollArea - Root container for scroll area %>
+<%
+  @as_child = local_assigns.fetch(:as_child, false)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+  @type = local_assigns.fetch(:type, "hover")
+  @scroll_hide_delay = local_assigns.fetch(:scroll_hide_delay, 600)
+
+  # Extend behavior for shared logic
+  extend ::UI::ScrollAreaBehavior
+
+  # Get HTML attributes from behavior
+  root_attrs = scroll_area_html_attributes.deep_merge(@attributes)
+
+  # Add Stimulus controller and values
+  root_attrs[:data] ||= {}
+  root_attrs[:data][:controller] = "ui--scroll-area"
+  root_attrs[:data][:ui__scroll_area_type_value] = @type
+  root_attrs[:data][:ui__scroll_area_scroll_hide_delay_value] = @scroll_hide_delay
+-%>
+<% if @as_child %>
+  <%# asChild mode: capture block and inject attributes into first element %>
+  <% captured_content = capture do %>
+    <%= yield %>
+    <%= render "ui/scroll_area/scrollbar", orientation: "vertical" %>
+    <%= render "ui/scroll_area/corner" %>
+  <% end %>
+  <%= raw captured_content.sub(/(<[a-z][a-z0-9]*)([\s>])/i) { |match|
+    tag_start = $1
+    tag_end = $2
+
+    # Build attributes string manually
+    attrs_array = root_attrs.map do |key, value|
+      key_name = key.to_s.gsub('_', '-')
+      if key == :data && value.is_a?(Hash)
+        # Handle data attributes
+        value.map { |k, v| "data-#{k.to_s.gsub('_', '-')}=\"#{ERB::Util.html_escape(v)}\"" }.join(" ")
+      elsif key == :style
+        "style=\"#{ERB::Util.html_escape(value)}\""
+      elsif value.is_a?(TrueClass)
+        key_name
+      elsif value.is_a?(FalseClass) || value.nil?
+        nil
+      else
+        "#{key_name}=\"#{ERB::Util.html_escape(value)}\""
+      end
+    end.compact.join(" ")
+
+    "#{tag_start} #{attrs_array}#{tag_end}"
+  } %>
+<% else %>
+  <%# Default mode: render as div %>
+  <%= content_tag :div, root_attrs do %>
+    <%= render "ui/scroll_area/viewport" do %>
+      <%= yield %>
+    <% end %>
+    <%= render "ui/scroll_area/scrollbar", orientation: "vertical" %>
+    <%= render "ui/scroll_area/corner" %>
+  <% end %>
+<% end %>

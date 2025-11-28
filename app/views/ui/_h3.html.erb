@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Typography::H3Behavior
+  extend UI::H3Behavior
   all_attributes = h3_html_attributes.merge(@attributes)
 %>
 <%= content_tag :h3, all_attributes do %>

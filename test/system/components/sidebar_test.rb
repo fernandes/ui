@@ -9,7 +9,7 @@ class SidebarTest < UI::SystemTestCase
 
   # Helper to get the sidebar element
   def sidebar
-    @sidebar ||= find_element(UI::Testing::SidebarElement)
+    @sidebar ||= find_element(UI::TestingSidebarElement)
   end
 
   # === Basic Interaction Tests ===

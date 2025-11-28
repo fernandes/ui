@@ -18,7 +18,7 @@
   <%= content&.call(close_attrs) %>
 <% else %>
   <%# Default: render as Button component %>
-  <%= render "ui/button/button", variant: @variant, size: @size, classes: @classes, attributes: close_attrs do %>
+  <%= render "ui/button", variant: @variant, size: @size, classes: @classes, attributes: close_attrs do %>
     <%= content || yield %>
   <% end %>
 <% end %>

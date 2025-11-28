@@ -20,7 +20,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend UI::InputOtp::InputOtpSlotBehavior
+  extend UI::InputOtpSlotBehavior
 
   # Get HTML attributes from behavior
   slot_attrs = input_otp_slot_html_attributes.deep_merge(@attributes)

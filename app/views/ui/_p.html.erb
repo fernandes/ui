@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Typography::PBehavior
+  extend UI::PBehavior
   all_attributes = p_html_attributes.merge(@attributes)
 %>
 <%= content_tag :p, all_attributes do %>

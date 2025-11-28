@@ -35,7 +35,7 @@ module UI
     end
 
     test "closes menu on click outside" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("Components")
       assert nav_menu.menu_open?("Components")
@@ -46,7 +46,7 @@ module UI
     end
 
     test "switches between menus on click" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # Open first menu
       nav_menu.open_menu("Home")
@@ -61,7 +61,7 @@ module UI
     end
 
     test "opens menu on hover after delay" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.hover_trigger("List")
 
@@ -71,7 +71,7 @@ module UI
     # === Content Interaction Tests ===
 
     test "displays content links when menu is open" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("Home")
 
@@ -81,7 +81,7 @@ module UI
     end
 
     test "can click links within content" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("Components")
 
@@ -96,7 +96,7 @@ module UI
     # === Simple Link Triggers (no dropdown) ===
 
     test "handles simple link triggers without dropdown" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # "Docs" is a simple link element within the navigation
       # It's not a trigger, so we need to find it differently
@@ -109,7 +109,7 @@ module UI
     # === Keyboard Navigation Tests ===
 
     test "navigates between triggers with arrow keys" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # Focus first trigger
       nav_menu.focus_trigger("Home")
@@ -125,7 +125,7 @@ module UI
     end
 
     test "navigates to first link in content with arrow down" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.focus_trigger("Home")
       nav_menu.press_arrow_down
@@ -135,7 +135,7 @@ module UI
     end
 
     test "opens menu with enter key" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.focus_trigger("Simple")
       nav_menu.press_enter
@@ -144,7 +144,7 @@ module UI
     end
 
     test "opens menu with space key" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.focus_trigger("Simple")
       nav_menu.press_space
@@ -153,7 +153,7 @@ module UI
     end
 
     test "closes menu with escape and returns focus to trigger" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.focus_trigger("List")
       nav_menu.press_enter
@@ -168,14 +168,14 @@ module UI
     # === ARIA Attributes Tests ===
 
     test "has correct navigation tag" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # Navigation menu uses <nav> tag which is semantically a navigation element
       assert_equal "nav", nav_menu.node.tag_name
     end
 
     test "trigger has correct ARIA attributes when closed" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       attrs = nav_menu.trigger_aria_attributes("Home")
 
@@ -184,7 +184,7 @@ module UI
     end
 
     test "trigger has correct ARIA attributes when open" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("Home")
 
@@ -196,7 +196,7 @@ module UI
     # === State Management Tests ===
 
     test "tracks menu count correctly" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # Should have 5 triggers: Home, Components, List, Simple, With Icon
       # (Docs is a link, not a trigger)
@@ -204,7 +204,7 @@ module UI
     end
 
     test "returns all menu trigger texts" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       menus = nav_menu.menus
 
@@ -218,13 +218,13 @@ module UI
     end
 
     test "active_menu returns nil when all menus are closed" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       assert_nil nav_menu.active_menu
     end
 
     test "active_menu returns current open menu" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("With Icon")
 
@@ -234,7 +234,7 @@ module UI
     # === Viewport Tests (when viewport is disabled) ===
 
     test "viewport is disabled in test examples" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       refute nav_menu.viewport_enabled?
     end
@@ -242,7 +242,7 @@ module UI
     # === Animation and Motion Tests ===
 
     test "content has correct data-state when open" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("Simple")
 
@@ -251,7 +251,7 @@ module UI
     end
 
     test "content has correct data-state when closed" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       nav_menu.open_menu("Simple")
       nav_menu.close_menu
@@ -263,7 +263,7 @@ module UI
     # === Multiple Menu Variations Tests ===
 
     test "works with ERB partials implementation" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#erb-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#erb-nav")
 
       nav_menu.open_menu("Home")
       assert nav_menu.menu_open?("Home")
@@ -273,7 +273,7 @@ module UI
     end
 
     test "works with ViewComponent implementation" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#vc-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#vc-nav")
 
       nav_menu.open_menu("Components")
       assert nav_menu.menu_open?("Components")
@@ -284,7 +284,7 @@ module UI
     # === Complex Navigation Flow Tests ===
 
     test "can navigate through multiple menus in sequence" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # Open Home
       nav_menu.open_menu("Home")
@@ -306,7 +306,7 @@ module UI
     end
 
     test "reopening same menu works correctly" do
-      nav_menu = find_element(UI::Testing::NavigationMenuElement, "#phlex-nav")
+      nav_menu = find_element(UI::TestingNavigationMenuElement, "#phlex-nav")
 
       # Open
       nav_menu.open_menu("Simple")

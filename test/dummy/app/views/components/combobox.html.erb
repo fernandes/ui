@@ -30,7 +30,7 @@
           { value: "astro", label: "Astro" }
         ]
       %>
-      <%= render UI::Popover::Popover.new(
+      <%= render UI::Popover.new(
         id: "framework-combobox-erb",
         placement: "bottom-start",
         data: {
@@ -38,8 +38,8 @@
           ui__combobox_value_value: ""
         }
       ) do %>
-        <%= render UI::Popover::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(
+        <%= render UI::PopoverTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(
             **trigger_attrs,
             variant: :outline,
             classes: "w-[200px] justify-between"
@@ -52,14 +52,14 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Popover::Content.new(classes: "w-[200px] p-0") do %>
-          <%= render UI::Command::Command.new do %>
-            <%= render UI::Command::Input.new(placeholder: "Search framework...") %>
-            <%= render UI::Command::List.new do %>
-              <%= render UI::Command::Empty.new { "No framework found." } %>
-              <%= render UI::Command::Group.new do %>
+        <%= render UI::PopoverContent.new(classes: "w-[200px] p-0") do %>
+          <%= render UI::Command.new do %>
+            <%= render UI::CommandInput.new(placeholder: "Search framework...") %>
+            <%= render UI::CommandList.new do %>
+              <%= render UI::CommandEmpty.new { "No framework found." } %>
+              <%= render UI::CommandGroup.new do %>
                 <% frameworks.each do |framework| %>
-                  <%= render UI::Command::Item.new(
+                  <%= render UI::CommandItem.new(
                     value: framework[:value],
                     data: { ui__combobox_target: "item" }
                   ) do %>
@@ -95,7 +95,7 @@
           { value: "astro", label: "Astro" }
         ]
       %>
-      <%= render UI::Popover::Popover.new(
+      <%= render UI::Popover.new(
         id: "framework-combobox-phlex",
         placement: "bottom-start",
         data: {
@@ -103,8 +103,8 @@
           ui__combobox_value_value: ""
         }
       ) do %>
-        <%= render UI::Popover::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(
+        <%= render UI::PopoverTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(
             **trigger_attrs,
             variant: :outline,
             classes: "w-[200px] justify-between"
@@ -117,14 +117,14 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Popover::Content.new(classes: "w-[200px] p-0") do %>
-          <%= render UI::Command::Command.new do %>
-            <%= render UI::Command::Input.new(placeholder: "Search framework...") %>
-            <%= render UI::Command::List.new do %>
-              <%= render UI::Command::Empty.new { "No framework found." } %>
-              <%= render UI::Command::Group.new do %>
+        <%= render UI::PopoverContent.new(classes: "w-[200px] p-0") do %>
+          <%= render UI::Command.new do %>
+            <%= render UI::CommandInput.new(placeholder: "Search framework...") %>
+            <%= render UI::CommandList.new do %>
+              <%= render UI::CommandEmpty.new { "No framework found." } %>
+              <%= render UI::CommandGroup.new do %>
                 <% frameworks.each do |framework| %>
-                  <%= render UI::Command::Item.new(
+                  <%= render UI::CommandItem.new(
                     value: framework[:value],
                     data: { ui__combobox_target: "item" }
                   ) do %>
@@ -160,7 +160,7 @@
           { value: "astro", label: "Astro" }
         ]
       %>
-      <%= render UI::Popover::PopoverComponent.new(
+      <%= render UI::PopoverComponent.new(
         id: "framework-combobox-vc",
         placement: "bottom-start",
         data: {
@@ -168,8 +168,8 @@
           ui__combobox_value_value: ""
         }
       ) do %>
-          <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-            <%= render UI::Button::ButtonComponent.new(
+          <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+            <%= render UI::ButtonComponent.new(
               variant: :outline,
               classes: "w-[200px] justify-between"
             ) do %>
@@ -181,14 +181,14 @@
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::ContentComponent.new(classes: "w-[200px] p-0") do %>
-            <%= render UI::Command::CommandComponent.new do %>
-              <%= render UI::Command::InputComponent.new(placeholder: "Search framework...") %>
-              <%= render UI::Command::ListComponent.new do %>
-                <%= render(UI::Command::EmptyComponent.new) { "No framework found." } %>
-                <%= render UI::Command::GroupComponent.new do %>
+          <%= render UI::PopoverContentComponent.new(classes: "w-[200px] p-0") do %>
+            <%= render UI::CommandComponent.new do %>
+              <%= render UI::CommandInputComponent.new(placeholder: "Search framework...") %>
+              <%= render UI::CommandListComponent.new do %>
+                <%= render(UI::CommandEmptyComponent.new) { "No framework found." } %>
+                <%= render UI::CommandGroupComponent.new do %>
                   <% frameworks.each do |framework| %>
-                    <%= render UI::Command::ItemComponent.new(
+                    <%= render UI::CommandItemComponent.new(
                       value: framework[:value],
                       data: { ui__combobox_target: "item" }
                     ) do %>
@@ -224,7 +224,7 @@
           { value: "canceled", label: "Canceled", icon: "x-circle" }
         ]
       %>
-      <%= render UI::Popover::Popover.new(
+      <%= render UI::Popover.new(
         id: "status-combobox-erb",
         placement: "bottom-start",
         data: {
@@ -232,8 +232,8 @@
           ui__combobox_value_value: ""
         }
       ) do %>
-        <%= render UI::Popover::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(
+        <%= render UI::PopoverTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(
             **trigger_attrs,
             variant: :outline,
             classes: "w-[200px] justify-start"
@@ -242,14 +242,14 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Popover::Content.new(classes: "w-[200px] p-0", align: "start") do %>
-          <%= render UI::Command::Command.new do %>
-            <%= render UI::Command::Input.new(placeholder: "Change status...") %>
-            <%= render UI::Command::List.new do %>
-              <%= render UI::Command::Empty.new { "No results found." } %>
-              <%= render UI::Command::Group.new do %>
+        <%= render UI::PopoverContent.new(classes: "w-[200px] p-0", align: "start") do %>
+          <%= render UI::Command.new do %>
+            <%= render UI::CommandInput.new(placeholder: "Change status...") %>
+            <%= render UI::CommandList.new do %>
+              <%= render UI::CommandEmpty.new { "No results found." } %>
+              <%= render UI::CommandGroup.new do %>
                 <% statuses.each do |status| %>
-                  <%= render UI::Command::Item.new(
+                  <%= render UI::CommandItem.new(
                     value: status[:value],
                     data: { ui__combobox_target: "item" }
                   ) do %>
@@ -302,15 +302,15 @@
           { value: "canceled", label: "Canceled", icon: "x-circle" }
         ]
       %>
-      <%= render UI::Popover::Popover.new(
+      <%= render UI::Popover.new(
         placement: "bottom-start",
         data: {
           controller: "ui--popover ui--combobox",
           ui__combobox_value_value: ""
         }
       ) do %>
-        <%= render UI::Popover::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(
+        <%= render UI::PopoverTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(
             **trigger_attrs,
             variant: :outline,
             classes: "w-[200px] justify-start"
@@ -319,14 +319,14 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Popover::Content.new(classes: "w-[200px] p-0", align: "start") do %>
-          <%= render UI::Command::Command.new do %>
-            <%= render UI::Command::Input.new(placeholder: "Change status...") %>
-            <%= render UI::Command::List.new do %>
-              <%= render UI::Command::Empty.new { "No results found." } %>
-              <%= render UI::Command::Group.new do %>
+        <%= render UI::PopoverContent.new(classes: "w-[200px] p-0", align: "start") do %>
+          <%= render UI::Command.new do %>
+            <%= render UI::CommandInput.new(placeholder: "Change status...") %>
+            <%= render UI::CommandList.new do %>
+              <%= render UI::CommandEmpty.new { "No results found." } %>
+              <%= render UI::CommandGroup.new do %>
                 <% statuses.each do |status| %>
-                  <%= render UI::Command::Item.new(
+                  <%= render UI::CommandItem.new(
                     value: status[:value],
                     data: { ui__combobox_target: "item" }
                   ) do %>
@@ -379,15 +379,15 @@
           { value: "canceled", label: "Canceled", icon: "x-circle" }
         ]
       %>
-      <%= render UI::Popover::PopoverComponent.new(
+      <%= render UI::PopoverComponent.new(
         placement: "bottom-start",
         data: {
           controller: "ui--popover ui--combobox",
           ui__combobox_value_value: ""
         }
       ) do %>
-          <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-            <%= render UI::Button::ButtonComponent.new(
+          <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+            <%= render UI::ButtonComponent.new(
               variant: :outline,
               classes: "w-[200px] justify-start"
             ) do %>
@@ -395,14 +395,14 @@
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::ContentComponent.new(classes: "w-[200px] p-0", align: "start") do %>
-            <%= render UI::Command::CommandComponent.new do %>
-              <%= render UI::Command::InputComponent.new(placeholder: "Change status...") %>
-              <%= render UI::Command::ListComponent.new do %>
-                <%= render(UI::Command::EmptyComponent.new) { "No results found." } %>
-                <%= render UI::Command::GroupComponent.new do %>
+          <%= render UI::PopoverContentComponent.new(classes: "w-[200px] p-0", align: "start") do %>
+            <%= render UI::CommandComponent.new do %>
+              <%= render UI::CommandInputComponent.new(placeholder: "Change status...") %>
+              <%= render UI::CommandListComponent.new do %>
+                <%= render(UI::CommandEmptyComponent.new) { "No results found." } %>
+                <%= render UI::CommandGroupComponent.new do %>
                   <% statuses.each do |status| %>
-                    <%= render UI::Command::ItemComponent.new(
+                    <%= render UI::CommandItemComponent.new(
                       value: status[:value],
                       data: { ui__combobox_target: "item" }
                     ) do %>
@@ -454,37 +454,37 @@
           { value: "documentation", label: "Documentation" }
         ]
       %>
-      <%= render UI::DropdownMenu::DropdownMenu.new(
+      <%= render UI::DropdownMenu.new(
         id: "labels-combobox-erb",
         data: {
           controller: "ui--dropdown ui--combobox",
           ui__combobox_value_value: ""
         }
       ) do %>
-        <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline) do %>
+        <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(**trigger_attrs, variant: :outline) do %>
             <span data-ui--combobox-target="text">Labels</span>
           <% end %>
         <% end %>
 
-        <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
-          <%= render UI::DropdownMenu::Label.new { "Apply labels" } %>
-          <%= render UI::DropdownMenu::Separator.new %>
-          <%= render UI::DropdownMenu::Sub.new do %>
-            <%= render UI::DropdownMenu::SubTrigger.new do %>
+        <%= render UI::DropdownMenuContent.new(classes: "w-56") do %>
+          <%= render UI::DropdownMenuLabel.new { "Apply labels" } %>
+          <%= render UI::DropdownMenuSeparator.new %>
+          <%= render UI::DropdownMenuSub.new do %>
+            <%= render UI::DropdownMenuSubTrigger.new do %>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
                 <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
               </svg>
               <span>Labels</span>
             <% end %>
-            <%= render UI::DropdownMenu::SubContent.new do %>
-              <%= render UI::Command::Command.new do %>
-                <%= render UI::Command::Input.new(placeholder: "Search label...") %>
-                <%= render UI::Command::List.new do %>
-                  <%= render UI::Command::Empty.new { "No label found." } %>
-                  <%= render UI::Command::Group.new do %>
+            <%= render UI::DropdownMenuSubContent.new do %>
+              <%= render UI::Command.new do %>
+                <%= render UI::CommandInput.new(placeholder: "Search label...") %>
+                <%= render UI::CommandList.new do %>
+                  <%= render UI::CommandEmpty.new { "No label found." } %>
+                  <%= render UI::CommandGroup.new do %>
                     <% labels.each do |label| %>
-                      <%= render UI::Command::Item.new(
+                      <%= render UI::CommandItem.new(
                         value: label[:value],
                         data: { ui__combobox_target: "item" }
                       ) do %>
@@ -518,36 +518,36 @@
           { value: "documentation", label: "Documentation" }
         ]
       %>
-      <%= render UI::DropdownMenu::DropdownMenu.new(
+      <%= render UI::DropdownMenu.new(
         data: {
           controller: "ui--dropdown ui--combobox",
           ui__combobox_value_value: ""
         }
       ) do %>
-        <%= render UI::DropdownMenu::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(**trigger_attrs, variant: :outline) do %>
+        <%= render UI::DropdownMenuTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(**trigger_attrs, variant: :outline) do %>
             <span data-ui--combobox-target="text">Labels</span>
           <% end %>
         <% end %>
 
-        <%= render UI::DropdownMenu::Content.new(classes: "w-56") do %>
-          <%= render UI::DropdownMenu::Label.new { "Apply labels" } %>
-          <%= render UI::DropdownMenu::Separator.new %>
-          <%= render UI::DropdownMenu::Sub.new do %>
-            <%= render UI::DropdownMenu::SubTrigger.new do %>
+        <%= render UI::DropdownMenuContent.new(classes: "w-56") do %>
+          <%= render UI::DropdownMenuLabel.new { "Apply labels" } %>
+          <%= render UI::DropdownMenuSeparator.new %>
+          <%= render UI::DropdownMenuSub.new do %>
+            <%= render UI::DropdownMenuSubTrigger.new do %>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
                 <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
               </svg>
               <span>Labels</span>
             <% end %>
-            <%= render UI::DropdownMenu::SubContent.new do %>
-              <%= render UI::Command::Command.new do %>
-                <%= render UI::Command::Input.new(placeholder: "Search label...") %>
-                <%= render UI::Command::List.new do %>
-                  <%= render UI::Command::Empty.new { "No label found." } %>
-                  <%= render UI::Command::Group.new do %>
+            <%= render UI::DropdownMenuSubContent.new do %>
+              <%= render UI::Command.new do %>
+                <%= render UI::CommandInput.new(placeholder: "Search label...") %>
+                <%= render UI::CommandList.new do %>
+                  <%= render UI::CommandEmpty.new { "No label found." } %>
+                  <%= render UI::CommandGroup.new do %>
                     <% labels.each do |label| %>
-                      <%= render UI::Command::Item.new(
+                      <%= render UI::CommandItem.new(
                         value: label[:value],
                         data: { ui__combobox_target: "item" }
                       ) do %>
@@ -581,36 +581,36 @@
           { value: "documentation", label: "Documentation" }
         ]
       %>
-      <%= render UI::DropdownMenu::DropdownMenuComponent.new(
+      <%= render UI::DropdownMenuComponent.new(
         data: {
           controller: "ui--dropdown ui--combobox",
           ui__combobox_value_value: ""
         }
       ) do %>
-          <%= render UI::DropdownMenu::TriggerComponent.new(as_child: true) do %>
-            <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+          <%= render UI::DropdownMenuTriggerComponent.new(as_child: true) do %>
+            <%= render UI::ButtonComponent.new(variant: :outline) do %>
               <span data-ui--combobox-target="text">Labels</span>
             <% end %>
           <% end %>
 
-          <%= render UI::DropdownMenu::ContentComponent.new(classes: "w-56") do %>
-            <%= render UI::DropdownMenu::LabelComponent.new { "Apply labels" } %>
-            <%= render UI::DropdownMenu::SeparatorComponent.new %>
-            <%= render UI::DropdownMenu::SubComponent.new do %>
-              <%= render UI::DropdownMenu::SubTriggerComponent.new do %>
+          <%= render UI::DropdownMenuContentComponent.new(classes: "w-56") do %>
+            <%= render UI::DropdownMenuLabelComponent.new { "Apply labels" } %>
+            <%= render UI::DropdownMenuSeparatorComponent.new %>
+            <%= render UI::DropdownMenuSubComponent.new do %>
+              <%= render UI::DropdownMenuSubTriggerComponent.new do %>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
                   <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
                 </svg>
                 <span>Labels</span>
               <% end %>
-              <%= render UI::DropdownMenu::SubContentComponent.new do %>
-                <%= render UI::Command::CommandComponent.new do %>
-                  <%= render UI::Command::InputComponent.new(placeholder: "Search label...") %>
-                  <%= render UI::Command::ListComponent.new do %>
-                    <%= render UI::Command::EmptyComponent.new { "No label found." } %>
-                    <%= render UI::Command::GroupComponent.new do %>
+              <%= render UI::DropdownMenuSubContentComponent.new do %>
+                <%= render UI::CommandComponent.new do %>
+                  <%= render UI::CommandInputComponent.new(placeholder: "Search label...") %>
+                  <%= render UI::CommandListComponent.new do %>
+                    <%= render UI::CommandEmptyComponent.new { "No label found." } %>
+                    <%= render UI::CommandGroupComponent.new do %>
                       <% labels.each do |label| %>
-                        <%= render UI::Command::ItemComponent.new(
+                        <%= render UI::CommandItemComponent.new(
                           value: label[:value],
                           data: { ui__combobox_target: "item" }
                         ) do %>
@@ -648,15 +648,15 @@
 
       <%# Desktop: Popover %>
       <div class="hidden md:block">
-        <%= render "ui/popover/popover", placement: "bottom-start", data: { controller: "ui--popover ui--combobox", ui__combobox_value_value: "" } do %>
-          <%= render "ui/popover/popover_trigger", as_child: true do |trigger_attrs| %>
-            <%= render "ui/button/button", **trigger_attrs, variant: :outline, classes: "w-[200px] justify-start" do %>
+        <%= render "ui/popover", placement: "bottom-start", data: { controller: "ui--popover ui--combobox", ui__combobox_value_value: "" } do %>
+          <%= render "ui/popover/trigger", as_child: true do |trigger_attrs| %>
+            <%= render "ui/button", **trigger_attrs, variant: :outline, classes: "w-[200px] justify-start" do %>
               <span data-ui--combobox-target="text">+ Set status</span>
             <% end %>
           <% end %>
 
-          <%= render "ui/popover/popover_content", classes: "w-[200px] p-0", align: "start" do %>
-            <%= render "ui/command/command" do %>
+          <%= render "ui/popover/content", classes: "w-[200px] p-0", align: "start" do %>
+            <%= render "ui/command" do %>
               <%= render "ui/command/input", placeholder: "Change status..." %>
               <%= render "ui/command/list" do %>
                 <%= render "ui/command/empty" do %>
@@ -677,9 +677,9 @@
 
       <%# Mobile: Drawer %>
       <div class="md:hidden" data-controller="ui--combobox" data-ui--combobox-value-value="">
-        <%= render "ui/drawer/drawer" do %>
+        <%= render "ui/drawer" do %>
           <%= render "ui/drawer/trigger", as_child: true do |trigger_attrs| %>
-            <%= render "ui/button/button", attributes: trigger_attrs, variant: :outline, classes: "w-[200px] justify-start" do %>
+            <%= render "ui/button", attributes: trigger_attrs, variant: :outline, classes: "w-[200px] justify-start" do %>
               <span data-ui--combobox-target="text">+ Set status</span>
             <% end %>
           <% end %>
@@ -699,7 +699,7 @@
             <% end %>
 
             <div class="p-4">
-              <%= render "ui/command/command" do %>
+              <%= render "ui/command" do %>
                 <%= render "ui/command/input", placeholder: "Change status..." %>
                 <%= render "ui/command/list" do %>
                   <%= render "ui/command/empty" do %>
@@ -742,15 +742,15 @@
 
       <%# Desktop: Popover %>
       <div class="hidden md:block">
-        <%= render UI::Popover::Popover.new(
+        <%= render UI::Popover.new(
           placement: "bottom-start",
           data: {
             controller: "ui--popover ui--combobox",
             ui__combobox_value_value: ""
           }
         ) do %>
-          <%= render UI::Popover::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(
+          <%= render UI::PopoverTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(
               **trigger_attrs,
               variant: :outline,
               classes: "w-[200px] justify-start"
@@ -759,14 +759,14 @@
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::Content.new(classes: "w-[200px] p-0", align: "start") do %>
-            <%= render UI::Command::Command.new do %>
-              <%= render UI::Command::Input.new(placeholder: "Change status...") %>
-              <%= render UI::Command::List.new do %>
-                <%= render UI::Command::Empty.new { "No results found." } %>
-                <%= render UI::Command::Group.new do %>
+          <%= render UI::PopoverContent.new(classes: "w-[200px] p-0", align: "start") do %>
+            <%= render UI::Command.new do %>
+              <%= render UI::CommandInput.new(placeholder: "Change status...") %>
+              <%= render UI::CommandList.new do %>
+                <%= render UI::CommandEmpty.new { "No results found." } %>
+                <%= render UI::CommandGroup.new do %>
                   <% statuses.each do |status| %>
-                    <%= render UI::Command::Item.new(
+                    <%= render UI::CommandItem.new(
                       value: status[:value],
                       data: { ui__combobox_target: "item" }
                     ) do %>
@@ -782,9 +782,9 @@
 
       <%# Mobile: Drawer %>
       <div class="md:hidden" data-controller="ui--combobox" data-ui--combobox-value-value="">
-        <%= render UI::Drawer::Drawer.new do %>
-          <%= render UI::Drawer::Trigger.new(as_child: true) do |trigger_attrs| %>
-            <%= render UI::Button::Button.new(
+        <%= render UI::Drawer.new do %>
+          <%= render UI::DrawerTrigger.new(as_child: true) do |trigger_attrs| %>
+            <%= render UI::Button.new(
               **trigger_attrs,
               variant: :outline,
               classes: "w-[200px] justify-start"
@@ -793,24 +793,24 @@
             <% end %>
           <% end %>
 
-          <%= render UI::Drawer::Overlay.new %>
+          <%= render UI::DrawerOverlay.new %>
 
-          <%= render UI::Drawer::Content.new do %>
-            <%= render UI::Drawer::Handle.new %>
+          <%= render UI::DrawerContent.new do %>
+            <%= render UI::DrawerHandle.new %>
 
-            <%= render UI::Drawer::Header.new do %>
-              <%= render UI::Drawer::Title.new { "Set Status" } %>
-              <%= render UI::Drawer::Description.new { "Select a status for your task" } %>
+            <%= render UI::DrawerHeader.new do %>
+              <%= render UI::DrawerTitle.new { "Set Status" } %>
+              <%= render UI::DrawerDescription.new { "Select a status for your task" } %>
             <% end %>
 
             <div class="p-4">
-              <%= render UI::Command::Command.new do %>
-                <%= render UI::Command::Input.new(placeholder: "Change status...") %>
-                <%= render UI::Command::List.new do %>
-                  <%= render UI::Command::Empty.new { "No results found." } %>
-                  <%= render UI::Command::Group.new do %>
+              <%= render UI::Command.new do %>
+                <%= render UI::CommandInput.new(placeholder: "Change status...") %>
+                <%= render UI::CommandList.new do %>
+                  <%= render UI::CommandEmpty.new { "No results found." } %>
+                  <%= render UI::CommandGroup.new do %>
                     <% statuses.each do |status| %>
-                      <%= render UI::Command::Item.new(
+                      <%= render UI::CommandItem.new(
                         value: status[:value],
                         data: { ui__combobox_target: "item" }
                       ) do %>
@@ -848,15 +848,15 @@
 
       <%# Desktop: Popover %>
       <div class="hidden md:block">
-        <%= render UI::Popover::PopoverComponent.new(
+        <%= render UI::PopoverComponent.new(
           placement: "bottom-start",
           data: {
             controller: "ui--popover ui--combobox",
             ui__combobox_value_value: ""
           }
         ) do %>
-          <%= render UI::Popover::TriggerComponent.new(as_child: true) do %>
-            <%= render UI::Button::ButtonComponent.new(
+          <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
+            <%= render UI::ButtonComponent.new(
               variant: :outline,
               classes: "w-[200px] justify-start"
             ) do %>
@@ -864,14 +864,14 @@
             <% end %>
           <% end %>
 
-          <%= render UI::Popover::ContentComponent.new(classes: "w-[200px] p-0", align: "start") do %>
-            <%= render UI::Command::CommandComponent.new do %>
-              <%= render UI::Command::InputComponent.new(placeholder: "Change status...") %>
-              <%= render UI::Command::ListComponent.new do %>
-                <%= render UI::Command::EmptyComponent.new { "No results found." } %>
-                <%= render UI::Command::GroupComponent.new do %>
+          <%= render UI::PopoverContentComponent.new(classes: "w-[200px] p-0", align: "start") do %>
+            <%= render UI::CommandComponent.new do %>
+              <%= render UI::CommandInputComponent.new(placeholder: "Change status...") %>
+              <%= render UI::CommandListComponent.new do %>
+                <%= render UI::CommandEmptyComponent.new { "No results found." } %>
+                <%= render UI::CommandGroupComponent.new do %>
                   <% statuses.each do |status| %>
-                    <%= render UI::Command::ItemComponent.new(
+                    <%= render UI::CommandItemComponent.new(
                       value: status[:value],
                       data: { ui__combobox_target: "item" }
                     ) do %>
@@ -887,9 +887,9 @@
 
       <%# Mobile: Drawer %>
       <div class="md:hidden" data-controller="ui--combobox" data-ui--combobox-value-value="">
-        <%= render UI::Drawer::DrawerComponent.new do %>
-          <%= render UI::Drawer::TriggerComponent.new(as_child: true) do %>
-            <%= render UI::Button::ButtonComponent.new(
+        <%= render UI::DrawerComponent.new do %>
+          <%= render UI::DrawerTriggerComponent.new(as_child: true) do %>
+            <%= render UI::ButtonComponent.new(
               variant: :outline,
               classes: "w-[200px] justify-start"
             ) do %>
@@ -897,24 +897,24 @@
             <% end %>
           <% end %>
 
-          <%= render UI::Drawer::OverlayComponent.new %>
+          <%= render UI::DrawerOverlayComponent.new %>
 
-          <%= render UI::Drawer::ContentComponent.new do %>
-            <%= render UI::Drawer::HandleComponent.new %>
+          <%= render UI::DrawerContentComponent.new do %>
+            <%= render UI::DrawerHandleComponent.new %>
 
-            <%= render UI::Drawer::HeaderComponent.new do %>
-              <%= render UI::Drawer::TitleComponent.new { "Set Status" } %>
-              <%= render UI::Drawer::DescriptionComponent.new { "Select a status for your task" } %>
+            <%= render UI::DrawerHeaderComponent.new do %>
+              <%= render UI::DrawerTitleComponent.new { "Set Status" } %>
+              <%= render UI::DrawerDescriptionComponent.new { "Select a status for your task" } %>
             <% end %>
 
             <div class="p-4">
-              <%= render UI::Command::CommandComponent.new do %>
-                <%= render UI::Command::InputComponent.new(placeholder: "Change status...") %>
-                <%= render UI::Command::ListComponent.new do %>
-                  <%= render UI::Command::EmptyComponent.new { "No results found." } %>
-                  <%= render UI::Command::GroupComponent.new do %>
+              <%= render UI::CommandComponent.new do %>
+                <%= render UI::CommandInputComponent.new(placeholder: "Change status...") %>
+                <%= render UI::CommandListComponent.new do %>
+                  <%= render UI::CommandEmptyComponent.new { "No results found." } %>
+                  <%= render UI::CommandGroupComponent.new do %>
                     <% statuses.each do |status| %>
-                      <%= render UI::Command::ItemComponent.new(
+                      <%= render UI::CommandItemComponent.new(
                         value: status[:value],
                         data: { ui__combobox_target: "item" }
                       ) do %>

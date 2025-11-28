@@ -1,0 +1,25 @@
+<%# Drawer Component - Root container for drawer %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @open = local_assigns.fetch(:open, false)
+  @direction = local_assigns.fetch(:direction, "bottom")
+  @dismissible = local_assigns.fetch(:dismissible, true)
+  @modal = local_assigns.fetch(:modal, true)
+  @snap_points = local_assigns.fetch(:snap_points, nil)
+  @active_snap_point = local_assigns.fetch(:active_snap_point, nil)
+  @fade_from_index = local_assigns.fetch(:fade_from_index, nil)
+  @snap_to_sequential_point = local_assigns.fetch(:snap_to_sequential_point, false)
+  @handle_only = local_assigns.fetch(:handle_only, false)
+  @reposition_inputs = local_assigns.fetch(:reposition_inputs, true)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::DrawerBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = drawer_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= content || yield %>
+<% end %>

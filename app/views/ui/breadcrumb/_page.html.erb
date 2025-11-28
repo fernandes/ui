@@ -1,0 +1,15 @@
+<%# Breadcrumb Page Component - Current page indicator (non-clickable) %>
+<%
+  content ||= local_assigns.fetch(:content, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::BreadcrumbPageBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = breadcrumb_page_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :span, all_attributes do %>
+  <%= content || yield %>
+<% end %>

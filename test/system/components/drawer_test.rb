@@ -12,7 +12,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "default drawer opens and closes with trigger and close button" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     assert drawer.closed?, "Drawer should be closed initially"
     refute drawer.content_visible?, "Content should not be visible initially"
@@ -26,7 +26,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "default drawer closes with escape key" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-erb")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-erb")
 
     drawer.open
     assert drawer.open?, "Drawer should be open"
@@ -36,7 +36,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "default drawer closes with overlay click" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-vc")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-vc")
 
     drawer.open
     assert drawer.open?, "Drawer should be open"
@@ -46,7 +46,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "default drawer displays title and description" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -55,7 +55,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "default drawer has proper ARIA attributes" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -68,7 +68,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "drawer direction top" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-direction-top-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-direction-top-phlex")
 
     assert_equal "top", drawer.direction
 
@@ -81,7 +81,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer direction left" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-direction-left-erb")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-direction-left-erb")
 
     assert_equal "left", drawer.direction
 
@@ -94,7 +94,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer direction right" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-direction-right-vc")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-direction-right-vc")
 
     assert_equal "right", drawer.direction
 
@@ -111,7 +111,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "snap points drawer has correct snap point configuration" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points-phlex")
 
     assert drawer.has_snap_points?, "Drawer should have snap points configured"
     assert_equal 3, drawer.snap_points_count, "Should have 3 snap points"
@@ -119,7 +119,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "snap points drawer opens at first snap point" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points-phlex")
 
     drawer.open
     assert drawer.open?, "Drawer should be open"
@@ -127,7 +127,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "snap points drawer can snap to different points" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points-erb")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points-erb")
 
     drawer.open
     assert drawer.at_snap_point?(0), "Should start at first snap point"
@@ -149,7 +149,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "snap points drawer maintains state after snapping" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points-vc")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points-vc")
 
     drawer.open
     drawer.snap_to(2) # Snap to 100%
@@ -160,7 +160,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "snap points drawer has handle for dragging" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points-phlex")
 
     drawer.open
 
@@ -169,7 +169,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "snap points drawer queries current snap point correctly" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points-erb")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points-erb")
 
     drawer.open
 
@@ -190,7 +190,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "handle-only drawer opens and has handle" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-handle-only-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-handle-only-phlex")
 
     drawer.open
     assert drawer.open?, "Handle-only drawer should open"
@@ -198,7 +198,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "handle-only drawer opens and closes" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-handle-only-erb")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-handle-only-erb")
 
     drawer.open
     assert drawer.open?, "Handle-only drawer should open"
@@ -209,7 +209,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "handle-only drawer has visible handle" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-handle-only-vc")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-handle-only-vc")
 
     drawer.open
 
@@ -221,7 +221,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "non-modal drawer opens with content visible" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-non-modal-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-non-modal-phlex")
 
     drawer.open
     assert drawer.open?, "Non-modal drawer should open"
@@ -229,7 +229,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "non-modal drawer opens and closes" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-non-modal-erb")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-non-modal-erb")
 
     drawer.open
     assert drawer.open?, "Non-modal drawer should open"
@@ -240,7 +240,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "non-modal drawer opens correctly" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-non-modal-vc")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-non-modal-vc")
 
     drawer.open
 
@@ -255,7 +255,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "drawer has dialog role" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -263,7 +263,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer has aria-modal attribute in modal mode" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -271,13 +271,13 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer is dismissible by default" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     assert drawer.dismissible?, "Drawer should be dismissible by default"
   end
 
   test "drawer has close button" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -289,7 +289,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "drawer overlay is visible when open" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -297,7 +297,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer overlay has correct data-state" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -313,7 +313,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "drawer has handle element" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
 
@@ -321,7 +321,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer handle can be interacted with" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-handle-only-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-handle-only-phlex")
 
     drawer.open
 
@@ -335,7 +335,7 @@ class DrawerComponentTest < UI::SystemTestCase
   # ============================================================================
 
   test "drawer content has correct data-state" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
     assert_equal "open", drawer.content["data-state"]
@@ -345,7 +345,7 @@ class DrawerComponentTest < UI::SystemTestCase
   end
 
   test "drawer container has correct data-state" do
-    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-phlex")
+    drawer = find_element(UI::TestingDrawerElement, "#drawer-default-phlex")
 
     drawer.open
     assert_equal "open", drawer.container["data-state"]

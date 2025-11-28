@@ -7,7 +7,7 @@
   @disabled = local_assigns.fetch(:disabled, false)
 
   # Extend behavior for shared logic
-  extend UI::Menubar::MenubarSubTriggerBehavior
+  extend UI::MenubarSubTriggerBehavior
 
   # Get HTML attributes from behavior
   all_attributes = menubar_sub_trigger_html_attributes.deep_merge(@attributes)

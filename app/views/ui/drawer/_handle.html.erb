@@ -4,7 +4,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend ::UI::Drawer::DrawerHandleBehavior
+  extend UI::DrawerHandleBehavior
 
   # Get HTML attributes from behavior
   all_attributes = drawer_handle_html_attributes.deep_merge(@attributes)

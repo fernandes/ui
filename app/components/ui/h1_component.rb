@@ -9,7 +9,7 @@ module UI
     end
 
     def call
-      extend UI::Typography::H1Behavior
+      extend UI::H1Behavior
 
       attrs = h1_html_attributes
 

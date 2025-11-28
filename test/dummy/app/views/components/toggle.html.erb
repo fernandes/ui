@@ -16,13 +16,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(variant: "default", id: "phlex-default") do %>
+        <%= render UI::Toggle.new(variant: "default", id: "phlex-default") do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(variant: "outline", id: "phlex-outline") do %>
+        <%= render UI::Toggle.new(variant: "outline", id: "phlex-outline") do %>
           <%= lucide_icon("bold") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(variant: "outline", pressed: true, id: "phlex-pressed") do %>
+        <%= render UI::Toggle.new(variant: "outline", pressed: true, id: "phlex-pressed") do %>
           <%= lucide_icon("underline") %>
         <% end %>
       </div>
@@ -32,13 +32,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::ToggleComponent.new(variant: "default") do %>
+        <%= render UI::ToggleComponent.new(variant: "default") do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render UI::Toggle::ToggleComponent.new(variant: "outline") do %>
+        <%= render UI::ToggleComponent.new(variant: "outline") do %>
           <%= lucide_icon("bold") %>
         <% end %>
-        <%= render UI::Toggle::ToggleComponent.new(variant: "outline", pressed: true) do %>
+        <%= render UI::ToggleComponent.new(variant: "outline", pressed: true) do %>
           <%= lucide_icon("underline") %>
         <% end %>
       </div>
@@ -48,13 +48,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render "ui/toggle/toggle", variant: "default" do %>
+        <%= render "ui/toggle", variant: "default" do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render "ui/toggle/toggle", variant: "outline" do %>
+        <%= render "ui/toggle", variant: "outline" do %>
           <%= lucide_icon("bold") %>
         <% end %>
-        <%= render "ui/toggle/toggle", variant: "outline", pressed: true do %>
+        <%= render "ui/toggle", variant: "outline", pressed: true do %>
           <%= lucide_icon("underline") %>
         <% end %>
       </div>
@@ -64,13 +64,13 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Sizes (Phlex)</h2>
       <div class="flex flex-wrap items-center gap-4">
-        <%= render UI::Toggle::Toggle.new(size: "sm", variant: "outline", id: "phlex-size-sm") do %>
+        <%= render UI::Toggle.new(size: "sm", variant: "outline", id: "phlex-size-sm") do %>
           <%= lucide_icon("align-left", class: "h-3 w-3") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(size: "default", variant: "outline", id: "phlex-size-default") do %>
+        <%= render UI::Toggle.new(size: "default", variant: "outline", id: "phlex-size-default") do %>
           <%= lucide_icon("align-center") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(size: "lg", variant: "outline", id: "phlex-size-lg") do %>
+        <%= render UI::Toggle.new(size: "lg", variant: "outline", id: "phlex-size-lg") do %>
           <%= lucide_icon("align-right", class: "h-5 w-5") %>
         <% end %>
       </div>
@@ -80,15 +80,15 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Text (ViewComponent)</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::ToggleComponent.new(variant: "outline") do %>
+        <%= render UI::ToggleComponent.new(variant: "outline") do %>
           <%= lucide_icon("italic") %>
           <span>Italic</span>
         <% end %>
-        <%= render UI::Toggle::ToggleComponent.new(variant: "outline") do %>
+        <%= render UI::ToggleComponent.new(variant: "outline") do %>
           <%= lucide_icon("bold") %>
           <span>Bold</span>
         <% end %>
-        <%= render UI::Toggle::ToggleComponent.new(variant: "outline") do %>
+        <%= render UI::ToggleComponent.new(variant: "outline") do %>
           <%= lucide_icon("underline") %>
           <span>Underline</span>
         <% end %>
@@ -99,10 +99,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Disabled State (Phlex)</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(disabled: true, variant: "outline", id: "phlex-disabled-released") do %>
+        <%= render UI::Toggle.new(disabled: true, variant: "outline", id: "phlex-disabled-released") do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(disabled: true, variant: "outline", pressed: true, id: "phlex-disabled-pressed") do %>
+        <%= render UI::Toggle.new(disabled: true, variant: "outline", pressed: true, id: "phlex-disabled-pressed") do %>
           <%= lucide_icon("bold") %>
         <% end %>
       </div>
@@ -112,16 +112,16 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Formatting Toolbar Example (ERB)</h2>
       <div class="flex items-center gap-1 rounded-lg border p-1 w-fit">
-        <%= render "ui/toggle/toggle", variant: "default", size: "sm", attributes: { "aria-label": "Toggle bold" } do %>
+        <%= render "ui/toggle", variant: "default", size: "sm", attributes: { "aria-label": "Toggle bold" } do %>
           <%= lucide_icon("bold") %>
         <% end %>
-        <%= render "ui/toggle/toggle", variant: "default", size: "sm", attributes: { "aria-label": "Toggle italic" } do %>
+        <%= render "ui/toggle", variant: "default", size: "sm", attributes: { "aria-label": "Toggle italic" } do %>
           <%= lucide_icon("italic") %>
         <% end %>
-        <%= render "ui/toggle/toggle", variant: "default", size: "sm", pressed: true, attributes: { "aria-label": "Toggle underline" } do %>
+        <%= render "ui/toggle", variant: "default", size: "sm", pressed: true, attributes: { "aria-label": "Toggle underline" } do %>
           <%= lucide_icon("underline") %>
         <% end %>
-        <%= render "ui/toggle/toggle", variant: "default", size: "sm", attributes: { "aria-label": "Toggle strikethrough" } do %>
+        <%= render "ui/toggle", variant: "default", size: "sm", attributes: { "aria-label": "Toggle strikethrough" } do %>
           <%= lucide_icon("strikethrough") %>
         <% end %>
       </div>
@@ -131,14 +131,14 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Bookmark Toggle Example (Phlex)</h2>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(
+        <%= render UI::Toggle.new(
           variant: "outline",
           size: "sm",
           attributes: { "aria-label": "Toggle bookmark" }
         ) do %>
           <%= lucide_icon("bookmark") %>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(
+        <%= render UI::Toggle.new(
           variant: "outline",
           size: "sm",
           pressed: true,
@@ -154,7 +154,7 @@
       <h2 class="text-2xl font-semibold">Bookmark with Text - Icon Color Changes (shadcn pattern)</h2>
       <p class="text-sm text-muted-foreground">Click the toggle - only the icon changes color to blue when active</p>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(
+        <%= render UI::Toggle.new(
           variant: "outline",
           size: "sm",
           classes: "data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500",
@@ -164,7 +164,7 @@
           <span>Bookmark</span>
         <% end %>
 
-        <%= render UI::Toggle::Toggle.new(
+        <%= render UI::Toggle.new(
           variant: "outline",
           size: "sm",
           pressed: true,
@@ -175,7 +175,7 @@
           <span>Bookmark</span>
         <% end %>
 
-        <%= render UI::Toggle::Toggle.new(
+        <%= render UI::Toggle.new(
           variant: "outline",
           size: "sm",
           classes: "data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-green-500 data-[state=on]:*:[svg]:stroke-green-500",
@@ -185,7 +185,7 @@
           <span>Star</span>
         <% end %>
 
-        <%= render UI::Toggle::Toggle.new(
+        <%= render UI::Toggle.new(
           variant: "outline",
           size: "sm",
           classes: "data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500",
@@ -202,11 +202,11 @@
       <h2 class="text-2xl font-semibold">State Demonstration</h2>
       <p class="text-sm text-muted-foreground">Click the toggles below to see the state change in action</p>
       <div class="flex flex-wrap gap-4">
-        <%= render UI::Toggle::Toggle.new(variant: "outline", id: "keyboard-test") do %>
+        <%= render UI::Toggle.new(variant: "outline", id: "keyboard-test") do %>
           <%= lucide_icon("italic") %>
           <span>Toggle Me</span>
         <% end %>
-        <%= render UI::Toggle::Toggle.new(variant: "default") do %>
+        <%= render UI::Toggle.new(variant: "default") do %>
           <%= lucide_icon("bold") %>
           <span>Click to Toggle</span>
         <% end %>

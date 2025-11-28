@@ -12,18 +12,18 @@
       <!-- Basic Example -->
       <div class="space-y-2" id="basic-breadcrumb">
         <h3 class="text-lg font-medium">Basic Breadcrumb</h3>
-        <%= render UI::Breadcrumb::Breadcrumb.new do %>
-          <%= render UI::Breadcrumb::List.new do %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/") { "Home" } %>
+        <%= render UI::Breadcrumb.new do %>
+          <%= render UI::BreadcrumbList.new do %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/") { "Home" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/components") { "Components" } %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/components") { "Components" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Page.new { "Breadcrumb" } %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbPage.new { "Breadcrumb" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -32,22 +32,22 @@
       <!-- With Custom Separator -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Custom Separator</h3>
-        <%= render UI::Breadcrumb::Breadcrumb.new do %>
-          <%= render UI::Breadcrumb::List.new do %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/") { "Home" } %>
+        <%= render UI::Breadcrumb.new do %>
+          <%= render UI::BreadcrumbList.new do %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/") { "Home" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new do %>
+            <%= render UI::BreadcrumbSeparator.new do %>
               <span class="text-muted-foreground">/</span>
             <% end %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/docs") { "Docs" } %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/docs") { "Docs" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new do %>
+            <%= render UI::BreadcrumbSeparator.new do %>
               <span class="text-muted-foreground">/</span>
             <% end %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Page.new { "Components" } %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbPage.new { "Components" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -57,38 +57,38 @@
       <div class="space-y-2" id="dropdown-breadcrumb">
         <h3 class="text-lg font-medium">Responsive with Dropdown (Collapsed Items)</h3>
         <p class="text-sm text-muted-foreground">Click the ellipsis to see hidden breadcrumb items</p>
-        <%= render UI::Breadcrumb::Breadcrumb.new do %>
-          <%= render UI::Breadcrumb::List.new do %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/") { "Home" } %>
+        <%= render UI::Breadcrumb.new do %>
+          <%= render UI::BreadcrumbList.new do %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/") { "Home" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::DropdownMenu::DropdownMenu.new do %>
-                <%= render UI::DropdownMenu::Trigger.new(classes: "flex items-center gap-1") do %>
-                  <%= render UI::Breadcrumb::Ellipsis.new %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::DropdownMenu.new do %>
+                <%= render UI::DropdownMenuTrigger.new(classes: "flex items-center gap-1") do %>
+                  <%= render UI::BreadcrumbEllipsis.new %>
                   <span class="sr-only">Toggle menu</span>
                 <% end %>
-                <%= render UI::DropdownMenu::Content.new(align: "start") do %>
-                  <%= render UI::DropdownMenu::Item.new do %>
+                <%= render UI::DropdownMenuContent.new(align: "start") do %>
+                  <%= render UI::DropdownMenuItem.new do %>
                     <a href="/docs">Documentation</a>
                   <% end %>
-                  <%= render UI::DropdownMenu::Item.new do %>
+                  <%= render UI::DropdownMenuItem.new do %>
                     <a href="/docs/themes">Themes</a>
                   <% end %>
-                  <%= render UI::DropdownMenu::Item.new do %>
+                  <%= render UI::DropdownMenuItem.new do %>
                     <a href="/docs/github">GitHub</a>
                   <% end %>
                 <% end %>
               <% end %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/components") { "Components" } %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/components") { "Components" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Page.new { "Breadcrumb" } %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbPage.new { "Breadcrumb" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -97,18 +97,18 @@
       <!-- Link as Child (Turbo Frame Example) -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Custom Styling</h3>
-        <%= render UI::Breadcrumb::Breadcrumb.new do %>
-          <%= render UI::Breadcrumb::List.new do %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/", classes: "text-blue-600") { "Home" } %>
+        <%= render UI::Breadcrumb.new do %>
+          <%= render UI::BreadcrumbList.new do %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/", classes: "text-blue-600") { "Home" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Link.new(href: "/products", classes: "text-blue-600") { "Products" } %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbLink.new(href: "/products", classes: "text-blue-600") { "Products" } %>
             <% end %>
-            <%= render UI::Breadcrumb::Separator.new %>
-            <%= render UI::Breadcrumb::Item.new do %>
-              <%= render UI::Breadcrumb::Page.new(classes: "font-semibold") { "Laptop" } %>
+            <%= render UI::BreadcrumbSeparator.new %>
+            <%= render UI::BreadcrumbItem.new do %>
+              <%= render UI::BreadcrumbPage.new(classes: "font-semibold") { "Laptop" } %>
             <% end %>
           <% end %>
         <% end %>
@@ -124,22 +124,22 @@
       <!-- Basic Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Breadcrumb</h3>
-        <%= render "ui/breadcrumb/breadcrumb" do %>
-          <%= render "ui/breadcrumb/breadcrumb_list" do %>
-            <%= render "ui/breadcrumb/breadcrumb_item" do %>
-              <%= render "ui/breadcrumb/breadcrumb_link", href: "/" do %>
+        <%= render "ui/breadcrumb" do %>
+          <%= render "ui/breadcrumb/list" do %>
+            <%= render "ui/breadcrumb/item" do %>
+              <%= render "ui/breadcrumb/link", href: "/" do %>
                 Home
               <% end %>
             <% end %>
-            <%= render "ui/breadcrumb/breadcrumb_separator" %>
-            <%= render "ui/breadcrumb/breadcrumb_item" do %>
-              <%= render "ui/breadcrumb/breadcrumb_link", href: "/components" do %>
+            <%= render "ui/breadcrumb/separator" %>
+            <%= render "ui/breadcrumb/item" do %>
+              <%= render "ui/breadcrumb/link", href: "/components" do %>
                 Components
               <% end %>
             <% end %>
-            <%= render "ui/breadcrumb/breadcrumb_separator" %>
-            <%= render "ui/breadcrumb/breadcrumb_item" do %>
-              <%= render "ui/breadcrumb/breadcrumb_page" do %>
+            <%= render "ui/breadcrumb/separator" %>
+            <%= render "ui/breadcrumb/item" do %>
+              <%= render "ui/breadcrumb/page" do %>
                 Breadcrumb
               <% end %>
             <% end %>
@@ -150,26 +150,26 @@
       <!-- With Custom Separator -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Custom Separator</h3>
-        <%= render "ui/breadcrumb/breadcrumb" do %>
-          <%= render "ui/breadcrumb/breadcrumb_list" do %>
-            <%= render "ui/breadcrumb/breadcrumb_item" do %>
-              <%= render "ui/breadcrumb/breadcrumb_link", href: "/" do %>
+        <%= render "ui/breadcrumb" do %>
+          <%= render "ui/breadcrumb/list" do %>
+            <%= render "ui/breadcrumb/item" do %>
+              <%= render "ui/breadcrumb/link", href: "/" do %>
                 Home
               <% end %>
             <% end %>
-            <%= render "ui/breadcrumb/breadcrumb_separator" do %>
+            <%= render "ui/breadcrumb/separator" do %>
               <span class="text-muted-foreground">→</span>
             <% end %>
-            <%= render "ui/breadcrumb/breadcrumb_item" do %>
-              <%= render "ui/breadcrumb/breadcrumb_link", href: "/library" do %>
+            <%= render "ui/breadcrumb/item" do %>
+              <%= render "ui/breadcrumb/link", href: "/library" do %>
                 Library
               <% end %>
             <% end %>
-            <%= render "ui/breadcrumb/breadcrumb_separator" do %>
+            <%= render "ui/breadcrumb/separator" do %>
               <span class="text-muted-foreground">→</span>
             <% end %>
-            <%= render "ui/breadcrumb/breadcrumb_item" do %>
-              <%= render "ui/breadcrumb/breadcrumb_page" do %>
+            <%= render "ui/breadcrumb/item" do %>
+              <%= render "ui/breadcrumb/page" do %>
                 Data
               <% end %>
             <% end %>
@@ -187,22 +187,22 @@
       <!-- Basic Example -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">Basic Breadcrumb</h3>
-        <%= render UI::Breadcrumb::BreadcrumbComponent.new do %>
-          <%= render UI::Breadcrumb::BreadcrumbListComponent.new do %>
-            <%= render UI::Breadcrumb::BreadcrumbItemComponent.new do %>
-              <%= render UI::Breadcrumb::BreadcrumbLinkComponent.new(href: "/") do %>
+        <%= render UI::BreadcrumbComponent.new do %>
+          <%= render UI::BreadcrumbListComponent.new do %>
+            <%= render UI::BreadcrumbItemComponent.new do %>
+              <%= render UI::BreadcrumbLinkComponent.new(href: "/") do %>
                 Home
               <% end %>
             <% end %>
-            <%= render UI::Breadcrumb::BreadcrumbSeparatorComponent.new %>
-            <%= render UI::Breadcrumb::BreadcrumbItemComponent.new do %>
-              <%= render UI::Breadcrumb::BreadcrumbLinkComponent.new(href: "/components") do %>
+            <%= render UI::BreadcrumbSeparatorComponent.new %>
+            <%= render UI::BreadcrumbItemComponent.new do %>
+              <%= render UI::BreadcrumbLinkComponent.new(href: "/components") do %>
                 Components
               <% end %>
             <% end %>
-            <%= render UI::Breadcrumb::BreadcrumbSeparatorComponent.new %>
-            <%= render UI::Breadcrumb::BreadcrumbItemComponent.new do %>
-              <%= render UI::Breadcrumb::BreadcrumbPageComponent.new do %>
+            <%= render UI::BreadcrumbSeparatorComponent.new %>
+            <%= render UI::BreadcrumbItemComponent.new do %>
+              <%= render UI::BreadcrumbPageComponent.new do %>
                 Breadcrumb
               <% end %>
             <% end %>
@@ -213,26 +213,26 @@
       <!-- With Custom Separator -->
       <div class="space-y-2">
         <h3 class="text-lg font-medium">With Custom Separator</h3>
-        <%= render UI::Breadcrumb::BreadcrumbComponent.new do %>
-          <%= render UI::Breadcrumb::BreadcrumbListComponent.new do %>
-            <%= render UI::Breadcrumb::BreadcrumbItemComponent.new do %>
-              <%= render UI::Breadcrumb::BreadcrumbLinkComponent.new(href: "/") do %>
+        <%= render UI::BreadcrumbComponent.new do %>
+          <%= render UI::BreadcrumbListComponent.new do %>
+            <%= render UI::BreadcrumbItemComponent.new do %>
+              <%= render UI::BreadcrumbLinkComponent.new(href: "/") do %>
                 Home
               <% end %>
             <% end %>
-            <%= render UI::Breadcrumb::BreadcrumbSeparatorComponent.new do %>
+            <%= render UI::BreadcrumbSeparatorComponent.new do %>
               <span class="text-muted-foreground">•</span>
             <% end %>
-            <%= render UI::Breadcrumb::BreadcrumbItemComponent.new do %>
-              <%= render UI::Breadcrumb::BreadcrumbLinkComponent.new(href: "/dashboard") do %>
+            <%= render UI::BreadcrumbItemComponent.new do %>
+              <%= render UI::BreadcrumbLinkComponent.new(href: "/dashboard") do %>
                 Dashboard
               <% end %>
             <% end %>
-            <%= render UI::Breadcrumb::BreadcrumbSeparatorComponent.new do %>
+            <%= render UI::BreadcrumbSeparatorComponent.new do %>
               <span class="text-muted-foreground">•</span>
             <% end %>
-            <%= render UI::Breadcrumb::BreadcrumbItemComponent.new do %>
-              <%= render UI::Breadcrumb::BreadcrumbPageComponent.new do %>
+            <%= render UI::BreadcrumbItemComponent.new do %>
+              <%= render UI::BreadcrumbPageComponent.new do %>
                 Settings
               <% end %>
             <% end %>

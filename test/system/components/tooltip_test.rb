@@ -9,37 +9,37 @@ class TooltipTest < UI::SystemTestCase
 
   # Helper to get the basic tooltip by ID
   def basic_tooltip
-    find_element(UI::Testing::TooltipElement, "#basic-tooltip")
+    find_element(UI::TestingTooltipElement, "#basic-tooltip")
   end
 
   # Helper to get the top positioned tooltip by ID
   def top_tooltip
-    find_element(UI::Testing::TooltipElement, "#tooltip-top")
+    find_element(UI::TestingTooltipElement, "#tooltip-top")
   end
 
   # Helper to get the right positioned tooltip by ID
   def right_tooltip
-    find_element(UI::Testing::TooltipElement, "#tooltip-right")
+    find_element(UI::TestingTooltipElement, "#tooltip-right")
   end
 
   # Helper to get the bottom positioned tooltip by ID
   def bottom_tooltip
-    find_element(UI::Testing::TooltipElement, "#tooltip-bottom")
+    find_element(UI::TestingTooltipElement, "#tooltip-bottom")
   end
 
   # Helper to get the left positioned tooltip by ID
   def left_tooltip
-    find_element(UI::Testing::TooltipElement, "#tooltip-left")
+    find_element(UI::TestingTooltipElement, "#tooltip-left")
   end
 
   # Helper to get the tooltip with button by ID
   def button_tooltip
-    find_element(UI::Testing::TooltipElement, "#tooltip-with-button")
+    find_element(UI::TestingTooltipElement, "#tooltip-with-button")
   end
 
   # Helper to get the tooltip with destructive button by ID
   def destructive_tooltip
-    find_element(UI::Testing::TooltipElement, "#tooltip-destructive")
+    find_element(UI::TestingTooltipElement, "#tooltip-destructive")
   end
 
   # === Basic Interaction Tests ===

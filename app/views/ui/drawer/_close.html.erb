@@ -7,11 +7,11 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend ::UI::Drawer::DrawerCloseBehavior
+  extend UI::DrawerCloseBehavior
 
   # Merge close data attributes with user attributes
   all_attributes = drawer_close_data_attributes.deep_merge(@attributes)
 -%>
-<%= render "ui/button/button", variant: @variant, size: @size, classes: @classes, attributes: all_attributes do %>
+<%= render "ui/button", variant: @variant, size: @size, classes: @classes, attributes: all_attributes do %>
   <%= content || yield %>
 <% end %>

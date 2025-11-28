@@ -9,17 +9,17 @@ class AlertDialogTest < UI::SystemTestCase
 
   # Helper to get the default alert dialog by ID
   def default_alert_dialog
-    find_element(UI::Testing::AlertDialogElement, "#default-alert-dialog")
+    find_element(UI::TestingAlertDialogElement, "#default-alert-dialog")
   end
 
   # Helper to get the destructive alert dialog by ID
   def destructive_alert_dialog
-    find_element(UI::Testing::AlertDialogElement, "#destructive-alert-dialog")
+    find_element(UI::TestingAlertDialogElement, "#destructive-alert-dialog")
   end
 
   # Helper to get the save changes alert dialog by ID
   def save_changes_alert_dialog
-    find_element(UI::Testing::AlertDialogElement, "#save-changes-alert-dialog")
+    find_element(UI::TestingAlertDialogElement, "#save-changes-alert-dialog")
   end
 
   # === Basic Interaction Tests ===

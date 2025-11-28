@@ -7,7 +7,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend UI::Tooltip::TooltipContentBehavior
+  extend UI::TooltipContentBehavior
 
   # Get HTML attributes from behavior
   all_attributes = tooltip_content_html_attributes.deep_merge(@attributes)

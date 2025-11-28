@@ -15,7 +15,7 @@
     <!-- Basic Table - Phlex DSL -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Table (Phlex DSL)</h2>
-      <%= render UI::Table::Table.new do |t|
+      <%= render UI::Table.new do |t|
         t.caption { "A list of your recent invoices." }
         t.header do
           t.row do
@@ -69,7 +69,7 @@
     <!-- Basic Table - ViewComponent Slots -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Table (ViewComponent Slots)</h2>
-      <%= render UI::Table::TableComponent.new do |t|
+      <%= render UI::TableComponent.new do |t|
         t.caption { "A list of your recent invoices." }
         t.header do |h|
           h.row do |r|
@@ -111,7 +111,7 @@
     <!-- Basic Table - ERB Partials -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Table (ERB Partials)</h2>
-      <%= render "ui/table/table" do %>
+      <%= render "ui/table" do %>
         <%= render "ui/table/caption" do %>A list of your recent invoices.<% end %>
         <%= render "ui/table/header" do %>
           <%= render "ui/table/row" do %>
@@ -153,7 +153,7 @@
     <!-- Simple Table without Footer -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Simple Table</h2>
-      <%= render UI::Table::Table.new do |t|
+      <%= render UI::Table.new do |t|
         t.header do
           t.row do
             t.head { "Name" }
@@ -185,7 +185,7 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Table with Hover Effect</h2>
       <p class="text-sm text-muted-foreground">Hover over rows to see the hover effect (hover:bg-muted/50).</p>
-      <%= render UI::Table::Table.new do |t|
+      <%= render UI::Table.new do |t|
         t.header do
           t.row do
             t.head { "Product" }
@@ -216,13 +216,13 @@
     <!-- Table inside Card -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Table inside Card</h2>
-      <%= render UI::Card::Card.new do %>
-        <%= render UI::Card::Header.new do %>
-          <%= render UI::Card::Title.new { "Recent Orders" } %>
-          <%= render UI::Card::Description.new { "A list of your recent orders." } %>
+      <%= render UI::Card.new do %>
+        <%= render UI::CardHeader.new do %>
+          <%= render UI::CardTitle.new { "Recent Orders" } %>
+          <%= render UI::CardDescription.new { "A list of your recent orders." } %>
         <% end %>
-        <%= render UI::Card::Content.new do %>
-          <%= render UI::Table::Table.new do |t|
+        <%= render UI::CardContent.new do %>
+          <%= render UI::Table.new do |t|
             t.header do
               t.row do
                 t.head { "Order ID" }

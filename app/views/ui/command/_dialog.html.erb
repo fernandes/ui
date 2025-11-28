@@ -1,6 +1,6 @@
 <%# locals: (shortcut: "meta+j", classes: "", **attributes) %>
 <%
-  dialog_behavior = Class.new { include UI::Command::DialogBehavior }.new
+  dialog_behavior = Class.new { include UI::DialogBehavior }.new
   dialog_behavior.instance_variable_set(:@shortcut, shortcut)
   dialog_behavior.instance_variable_set(:@classes, classes)
 %>

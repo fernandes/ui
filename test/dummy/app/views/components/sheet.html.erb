@@ -15,9 +15,9 @@
         Default sheet that slides in from the right side.
       </p>
 
-      <%= render "ui/sheet/sheet", attributes: { id: "erb-default-sheet" } do %>
+      <%= render "ui/sheet", attributes: { id: "erb-default-sheet" } do %>
         <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
-          <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+          <%= render "ui/button", variant: :outline, attributes: attrs do %>
             Open Sheet
           <% end %>
         <% end %>
@@ -45,11 +45,11 @@
             </div>
 
             <%= render "ui/sheet/footer" do %>
-              <%= render "ui/button/button", variant: :default do %>
+              <%= render "ui/button", variant: :default do %>
                 Save changes
               <% end %>
               <%= render "ui/sheet/close", as_child: true do |attrs| %>
-                <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+                <%= render "ui/button", variant: :outline, attributes: attrs do %>
                   Close
                 <% end %>
               <% end %>
@@ -68,9 +68,9 @@
 
       <div class="flex flex-wrap gap-4">
         <% %w[top right bottom left].each do |side| %>
-          <%= render "ui/sheet/sheet", attributes: { id: "erb-sheet-#{side}" } do %>
+          <%= render "ui/sheet", attributes: { id: "erb-sheet-#{side}" } do %>
             <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
-              <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+              <%= render "ui/button", variant: :outline, attributes: attrs do %>
                 <%= side.capitalize %>
               <% end %>
             <% end %>
@@ -109,9 +109,9 @@
         Customize the sheet width using Tailwind classes.
       </p>
 
-      <%= render "ui/sheet/sheet", attributes: { id: "erb-wide-sheet" } do %>
+      <%= render "ui/sheet", attributes: { id: "erb-wide-sheet" } do %>
         <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
-          <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+          <%= render "ui/button", variant: :outline, attributes: attrs do %>
             Wide Sheet
           <% end %>
         <% end %>
@@ -148,9 +148,9 @@
         Sheet without the built-in close button in the corner.
       </p>
 
-      <%= render "ui/sheet/sheet", attributes: { id: "erb-no-close-button-sheet" } do %>
+      <%= render "ui/sheet", attributes: { id: "erb-no-close-button-sheet" } do %>
         <%= render "ui/sheet/trigger", as_child: true do |attrs| %>
-          <%= render "ui/button/button", variant: :outline, attributes: attrs do %>
+          <%= render "ui/button", variant: :outline, attributes: attrs do %>
             No X Button
           <% end %>
         <% end %>
@@ -187,20 +187,20 @@
     <div class="space-y-4">
       <h3 class="text-xl font-semibold">Basic (Right Side)</h3>
 
-      <%= render UI::Sheet::Sheet.new do %>
-        <%= render UI::Sheet::Trigger.new(as_child: true) do |attrs| %>
-          <%= render UI::Button::Button.new(**attrs, variant: :outline) do %>
+      <%= render UI::Sheet.new do %>
+        <%= render UI::SheetTrigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button.new(**attrs, variant: :outline) do %>
             Open Sheet
           <% end %>
         <% end %>
 
-        <%= render UI::Sheet::Overlay.new do %>
-          <%= render UI::Sheet::Content.new do %>
-            <%= render UI::Sheet::Header.new do %>
-              <%= render UI::Sheet::Title.new do %>
+        <%= render UI::SheetOverlay.new do %>
+          <%= render UI::SheetContent.new do %>
+            <%= render UI::SheetHeader.new do %>
+              <%= render UI::SheetTitle.new do %>
                 Edit profile
               <% end %>
-              <%= render UI::Sheet::Description.new do %>
+              <%= render UI::SheetDescription.new do %>
                 Make changes to your profile here. Click save when you're done.
               <% end %>
             <% end %>
@@ -216,12 +216,12 @@
               </div>
             </div>
 
-            <%= render UI::Sheet::Footer.new do %>
-              <%= render UI::Button::Button.new(variant: :default) do %>
+            <%= render UI::SheetFooter.new do %>
+              <%= render UI::Button.new(variant: :default) do %>
                 Save changes
               <% end %>
-              <%= render UI::Sheet::Close.new(as_child: true) do |attrs| %>
-                <%= render UI::Button::Button.new(**attrs, variant: :outline) do %>
+              <%= render UI::SheetClose.new(as_child: true) do |attrs| %>
+                <%= render UI::Button.new(**attrs, variant: :outline) do %>
                   Close
                 <% end %>
               <% end %>
@@ -237,20 +237,20 @@
 
       <div class="flex flex-wrap gap-4">
         <% %w[top right bottom left].each do |side| %>
-          <%= render UI::Sheet::Sheet.new do %>
-            <%= render UI::Sheet::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) do %>
+          <%= render UI::Sheet.new do %>
+            <%= render UI::SheetTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) do %>
                 <%= side.capitalize %>
               <% end %>
             <% end %>
 
-            <%= render UI::Sheet::Overlay.new do %>
-              <%= render UI::Sheet::Content.new(side: side) do %>
-                <%= render UI::Sheet::Header.new do %>
-                  <%= render UI::Sheet::Title.new do %>
+            <%= render UI::SheetOverlay.new do %>
+              <%= render UI::SheetContent.new(side: side) do %>
+                <%= render UI::SheetHeader.new do %>
+                  <%= render UI::SheetTitle.new do %>
                     <%= side.capitalize %> Sheet
                   <% end %>
-                  <%= render UI::Sheet::Description.new do %>
+                  <%= render UI::SheetDescription.new do %>
                     This sheet slides in from the <%= side %> side.
                   <% end %>
                 <% end %>
@@ -259,8 +259,8 @@
                   <p class="text-sm text-muted-foreground">Sheet content goes here.</p>
                 </div>
 
-                <%= render UI::Sheet::Footer.new do %>
-                  <%= render UI::Sheet::Close.new do %>
+                <%= render UI::SheetFooter.new do %>
+                  <%= render UI::SheetClose.new do %>
                     Close
                   <% end %>
                 <% end %>
@@ -278,20 +278,20 @@
     <div class="space-y-4">
       <h3 class="text-xl font-semibold">Basic (Right Side)</h3>
 
-      <%= render UI::Sheet::SheetComponent.new do %>
-        <%= render UI::Sheet::TriggerComponent.new(as_child: true) do %>
-          <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+      <%= render UI::SheetComponent.new do %>
+        <%= render UI::SheetTriggerComponent.new(as_child: true) do %>
+          <%= render UI::ButtonComponent.new(variant: :outline) do %>
             Open Sheet
           <% end %>
         <% end %>
 
-        <%= render UI::Sheet::OverlayComponent.new do %>
-          <%= render UI::Sheet::ContentComponent.new do %>
-            <%= render UI::Sheet::HeaderComponent.new do %>
-              <%= render UI::Sheet::TitleComponent.new do %>
+        <%= render UI::SheetOverlayComponent.new do %>
+          <%= render UI::SheetContentComponent.new do %>
+            <%= render UI::SheetHeaderComponent.new do %>
+              <%= render UI::SheetTitleComponent.new do %>
                 Edit profile
               <% end %>
-              <%= render UI::Sheet::DescriptionComponent.new do %>
+              <%= render UI::SheetDescriptionComponent.new do %>
                 Make changes to your profile here. Click save when you're done.
               <% end %>
             <% end %>
@@ -307,12 +307,12 @@
               </div>
             </div>
 
-            <%= render UI::Sheet::FooterComponent.new do %>
-              <%= render UI::Button::ButtonComponent.new(variant: :default) do %>
+            <%= render UI::SheetFooterComponent.new do %>
+              <%= render UI::ButtonComponent.new(variant: :default) do %>
                 Save changes
               <% end %>
-              <%= render UI::Sheet::CloseComponent.new(as_child: true) do %>
-                <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+              <%= render UI::SheetCloseComponent.new(as_child: true) do %>
+                <%= render UI::ButtonComponent.new(variant: :outline) do %>
                   Close
                 <% end %>
               <% end %>
@@ -328,20 +328,20 @@
 
       <div class="flex flex-wrap gap-4">
         <% %w[top right bottom left].each do |side| %>
-          <%= render UI::Sheet::SheetComponent.new do %>
-            <%= render UI::Sheet::TriggerComponent.new(as_child: true) do %>
-              <%= render UI::Button::ButtonComponent.new(variant: :outline) do %>
+          <%= render UI::SheetComponent.new do %>
+            <%= render UI::SheetTriggerComponent.new(as_child: true) do %>
+              <%= render UI::ButtonComponent.new(variant: :outline) do %>
                 <%= side.capitalize %>
               <% end %>
             <% end %>
 
-            <%= render UI::Sheet::OverlayComponent.new do %>
-              <%= render UI::Sheet::ContentComponent.new(side: side) do %>
-                <%= render UI::Sheet::HeaderComponent.new do %>
-                  <%= render UI::Sheet::TitleComponent.new do %>
+            <%= render UI::SheetOverlayComponent.new do %>
+              <%= render UI::SheetContentComponent.new(side: side) do %>
+                <%= render UI::SheetHeaderComponent.new do %>
+                  <%= render UI::SheetTitleComponent.new do %>
                     <%= side.capitalize %> Sheet
                   <% end %>
-                  <%= render UI::Sheet::DescriptionComponent.new do %>
+                  <%= render UI::SheetDescriptionComponent.new do %>
                     This sheet slides in from the <%= side %> side.
                   <% end %>
                 <% end %>
@@ -350,8 +350,8 @@
                   <p class="text-sm text-muted-foreground">Sheet content goes here.</p>
                 </div>
 
-                <%= render UI::Sheet::FooterComponent.new do %>
-                  <%= render UI::Sheet::CloseComponent.new do %>
+                <%= render UI::SheetFooterComponent.new do %>
+                  <%= render UI::SheetCloseComponent.new do %>
                     Close
                   <% end %>
                 <% end %>

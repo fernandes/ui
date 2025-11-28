@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Typography::ListBehavior
+  extend UI::ListBehavior
   all_attributes = list_html_attributes.merge(@attributes)
 %>
 <%= content_tag :ul, all_attributes do %>

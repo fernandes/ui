@@ -3,7 +3,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::NavigationMenu::ListBehavior
+  extend UI::NavigationMenuListBehavior
 
   all_attributes = navigation_menu_list_html_attributes.deep_merge(@attributes)
 -%>

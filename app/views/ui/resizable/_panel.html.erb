@@ -8,7 +8,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend ::UI::Resizable::PanelBehavior
+  extend UI::ResizablePanelBehavior
 
   # Get HTML attributes from behavior
   all_attributes = panel_html_attributes.deep_merge(@attributes.except(:data))

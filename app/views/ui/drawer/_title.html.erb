@@ -5,7 +5,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend ::UI::Drawer::DrawerTitleBehavior
+  extend UI::DrawerTitleBehavior
 
   # Get HTML attributes from behavior
   all_attributes = drawer_title_html_attributes.deep_merge(@attributes)

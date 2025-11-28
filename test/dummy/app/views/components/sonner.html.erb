@@ -7,7 +7,7 @@
 </head>
 <body class="p-8 bg-background text-foreground">
   <!-- Toaster container - render once -->
-  <%= render UI::Sonner::Toaster.new %>
+  <%= render UI::SonnerToaster.new %>
 
   <div class="max-w-4xl mx-auto space-y-12">
     <header>
@@ -23,31 +23,31 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Toast Types</h3>
         <div class="flex flex-wrap items-center gap-4">
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "default-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { message: 'Event has been created', description: 'Sunday, December 03, 2023 at 9:00 AM' } }))")
           ) { "Default" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "success-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Profile updated', description: 'Your changes have been saved successfully.' } }))")
           ) { "Success" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "error-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'error', message: 'Error occurred', description: 'There was a problem with your request.' } }))")
           ) { "Error" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "info-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Did you know?', description: 'You can customize the position of toasts.' } }))")
           ) { "Info" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "warning-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'warning', message: 'Warning', description: 'Your session will expire in 5 minutes.' } }))")
@@ -59,13 +59,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Simple Toast (no description)</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "copy-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Copied to clipboard!' } }))")
           ) { "Copy" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "save-fail-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'error', message: 'Failed to save' } }))")
@@ -77,13 +77,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Custom Duration</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "quick-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Quick toast', description: 'This disappears in 1 second', duration: 1000 } }))")
           ) { "1 second" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "long-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'Long toast', description: 'This stays for 10 seconds', duration: 10000 } }))")
@@ -100,13 +100,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Using Custom Events</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "trigger-js-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'success', message: 'Event from JS', description: 'Triggered via CustomEvent' } }))")
           ) { "Trigger via JS" } %>
 
-          <%= render UI::Button::Button.new(
+          <%= render UI::Button.new(
             variant: :outline,
             id: "action-toast-btn",
             onclick: phlex_safe("document.dispatchEvent(new CustomEvent('ui:toast', { detail: { type: 'info', message: 'With Action', description: 'Click the button to undo', action: { label: 'Undo', event: 'undo:action' } } }))")
@@ -177,7 +177,7 @@
 
       <div class="rounded-md bg-muted p-4 mb-4">
         <p class="text-sm font-mono">
-          &lt;%= render UI::Sonner::ToasterComponent.new %&gt;
+          &lt;%= render UI::SonnerToasterComponent.new %&gt;
         </p>
       </div>
 
@@ -185,7 +185,7 @@
         <h3 class="text-sm font-medium text-muted-foreground">ViewComponent Toaster with options</h3>
         <div class="rounded-md bg-muted p-4">
           <p class="text-sm font-mono">
-            &lt;%= render UI::Sonner::ToasterComponent.new(
+            &lt;%= render UI::SonnerToasterComponent.new(
             <br>
             &nbsp;&nbsp;position: "top-center",
             <br>

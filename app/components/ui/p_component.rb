@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module UI
-  class PComponent < ViewComponent::Base
+  class UI::PComponent < ViewComponent::Base
     def initialize(classes: nil, **attributes)
       @classes = classes
       @attributes = attributes
     end
 
     def call
-      extend UI::Typography::PBehavior
+      extend UI::PBehavior
       attrs = p_html_attributes
       content_tag :p, **attrs.merge(@attributes) do
         content

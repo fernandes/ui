@@ -21,11 +21,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(id: "basic-calendar") %>
+          <%= render UI::Calendar.new(id: "basic-calendar") %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new %&gt;</p>
         </div>
       </div>
     </section>
@@ -39,11 +39,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(selected: Date.today, id: "selected-calendar") %>
+          <%= render UI::Calendar.new(selected: Date.today, id: "selected-calendar") %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(selected: Date.today) %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(selected: Date.today) %&gt;</p>
         </div>
       </div>
     </section>
@@ -57,7 +57,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(
+          <%= render UI::Calendar.new(
             mode: :range,
             selected: Date.today..(Date.today + 7),
             id: "range-calendar"
@@ -65,7 +65,7 @@
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   mode: :range,
   selected: Date.today..(Date.today + 7)
 ) %&gt;</p>
@@ -82,11 +82,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(number_of_months: 2, id: "multiple-months-calendar") %>
+          <%= render UI::Calendar.new(number_of_months: 2, id: "multiple-months-calendar") %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(number_of_months: 2) %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(number_of_months: 2) %&gt;</p>
         </div>
       </div>
     </section>
@@ -100,14 +100,14 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(
+          <%= render UI::Calendar.new(
             mode: :range,
             number_of_months: 2
           ) %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   mode: :range,
   number_of_months: 2
 ) %&gt;</p>
@@ -124,11 +124,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(show_dropdowns: true) %>
+          <%= render UI::Calendar.new(show_dropdowns: true) %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(show_dropdowns: true) %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(show_dropdowns: true) %&gt;</p>
         </div>
       </div>
     </section>
@@ -142,7 +142,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(
+          <%= render UI::Calendar.new(
             show_dropdowns: true,
             month: Date.new(1990, 1, 1),
             min_date: Date.today - 100.years,
@@ -151,7 +151,7 @@
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   show_dropdowns: true,
   month: Date.new(1990, 1, 1),
   min_date: Date.today - 100.years,
@@ -170,7 +170,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(
+          <%= render UI::Calendar.new(
             min_date: Date.today,
             max_date: Date.today + 30.days,
             id: "min-max-calendar"
@@ -178,7 +178,7 @@
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   min_date: Date.today,
   max_date: Date.today + 30.days
 ) %&gt;</p>
@@ -195,7 +195,7 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(
+          <%= render UI::Calendar.new(
             mode: :range,
             min_range_days: 3,
             max_range_days: 7
@@ -203,7 +203,7 @@
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   mode: :range,
   min_range_days: 3,
   max_range_days: 7
@@ -228,7 +228,7 @@
             month_end = today.end_of_month
             weekend_dates = (month_start..month_end).select { |d| d.saturday? || d.sunday? }
           %>
-          <%= render UI::Calendar::Calendar.new(
+          <%= render UI::Calendar.new(
             mode: :range,
             exclude_disabled: true,
             disabled_dates: weekend_dates
@@ -236,7 +236,7 @@
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   mode: :range,
   exclude_disabled: true,
   disabled_dates: weekend_dates
@@ -254,11 +254,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::Calendar.new(week_starts_on: 1) %>
+          <%= render UI::Calendar.new(week_starts_on: 1) %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(week_starts_on: 1) %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(week_starts_on: 1) %&gt;</p>
         </div>
       </div>
     </section>
@@ -274,29 +274,29 @@
         <div>
           <p class="text-sm font-medium mb-2">Portuguese (Brazil)</p>
           <div class="rounded-md border">
-            <%= render UI::Calendar::Calendar.new(locale: "pt-BR") %>
+            <%= render UI::Calendar.new(locale: "pt-BR") %>
           </div>
         </div>
 
         <div>
           <p class="text-sm font-medium mb-2">Spanish</p>
           <div class="rounded-md border">
-            <%= render UI::Calendar::Calendar.new(locale: "es-ES") %>
+            <%= render UI::Calendar.new(locale: "es-ES") %>
           </div>
         </div>
 
         <div>
           <p class="text-sm font-medium mb-2">Japanese</p>
           <div class="rounded-md border">
-            <%= render UI::Calendar::Calendar.new(locale: "ja-JP") %>
+            <%= render UI::Calendar.new(locale: "ja-JP") %>
           </div>
         </div>
       </div>
 
       <div class="rounded-md bg-muted p-4">
-        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(locale: "pt-BR") %&gt;
-&lt;%= render UI::Calendar::Calendar.new(locale: "es-ES") %&gt;
-&lt;%= render UI::Calendar::Calendar.new(locale: "ja-JP") %&gt;</p>
+        <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(locale: "pt-BR") %&gt;
+&lt;%= render UI::Calendar.new(locale: "es-ES") %&gt;
+&lt;%= render UI::Calendar.new(locale: "ja-JP") %&gt;</p>
       </div>
     </section>
 
@@ -310,13 +310,13 @@
       <div class="flex flex-wrap gap-8">
         <%= form_with url: "#", method: :get, class: "space-y-4" do |f| %>
           <div class="rounded-md border">
-            <%= render UI::Calendar::Calendar.new(name: "booking_date", selected: Date.today, id: "form-calendar") %>
+            <%= render UI::Calendar.new(name: "booking_date", selected: Date.today, id: "form-calendar") %>
           </div>
-          <%= render UI::Button::Button.new(type: "submit") { "Submit Form" } %>
+          <%= render UI::Button.new(type: "submit") { "Submit Form" } %>
         <% end %>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::Calendar.new(
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar.new(
   name: "booking_date",
   selected: Date.today
 ) %&gt;</p>
@@ -333,11 +333,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render "ui/calendar/calendar" %>
+          <%= render "ui/calendar" %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar/calendar" %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar" %&gt;</p>
         </div>
       </div>
     </section>
@@ -351,11 +351,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render "ui/calendar/calendar", show_dropdowns: true, selected: Date.today %>
+          <%= render "ui/calendar", show_dropdowns: true, selected: Date.today %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar/calendar",
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar",
   show_dropdowns: true,
   selected: Date.today
   # use_native_select: true (default)
@@ -373,11 +373,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render "ui/calendar/calendar", show_dropdowns: true, use_native_select: false, selected: Date.today %>
+          <%= render "ui/calendar", show_dropdowns: true, use_native_select: false, selected: Date.today %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar/calendar",
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/calendar",
   show_dropdowns: true,
   use_native_select: false,
   selected: Date.today
@@ -395,11 +395,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::CalendarComponent.new %>
+          <%= render UI::CalendarComponent.new %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::CalendarComponent.new %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::CalendarComponent.new %&gt;</p>
         </div>
       </div>
     </section>
@@ -413,11 +413,11 @@
 
       <div class="flex flex-wrap gap-8">
         <div class="rounded-md border">
-          <%= render UI::Calendar::CalendarComponent.new(show_dropdowns: true) %>
+          <%= render UI::CalendarComponent.new(show_dropdowns: true) %>
         </div>
 
         <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
-          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::Calendar::CalendarComponent.new(show_dropdowns: true) %&gt;</p>
+          <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render UI::CalendarComponent.new(show_dropdowns: true) %&gt;</p>
         </div>
       </div>
     </section>

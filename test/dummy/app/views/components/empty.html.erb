@@ -19,20 +19,20 @@
       <div class="space-y-6">
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
-          <%= render UI::Empty::Empty.new do %>
-            <%= render UI::Empty::EmptyHeader.new do %>
-              <%= render UI::Empty::EmptyTitle.new { "No results found" } %>
-              <%= render UI::Empty::EmptyDescription.new { "Try adjusting your search criteria." } %>
+          <%= render UI::Empty.new do %>
+            <%= render UI::EmptyHeader.new do %>
+              <%= render UI::EmptyTitle.new { "No results found" } %>
+              <%= render UI::EmptyDescription.new { "Try adjusting your search criteria." } %>
             <% end %>
           <% end %>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
-          <%= render UI::Empty::EmptyComponent.new do %>
-            <%= render UI::Empty::EmptyHeaderComponent.new do %>
-              <%= render(UI::Empty::EmptyTitleComponent.new) { "No results found" } %>
-              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "Try adjusting your search criteria." } %>
+          <%= render UI::EmptyComponent.new do %>
+            <%= render UI::EmptyHeaderComponent.new do %>
+              <%= render(UI::EmptyTitleComponent.new) { "No results found" } %>
+              <%= render(UI::EmptyDescriptionComponent.new) { "Try adjusting your search criteria." } %>
             <% end %>
           <% end %>
         </div>
@@ -56,36 +56,36 @@
       <div class="space-y-6">
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
-          <%= render UI::Empty::Empty.new do %>
-            <%= render UI::Empty::EmptyHeader.new do %>
-              <%= render UI::Empty::EmptyMedia.new(variant: "icon") do %>
+          <%= render UI::Empty.new do %>
+            <%= render UI::EmptyHeader.new do %>
+              <%= render UI::EmptyMedia.new(variant: "icon") do %>
                 <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               <% end %>
-              <%= render UI::Empty::EmptyTitle.new { "No documents" } %>
-              <%= render UI::Empty::EmptyDescription.new { "You haven't created any documents yet." } %>
+              <%= render UI::EmptyTitle.new { "No documents" } %>
+              <%= render UI::EmptyDescription.new { "You haven't created any documents yet." } %>
             <% end %>
-            <%= render UI::Empty::EmptyContent.new do %>
-              <%= render UI::Button::Button.new { "Create Document" } %>
+            <%= render UI::EmptyContent.new do %>
+              <%= render UI::Button.new { "Create Document" } %>
             <% end %>
           <% end %>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
-          <%= render UI::Empty::EmptyComponent.new do %>
-            <%= render UI::Empty::EmptyHeaderComponent.new do %>
-              <%= render UI::Empty::EmptyMediaComponent.new(variant: "icon") do %>
+          <%= render UI::EmptyComponent.new do %>
+            <%= render UI::EmptyHeaderComponent.new do %>
+              <%= render UI::EmptyMediaComponent.new(variant: "icon") do %>
                 <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               <% end %>
-              <%= render(UI::Empty::EmptyTitleComponent.new) { "No documents" } %>
-              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "You haven't created any documents yet." } %>
+              <%= render(UI::EmptyTitleComponent.new) { "No documents" } %>
+              <%= render(UI::EmptyDescriptionComponent.new) { "You haven't created any documents yet." } %>
             <% end %>
-            <%= render UI::Empty::EmptyContentComponent.new do %>
-              <%= render(UI::Button::ButtonComponent.new) { "Create Document" } %>
+            <%= render UI::EmptyContentComponent.new do %>
+              <%= render(UI::ButtonComponent.new) { "Create Document" } %>
             <% end %>
           <% end %>
         </div>
@@ -117,20 +117,20 @@
       <div class="space-y-6">
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
-          <%= render UI::Empty::Empty.new(classes: "border border-dashed") do %>
-            <%= render UI::Empty::EmptyHeader.new do %>
-              <%= render UI::Empty::EmptyTitle.new { "No projects" } %>
-              <%= render UI::Empty::EmptyDescription.new { "Create a new project to get started." } %>
+          <%= render UI::Empty.new(classes: "border border-dashed") do %>
+            <%= render UI::EmptyHeader.new do %>
+              <%= render UI::EmptyTitle.new { "No projects" } %>
+              <%= render UI::EmptyDescription.new { "Create a new project to get started." } %>
             <% end %>
           <% end %>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
-          <%= render UI::Empty::EmptyComponent.new(classes: "border border-dashed") do %>
-            <%= render UI::Empty::EmptyHeaderComponent.new do %>
-              <%= render(UI::Empty::EmptyTitleComponent.new) { "No projects" } %>
-              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "Create a new project to get started." } %>
+          <%= render UI::EmptyComponent.new(classes: "border border-dashed") do %>
+            <%= render UI::EmptyHeaderComponent.new do %>
+              <%= render(UI::EmptyTitleComponent.new) { "No projects" } %>
+              <%= render(UI::EmptyDescriptionComponent.new) { "Create a new project to get started." } %>
             <% end %>
           <% end %>
         </div>
@@ -154,30 +154,30 @@
       <div class="space-y-6">
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
-          <%= render UI::Empty::Empty.new(classes: "bg-gradient-to-b from-muted/50") do %>
-            <%= render UI::Empty::EmptyHeader.new do %>
-              <%= render UI::Empty::EmptyMedia.new(variant: "icon") do %>
+          <%= render UI::Empty.new(classes: "bg-gradient-to-b from-muted/50") do %>
+            <%= render UI::EmptyHeader.new do %>
+              <%= render UI::EmptyMedia.new(variant: "icon") do %>
                 <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
               <% end %>
-              <%= render UI::Empty::EmptyTitle.new { "No messages" } %>
-              <%= render UI::Empty::EmptyDescription.new { "Start a conversation to see messages here." } %>
+              <%= render UI::EmptyTitle.new { "No messages" } %>
+              <%= render UI::EmptyDescription.new { "Start a conversation to see messages here." } %>
             <% end %>
           <% end %>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
-          <%= render UI::Empty::EmptyComponent.new(classes: "bg-gradient-to-b from-muted/50") do %>
-            <%= render UI::Empty::EmptyHeaderComponent.new do %>
-              <%= render UI::Empty::EmptyMediaComponent.new(variant: "icon") do %>
+          <%= render UI::EmptyComponent.new(classes: "bg-gradient-to-b from-muted/50") do %>
+            <%= render UI::EmptyHeaderComponent.new do %>
+              <%= render UI::EmptyMediaComponent.new(variant: "icon") do %>
                 <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
               <% end %>
-              <%= render(UI::Empty::EmptyTitleComponent.new) { "No messages" } %>
-              <%= render(UI::Empty::EmptyDescriptionComponent.new) { "Start a conversation to see messages here." } %>
+              <%= render(UI::EmptyTitleComponent.new) { "No messages" } %>
+              <%= render(UI::EmptyDescriptionComponent.new) { "Start a conversation to see messages here." } %>
             <% end %>
           <% end %>
         </div>
@@ -206,18 +206,18 @@
       <div class="space-y-6">
         <div>
           <h3 class="text-sm font-medium mb-3">Phlex</h3>
-          <%= render UI::Empty::Empty.new do %>
-            <%= render UI::Empty::EmptyHeader.new do %>
-              <%= render UI::Empty::EmptyTitle.new { "Nothing to see here" } %>
+          <%= render UI::Empty.new do %>
+            <%= render UI::EmptyHeader.new do %>
+              <%= render UI::EmptyTitle.new { "Nothing to see here" } %>
             <% end %>
           <% end %>
         </div>
 
         <div>
           <h3 class="text-sm font-medium mb-3">ViewComponent</h3>
-          <%= render UI::Empty::EmptyComponent.new do %>
-            <%= render UI::Empty::EmptyHeaderComponent.new do %>
-              <%= render(UI::Empty::EmptyTitleComponent.new) { "Nothing to see here" } %>
+          <%= render UI::EmptyComponent.new do %>
+            <%= render UI::EmptyHeaderComponent.new do %>
+              <%= render(UI::EmptyTitleComponent.new) { "Nothing to see here" } %>
             <% end %>
           <% end %>
         </div>

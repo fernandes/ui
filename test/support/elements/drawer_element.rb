@@ -15,14 +15,14 @@ module UI
     #   assert drawer.closed?
     #
     # @example Testing snap points
-    #   drawer = find_element(UI::Testing::DrawerElement, "#drawer-snap-points")
+    #   drawer = find_element(UI::TestingDrawerElement, "#drawer-snap-points")
     #   drawer.open
     #   assert_equal 3, drawer.snap_points_count
     #   drawer.snap_to(2) # Snap to third snap point
     #   assert drawer.at_snap_point?(2)
     #
     # @example Testing different directions
-    #   drawer = find_element(UI::Testing::DrawerElement, "#drawer-left")
+    #   drawer = find_element(UI::TestingDrawerElement, "#drawer-left")
     #   drawer.open
     #   assert_equal "left", drawer.direction
     #

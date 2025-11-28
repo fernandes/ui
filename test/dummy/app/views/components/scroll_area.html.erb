@@ -11,7 +11,7 @@
     <!-- Basic Example -->
     <div class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Example</h2>
-      <%= render "ui/scroll_area/scroll_area", classes: "h-[200px] w-[350px] rounded-md border p-4", attributes: { id: "basic-scroll-area" } do %>
+      <%= render "ui/scroll_area", classes: "h-[200px] w-[350px] rounded-md border p-4", attributes: { id: "basic-scroll-area" } do %>
         <div class="space-y-4">
           <h3 class="text-sm font-semibold">Tags</h3>
           <div class="space-y-1">
@@ -38,7 +38,7 @@
             </div>
           </div>
         </div>
-        <%= render "ui/scroll_area/scroll_area_scrollbar", orientation: "horizontal" %>
+        <%= render "ui/scroll_area/scrollbar", orientation: "horizontal" %>
       </div>
     </div>
 
@@ -48,7 +48,7 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <h3 class="text-sm font-medium mb-2">Small (h-24)</h3>
-          <%= render "ui/scroll_area/scroll_area", classes: "h-24 w-full rounded-md border p-4", attributes: { id: "small-scroll-area" } do %>
+          <%= render "ui/scroll_area", classes: "h-24 w-full rounded-md border p-4", attributes: { id: "small-scroll-area" } do %>
             <div class="space-y-2">
               <% 10.times do |i| %>
                 <div class="text-sm">Item <%= i + 1 %></div>
@@ -59,7 +59,7 @@
 
         <div>
           <h3 class="text-sm font-medium mb-2">Large (h-96)</h3>
-          <%= render "ui/scroll_area/scroll_area", classes: "h-96 w-full rounded-md border p-4", attributes: { id: "large-scroll-area" } do %>
+          <%= render "ui/scroll_area", classes: "h-96 w-full rounded-md border p-4", attributes: { id: "large-scroll-area" } do %>
             <div class="space-y-2">
               <% 50.times do |i| %>
                 <div class="text-sm">Item <%= i + 1 %></div>
@@ -73,7 +73,7 @@
     <!-- Long Content Example -->
     <div class="space-y-4">
       <h2 class="text-2xl font-semibold">Long Content</h2>
-      <%= render "ui/scroll_area/scroll_area", classes: "h-[400px] w-full max-w-2xl rounded-md border p-6", attributes: { id: "long-content-scroll-area" } do %>
+      <%= render "ui/scroll_area", classes: "h-[400px] w-full max-w-2xl rounded-md border p-6", attributes: { id: "long-content-scroll-area" } do %>
         <div class="space-y-4">
           <h3 class="text-lg font-semibold">About Scroll Area</h3>
           <p class="text-sm text-muted-foreground">

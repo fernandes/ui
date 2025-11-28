@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Typography::SmallBehavior
+  extend UI::SmallBehavior
   all_attributes = small_html_attributes.merge(@attributes)
 %>
 <%= content_tag :small, all_attributes do %>

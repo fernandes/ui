@@ -1,0 +1,21 @@
+<%# Context Menu Component - Container for context menus triggered by right-click %>
+<%#
+  @example Basic usage
+    render "ui/context_menu/context_menu" do
+      render "ui/context_menu/context_menu_trigger" { "Right click" }
+      render "ui/context_menu/context_menu_content" { "Items" }
+    end
+%>
+<%
+  @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
+
+  # Extend behavior for shared logic
+  extend UI::ContextMenuBehavior
+
+  # Get HTML attributes from behavior
+  all_attributes = context_menu_html_attributes.deep_merge(@attributes)
+-%>
+<%= content_tag :div, all_attributes do %>
+  <%= yield %>
+<% end %>

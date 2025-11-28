@@ -4,7 +4,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
-  extend UI::Menubar::MenubarSeparatorBehavior
+  extend UI::MenubarSeparatorBehavior
 
   # Get HTML attributes from behavior
   all_attributes = menubar_separator_html_attributes.deep_merge(@attributes)

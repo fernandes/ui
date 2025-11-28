@@ -16,19 +16,19 @@
     </div>
     <div class="flex items-center gap-2">
       <span class="text-sm">Hover over</span>
-      <%= render UI::HoverCard::HoverCard.new do %>
+      <%= render UI::HoverCard.new do %>
         <%# Trigger with asChild - composes with Button %>
-        <%= render UI::HoverCard::Trigger.new(as_child: true) do |trigger_attrs| %>
-          <%= render UI::Button::Button.new(**trigger_attrs, variant: :link, classes: "px-0") do %>
+        <%= render UI::HoverCardTrigger.new(as_child: true) do |trigger_attrs| %>
+          <%= render UI::Button.new(**trigger_attrs, variant: :link, classes: "px-0") do %>
             @nextjs
           <% end %>
         <% end %>
 
-        <%= render UI::HoverCard::Content.new(classes: "w-80") do %>
+        <%= render UI::HoverCardContent.new(classes: "w-80") do %>
           <div class="flex gap-4">
-            <%= render UI::Avatar::Avatar.new do %>
-              <%= render UI::Avatar::Image.new(src: "https://github.com/vercel.png", alt: "@vercel") %>
-              <%= render UI::Avatar::Fallback.new { "VC" } %>
+            <%= render UI::Avatar.new do %>
+              <%= render UI::AvatarImage.new(src: "https://github.com/vercel.png", alt: "@vercel") %>
+              <%= render UI::AvatarFallback.new { "VC" } %>
             <% end %>
             <div class="space-y-1">
               <h4 class="text-sm font-semibold">@nextjs</h4>
@@ -61,12 +61,12 @@
     </div>
     <div class="flex items-center gap-2">
       <span class="text-sm">Read more about</span>
-      <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-        <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+      <%= render(UI::HoverCardComponent.new) do %>
+        <%= render(UI::HoverCardTriggerComponent.new(as_child: true)) do |trigger_attrs| %>
           <%= link_to "shadcn/ui", "https://ui.shadcn.com", **trigger_attrs, class: "font-medium underline underline-offset-4 rounded-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]" %>
         <% end %>
 
-        <%= render(UI::HoverCard::ContentComponent.new(align: "start")) do %>
+        <%= render(UI::HoverCardContentComponent.new(align: "start")) do %>
           <div class="space-y-2">
             <h4 class="text-sm font-semibold">shadcn/ui</h4>
             <p class="text-sm text-muted-foreground">
@@ -95,7 +95,7 @@
     </div>
     <div class="flex items-center gap-2">
       <span class="text-sm">Hover over</span>
-      <%= render "ui/hover_card/hover_card" do %>
+      <%= render "ui/hover_card" do %>
         <%= render "ui/hover_card/trigger", classes: "cursor-pointer font-medium underline underline-offset-4" do %>
           this trigger
         <% end %>
@@ -124,14 +124,14 @@
     </div>
     <div class="flex items-center justify-between gap-8">
       <%# Start aligned %>
-      <%= render UI::HoverCard::HoverCard.new do %>
-        <%= render UI::HoverCard::Trigger.new(as_child: true) do |attrs| %>
-          <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) do %>
+      <%= render UI::HoverCard.new do %>
+        <%= render UI::HoverCardTrigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) do %>
             Align Start
           <% end %>
         <% end %>
 
-        <%= render UI::HoverCard::Content.new(align: "start") do %>
+        <%= render UI::HoverCardContent.new(align: "start") do %>
           <div class="space-y-1">
             <p class="text-sm font-semibold">Start Aligned</p>
             <p class="text-xs text-muted-foreground">
@@ -142,14 +142,14 @@
       <% end %>
 
       <%# Center aligned (default) %>
-      <%= render UI::HoverCard::HoverCard.new do %>
-        <%= render UI::HoverCard::Trigger.new(as_child: true) do |attrs| %>
-          <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) do %>
+      <%= render UI::HoverCard.new do %>
+        <%= render UI::HoverCardTrigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) do %>
             Align Center
           <% end %>
         <% end %>
 
-        <%= render UI::HoverCard::Content.new(align: "center") do %>
+        <%= render UI::HoverCardContent.new(align: "center") do %>
           <div class="space-y-1">
             <p class="text-sm font-semibold">Center Aligned</p>
             <p class="text-xs text-muted-foreground">
@@ -160,14 +160,14 @@
       <% end %>
 
       <%# End aligned %>
-      <%= render UI::HoverCard::HoverCard.new do %>
-        <%= render UI::HoverCard::Trigger.new(as_child: true) do |attrs| %>
-          <%= render UI::Button::Button.new(**attrs, variant: :outline, size: :sm) do %>
+      <%= render UI::HoverCard.new do %>
+        <%= render UI::HoverCardTrigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Button.new(**attrs, variant: :outline, size: :sm) do %>
             Align End
           <% end %>
         <% end %>
 
-        <%= render UI::HoverCard::Content.new(align: "end") do %>
+        <%= render UI::HoverCardContent.new(align: "end") do %>
           <div class="space-y-1">
             <p class="text-sm font-semibold">End Aligned</p>
             <p class="text-xs text-muted-foreground">
@@ -190,18 +190,18 @@
     <div class="space-y-4">
       <div class="flex flex-wrap gap-4">
         <%# User 1 %>
-        <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
-            <%= render(UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
+        <%= render(UI::HoverCardComponent.new) do %>
+          <%= render(UI::HoverCardTriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+            <%= render(UI::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
               @shadcn
             <% end %>
           <% end %>
 
-          <%= render(UI::HoverCard::ContentComponent.new(classes: "w-80")) do %>
+          <%= render(UI::HoverCardContentComponent.new(classes: "w-80")) do %>
             <div class="flex gap-4">
-              <%= render(UI::Avatar::AvatarComponent.new) do %>
-                <%= render(UI::Avatar::ImageComponent.new(src: "https://github.com/shadcn.png", alt: "@shadcn")) %>
-                <%= render(UI::Avatar::FallbackComponent.new) { "SC" } %>
+              <%= render(UI::AvatarComponent.new) do %>
+                <%= render(UI::AvatarImageComponent.new(src: "https://github.com/shadcn.png", alt: "@shadcn")) %>
+                <%= render(UI::AvatarFallbackComponent.new) { "SC" } %>
               <% end %>
               <div class="space-y-1">
                 <h4 class="text-sm font-semibold">shadcn</h4>
@@ -222,18 +222,18 @@
         <% end %>
 
         <%# User 2 %>
-        <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
-            <%= render(UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
+        <%= render(UI::HoverCardComponent.new) do %>
+          <%= render(UI::HoverCardTriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+            <%= render(UI::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
               @vercel
             <% end %>
           <% end %>
 
-          <%= render(UI::HoverCard::ContentComponent.new(classes: "w-80")) do %>
+          <%= render(UI::HoverCardContentComponent.new(classes: "w-80")) do %>
             <div class="flex gap-4">
-              <%= render(UI::Avatar::AvatarComponent.new) do %>
-                <%= render(UI::Avatar::ImageComponent.new(src: "https://github.com/vercel.png", alt: "@vercel")) %>
-                <%= render(UI::Avatar::FallbackComponent.new) { "VC" } %>
+              <%= render(UI::AvatarComponent.new) do %>
+                <%= render(UI::AvatarImageComponent.new(src: "https://github.com/vercel.png", alt: "@vercel")) %>
+                <%= render(UI::AvatarFallbackComponent.new) { "VC" } %>
               <% end %>
               <div class="space-y-1">
                 <h4 class="text-sm font-semibold">Vercel</h4>
@@ -254,18 +254,18 @@
         <% end %>
 
         <%# User 3 %>
-        <%= render(UI::HoverCard::HoverCardComponent.new) do %>
-          <%= render(UI::HoverCard::TriggerComponent.new(as_child: true)) do |trigger_attrs| %>
-            <%= render(UI::Button::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
+        <%= render(UI::HoverCardComponent.new) do %>
+          <%= render(UI::HoverCardTriggerComponent.new(as_child: true)) do |trigger_attrs| %>
+            <%= render(UI::ButtonComponent.new(**trigger_attrs, variant: :link, classes: "px-0")) do %>
               @github
             <% end %>
           <% end %>
 
-          <%= render(UI::HoverCard::ContentComponent.new(classes: "w-80")) do %>
+          <%= render(UI::HoverCardContentComponent.new(classes: "w-80")) do %>
             <div class="flex gap-4">
-              <%= render(UI::Avatar::AvatarComponent.new) do %>
-                <%= render(UI::Avatar::ImageComponent.new(src: "https://github.com/github.png", alt: "@github")) %>
-                <%= render(UI::Avatar::FallbackComponent.new) { "GH" } %>
+              <%= render(UI::AvatarComponent.new) do %>
+                <%= render(UI::AvatarImageComponent.new(src: "https://github.com/github.png", alt: "@github")) %>
+                <%= render(UI::AvatarFallbackComponent.new) { "GH" } %>
               <% end %>
               <div class="space-y-1">
                 <h4 class="text-sm font-semibold">GitHub</h4>
@@ -310,9 +310,9 @@
         </code>
       </div>
       <div class="mt-4 flex items-center gap-4">
-        <%= render "ui/hover_card/hover_card" do %>
+        <%= render "ui/hover_card" do %>
           <%= render "ui/hover_card/trigger", as_child: true do |attrs| %>
-            <%= render "ui/button/button", **attrs, variant: :default do %>
+            <%= render "ui/button", **attrs, variant: :default do %>
               Hover with asChild
             <% end %>
           <% end %>

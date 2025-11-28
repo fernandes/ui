@@ -30,14 +30,14 @@
     <h2 class="mb-4 text-2xl font-semibold">Default</h2>
     <div class="bg-card rounded-lg border p-8">
       <% if format == 'erb' %>
-        <%= render "ui/textarea/textarea",
+        <%= render "ui/textarea",
           placeholder: "Type your message here." %>
       <% elsif format == 'phlex' %>
-        <%= render UI::Textarea::Textarea.new(
+        <%= render UI::Textarea.new(
           placeholder: "Type your message here."
         ) %>
       <% else # vc %>
-        <%= render UI::Textarea::TextareaComponent.new(
+        <%= render UI::TextareaComponent.new(
           placeholder: "Type your message here."
         ) %>
       <% end %>
@@ -49,16 +49,16 @@
     <h2 class="mb-4 text-2xl font-semibold">Disabled</h2>
     <div class="bg-card rounded-lg border p-8">
       <% if format == 'erb' %>
-        <%= render "ui/textarea/textarea",
+        <%= render "ui/textarea",
           placeholder: "Type your message here.",
           attributes: { disabled: true } %>
       <% elsif format == 'phlex' %>
-        <%= render UI::Textarea::Textarea.new(
+        <%= render UI::Textarea.new(
           placeholder: "Type your message here.",
           disabled: true
         ) %>
       <% else # vc %>
-        <%= render UI::Textarea::TextareaComponent.new(
+        <%= render UI::TextareaComponent.new(
           placeholder: "Type your message here.",
           disabled: true
         ) %>
@@ -72,23 +72,23 @@
     <div class="bg-card rounded-lg border p-8">
       <div class="grid w-full gap-1.5">
         <% if format == 'erb' %>
-          <%= render "ui/label/label", for: "message" do %>
+          <%= render "ui/label", for: "message" do %>
             Your message
           <% end %>
-          <%= render "ui/textarea/textarea",
+          <%= render "ui/textarea",
             id: "message",
             placeholder: "Type your message here." %>
         <% elsif format == 'phlex' %>
-          <%= render UI::Label::Label.new(for: "message") { "Your message" } %>
-          <%= render UI::Textarea::Textarea.new(
+          <%= render UI::Label.new(for: "message") { "Your message" } %>
+          <%= render UI::Textarea.new(
             id: "message",
             placeholder: "Type your message here."
           ) %>
         <% else # vc %>
-          <%= render UI::Label::LabelComponent.new(for: "message") do %>
+          <%= render UI::LabelComponent.new(for: "message") do %>
             Your message
           <% end %>
-          <%= render UI::Textarea::TextareaComponent.new(
+          <%= render UI::TextareaComponent.new(
             id: "message",
             placeholder: "Type your message here."
           ) %>
@@ -103,18 +103,18 @@
     <div class="bg-card rounded-lg border p-8">
       <div class="grid w-full gap-1.5">
         <% if format == 'erb' %>
-          <%= render "ui/label/label", for: "message-2" do %>
+          <%= render "ui/label", for: "message-2" do %>
             Your message
           <% end %>
-          <%= render "ui/textarea/textarea",
+          <%= render "ui/textarea",
             id: "message-2",
             placeholder: "Type your message here." %>
           <p class="text-muted-foreground text-sm">
             Your message will be copied to the support team.
           </p>
         <% elsif format == 'phlex' %>
-          <%= render UI::Label::Label.new(for: "message-2") { "Your message" } %>
-          <%= render UI::Textarea::Textarea.new(
+          <%= render UI::Label.new(for: "message-2") { "Your message" } %>
+          <%= render UI::Textarea.new(
             id: "message-2",
             placeholder: "Type your message here."
           ) %>
@@ -122,10 +122,10 @@
             Your message will be copied to the support team.
           </p>
         <% else # vc %>
-          <%= render UI::Label::LabelComponent.new(for: "message-2") do %>
+          <%= render UI::LabelComponent.new(for: "message-2") do %>
             Your message
           <% end %>
-          <%= render UI::Textarea::TextareaComponent.new(
+          <%= render UI::TextareaComponent.new(
             id: "message-2",
             placeholder: "Type your message here."
           ) %>
@@ -143,21 +143,21 @@
     <div class="bg-card rounded-lg border p-8">
       <div class="grid w-full gap-2">
         <% if format == 'erb' %>
-          <%= render "ui/textarea/textarea",
+          <%= render "ui/textarea",
             placeholder: "Type your message here." %>
-          <%= render "ui/button/button" do %>
+          <%= render "ui/button" do %>
             Send message
           <% end %>
         <% elsif format == 'phlex' %>
-          <%= render UI::Textarea::Textarea.new(
+          <%= render UI::Textarea.new(
             placeholder: "Type your message here."
           ) %>
-          <%= render UI::Button::Button.new { "Send message" } %>
+          <%= render UI::Button.new { "Send message" } %>
         <% else # vc %>
-          <%= render UI::Textarea::TextareaComponent.new(
+          <%= render UI::TextareaComponent.new(
             placeholder: "Type your message here."
           ) %>
-          <%= render UI::Button::ButtonComponent.new do %>
+          <%= render UI::ButtonComponent.new do %>
             Send message
           <% end %>
         <% end %>

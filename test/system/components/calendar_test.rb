@@ -9,27 +9,27 @@ class CalendarTest < UI::SystemTestCase
 
   # Helper methods to get different calendar instances
   def basic_calendar
-    find_element(UI::Testing::CalendarElement, "#basic-calendar")
+    find_element(UI::TestingCalendarElement, "#basic-calendar")
   end
 
   def selected_calendar
-    find_element(UI::Testing::CalendarElement, "#selected-calendar")
+    find_element(UI::TestingCalendarElement, "#selected-calendar")
   end
 
   def range_calendar
-    find_element(UI::Testing::CalendarElement, "#range-calendar")
+    find_element(UI::TestingCalendarElement, "#range-calendar")
   end
 
   def multiple_months_calendar
-    find_element(UI::Testing::CalendarElement, "#multiple-months-calendar")
+    find_element(UI::TestingCalendarElement, "#multiple-months-calendar")
   end
 
   def min_max_calendar
-    find_element(UI::Testing::CalendarElement, "#min-max-calendar")
+    find_element(UI::TestingCalendarElement, "#min-max-calendar")
   end
 
   def form_calendar
-    find_element(UI::Testing::CalendarElement, "#form-calendar")
+    find_element(UI::TestingCalendarElement, "#form-calendar")
   end
 
   # === Basic Interaction Tests ===

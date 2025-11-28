@@ -11,7 +11,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
 
-  extend UI::Typography::LargeBehavior
+  extend UI::LargeBehavior
   all_attributes = large_html_attributes.merge(@attributes)
 %>
 <%= content_tag :div, all_attributes do %>

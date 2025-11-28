@@ -20,9 +20,9 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Tooltip</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Hover me" } %>
-            <%= render UI::Tooltip::Content.new { "Add to library" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Hover me" } %>
+            <%= render UI::TooltipContent.new { "Add to library" } %>
           <% end %>
         </div>
       </div>
@@ -31,24 +31,24 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Different Sides</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Top" } %>
-            <%= render UI::Tooltip::Content.new { "Appears on top" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Top" } %>
+            <%= render UI::TooltipContent.new { "Appears on top" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Right" } %>
-            <%= render UI::Tooltip::Content.new(side: "right") { "Appears on right" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Right" } %>
+            <%= render UI::TooltipContent.new(side: "right") { "Appears on right" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Bottom" } %>
-            <%= render UI::Tooltip::Content.new(side: "bottom") { "Appears on bottom" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Bottom" } %>
+            <%= render UI::TooltipContent.new(side: "bottom") { "Appears on bottom" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Left" } %>
-            <%= render UI::Tooltip::Content.new(side: "left") { "Appears on left" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Left" } %>
+            <%= render UI::TooltipContent.new(side: "left") { "Appears on left" } %>
           <% end %>
         </div>
       </div>
@@ -57,18 +57,18 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">With asChild - Compose with Button</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :outline) { "Hover" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :outline) { "Hover" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Button with tooltip" } %>
+            <%= render UI::TooltipContent.new { "Button with tooltip" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :destructive) { "Delete" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :destructive) { "Delete" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Delete item permanently" } %>
+            <%= render UI::TooltipContent.new { "Delete item permanently" } %>
           <% end %>
         </div>
       </div>
@@ -77,32 +77,32 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Icon Buttons with Tooltips</h3>
         <div class="flex items-center gap-2">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :icon) { "🏠" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :icon) { "🏠" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Home" } %>
+            <%= render UI::TooltipContent.new { "Home" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :icon) { "🔔" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :icon) { "🔔" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Notifications" } %>
+            <%= render UI::TooltipContent.new { "Notifications" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :icon) { "⚙️" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :icon) { "⚙️" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Settings" } %>
+            <%= render UI::TooltipContent.new { "Settings" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :icon) { "❓" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :icon) { "❓" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new(side: "bottom") { "Help & Support" } %>
+            <%= render UI::TooltipContent.new(side: "bottom") { "Help & Support" } %>
           <% end %>
         </div>
       </div>
@@ -111,13 +111,13 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Custom Element with asChild</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
               <span **attrs class="cursor-help text-muted-foreground border-b border-dashed border-muted-foreground">
                 Hover over this text
               </span>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "This is a custom tooltip trigger" } %>
+            <%= render UI::TooltipContent.new { "This is a custom tooltip trigger" } %>
           <% end %>
         </div>
       </div>
@@ -126,14 +126,14 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Custom Side Offset</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Default offset" } %>
-            <%= render UI::Tooltip::Content.new { "4px from trigger" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Default offset" } %>
+            <%= render UI::TooltipContent.new { "4px from trigger" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new { "Large offset" } %>
-            <%= render UI::Tooltip::Content.new(side_offset: 16) { "16px from trigger" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new { "Large offset" } %>
+            <%= render UI::TooltipContent.new(side_offset: 16) { "16px from trigger" } %>
           <% end %>
         </div>
       </div>
@@ -147,7 +147,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Tooltip</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip", attributes: { id: "basic-tooltip" } do %>
+          <%= render "ui/tooltip", attributes: { id: "basic-tooltip" } do %>
             <%= render "ui/tooltip/trigger" do %>
               Hover me (ERB)
             <% end %>
@@ -162,7 +162,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">With Button Content</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-with-button" } do %>
+          <%= render "ui/tooltip", attributes: { id: "tooltip-with-button" } do %>
             <%= render "ui/tooltip/trigger" do %>
               Delete (ERB)
             <% end %>
@@ -177,7 +177,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Destructive Variant</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-destructive" } do %>
+          <%= render "ui/tooltip", attributes: { id: "tooltip-destructive" } do %>
             <%= render "ui/tooltip/trigger" do %>
               Delete Permanently
             <% end %>
@@ -192,22 +192,22 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Tooltip Positioning</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-top" } do %>
+          <%= render "ui/tooltip", attributes: { id: "tooltip-top" } do %>
             <%= render "ui/tooltip/trigger" do %>Top<% end %>
             <%= render "ui/tooltip/content" do %>Appears on top<% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-right" } do %>
+          <%= render "ui/tooltip", attributes: { id: "tooltip-right" } do %>
             <%= render "ui/tooltip/trigger" do %>Right<% end %>
             <%= render "ui/tooltip/content", side: "right" do %>Appears on right<% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-bottom" } do %>
+          <%= render "ui/tooltip", attributes: { id: "tooltip-bottom" } do %>
             <%= render "ui/tooltip/trigger" do %>Bottom<% end %>
             <%= render "ui/tooltip/content", side: "bottom" do %>Appears on bottom<% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip", attributes: { id: "tooltip-left" } do %>
+          <%= render "ui/tooltip", attributes: { id: "tooltip-left" } do %>
             <%= render "ui/tooltip/trigger" do %>Left<% end %>
             <%= render "ui/tooltip/content", side: "left" do %>Appears on left<% end %>
           <% end %>
@@ -218,7 +218,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Tooltip on Custom Element</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip" do %>
             <%= render "ui/tooltip/trigger" do %>
               <span class="cursor-help border-b border-dashed">Help text</span>
             <% end %>
@@ -238,11 +238,11 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Tooltip</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Tooltip::TooltipComponent.new do %>
-            <%= render UI::Tooltip::TriggerComponent.new do %>
+          <%= render UI::TooltipComponent.new do %>
+            <%= render UI::TooltipTriggerComponent.new do %>
               Hover me (VC)
             <% end %>
-            <%= render UI::Tooltip::ContentComponent.new do %>
+            <%= render UI::TooltipContentComponent.new do %>
               ViewComponent tooltip
             <% end %>
           <% end %>
@@ -253,28 +253,28 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Different Positions</h3>
         <div class="flex items-center gap-4 justify-center p-12">
-          <%= render UI::Tooltip::TooltipComponent.new do %>
-            <%= render UI::Tooltip::TriggerComponent.new do %>Top<% end %>
-            <%= render UI::Tooltip::ContentComponent.new do %>Top position<% end %>
+          <%= render UI::TooltipComponent.new do %>
+            <%= render UI::TooltipTriggerComponent.new do %>Top<% end %>
+            <%= render UI::TooltipContentComponent.new do %>Top position<% end %>
           <% end %>
 
-          <%= render UI::Tooltip::TooltipComponent.new do %>
-            <%= render UI::Tooltip::TriggerComponent.new do %>Right<% end %>
-            <%= render UI::Tooltip::ContentComponent.new(side: "right") do %>
+          <%= render UI::TooltipComponent.new do %>
+            <%= render UI::TooltipTriggerComponent.new do %>Right<% end %>
+            <%= render UI::TooltipContentComponent.new(side: "right") do %>
               Right position
             <% end %>
           <% end %>
 
-          <%= render UI::Tooltip::TooltipComponent.new do %>
-            <%= render UI::Tooltip::TriggerComponent.new do %>Bottom<% end %>
-            <%= render UI::Tooltip::ContentComponent.new(side: "bottom") do %>
+          <%= render UI::TooltipComponent.new do %>
+            <%= render UI::TooltipTriggerComponent.new do %>Bottom<% end %>
+            <%= render UI::TooltipContentComponent.new(side: "bottom") do %>
               Bottom position
             <% end %>
           <% end %>
 
-          <%= render UI::Tooltip::TooltipComponent.new do %>
-            <%= render UI::Tooltip::TriggerComponent.new do %>Left<% end %>
-            <%= render UI::Tooltip::ContentComponent.new(side: "left") do %>
+          <%= render UI::TooltipComponent.new do %>
+            <%= render UI::TooltipTriggerComponent.new do %>Left<% end %>
+            <%= render UI::TooltipContentComponent.new(side: "left") do %>
               Left position
             <% end %>
           <% end %>
@@ -285,11 +285,11 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Button with Tooltip</h3>
         <div class="flex items-center gap-4">
-          <%= render UI::Tooltip::TooltipComponent.new do %>
-            <%= render UI::Tooltip::TriggerComponent.new do %>
+          <%= render UI::TooltipComponent.new do %>
+            <%= render UI::TooltipTriggerComponent.new do %>
               Save Draft
             <% end %>
-            <%= render UI::Tooltip::ContentComponent.new do %>
+            <%= render UI::TooltipContentComponent.new do %>
               Save your work as a draft
             <% end %>
           <% end %>
@@ -305,41 +305,41 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Toolbar with Tooltips (Phlex)</h3>
         <div class="flex items-center gap-1 p-2 border rounded-md w-fit">
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :sm) { "Bold" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :sm) { "Bold" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Make text bold (Ctrl+B)" } %>
+            <%= render UI::TooltipContent.new { "Make text bold (Ctrl+B)" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :sm) { "Italic" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :sm) { "Italic" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Make text italic (Ctrl+I)" } %>
+            <%= render UI::TooltipContent.new { "Make text italic (Ctrl+I)" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :sm) { "Underline" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :sm) { "Underline" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Underline text (Ctrl+U)" } %>
+            <%= render UI::TooltipContent.new { "Underline text (Ctrl+U)" } %>
           <% end %>
 
           <div class="w-px h-6 bg-border mx-1"></div>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :sm) { "Link" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :sm) { "Link" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Insert link (Ctrl+K)" } %>
+            <%= render UI::TooltipContent.new { "Insert link (Ctrl+K)" } %>
           <% end %>
 
-          <%= render UI::Tooltip::Tooltip.new do %>
-            <%= render UI::Tooltip::Trigger.new(as_child: true) do |attrs| %>
-              <%= render UI::Button::Button.new(**attrs, variant: :ghost, size: :sm) { "Image" } %>
+          <%= render UI::Tooltip.new do %>
+            <%= render UI::TooltipTrigger.new(as_child: true) do |attrs| %>
+              <%= render UI::Button.new(**attrs, variant: :ghost, size: :sm) { "Image" } %>
             <% end %>
-            <%= render UI::Tooltip::Content.new { "Insert image" } %>
+            <%= render UI::TooltipContent.new { "Insert image" } %>
           <% end %>
         </div>
       </div>
@@ -348,7 +348,7 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Status Indicators (ERB)</h3>
         <div class="flex items-center gap-4">
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip" do %>
             <%= render "ui/tooltip/trigger" do %>
               <div class="w-3 h-3 rounded-full bg-green-500 cursor-help"></div>
             <% end %>
@@ -357,7 +357,7 @@
             <% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip" do %>
             <%= render "ui/tooltip/trigger" do %>
               <div class="w-3 h-3 rounded-full bg-yellow-500 cursor-help"></div>
             <% end %>
@@ -366,7 +366,7 @@
             <% end %>
           <% end %>
 
-          <%= render "ui/tooltip/tooltip" do %>
+          <%= render "ui/tooltip" do %>
             <%= render "ui/tooltip/trigger" do %>
               <div class="w-3 h-3 rounded-full bg-red-500 cursor-help"></div>
             <% end %>

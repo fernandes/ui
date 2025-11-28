@@ -17,16 +17,16 @@
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="flex flex-col gap-3" role="radiogroup" id="plan-group">
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButton.new(id: "r1", name: "plan", value: "free", checked: true) %>
-          <%= render UI::Label::Label.new(for: "r1") { "Free Plan" } %>
+          <%= render UI::RadioButton.new(id: "r1", name: "plan", value: "free", checked: true) %>
+          <%= render UI::Label.new(for: "r1") { "Free Plan" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButton.new(id: "r2", name: "plan", value: "pro") %>
-          <%= render UI::Label::Label.new(for: "r2") { "Pro Plan" } %>
+          <%= render UI::RadioButton.new(id: "r2", name: "plan", value: "pro") %>
+          <%= render UI::Label.new(for: "r2") { "Pro Plan" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButton.new(id: "r3", name: "plan", value: "enterprise") %>
-          <%= render UI::Label::Label.new(for: "r3") { "Enterprise Plan" } %>
+          <%= render UI::RadioButton.new(id: "r3", name: "plan", value: "enterprise") %>
+          <%= render UI::Label.new(for: "r3") { "Enterprise Plan" } %>
         </div>
       </div>
     </section>
@@ -36,16 +36,16 @@
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="flex flex-col gap-3" role="radiogroup" id="size-group">
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButtonComponent.new(id: "vc-r1", name: "size", value: "small") %>
-          <%= render UI::Label::LabelComponent.new(for: "vc-r1") do %>Small<% end %>
+          <%= render UI::RadioButtonComponent.new(id: "vc-r1", name: "size", value: "small") %>
+          <%= render UI::LabelComponent.new(for: "vc-r1") do %>Small<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButtonComponent.new(id: "vc-r2", name: "size", value: "medium", checked: true) %>
-          <%= render UI::Label::LabelComponent.new(for: "vc-r2") do %>Medium (selected)<% end %>
+          <%= render UI::RadioButtonComponent.new(id: "vc-r2", name: "size", value: "medium", checked: true) %>
+          <%= render UI::LabelComponent.new(for: "vc-r2") do %>Medium (selected)<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButtonComponent.new(id: "vc-r3", name: "size", value: "large") %>
-          <%= render UI::Label::LabelComponent.new(for: "vc-r3") do %>Large<% end %>
+          <%= render UI::RadioButtonComponent.new(id: "vc-r3", name: "size", value: "large") %>
+          <%= render UI::LabelComponent.new(for: "vc-r3") do %>Large<% end %>
         </div>
       </div>
     </section>
@@ -55,16 +55,16 @@
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="flex flex-col gap-3" role="radiogroup" id="color-group">
         <div class="flex items-center space-x-2">
-          <%= render "ui/radio_button/radio_button", id: "erb-r1", name: "color", value: "red" %>
-          <%= render "ui/label/label", for: "erb-r1" do %>Red<% end %>
+          <%= render "ui/radio_button", id: "erb-r1", name: "color", value: "red" %>
+          <%= render "ui/label", for: "erb-r1" do %>Red<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render "ui/radio_button/radio_button", id: "erb-r2", name: "color", value: "green" %>
-          <%= render "ui/label/label", for: "erb-r2" do %>Green<% end %>
+          <%= render "ui/radio_button", id: "erb-r2", name: "color", value: "green" %>
+          <%= render "ui/label", for: "erb-r2" do %>Green<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render "ui/radio_button/radio_button", id: "erb-r3", name: "color", value: "blue", checked: true %>
-          <%= render "ui/label/label", for: "erb-r3" do %>Blue (selected)<% end %>
+          <%= render "ui/radio_button", id: "erb-r3", name: "color", value: "blue", checked: true %>
+          <%= render "ui/label", for: "erb-r3" do %>Blue (selected)<% end %>
         </div>
       </div>
     </section>
@@ -74,9 +74,9 @@
       <h2 class="text-2xl font-semibold">With Description (Phlex)</h2>
       <div class="space-y-4">
         <div class="flex items-start space-x-3">
-          <%= render UI::RadioButton::RadioButton.new(id: "plan-free", name: "subscription", value: "free", checked: true) %>
+          <%= render UI::RadioButton.new(id: "plan-free", name: "subscription", value: "free", checked: true) %>
           <div class="grid gap-1.5 leading-none">
-            <%= render UI::Label::Label.new(
+            <%= render UI::Label.new(
               for: "plan-free",
               classes: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             ) { "Free" } %>
@@ -86,18 +86,18 @@
           </div>
         </div>
         <div class="flex items-start space-x-3">
-          <%= render UI::RadioButton::RadioButton.new(id: "plan-pro", name: "subscription", value: "pro") %>
+          <%= render UI::RadioButton.new(id: "plan-pro", name: "subscription", value: "pro") %>
           <div class="grid gap-1.5 leading-none">
-            <%= render UI::Label::Label.new(for: "plan-pro") { "Pro" } %>
+            <%= render UI::Label.new(for: "plan-pro") { "Pro" } %>
             <p class="text-sm text-muted-foreground">
               $9/month with advanced features
             </p>
           </div>
         </div>
         <div class="flex items-start space-x-3">
-          <%= render UI::RadioButton::RadioButton.new(id: "plan-enterprise", name: "subscription", value: "enterprise") %>
+          <%= render UI::RadioButton.new(id: "plan-enterprise", name: "subscription", value: "enterprise") %>
           <div class="grid gap-1.5 leading-none">
-            <%= render UI::Label::Label.new(for: "plan-enterprise") { "Enterprise" } %>
+            <%= render UI::Label.new(for: "plan-enterprise") { "Enterprise" } %>
             <p class="text-sm text-muted-foreground">
               Custom pricing with dedicated support
             </p>
@@ -111,21 +111,21 @@
       <h2 class="text-2xl font-semibold">Card Selection (ViewComponent)</h2>
       <div class="grid gap-3 max-w-md">
         <label class="flex cursor-pointer items-center gap-3 rounded-lg border p-4 hover:bg-accent">
-          <%= render UI::RadioButton::RadioButtonComponent.new(id: "card-1", name: "payment", value: "visa", checked: true) %>
+          <%= render UI::RadioButtonComponent.new(id: "card-1", name: "payment", value: "visa", checked: true) %>
           <div class="flex-1">
             <div class="font-medium">Visa ending in 1234</div>
             <div class="text-sm text-muted-foreground">Expires 12/24</div>
           </div>
         </label>
         <label class="flex cursor-pointer items-center gap-3 rounded-lg border p-4 hover:bg-accent">
-          <%= render UI::RadioButton::RadioButtonComponent.new(id: "card-2", name: "payment", value: "mastercard") %>
+          <%= render UI::RadioButtonComponent.new(id: "card-2", name: "payment", value: "mastercard") %>
           <div class="flex-1">
             <div class="font-medium">Mastercard ending in 5678</div>
             <div class="text-sm text-muted-foreground">Expires 03/25</div>
           </div>
         </label>
         <label class="flex cursor-pointer items-center gap-3 rounded-lg border p-4 hover:bg-accent">
-          <%= render UI::RadioButton::RadioButtonComponent.new(id: "card-3", name: "payment", value: "amex") %>
+          <%= render UI::RadioButtonComponent.new(id: "card-3", name: "payment", value: "amex") %>
           <div class="flex-1">
             <div class="font-medium">Amex ending in 9012</div>
             <div class="text-sm text-muted-foreground">Expires 06/26</div>
@@ -139,16 +139,16 @@
       <h2 class="text-2xl font-semibold">Disabled State (ERB)</h2>
       <div class="flex flex-col gap-3" role="radiogroup" id="disabled-group">
         <div class="flex items-center space-x-2">
-          <%= render "ui/radio_button/radio_button", id: "disabled-1", name: "disabled-group", value: "1", checked: true %>
-          <%= render "ui/label/label", for: "disabled-1" do %>Option 1 (selected)<% end %>
+          <%= render "ui/radio_button", id: "disabled-1", name: "disabled-group", value: "1", checked: true %>
+          <%= render "ui/label", for: "disabled-1" do %>Option 1 (selected)<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render "ui/radio_button/radio_button", id: "disabled-2", name: "disabled-group", value: "2", disabled: true %>
-          <%= render "ui/label/label", for: "disabled-2" do %>Option 2 (disabled)<% end %>
+          <%= render "ui/radio_button", id: "disabled-2", name: "disabled-group", value: "2", disabled: true %>
+          <%= render "ui/label", for: "disabled-2" do %>Option 2 (disabled)<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render "ui/radio_button/radio_button", id: "disabled-3", name: "disabled-group", value: "3" %>
-          <%= render "ui/label/label", for: "disabled-3" do %>Option 3<% end %>
+          <%= render "ui/radio_button", id: "disabled-3", name: "disabled-group", value: "3" %>
+          <%= render "ui/label", for: "disabled-3" do %>Option 3<% end %>
         </div>
       </div>
     </section>
@@ -161,20 +161,20 @@
           <label class="text-sm font-medium">Select shipping method:</label>
           <div class="space-y-2">
             <div class="flex items-center space-x-2">
-              <%= render UI::RadioButton::RadioButton.new(id: "shipping-standard", name: "shipping", value: "standard", checked: true) %>
-              <%= render UI::Label::Label.new(for: "shipping-standard") { "Standard Shipping - Free" } %>
+              <%= render UI::RadioButton.new(id: "shipping-standard", name: "shipping", value: "standard", checked: true) %>
+              <%= render UI::Label.new(for: "shipping-standard") { "Standard Shipping - Free" } %>
             </div>
             <div class="flex items-center space-x-2">
-              <%= render UI::RadioButton::RadioButton.new(id: "shipping-express", name: "shipping", value: "express") %>
-              <%= render UI::Label::Label.new(for: "shipping-express") { "Express Shipping - $9.99" } %>
+              <%= render UI::RadioButton.new(id: "shipping-express", name: "shipping", value: "express") %>
+              <%= render UI::Label.new(for: "shipping-express") { "Express Shipping - $9.99" } %>
             </div>
             <div class="flex items-center space-x-2">
-              <%= render UI::RadioButton::RadioButton.new(id: "shipping-overnight", name: "shipping", value: "overnight") %>
-              <%= render UI::Label::Label.new(for: "shipping-overnight") { "Overnight Shipping - $19.99" } %>
+              <%= render UI::RadioButton.new(id: "shipping-overnight", name: "shipping", value: "overnight") %>
+              <%= render UI::Label.new(for: "shipping-overnight") { "Overnight Shipping - $19.99" } %>
             </div>
           </div>
         </div>
-        <%= render UI::Button::Button.new(type: "submit") { "Continue to Payment" } %>
+        <%= render UI::Button.new(type: "submit") { "Continue to Payment" } %>
       </form>
     </section>
 
@@ -184,16 +184,16 @@
       <p class="text-sm text-muted-foreground">Click the radio buttons to see the selection change</p>
       <div class="flex flex-wrap gap-8">
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButton.new(id: "demo-1", name: "demo", value: "option-a") %>
-          <%= render UI::Label::Label.new(for: "demo-1") { "Option A" } %>
+          <%= render UI::RadioButton.new(id: "demo-1", name: "demo", value: "option-a") %>
+          <%= render UI::Label.new(for: "demo-1") { "Option A" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButton.new(id: "demo-2", name: "demo", value: "option-b", checked: true) %>
-          <%= render UI::Label::Label.new(for: "demo-2") { "Option B" } %>
+          <%= render UI::RadioButton.new(id: "demo-2", name: "demo", value: "option-b", checked: true) %>
+          <%= render UI::Label.new(for: "demo-2") { "Option B" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::RadioButton::RadioButton.new(id: "demo-3", name: "demo", value: "option-c") %>
-          <%= render UI::Label::Label.new(for: "demo-3") { "Option C" } %>
+          <%= render UI::RadioButton.new(id: "demo-3", name: "demo", value: "option-c") %>
+          <%= render UI::Label.new(for: "demo-3") { "Option C" } %>
         </div>
       </div>
     </section>

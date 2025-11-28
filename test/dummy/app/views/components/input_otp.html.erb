@@ -15,7 +15,7 @@
       </p>
     </div>
     <div class="flex flex-col items-start gap-4">
-      <%= render "ui/input_otp/input_otp", length: 6, attributes: { id: "default-otp" } do %>
+      <%= render "ui/input_otp", length: 6, attributes: { id: "default-otp" } do %>
         <%= render "ui/input_otp/group" do %>
           <%= render "ui/input_otp/slot", index: 0 %>
           <%= render "ui/input_otp/slot", index: 1 %>
@@ -42,17 +42,17 @@
         OTP input with initial values set.
       </p>
     </div>
-    <%= render UI::InputOtp::InputOtp.new(length: 6, id: "prefilled-otp") do %>
-      <%= render UI::InputOtp::Group.new do %>
-        <%= render UI::InputOtp::Slot.new(index: 0, value: "1") %>
-        <%= render UI::InputOtp::Slot.new(index: 1, value: "2") %>
-        <%= render UI::InputOtp::Slot.new(index: 2, value: "3") %>
+    <%= render UI::InputOtp.new(length: 6, id: "prefilled-otp") do %>
+      <%= render UI::InputOtpGroup.new do %>
+        <%= render UI::InputOtpSlot.new(index: 0, value: "1") %>
+        <%= render UI::InputOtpSlot.new(index: 1, value: "2") %>
+        <%= render UI::InputOtpSlot.new(index: 2, value: "3") %>
       <% end %>
-      <%= render UI::InputOtp::Separator.new %>
-      <%= render UI::InputOtp::Group.new do %>
-        <%= render UI::InputOtp::Slot.new(index: 3, value: "4") %>
-        <%= render UI::InputOtp::Slot.new(index: 4, value: "5") %>
-        <%= render UI::InputOtp::Slot.new(index: 5, value: "6") %>
+      <%= render UI::InputOtpSeparator.new %>
+      <%= render UI::InputOtpGroup.new do %>
+        <%= render UI::InputOtpSlot.new(index: 3, value: "4") %>
+        <%= render UI::InputOtpSlot.new(index: 4, value: "5") %>
+        <%= render UI::InputOtpSlot.new(index: 5, value: "6") %>
       <% end %>
     <% end %>
   </div>
@@ -65,12 +65,12 @@
         Shorter PIN-style input without separator.
       </p>
     </div>
-    <%= render UI::InputOtp::InputOtpComponent.new(length: 4, id: "four-digit-otp") do %>
-      <%= render UI::InputOtp::GroupComponent.new do %>
-        <%= render UI::InputOtp::SlotComponent.new(index: 0) %>
-        <%= render UI::InputOtp::SlotComponent.new(index: 1) %>
-        <%= render UI::InputOtp::SlotComponent.new(index: 2) %>
-        <%= render UI::InputOtp::SlotComponent.new(index: 3) %>
+    <%= render UI::InputOtpComponent.new(length: 4, id: "four-digit-otp") do %>
+      <%= render UI::InputOtpGroupComponent.new do %>
+        <%= render UI::InputOtpSlotComponent.new(index: 0) %>
+        <%= render UI::InputOtpSlotComponent.new(index: 1) %>
+        <%= render UI::InputOtpSlotComponent.new(index: 2) %>
+        <%= render UI::InputOtpSlotComponent.new(index: 3) %>
       <% end %>
     <% end %>
   </div>
@@ -83,7 +83,7 @@
         Nine-digit OTP with three separate groups.
       </p>
     </div>
-    <%= render "ui/input_otp/input_otp", length: 9, attributes: { id: "three-groups-otp" } do %>
+    <%= render "ui/input_otp", length: 9, attributes: { id: "three-groups-otp" } do %>
       <%= render "ui/input_otp/group" do %>
         <%= render "ui/input_otp/slot", index: 0 %>
         <%= render "ui/input_otp/slot", index: 1 %>
@@ -112,14 +112,14 @@
         All slots in a single continuous group.
       </p>
     </div>
-    <%= render UI::InputOtp::InputOtp.new(length: 6, id: "no-separator-otp") do %>
-      <%= render UI::InputOtp::Group.new do %>
-        <%= render UI::InputOtp::Slot.new(index: 0) %>
-        <%= render UI::InputOtp::Slot.new(index: 1) %>
-        <%= render UI::InputOtp::Slot.new(index: 2) %>
-        <%= render UI::InputOtp::Slot.new(index: 3) %>
-        <%= render UI::InputOtp::Slot.new(index: 4) %>
-        <%= render UI::InputOtp::Slot.new(index: 5) %>
+    <%= render UI::InputOtp.new(length: 6, id: "no-separator-otp") do %>
+      <%= render UI::InputOtpGroup.new do %>
+        <%= render UI::InputOtpSlot.new(index: 0) %>
+        <%= render UI::InputOtpSlot.new(index: 1) %>
+        <%= render UI::InputOtpSlot.new(index: 2) %>
+        <%= render UI::InputOtpSlot.new(index: 3) %>
+        <%= render UI::InputOtpSlot.new(index: 4) %>
+        <%= render UI::InputOtpSlot.new(index: 5) %>
       <% end %>
     <% end %>
   </div>
@@ -133,19 +133,19 @@
       </p>
     </div>
     <div class="flex flex-col gap-2">
-      <%= render UI::Label::LabelComponent.new(content: "Verification Code", attributes: { for: "labeled-otp" }) %>
+      <%= render UI::LabelComponent.new(content: "Verification Code", attributes: { for: "labeled-otp" }) %>
       <div id="labeled-otp-wrapper">
-        <%= render UI::InputOtp::InputOtpComponent.new(length: 6, id: "labeled-otp") do %>
-          <%= render UI::InputOtp::GroupComponent.new do %>
-            <%= render UI::InputOtp::SlotComponent.new(index: 0) %>
-            <%= render UI::InputOtp::SlotComponent.new(index: 1) %>
-            <%= render UI::InputOtp::SlotComponent.new(index: 2) %>
+        <%= render UI::InputOtpComponent.new(length: 6, id: "labeled-otp") do %>
+          <%= render UI::InputOtpGroupComponent.new do %>
+            <%= render UI::InputOtpSlotComponent.new(index: 0) %>
+            <%= render UI::InputOtpSlotComponent.new(index: 1) %>
+            <%= render UI::InputOtpSlotComponent.new(index: 2) %>
           <% end %>
-          <%= render UI::InputOtp::SeparatorComponent.new %>
-          <%= render UI::InputOtp::GroupComponent.new do %>
-            <%= render UI::InputOtp::SlotComponent.new(index: 3) %>
-            <%= render UI::InputOtp::SlotComponent.new(index: 4) %>
-            <%= render UI::InputOtp::SlotComponent.new(index: 5) %>
+          <%= render UI::InputOtpSeparatorComponent.new %>
+          <%= render UI::InputOtpGroupComponent.new do %>
+            <%= render UI::InputOtpSlotComponent.new(index: 3) %>
+            <%= render UI::InputOtpSlotComponent.new(index: 4) %>
+            <%= render UI::InputOtpSlotComponent.new(index: 5) %>
           <% end %>
         <% end %>
       </div>
@@ -164,7 +164,7 @@
       </p>
     </div>
     <div class="flex flex-col items-start gap-4">
-      <%= render "ui/input_otp/input_otp", length: 6, pattern: "[A-Za-z0-9]", attributes: { id: "alphanumeric-otp" } do %>
+      <%= render "ui/input_otp", length: 6, pattern: "[A-Za-z0-9]", attributes: { id: "alphanumeric-otp" } do %>
         <%= render "ui/input_otp/group" do %>
           <%= render "ui/input_otp/slot", index: 0 %>
           <%= render "ui/input_otp/slot", index: 1 %>
@@ -191,17 +191,17 @@
         Shows how the component looks when disabled.
       </p>
     </div>
-    <%= render UI::InputOtp::InputOtp.new(length: 6, id: "disabled-otp") do %>
-      <%= render UI::InputOtp::Group.new do %>
-        <%= render UI::InputOtp::Slot.new(index: 0, value: "1", disabled: true) %>
-        <%= render UI::InputOtp::Slot.new(index: 1, value: "2", disabled: true) %>
-        <%= render UI::InputOtp::Slot.new(index: 2, value: "3", disabled: true) %>
+    <%= render UI::InputOtp.new(length: 6, id: "disabled-otp") do %>
+      <%= render UI::InputOtpGroup.new do %>
+        <%= render UI::InputOtpSlot.new(index: 0, value: "1", disabled: true) %>
+        <%= render UI::InputOtpSlot.new(index: 1, value: "2", disabled: true) %>
+        <%= render UI::InputOtpSlot.new(index: 2, value: "3", disabled: true) %>
       <% end %>
-      <%= render UI::InputOtp::Separator.new %>
-      <%= render UI::InputOtp::Group.new do %>
-        <%= render UI::InputOtp::Slot.new(index: 3, value: "4", disabled: true) %>
-        <%= render UI::InputOtp::Slot.new(index: 4, value: "5", disabled: true) %>
-        <%= render UI::InputOtp::Slot.new(index: 5, value: "6", disabled: true) %>
+      <%= render UI::InputOtpSeparator.new %>
+      <%= render UI::InputOtpGroup.new do %>
+        <%= render UI::InputOtpSlot.new(index: 3, value: "4", disabled: true) %>
+        <%= render UI::InputOtpSlot.new(index: 4, value: "5", disabled: true) %>
+        <%= render UI::InputOtpSlot.new(index: 5, value: "6", disabled: true) %>
       <% end %>
     <% end %>
   </div>
@@ -214,7 +214,7 @@
         Simple usage without manual slot composition. Automatically generates 6 input fields in a group.
       </p>
     </div>
-    <%= render UI::InputOtp::InputOtpComponent.new(length: 6, id: "auto-generated-otp") %>
+    <%= render UI::InputOtpComponent.new(length: 6, id: "auto-generated-otp") %>
     <p class="text-xs text-muted-foreground">
       When no block is provided, the component auto-generates slots wrapped in a group
     </p>
@@ -230,7 +230,7 @@
     </div>
     <div class="flex flex-col gap-4">
       <div data-controller="otp-demo" data-action="inputotp:complete->otp-demo#handleComplete">
-        <%= render "ui/input_otp/input_otp", length: 6, attributes: { id: "event-demo-otp" } do %>
+        <%= render "ui/input_otp", length: 6, attributes: { id: "event-demo-otp" } do %>
           <%= render "ui/input_otp/group" do %>
             <%= render "ui/input_otp/slot", index: 0 %>
             <%= render "ui/input_otp/slot", index: 1 %>

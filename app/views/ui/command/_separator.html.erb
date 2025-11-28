@@ -9,7 +9,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  extend UI::Command::SeparatorBehavior
+  extend UI::CommandSeparatorBehavior
   all_attributes = command_separator_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :div, nil, all_attributes %>

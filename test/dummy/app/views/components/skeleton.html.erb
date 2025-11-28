@@ -16,9 +16,9 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Skeletons (Phlex)</h2>
       <div class="flex flex-wrap items-center gap-4">
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-[20px] w-[100px] rounded-full") %>
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-[250px]") %>
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-12 w-12 rounded-full") %>
+        <%= render UI::Skeleton.new(classes: "h-[20px] w-[100px] rounded-full") %>
+        <%= render UI::Skeleton.new(classes: "h-4 w-[250px]") %>
+        <%= render UI::Skeleton.new(classes: "h-12 w-12 rounded-full") %>
       </div>
     </section>
 
@@ -26,10 +26,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Card Skeleton (ViewComponent)</h2>
       <div class="flex flex-col space-y-3 max-w-sm">
-        <%= render UI::Skeleton::SkeletonComponent.new(class: "h-[125px] w-[250px] rounded-xl") %>
+        <%= render UI::SkeletonComponent.new(class: "h-[125px] w-[250px] rounded-xl") %>
         <div class="space-y-2">
-          <%= render UI::Skeleton::SkeletonComponent.new(class: "h-4 w-[250px]") %>
-          <%= render UI::Skeleton::SkeletonComponent.new(class: "h-4 w-[200px]") %>
+          <%= render UI::SkeletonComponent.new(class: "h-4 w-[250px]") %>
+          <%= render UI::SkeletonComponent.new(class: "h-4 w-[200px]") %>
         </div>
       </div>
     </section>
@@ -38,10 +38,10 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">User Profile Skeleton (ERB)</h2>
       <div class="flex items-center space-x-4">
-        <%= render "ui/skeleton/skeleton", class: "h-12 w-12 rounded-full" %>
+        <%= render "ui/skeleton", class: "h-12 w-12 rounded-full" %>
         <div class="space-y-2">
-          <%= render "ui/skeleton/skeleton", class: "h-4 w-[250px]" %>
-          <%= render "ui/skeleton/skeleton", class: "h-4 w-[200px]" %>
+          <%= render "ui/skeleton", class: "h-4 w-[250px]" %>
+          <%= render "ui/skeleton", class: "h-4 w-[200px]" %>
         </div>
       </div>
     </section>
@@ -50,11 +50,11 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Table Skeleton (Phlex)</h2>
       <div class="space-y-2 max-w-lg">
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-full") %>
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-full") %>
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-3/4") %>
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-full") %>
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-2/3") %>
+        <%= render UI::Skeleton.new(classes: "h-4 w-full") %>
+        <%= render UI::Skeleton.new(classes: "h-4 w-full") %>
+        <%= render UI::Skeleton.new(classes: "h-4 w-3/4") %>
+        <%= render UI::Skeleton.new(classes: "h-4 w-full") %>
+        <%= render UI::Skeleton.new(classes: "h-4 w-2/3") %>
       </div>
     </section>
 
@@ -63,16 +63,16 @@
       <h2 class="text-2xl font-semibold">Different Shapes (Mixed)</h2>
       <div class="flex flex-wrap items-center gap-4">
         <!-- Circle -->
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-16 w-16 rounded-full") %>
+        <%= render UI::Skeleton.new(classes: "h-16 w-16 rounded-full") %>
 
         <!-- Square -->
-        <%= render UI::Skeleton::SkeletonComponent.new(class: "h-16 w-16") %>
+        <%= render UI::SkeletonComponent.new(class: "h-16 w-16") %>
 
         <!-- Rectangle -->
-        <%= render "ui/skeleton/skeleton", class: "h-16 w-32 rounded-lg" %>
+        <%= render "ui/skeleton", class: "h-16 w-32 rounded-lg" %>
 
         <!-- Wide rectangle -->
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-8 w-64 rounded-full") %>
+        <%= render UI::Skeleton.new(classes: "h-8 w-64 rounded-full") %>
       </div>
     </section>
 
@@ -81,25 +81,25 @@
       <h2 class="text-2xl font-semibold">Blog Post Skeleton (Phlex)</h2>
       <div class="space-y-4 max-w-2xl">
         <!-- Title -->
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-8 w-3/4") %>
+        <%= render UI::Skeleton.new(classes: "h-8 w-3/4") %>
 
         <!-- Meta -->
         <div class="flex items-center space-x-4">
-          <%= render UI::Skeleton::Skeleton.new(classes: "h-10 w-10 rounded-full") %>
+          <%= render UI::Skeleton.new(classes: "h-10 w-10 rounded-full") %>
           <div class="space-y-2 flex-1">
-            <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-[200px]") %>
-            <%= render UI::Skeleton::Skeleton.new(classes: "h-3 w-[150px]") %>
+            <%= render UI::Skeleton.new(classes: "h-4 w-[200px]") %>
+            <%= render UI::Skeleton.new(classes: "h-3 w-[150px]") %>
           </div>
         </div>
 
         <!-- Image -->
-        <%= render UI::Skeleton::Skeleton.new(classes: "h-64 w-full rounded-lg") %>
+        <%= render UI::Skeleton.new(classes: "h-64 w-full rounded-lg") %>
 
         <!-- Content -->
         <div class="space-y-2">
-          <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-full") %>
-          <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-full") %>
-          <%= render UI::Skeleton::Skeleton.new(classes: "h-4 w-3/4") %>
+          <%= render UI::Skeleton.new(classes: "h-4 w-full") %>
+          <%= render UI::Skeleton.new(classes: "h-4 w-full") %>
+          <%= render UI::Skeleton.new(classes: "h-4 w-3/4") %>
         </div>
       </div>
     </section>
@@ -110,9 +110,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <% 6.times do %>
           <div class="space-y-3">
-            <%= render UI::Skeleton::SkeletonComponent.new(class: "h-48 w-full rounded-lg") %>
-            <%= render UI::Skeleton::SkeletonComponent.new(class: "h-4 w-3/4") %>
-            <%= render UI::Skeleton::SkeletonComponent.new(class: "h-4 w-1/2") %>
+            <%= render UI::SkeletonComponent.new(class: "h-48 w-full rounded-lg") %>
+            <%= render UI::SkeletonComponent.new(class: "h-4 w-3/4") %>
+            <%= render UI::SkeletonComponent.new(class: "h-4 w-1/2") %>
           </div>
         <% end %>
       </div>

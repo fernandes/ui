@@ -20,8 +20,8 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Label with Input</h3>
         <div class="space-y-2 max-w-sm">
-          <%= render UI::Label::Label.new(for_id: "email-phlex") { "Email address" } %>
-          <%= render UI::Input::Input.new(type: "email", id: "email-phlex", placeholder: "john@example.com") %>
+          <%= render UI::Label.new(for_id: "email-phlex") { "Email address" } %>
+          <%= render UI::Input.new(type: "email", id: "email-phlex", placeholder: "john@example.com") %>
         </div>
       </div>
 
@@ -29,8 +29,8 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Label with Checkbox</h3>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "terms-phlex", name: "terms", value: "accepted") %>
-          <%= render UI::Label::Label.new(for_id: "terms-phlex", classes: "cursor-pointer") { "Accept terms and conditions" } %>
+          <%= render UI::Checkbox.new(id: "terms-phlex", name: "terms", value: "accepted") %>
+          <%= render UI::Label.new(for_id: "terms-phlex", classes: "cursor-pointer") { "Accept terms and conditions" } %>
         </div>
       </div>
 
@@ -39,12 +39,12 @@
         <h3 class="text-sm font-medium text-muted-foreground">Label with Radio Buttons</h3>
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
-            <%= render UI::RadioButton::RadioButton.new(id: "option1-phlex", name: "options-phlex", value: "1") %>
-            <%= render UI::Label::Label.new(for_id: "option1-phlex", classes: "cursor-pointer") { "Option 1" } %>
+            <%= render UI::RadioButton.new(id: "option1-phlex", name: "options-phlex", value: "1") %>
+            <%= render UI::Label.new(for_id: "option1-phlex", classes: "cursor-pointer") { "Option 1" } %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render UI::RadioButton::RadioButton.new(id: "option2-phlex", name: "options-phlex", value: "2") %>
-            <%= render UI::Label::Label.new(for_id: "option2-phlex", classes: "cursor-pointer") { "Option 2" } %>
+            <%= render UI::RadioButton.new(id: "option2-phlex", name: "options-phlex", value: "2") %>
+            <%= render UI::Label.new(for_id: "option2-phlex", classes: "cursor-pointer") { "Option 2" } %>
           </div>
         </div>
       </div>
@@ -53,8 +53,8 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Label with Custom Styling</h3>
         <div class="space-y-2 max-w-sm">
-          <%= render UI::Label::Label.new(for_id: "password-phlex", classes: "text-destructive font-bold") { "Password (required)" } %>
-          <%= render UI::Input::Input.new(type: "password", id: "password-phlex") %>
+          <%= render UI::Label.new(for_id: "password-phlex", classes: "text-destructive font-bold") { "Password (required)" } %>
+          <%= render UI::Input.new(type: "password", id: "password-phlex") %>
         </div>
       </div>
 
@@ -62,8 +62,8 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Label with Disabled Input</h3>
         <div class="space-y-2 max-w-sm">
-          <%= render UI::Label::Label.new(for_id: "disabled-phlex", classes: "peer-disabled:cursor-not-allowed peer-disabled:opacity-70") { "Disabled field" } %>
-          <%= render UI::Input::Input.new(type: "text", id: "disabled-phlex", value: "Cannot edit", readonly: true) %>
+          <%= render UI::Label.new(for_id: "disabled-phlex", classes: "peer-disabled:cursor-not-allowed peer-disabled:opacity-70") { "Disabled field" } %>
+          <%= render UI::Input.new(type: "text", id: "disabled-phlex", value: "Cannot edit", readonly: true) %>
         </div>
       </div>
     </section>
@@ -76,8 +76,8 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Label with Input</h3>
         <div class="space-y-2 max-w-sm">
-          <%= render "ui/label/label", for_id: "username-erb", content: "Username" %>
-          <%= render "ui/input/input", type: "text", id: "username-erb", placeholder: "johndoe" %>
+          <%= render "ui/label", for_id: "username-erb", content: "Username" %>
+          <%= render "ui/input", type: "text", id: "username-erb", placeholder: "johndoe" %>
         </div>
       </div>
 
@@ -85,8 +85,8 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Label with Checkbox</h3>
         <div class="flex items-center space-x-2">
-          <%= render "ui/checkbox/checkbox", id: "newsletter-erb", name: "newsletter", value: "yes" %>
-          <%= render "ui/label/label", for_id: "newsletter-erb", classes: "cursor-pointer", content: "Subscribe to newsletter" %>
+          <%= render "ui/checkbox", id: "newsletter-erb", name: "newsletter", value: "yes" %>
+          <%= render "ui/label", for_id: "newsletter-erb", classes: "cursor-pointer", content: "Subscribe to newsletter" %>
         </div>
       </div>
 
@@ -94,10 +94,10 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Label with Required Indicator</h3>
         <div class="space-y-2 max-w-sm">
-          <%= render "ui/label/label", for_id: "email-required-erb" do %>
+          <%= render "ui/label", for_id: "email-required-erb" do %>
             Email <span class="text-destructive">*</span>
           <% end %>
-          <%= render "ui/input/input", type: "email", id: "email-required-erb", placeholder: "john@example.com" %>
+          <%= render "ui/input", type: "email", id: "email-required-erb", placeholder: "john@example.com" %>
         </div>
       </div>
     </section>
@@ -110,10 +110,10 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Basic Label with Input</h3>
         <div class="space-y-2 max-w-sm">
-          <%= render UI::Label::LabelComponent.new(for_id: "phone-vc") do %>
+          <%= render UI::LabelComponent.new(for_id: "phone-vc") do %>
             Phone number
           <% end %>
-          <%= render UI::Input::InputComponent.new(type: "tel", id: "phone-vc", placeholder: "+1 (555) 000-0000") %>
+          <%= render UI::InputComponent.new(type: "tel", id: "phone-vc", placeholder: "+1 (555) 000-0000") %>
         </div>
       </div>
 
@@ -122,16 +122,16 @@
         <h3 class="text-sm font-medium text-muted-foreground">Label with Radio Buttons</h3>
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
-            <%= render UI::RadioButton::RadioButtonComponent.new(id: "size-small-vc", name: "size-vc", value: "small") %>
-            <%= render UI::Label::LabelComponent.new(for_id: "size-small-vc", classes: "cursor-pointer") do %>Small<% end %>
+            <%= render UI::RadioButtonComponent.new(id: "size-small-vc", name: "size-vc", value: "small") %>
+            <%= render UI::LabelComponent.new(for_id: "size-small-vc", classes: "cursor-pointer") do %>Small<% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render UI::RadioButton::RadioButtonComponent.new(id: "size-medium-vc", name: "size-vc", value: "medium") %>
-            <%= render UI::Label::LabelComponent.new(for_id: "size-medium-vc", classes: "cursor-pointer") do %>Medium<% end %>
+            <%= render UI::RadioButtonComponent.new(id: "size-medium-vc", name: "size-vc", value: "medium") %>
+            <%= render UI::LabelComponent.new(for_id: "size-medium-vc", classes: "cursor-pointer") do %>Medium<% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render UI::RadioButton::RadioButtonComponent.new(id: "size-large-vc", name: "size-vc", value: "large") %>
-            <%= render UI::Label::LabelComponent.new(for_id: "size-large-vc", classes: "cursor-pointer") do %>Large<% end %>
+            <%= render UI::RadioButtonComponent.new(id: "size-large-vc", name: "size-vc", value: "large") %>
+            <%= render UI::LabelComponent.new(for_id: "size-large-vc", classes: "cursor-pointer") do %>Large<% end %>
           </div>
         </div>
       </div>
@@ -140,10 +140,10 @@
       <div class="space-y-2">
         <h3 class="text-sm font-medium text-muted-foreground">Label with Helper Text</h3>
         <div class="space-y-1 max-w-sm">
-          <%= render UI::Label::LabelComponent.new(for_id: "password-vc") do %>
+          <%= render UI::LabelComponent.new(for_id: "password-vc") do %>
             Password
           <% end %>
-          <%= render UI::Input::InputComponent.new(type: "password", id: "password-vc") %>
+          <%= render UI::InputComponent.new(type: "password", id: "password-vc") %>
           <p class="text-sm text-muted-foreground">Must be at least 8 characters</p>
         </div>
       </div>

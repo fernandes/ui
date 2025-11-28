@@ -15,17 +15,17 @@
     <!-- Basic Card - Phlex -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Card (Phlex)</h2>
-      <%= render UI::Card::Card.new do %>
-        <%= render UI::Card::Header.new do %>
-          <%= render UI::Card::Title.new { "Card Title" } %>
-          <%= render UI::Card::Description.new { "Card description goes here." } %>
+      <%= render UI::Card.new do %>
+        <%= render UI::CardHeader.new do %>
+          <%= render UI::CardTitle.new { "Card Title" } %>
+          <%= render UI::CardDescription.new { "Card description goes here." } %>
         <% end %>
-        <%= render UI::Card::Content.new do %>
+        <%= render UI::CardContent.new do %>
           <p>Card content goes here. You can add any content you need.</p>
         <% end %>
-        <%= render UI::Card::Footer.new do %>
-          <%= render UI::Button::Button.new(variant: :outline) { "Cancel" } %>
-          <%= render UI::Button::Button.new { "Submit" } %>
+        <%= render UI::CardFooter.new do %>
+          <%= render UI::Button.new(variant: :outline) { "Cancel" } %>
+          <%= render UI::Button.new { "Submit" } %>
         <% end %>
       <% end %>
     </section>
@@ -33,17 +33,17 @@
     <!-- Basic Card - ViewComponent -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Card (ViewComponent)</h2>
-      <%= render(UI::Card::CardComponent.new) do %>
-        <%= render(UI::Card::HeaderComponent.new) do %>
-          <%= render(UI::Card::TitleComponent.new) { "Card Title" } %>
-          <%= render(UI::Card::DescriptionComponent.new) { "Card description goes here." } %>
+      <%= render(UI::CardComponent.new) do %>
+        <%= render(UI::CardHeaderComponent.new) do %>
+          <%= render(UI::CardTitleComponent.new) { "Card Title" } %>
+          <%= render(UI::CardDescriptionComponent.new) { "Card description goes here." } %>
         <% end %>
-        <%= render(UI::Card::ContentComponent.new) do %>
+        <%= render(UI::CardContentComponent.new) do %>
           <p>Card content goes here. You can add any content you need.</p>
         <% end %>
-        <%= render(UI::Card::FooterComponent.new) do %>
-          <%= render(UI::Button::ButtonComponent.new(variant: :outline)) { "Cancel" } %>
-          <%= render(UI::Button::ButtonComponent.new) { "Submit" } %>
+        <%= render(UI::CardFooterComponent.new) do %>
+          <%= render(UI::ButtonComponent.new(variant: :outline)) { "Cancel" } %>
+          <%= render(UI::ButtonComponent.new) { "Submit" } %>
         <% end %>
       <% end %>
     </section>
@@ -51,7 +51,7 @@
     <!-- Basic Card - ERB -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Basic Card (ERB)</h2>
-      <%= render "ui/card/card" do %>
+      <%= render "ui/card" do %>
         <%= render "ui/card/header" do %>
           <%= render "ui/card/title", content: "Card Title" %>
           <%= render "ui/card/description", content: "Card description goes here." %>
@@ -70,30 +70,30 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Login Card Example</h2>
       <div class="max-w-sm">
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new do %>
-            <%= render UI::Card::Title.new { "Login to your account" } %>
-            <%= render UI::Card::Description.new { "Enter your email and password to login." } %>
-            <%= render UI::Card::Action.new do %>
-              <%= render UI::Button::Button.new(variant: :link, classes: "text-sm") { "Sign up" } %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new do %>
+            <%= render UI::CardTitle.new { "Login to your account" } %>
+            <%= render UI::CardDescription.new { "Enter your email and password to login." } %>
+            <%= render UI::CardAction.new do %>
+              <%= render UI::Button.new(variant: :link, classes: "text-sm") { "Sign up" } %>
             <% end %>
           <% end %>
-          <%= render UI::Card::Content.new do %>
+          <%= render UI::CardContent.new do %>
             <div class="space-y-4">
-              <%= render UI::Label::Label.new(for: "email") { "Email" } %>
-              <%= render UI::Input::Input.new(type: "email", id: "email", placeholder: "m@example.com") %>
+              <%= render UI::Label.new(for: "email") { "Email" } %>
+              <%= render UI::Input.new(type: "email", id: "email", placeholder: "m@example.com") %>
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                  <%= render UI::Label::Label.new(for: "password") { "Password" } %>
-                  <%= render UI::Button::Button.new(variant: :link, classes: "px-0 h-auto text-sm text-muted-foreground") { "Forgot your password?" } %>
+                  <%= render UI::Label.new(for: "password") { "Password" } %>
+                  <%= render UI::Button.new(variant: :link, classes: "px-0 h-auto text-sm text-muted-foreground") { "Forgot your password?" } %>
                 </div>
-                <%= render UI::Input::Input.new(type: "password", id: "password") %>
+                <%= render UI::Input.new(type: "password", id: "password") %>
               </div>
             </div>
           <% end %>
-          <%= render UI::Card::Footer.new(classes: "flex-col gap-2") do %>
-            <%= render UI::Button::Button.new(classes: "w-full") { "Login" } %>
-            <%= render UI::Button::Button.new(variant: :outline, classes: "w-full") do %>
+          <%= render UI::CardFooter.new(classes: "flex-col gap-2") do %>
+            <%= render UI::Button.new(classes: "w-full") { "Login" } %>
+            <%= render UI::Button.new(variant: :outline, classes: "w-full") do %>
               <%= lucide_icon("mail") %>
               Login with Google
             <% end %>
@@ -106,12 +106,12 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Notification Card</h2>
       <div class="max-w-sm">
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new do %>
-            <%= render UI::Card::Title.new { "Notifications" } %>
-            <%= render UI::Card::Description.new { "You have 3 unread messages." } %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new do %>
+            <%= render UI::CardTitle.new { "Notifications" } %>
+            <%= render UI::CardDescription.new { "You have 3 unread messages." } %>
           <% end %>
-          <%= render UI::Card::Content.new do %>
+          <%= render UI::CardContent.new do %>
             <div class="space-y-4">
               <div class="flex items-start gap-4">
                 <span class="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"></span>
@@ -136,8 +136,8 @@
               </div>
             </div>
           <% end %>
-          <%= render UI::Card::Footer.new do %>
-            <%= render UI::Button::Button.new(classes: "w-full") do %>
+          <%= render UI::CardFooter.new do %>
+            <%= render UI::Button.new(classes: "w-full") do %>
               <%= lucide_icon("check") %>
               Mark all as read
             <% end %>
@@ -150,32 +150,32 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Stats Cards</h2>
       <div class="grid gap-4 md:grid-cols-3">
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new do %>
-            <%= render UI::Card::Description.new { "Total Revenue" } %>
-            <%= render UI::Card::Title.new(classes: "text-2xl") { "$45,231.89" } %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new do %>
+            <%= render UI::CardDescription.new { "Total Revenue" } %>
+            <%= render UI::CardTitle.new(classes: "text-2xl") { "$45,231.89" } %>
           <% end %>
-          <%= render UI::Card::Content.new do %>
+          <%= render UI::CardContent.new do %>
             <p class="text-xs text-muted-foreground">+20.1% from last month</p>
           <% end %>
         <% end %>
 
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new do %>
-            <%= render UI::Card::Description.new { "Subscriptions" } %>
-            <%= render UI::Card::Title.new(classes: "text-2xl") { "+2350" } %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new do %>
+            <%= render UI::CardDescription.new { "Subscriptions" } %>
+            <%= render UI::CardTitle.new(classes: "text-2xl") { "+2350" } %>
           <% end %>
-          <%= render UI::Card::Content.new do %>
+          <%= render UI::CardContent.new do %>
             <p class="text-xs text-muted-foreground">+180.1% from last month</p>
           <% end %>
         <% end %>
 
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new do %>
-            <%= render UI::Card::Description.new { "Active Now" } %>
-            <%= render UI::Card::Title.new(classes: "text-2xl") { "+573" } %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new do %>
+            <%= render UI::CardDescription.new { "Active Now" } %>
+            <%= render UI::CardTitle.new(classes: "text-2xl") { "+573" } %>
           <% end %>
-          <%= render UI::Card::Content.new do %>
+          <%= render UI::CardContent.new do %>
             <p class="text-xs text-muted-foreground">+201 since last hour</p>
           <% end %>
         <% end %>
@@ -186,38 +186,38 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Card with Action</h2>
       <div class="max-w-md">
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new do %>
-            <%= render UI::Card::Title.new { "Team Settings" } %>
-            <%= render UI::Card::Description.new { "Manage your team members and their permissions." } %>
-            <%= render UI::Card::Action.new do %>
-              <%= render UI::Button::Button.new(variant: :ghost, size: :icon) do %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new do %>
+            <%= render UI::CardTitle.new { "Team Settings" } %>
+            <%= render UI::CardDescription.new { "Manage your team members and their permissions." } %>
+            <%= render UI::CardAction.new do %>
+              <%= render UI::Button.new(variant: :ghost, size: :icon) do %>
                 <%= lucide_icon("ellipsis") %>
               <% end %>
             <% end %>
           <% end %>
-          <%= render UI::Card::Content.new do %>
+          <%= render UI::CardContent.new do %>
             <div class="space-y-4">
               <div class="flex items-center gap-4">
-                <%= render UI::Avatar::Avatar.new do %>
-                  <%= render UI::Avatar::Image.new(src: "https://github.com/shadcn.png", alt: "shadcn") %>
-                  <%= render UI::Avatar::Fallback.new { "SC" } %>
+                <%= render UI::Avatar.new do %>
+                  <%= render UI::AvatarImage.new(src: "https://github.com/shadcn.png", alt: "shadcn") %>
+                  <%= render UI::AvatarFallback.new { "SC" } %>
                 <% end %>
                 <div class="flex-1">
                   <p class="text-sm font-medium">Sofia Davis</p>
                   <p class="text-sm text-muted-foreground">sofia@example.com</p>
                 </div>
-                <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Remove" } %>
+                <%= render UI::Button.new(variant: :outline, size: :sm) { "Remove" } %>
               </div>
               <div class="flex items-center gap-4">
-                <%= render UI::Avatar::Avatar.new do %>
-                  <%= render UI::Avatar::Fallback.new { "JD" } %>
+                <%= render UI::Avatar.new do %>
+                  <%= render UI::AvatarFallback.new { "JD" } %>
                 <% end %>
                 <div class="flex-1">
                   <p class="text-sm font-medium">John Doe</p>
                   <p class="text-sm text-muted-foreground">john@example.com</p>
                 </div>
-                <%= render UI::Button::Button.new(variant: :outline, size: :sm) { "Remove" } %>
+                <%= render UI::Button.new(variant: :outline, size: :sm) { "Remove" } %>
               </div>
             </div>
           <% end %>
@@ -229,12 +229,12 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Card with Border Header</h2>
       <div class="max-w-md">
-        <%= render UI::Card::Card.new do %>
-          <%= render UI::Card::Header.new(classes: "border-b") do %>
-            <%= render UI::Card::Title.new { "Payment Method" } %>
-            <%= render UI::Card::Description.new { "Add a new payment method to your account." } %>
+        <%= render UI::Card.new do %>
+          <%= render UI::CardHeader.new(classes: "border-b") do %>
+            <%= render UI::CardTitle.new { "Payment Method" } %>
+            <%= render UI::CardDescription.new { "Add a new payment method to your account." } %>
           <% end %>
-          <%= render UI::Card::Content.new(classes: "pt-6") do %>
+          <%= render UI::CardContent.new(classes: "pt-6") do %>
             <div class="grid gap-4">
               <div class="flex items-center gap-4 p-4 border rounded-lg">
                 <%= lucide_icon("credit-card") %>
@@ -252,8 +252,8 @@
               </div>
             </div>
           <% end %>
-          <%= render UI::Card::Footer.new(classes: "border-t pt-6") do %>
-            <%= render UI::Button::Button.new(classes: "w-full") { "Continue" } %>
+          <%= render UI::CardFooter.new(classes: "border-t pt-6") do %>
+            <%= render UI::Button.new(classes: "w-full") { "Continue" } %>
           <% end %>
         <% end %>
       </div>

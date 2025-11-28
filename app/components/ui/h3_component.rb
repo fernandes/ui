@@ -8,7 +8,7 @@ module UI
     end
 
     def call
-      extend UI::Typography::H3Behavior
+      extend UI::H3Behavior
       attrs = h3_html_attributes
       content_tag :h3, **attrs.merge(@attributes) do
         content

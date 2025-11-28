@@ -9,22 +9,22 @@ class SheetTest < UI::SystemTestCase
 
   # Helper to get the default ERB sheet by ID
   def default_sheet
-    find_element(UI::Testing::SheetElement, "#erb-default-sheet")
+    find_element(UI::TestingSheetElement, "#erb-default-sheet")
   end
 
   # Helper to get a side-specific ERB sheet by ID
   def sheet_by_side(side)
-    find_element(UI::Testing::SheetElement, "#erb-sheet-#{side}")
+    find_element(UI::TestingSheetElement, "#erb-sheet-#{side}")
   end
 
   # Helper to get the custom width sheet
   def wide_sheet
-    find_element(UI::Testing::SheetElement, "#erb-wide-sheet")
+    find_element(UI::TestingSheetElement, "#erb-wide-sheet")
   end
 
   # Helper to get the no-close-button sheet
   def no_close_button_sheet
-    find_element(UI::Testing::SheetElement, "#erb-no-close-button-sheet")
+    find_element(UI::TestingSheetElement, "#erb-no-close-button-sheet")
   end
 
   # === Basic Interaction Tests ===

@@ -17,16 +17,16 @@
       <h2 class="text-2xl font-semibold">Phlex Implementation</h2>
       <div class="flex flex-col gap-4">
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "checkbox-1", name: "terms", value: "accepted") %>
-          <%= render UI::Label::Label.new(for: "checkbox-1") { "Accept terms and conditions" } %>
+          <%= render UI::Checkbox.new(id: "checkbox-1", name: "terms", value: "accepted") %>
+          <%= render UI::Label.new(for: "checkbox-1") { "Accept terms and conditions" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "checkbox-2", name: "subscribe", value: "yes", checked: true) %>
-          <%= render UI::Label::Label.new(for: "checkbox-2") { "Subscribe to newsletter (checked)" } %>
+          <%= render UI::Checkbox.new(id: "checkbox-2", name: "subscribe", value: "yes", checked: true) %>
+          <%= render UI::Label.new(for: "checkbox-2") { "Subscribe to newsletter (checked)" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "checkbox-3", name: "disabled", value: "yes", disabled: true) %>
-          <%= render UI::Label::Label.new(for: "checkbox-3") { "Disabled checkbox" } %>
+          <%= render UI::Checkbox.new(id: "checkbox-3", name: "disabled", value: "yes", disabled: true) %>
+          <%= render UI::Label.new(for: "checkbox-3") { "Disabled checkbox" } %>
         </div>
       </div>
     </section>
@@ -36,16 +36,16 @@
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>
       <div class="flex flex-col gap-4">
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::CheckboxComponent.new(id: "vc-1", name: "option1", value: "1") %>
-          <%= render UI::Label::LabelComponent.new(for: "vc-1") do %>Option 1<% end %>
+          <%= render UI::CheckboxComponent.new(id: "vc-1", name: "option1", value: "1") %>
+          <%= render UI::LabelComponent.new(for: "vc-1") do %>Option 1<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::CheckboxComponent.new(id: "vc-2", name: "option2", value: "2", checked: true) %>
-          <%= render UI::Label::LabelComponent.new(for: "vc-2") do %>Option 2 (checked)<% end %>
+          <%= render UI::CheckboxComponent.new(id: "vc-2", name: "option2", value: "2", checked: true) %>
+          <%= render UI::LabelComponent.new(for: "vc-2") do %>Option 2 (checked)<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::CheckboxComponent.new(id: "vc-3", name: "option3", value: "3") %>
-          <%= render UI::Label::LabelComponent.new(for: "vc-3") do %>Option 3<% end %>
+          <%= render UI::CheckboxComponent.new(id: "vc-3", name: "option3", value: "3") %>
+          <%= render UI::LabelComponent.new(for: "vc-3") do %>Option 3<% end %>
         </div>
       </div>
     </section>
@@ -55,16 +55,16 @@
       <h2 class="text-2xl font-semibold">ERB Partial Implementation</h2>
       <div class="flex flex-col gap-4">
         <div class="flex items-center space-x-2">
-          <%= render "ui/checkbox/checkbox", id: "basic-checkbox", name: "terms", value: "accepted" %>
-          <%= render "ui/label/label", for: "basic-checkbox" do %>Accept terms and conditions<% end %>
+          <%= render "ui/checkbox", id: "basic-checkbox", name: "terms", value: "accepted" %>
+          <%= render "ui/label", for: "basic-checkbox" do %>Accept terms and conditions<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render "ui/checkbox/checkbox", id: "checked-checkbox", name: "subscribe", value: "yes", checked: true %>
-          <%= render "ui/label/label", for: "checked-checkbox" do %>Subscribe to newsletter (checked)<% end %>
+          <%= render "ui/checkbox", id: "checked-checkbox", name: "subscribe", value: "yes", checked: true %>
+          <%= render "ui/label", for: "checked-checkbox" do %>Subscribe to newsletter (checked)<% end %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render "ui/checkbox/checkbox", id: "disabled-checkbox", name: "disabled", value: "yes", disabled: true %>
-          <%= render "ui/label/label", for: "disabled-checkbox" do %>Disabled checkbox<% end %>
+          <%= render "ui/checkbox", id: "disabled-checkbox", name: "disabled", value: "yes", disabled: true %>
+          <%= render "ui/label", for: "disabled-checkbox" do %>Disabled checkbox<% end %>
         </div>
       </div>
     </section>
@@ -73,9 +73,9 @@
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">With Description (Phlex)</h2>
       <div class="items-top flex space-x-2">
-        <%= render UI::Checkbox::Checkbox.new(id: "terms-desc", name: "terms", value: "accepted") %>
+        <%= render UI::Checkbox.new(id: "terms-desc", name: "terms", value: "accepted") %>
         <div class="grid gap-1.5 leading-none">
-          <%= render UI::Label::Label.new(
+          <%= render UI::Label.new(
             for: "terms-desc",
             classes: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           ) { "Accept terms and conditions" } %>
@@ -93,20 +93,20 @@
         <label class="text-sm font-medium">Select your interests:</label>
         <div class="space-y-2">
           <div class="flex items-center space-x-2">
-            <%= render UI::Checkbox::CheckboxComponent.new(id: "interest-technology", name: "interests[]", value: "technology") %>
-            <%= render UI::Label::LabelComponent.new(for: "interest-technology") do %>Technology<% end %>
+            <%= render UI::CheckboxComponent.new(id: "interest-technology", name: "interests[]", value: "technology") %>
+            <%= render UI::LabelComponent.new(for: "interest-technology") do %>Technology<% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render UI::Checkbox::CheckboxComponent.new(id: "interest-design", name: "interests[]", value: "design") %>
-            <%= render UI::Label::LabelComponent.new(for: "interest-design") do %>Design<% end %>
+            <%= render UI::CheckboxComponent.new(id: "interest-design", name: "interests[]", value: "design") %>
+            <%= render UI::LabelComponent.new(for: "interest-design") do %>Design<% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render UI::Checkbox::CheckboxComponent.new(id: "interest-3", name: "interests[]", value: "marketing") %>
-            <%= render UI::Label::LabelComponent.new(for: "interest-3") do %>Marketing<% end %>
+            <%= render UI::CheckboxComponent.new(id: "interest-3", name: "interests[]", value: "marketing") %>
+            <%= render UI::LabelComponent.new(for: "interest-3") do %>Marketing<% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render UI::Checkbox::CheckboxComponent.new(id: "interest-4", name: "interests[]", value: "sales") %>
-            <%= render UI::Label::LabelComponent.new(for: "interest-4") do %>Sales<% end %>
+            <%= render UI::CheckboxComponent.new(id: "interest-4", name: "interests[]", value: "sales") %>
+            <%= render UI::LabelComponent.new(for: "interest-4") do %>Sales<% end %>
           </div>
         </div>
       </div>
@@ -118,25 +118,25 @@
       <form class="space-y-6 max-w-md">
         <div class="space-y-4">
           <div class="flex items-center space-x-2">
-            <%= render "ui/checkbox/checkbox", id: "form-newsletter", name: "user[newsletter]", value: "1" %>
-            <%= render "ui/label/label", for: "form-newsletter" do %>
+            <%= render "ui/checkbox", id: "form-newsletter", name: "user[newsletter]", value: "1" %>
+            <%= render "ui/label", for: "form-newsletter" do %>
               Send me newsletter updates
             <% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render "ui/checkbox/checkbox", id: "form-marketing", name: "user[marketing]", value: "1" %>
-            <%= render "ui/label/label", for: "form-marketing" do %>
+            <%= render "ui/checkbox", id: "form-marketing", name: "user[marketing]", value: "1" %>
+            <%= render "ui/label", for: "form-marketing" do %>
               Send me marketing emails
             <% end %>
           </div>
           <div class="flex items-center space-x-2">
-            <%= render "ui/checkbox/checkbox", id: "form-updates", name: "user[updates]", value: "1", checked: true %>
-            <%= render "ui/label/label", for: "form-updates" do %>
+            <%= render "ui/checkbox", id: "form-updates", name: "user[updates]", value: "1", checked: true %>
+            <%= render "ui/label", for: "form-updates" do %>
               Send me product updates
             <% end %>
           </div>
         </div>
-        <%= render UI::Button::Button.new(type: "submit") { "Save Preferences" } %>
+        <%= render UI::Button.new(type: "submit") { "Save Preferences" } %>
       </form>
     </section>
 
@@ -146,16 +146,16 @@
       <p class="text-sm text-muted-foreground">Click the checkboxes to see the state change animation</p>
       <div class="flex flex-wrap gap-8">
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "demo-1", name: "demo", value: "1") %>
-          <%= render UI::Label::Label.new(for: "demo-1") { "Option A" } %>
+          <%= render UI::Checkbox.new(id: "demo-1", name: "demo", value: "1") %>
+          <%= render UI::Label.new(for: "demo-1") { "Option A" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "demo-2", name: "demo", value: "2") %>
-          <%= render UI::Label::Label.new(for: "demo-2") { "Option B" } %>
+          <%= render UI::Checkbox.new(id: "demo-2", name: "demo", value: "2") %>
+          <%= render UI::Label.new(for: "demo-2") { "Option B" } %>
         </div>
         <div class="flex items-center space-x-2">
-          <%= render UI::Checkbox::Checkbox.new(id: "demo-3", name: "demo", value: "3") %>
-          <%= render UI::Label::Label.new(for: "demo-3") { "Option C" } %>
+          <%= render UI::Checkbox.new(id: "demo-3", name: "demo", value: "3") %>
+          <%= render UI::Label.new(for: "demo-3") { "Option C" } %>
         </div>
       </div>
     </section>

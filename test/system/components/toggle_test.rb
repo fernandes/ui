@@ -9,42 +9,42 @@ class ToggleTest < UI::SystemTestCase
 
   # Helper to get the default toggle (Phlex, released by default)
   def default_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-default")
+    find_element(UI::TestingToggleElement, "#phlex-default")
   end
 
   # Helper to get the outline toggle (Phlex, released by default)
   def outline_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-outline")
+    find_element(UI::TestingToggleElement, "#phlex-outline")
   end
 
   # Helper to get the pressed toggle (Phlex, pressed by default)
   def pressed_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-pressed")
+    find_element(UI::TestingToggleElement, "#phlex-pressed")
   end
 
   # Helper to get the small size toggle (Phlex)
   def small_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-size-sm")
+    find_element(UI::TestingToggleElement, "#phlex-size-sm")
   end
 
   # Helper to get the large size toggle (Phlex)
   def large_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-size-lg")
+    find_element(UI::TestingToggleElement, "#phlex-size-lg")
   end
 
   # Helper to get the disabled toggle (Phlex, disabled and released)
   def disabled_released_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-disabled-released")
+    find_element(UI::TestingToggleElement, "#phlex-disabled-released")
   end
 
   # Helper to get the disabled pressed toggle (Phlex, disabled and pressed)
   def disabled_pressed_toggle
-    find_element(UI::Testing::ToggleElement, "#phlex-disabled-pressed")
+    find_element(UI::TestingToggleElement, "#phlex-disabled-pressed")
   end
 
   # Helper to get the keyboard test toggle
   def keyboard_toggle
-    find_element(UI::Testing::ToggleElement, "#keyboard-test")
+    find_element(UI::TestingToggleElement, "#keyboard-test")
   end
 
   # === Basic Interaction Tests ===

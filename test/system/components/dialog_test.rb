@@ -9,12 +9,12 @@ class DialogTest < UI::SystemTestCase
 
   # Helper to get the default ERB dialog by ID
   def default_dialog
-    find_element(UI::Testing::DialogElement, "#erb-default-dialog")
+    find_element(UI::TestingDialogElement, "#erb-default-dialog")
   end
 
   # Helper to get the asChild ERB dialog by ID (has close_on_overlay_click: false)
   def no_overlay_dialog
-    find_element(UI::Testing::DialogElement, "#erb-aschild-dialog")
+    find_element(UI::TestingDialogElement, "#erb-aschild-dialog")
   end
 
   # === Basic Interaction Tests ===
