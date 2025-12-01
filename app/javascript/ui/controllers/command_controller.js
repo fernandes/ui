@@ -5,7 +5,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["input", "list", "item", "group", "empty"]
   static values = {
-    loop: { type: Boolean, default: true }
+    loop: { type: Boolean, default: true },
+    autofocus: { type: Boolean, default: false }
   }
 
   connect() {
@@ -23,8 +24,8 @@ export default class extends Controller {
   }
 
   handleShow() {
-    // Focus the input when popover/drawer opens
-    if (this.hasInputTarget) {
+    // Focus the input when popover/drawer opens (only if autofocus is enabled)
+    if (this.autofocusValue && this.hasInputTarget) {
       this.inputTarget.focus()
     }
 

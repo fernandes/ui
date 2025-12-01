@@ -37,7 +37,11 @@ api:
     - name: loop
       type: Boolean
       default: 'true'
-      description: The loop
+      description: Whether keyboard navigation loops from last to first item
+    - name: autofocus
+      type: Boolean
+      default: 'false'
+      description: Whether to focus the input when the command opens (set to true in CommandDialog)
     data_attributes: []
     css_variables: []
   Empty:
@@ -119,7 +123,10 @@ javascript:
   values:
   - name: loop
     type: Boolean
-    description: The loop
+    description: Whether keyboard navigation loops from last to first item
+  - name: autofocus
+    type: Boolean
+    description: Whether to focus the input when the command opens
   actions:
   - filter
   - selectNext

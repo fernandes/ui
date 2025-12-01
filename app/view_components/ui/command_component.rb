@@ -3,8 +3,9 @@
 class UI::CommandComponent < ViewComponent::Base
   include UI::CommandBehavior
 
-  def initialize(loop: true, classes: "", **attributes)
+  def initialize(loop: true, autofocus: false, classes: "", **attributes)
     @loop = loop
+    @autofocus = autofocus
     @classes = classes
     @attributes = attributes
   end

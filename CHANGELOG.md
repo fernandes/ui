@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Components YAML to help on documentation
 - Components aspect ratios for aspect ration component
+- [Command] Configure autofocus with parameter
 
 ## [0.1.1] - 2025-11-28
 

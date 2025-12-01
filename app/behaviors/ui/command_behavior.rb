@@ -51,7 +51,8 @@ module UI::CommandBehavior
     {
       controller: "ui--command",
       slot: "command",
-      ui__command_loop_value: @loop.to_s
+      ui__command_loop_value: @loop.to_s,
+      ui__command_autofocus_value: @autofocus.to_s
     }
   end
 

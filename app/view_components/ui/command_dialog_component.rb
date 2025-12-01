@@ -3,8 +3,9 @@
 class UI::CommandDialogComponent < ViewComponent::Base
   include UI::CommandDialogBehavior
 
-  def initialize(shortcut: "meta+j", classes: "", **attributes)
+  def initialize(shortcut: "meta+j", autofocus: true, classes: "", **attributes)
     @shortcut = shortcut
+    @autofocus = autofocus
     @classes = classes
     @attributes = attributes
   end
@@ -14,7 +15,7 @@ class UI::CommandDialogComponent < ViewComponent::Base
       render UI::DialogComponent.new(close_on_escape: true, close_on_overlay_click: true) do
         render UI::DialogOverlayComponent.new do
           render UI::DialogContentComponent.new(classes: command_dialog_content_classes) do
-            render UI::CommandComponent.new do
+            render UI::CommandComponent.new(autofocus: @autofocus) do
               content
             end
           end

@@ -2919,6 +2919,10 @@ class CommandController extends Controller {
     loop: {
       type: Boolean,
       default: true
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
     }
   };
   connect() {
@@ -2932,7 +2936,7 @@ class CommandController extends Controller {
     this.element.removeEventListener("drawer:show", this.handleShow.bind(this));
   }
   handleShow() {
-    if (this.hasInputTarget) {
+    if (this.autofocusValue && this.hasInputTarget) {
       this.inputTarget.focus();
     }
     const visibleItems = this.visibleItems;

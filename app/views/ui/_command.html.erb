@@ -4,10 +4,12 @@
   # A command palette component for searching and selecting items.
   #
   # @param loop [Boolean] Whether to loop navigation
+  # @param autofocus [Boolean] Whether to focus the input on show (default: false)
   # @param classes [String] Additional CSS classes
   # @param attributes [Hash] Additional HTML attributes
 
   @loop = local_assigns.fetch(:loop, true)
+  @autofocus = local_assigns.fetch(:autofocus, false)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
