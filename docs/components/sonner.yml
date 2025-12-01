@@ -1,11 +1,11 @@
 ---
-name: Sonner Toaster
-slug: sonner_toaster
+name: Sonner
+slug: sonner
 category: other
 description: Sonner Toaster component (Phlex) Container for toast notifications -
   render once in your layout
 anatomy:
-- name: Sonner Toaster
+- name: Sonner
   description: Sonner Toaster component part
   required: true
 features:
