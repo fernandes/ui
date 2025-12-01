@@ -39,7 +39,7 @@ module UI::MenubarRadioItemBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     base_data = {
       "ui--menubar-target": "item",
-      action: "click->ui--menubar#selectRadio mouseenter->ui--menubar#trackHoveredItem",
+      action: "click->ui--menubar#selectItem mouseenter->ui--menubar#trackHoveredItem",
       state: checked? ? "checked" : "unchecked"
     }
 

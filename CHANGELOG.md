@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Avatar] ERB partial now properly merges custom classes (e.g., `size-16 grayscale`)
 - [Table] Fix rendering for Phlex/VC implementations
+- [Menubar] Fix checkboxes / radio groups not being selected
 
 ## 0.1.2
 

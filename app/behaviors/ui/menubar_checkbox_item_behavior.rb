@@ -39,7 +39,7 @@ module UI::MenubarCheckboxItemBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     (attributes_value&.fetch(:data, {}) || {}).merge({
       "ui--menubar-target": "item",
-      action: "click->ui--menubar#toggleCheckbox mouseenter->ui--menubar#trackHoveredItem",
+      action: "click->ui--menubar#selectItem mouseenter->ui--menubar#trackHoveredItem",
       state: checked? ? "checked" : "unchecked"
     })
   end
