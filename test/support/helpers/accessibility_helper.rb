@@ -201,8 +201,8 @@ module UI
       text_content = node.text.strip
 
       has_name = aria_label.present? ||
-                 aria_labelledby.present? ||
-                 text_content.present?
+        aria_labelledby.present? ||
+        text_content.present?
 
       assert has_name, "Element should have an accessible name"
 

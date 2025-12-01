@@ -9,6 +9,7 @@ module UI
 
     def view_template(&block)
       extend UI::H3Behavior
+
       h3(**h3_html_attributes.merge(@attributes), &block)
     end
   end

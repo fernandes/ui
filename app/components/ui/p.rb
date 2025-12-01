@@ -9,6 +9,7 @@ module UI
 
     def view_template(&block)
       extend UI::PBehavior
+
       p(**p_html_attributes.merge(@attributes), &block)
     end
   end

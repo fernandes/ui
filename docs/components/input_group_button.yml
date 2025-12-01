@@ -1,0 +1,30 @@
+---
+name: Input Group Button
+slug: input_group_button
+category: other
+description: Button - Phlex implementation
+anatomy:
+- name: Input Group Button
+  description: A button component specifically styled for use within input groups.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Disabled state support
+api:
+  Input Group Button:
+    description: A button component specifically styled for use within input groups.
+    parameters:
+    - name: size
+      type: String
+      default: xs
+      description: Size of the element
+    - name: variant
+      type: String
+      default: ghost
+      description: Visual style variant
+    - name: type
+      type: String
+      default: button
+      description: The type
+    data_attributes: []
+    css_variables: []

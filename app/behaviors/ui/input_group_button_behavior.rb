@@ -2,8 +2,15 @@
 
 # UI::InputGroupButtonBehavior
 #
-# Shared behavior for InputGroupButton component across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent styling and HTML attribute generation for input group buttons.
+# @ui_component Input Group Button
+# @ui_description Button - Phlex implementation
+# @ui_category other
+#
+# @ui_anatomy Input Group Button - A button component specifically styled for use within input groups. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+# @ui_feature Disabled state support
+#
 module UI::InputGroupButtonBehavior
   # Returns HTML attributes for the input group button
   def input_group_button_html_attributes

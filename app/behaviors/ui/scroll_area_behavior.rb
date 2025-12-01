@@ -2,8 +2,23 @@
 
 # UI::ScrollAreaBehavior
 #
-# Shared behavior for ScrollArea root across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent HTML attribute generation and styling.
+# @ui_component Scroll Area
+# @ui_description ScrollArea - Phlex implementation
+# @ui_category layout
+#
+# @ui_anatomy Scroll Area - Augments native scroll functionality for custom, cross-browser styling. (required)
+# @ui_anatomy Viewport - Scrollable content container with hidden native scrollbar.
+#
+# @ui_feature Custom styling with Tailwind classes
+#
+# @ui_aria_pattern Scrollable Region
+# @ui_aria_reference https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/
+#
+# @ui_keyboard Enter Activates the focused element
+# @ui_keyboard End Moves focus to last item
+#
+# @ui_related carousel
+#
 module UI::ScrollAreaBehavior
   # Returns HTML attributes for the scroll area root element
   def scroll_area_html_attributes

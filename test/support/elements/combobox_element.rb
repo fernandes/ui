@@ -206,11 +206,10 @@ module UI
       def trigger
         # The trigger is typically a Button inside the Popover/Drawer trigger
         # Try to find button with role first, then any button
-        begin
-          find_within('button[role="combobox"]')
-        rescue Capybara::ElementNotFound
-          find_within('button')
-        end
+
+        find_within('button[role="combobox"]')
+      rescue Capybara::ElementNotFound
+        find_within("button")
       end
 
       # Get the text target (span showing selected value)

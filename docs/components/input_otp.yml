@@ -1,0 +1,80 @@
+---
+name: Input OTP
+slug: input_otp
+category: forms
+description: InputOtp - Phlex implementation
+anatomy:
+- name: Input OTP
+  description: Accessible one-time password container component.
+  required: true
+- name: Group
+  description: Container for grouping OTP input slots together visually.
+  required: false
+- name: Separator
+  description: Visual divider between OTP input groups.
+  required: false
+features:
+- Custom styling with Tailwind classes
+- Disabled state support
+api:
+  Input OTP:
+    description: Accessible one-time password container component.
+    parameters:
+    - name: length
+      type: Integer
+      default: '6'
+      description: The length
+    - name: pattern
+      type: String
+      default: "\\\\d"
+      description: The pattern
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    - name: id
+      type: String
+      default: nil
+      description: HTML id attribute
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: Container for grouping OTP input slots together visually.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: Visual divider between OTP input groups.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+keyboard:
+- key: ArrowLeft
+  description: Moves focus left or decreases value
+- key: ArrowRight
+  description: Moves focus right or increases value
+- key: Home
+  description: Moves focus to first item
+- key: End
+  description: Moves focus to last item
+javascript:
+  controller: ui--input-otp
+  targets:
+  - input
+  values:
+  - name: length
+    type: Number
+    description: The length
+  actions:
+  - input
+  - keydown
+  - paste
+  - checkComplete
+  - clear
+  events:
+  - name: inputotp:complete
+    description: Fired when inputotp complete

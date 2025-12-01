@@ -1,0 +1,16 @@
+---
+name: Table Head
+slug: table_head
+category: other
+anatomy:
+- name: Table Head
+  description: Table header element
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Table Head:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

@@ -15,7 +15,7 @@ module UI::InputGroupInputBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     # Merge data-slot to override the default "input" slot with "input-group-control"
     # For Phlex: merge at top level, for ERB/VC: merge inside attributes hash
-    data_slot_override = { data: { slot: "input-group-control" } }
+    data_slot_override = {data: {slot: "input-group-control"}}
 
     # Merge the data-slot both at top level (for Phlex) and in attributes (for ERB/VC)
     merged_attrs = attributes_value.deep_merge(data_slot_override)

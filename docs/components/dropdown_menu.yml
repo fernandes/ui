@@ -1,0 +1,151 @@
+---
+name: Dropdown Menu
+slug: dropdown_menu
+category: overlay
+description: DropdownMenu - Phlex implementation
+anatomy:
+- name: Dropdown Menu
+  description: Container for dropdown menus with Stimulus controller for interactivity.
+  required: true
+- name: Content
+  description: Menu items container with animations and positioning.
+  required: true
+- name: Item
+  description: Individual menu item that can be rendered as a link or div.
+  required: false
+- name: Label
+  description: Label for menu sections to organize items.
+  required: false
+- name: Separator
+  description: Visual separator between menu items.
+  required: false
+- name: Shortcut
+  description: Keyboard shortcut indicator displayed at the end of menu items.
+  required: false
+- name: Sub
+  description: Container for submenu with relative positioning.
+  required: false
+- name: Sub Content
+  description: Submenu items container positioned to the right of the trigger.
+  required: true
+- name: Sub Trigger
+  description: Item that opens a submenu on hover.
+  required: true
+- name: Trigger
+  description: Wrapper that adds toggle action to child element.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Dropdown Menu:
+    description: Container for dropdown menus with Stimulus controller for interactivity.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: placement
+      type: String
+      default: bottom-start
+      description: The placement
+    - name: offset
+      type: Integer
+      default: '4'
+      description: The offset
+    - name: flip
+      type: Boolean
+      default: 'true'
+      description: The flip
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Menu items container with animations and positioning.
+    parameters:
+    - name: side_offset
+      type: Integer
+      default: '4'
+      description: The side offset
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: Individual menu item that can be rendered as a link or div.
+    parameters:
+    - name: href
+      type: String
+      default: nil
+      description: The href
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    - name: variant
+      type: String
+      default: default
+      description: Visual style variant
+    data_attributes: []
+    css_variables: []
+  Label:
+    description: Label for menu sections to organize items.
+    parameters:
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: Visual separator between menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Shortcut:
+    description: Keyboard shortcut indicator displayed at the end of menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub:
+    description: Container for submenu with relative positioning.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub Content:
+    description: Submenu items container positioned to the right of the trigger.
+    parameters:
+    - name: side
+      type: String
+      default: right
+      description: Which side to display on
+    - name: align
+      type: String
+      default: start
+      description: Alignment within container
+    data_attributes: []
+    css_variables: []
+  Sub Trigger:
+    description: Item that opens a submenu on hover.
+    parameters:
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Wrapper that adds toggle action to child element.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Menu Button
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
+  description: Implements the WAI-ARIA Menu Button pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+related:
+- context_menu
+- menubar
+- select

@@ -1,0 +1,22 @@
+---
+name: Spinner
+slug: spinner
+category: feedback
+description: Spinner - Phlex implementation
+anatomy:
+- name: Spinner
+  description: A loading indicator component using an animated spinner icon.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- ARIA attributes for accessibility
+api:
+  Spinner:
+    description: A loading indicator component using an animated spinner icon.
+    parameters:
+    - name: size
+      type: String
+      default: default
+      description: Size of the element
+    data_attributes: []
+    css_variables: []

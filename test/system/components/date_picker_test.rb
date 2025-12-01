@@ -94,7 +94,7 @@ module UI
       picker.open
 
       current_month = picker.calendar.current_month
-      current_year = picker.calendar.current_year
+      picker.calendar.current_year
 
       # Navigate to next month
       picker.next_month
@@ -184,7 +184,7 @@ module UI
       assert picker.closed?
 
       # Verify formatted range text is displayed
-      expected_text = "#{start_date.strftime('%B %-d, %Y')} - #{end_date.strftime('%B %-d, %Y')}"
+      expected_text = "#{start_date.strftime("%B %-d, %Y")} - #{end_date.strftime("%B %-d, %Y")}"
       assert_equal expected_text, picker.selected_text
     end
 
@@ -204,7 +204,7 @@ module UI
       sleep 0.3
 
       # Verify range display (no leading zero on day)
-      expected_text = "#{start_date.strftime('%B %-d, %Y')} - #{end_date.strftime('%B %-d, %Y')}"
+      expected_text = "#{start_date.strftime("%B %-d, %Y")} - #{end_date.strftime("%B %-d, %Y")}"
       assert_equal expected_text, picker.selected_text
     end
 
@@ -441,7 +441,7 @@ module UI
 
       # Should show partial range indicator
       text = picker.selected_text
-      assert text.include?(start_date.strftime('%B %-d, %Y'))
+      assert text.include?(start_date.strftime("%B %-d, %Y"))
     end
   end
 end

@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-    class UI::SheetOverlay < Phlex::HTML
-      include UI::SheetOverlayBehavior
+class UI::SheetOverlay < Phlex::HTML
+  include UI::SheetOverlayBehavior
 
-      def initialize(open: false, classes: nil, **attributes)
-        @open = open
-        @classes = classes
-        @attributes = attributes
-      end
+  def initialize(open: false, classes: nil, **attributes)
+    @open = open
+    @classes = classes
+    @attributes = attributes
+  end
 
-      def view_template(&block)
-        div(**sheet_overlay_container_html_attributes) do
-          div(**sheet_overlay_html_attributes)
-          yield if block_given?
-        end
-      end
+  def view_template(&block)
+    div(**sheet_overlay_container_html_attributes) do
+      div(**sheet_overlay_html_attributes)
+      yield if block_given?
     end
+  end
+end

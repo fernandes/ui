@@ -1,0 +1,21 @@
+---
+name: Combobox Wrapper
+slug: combobox_wrapper
+category: other
+description: Wrapper - Phlex implementation
+anatomy:
+- name: Combobox Wrapper
+  description: Wrapper component that yields combobox attributes to be spread into
+    a container component.
+  required: true
+api:
+  Combobox Wrapper:
+    description: Wrapper component that yields combobox attributes to be spread into
+      a container component.
+    parameters:
+    - name: value
+      type: String
+      default: ''
+      description: The current value
+    data_attributes: []
+    css_variables: []

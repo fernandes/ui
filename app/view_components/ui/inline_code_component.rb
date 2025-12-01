@@ -9,6 +9,7 @@ module UI
 
     def call
       extend UI::InlineCodeBehavior
+
       attrs = inline_code_html_attributes
       content_tag :code, **attrs.merge(@attributes) do
         content

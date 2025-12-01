@@ -286,7 +286,11 @@ class SwitchTest < UI::SystemTestCase
     assert switch.disabled?
 
     # Try to toggle (should do nothing)
-    switch.node.click rescue nil # Click anyway despite disabled
+    begin
+      switch.node.click
+    rescue
+      nil
+    end # Click anyway despite disabled
     sleep 0.1
 
     # Should remain off
@@ -301,7 +305,11 @@ class SwitchTest < UI::SystemTestCase
     assert switch.disabled?
 
     # Try to toggle
-    switch.node.click rescue nil
+    begin
+      switch.node.click
+    rescue
+      nil
+    end
     sleep 0.1
 
     # Should remain on

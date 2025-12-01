@@ -239,7 +239,7 @@ class SliderTest < UI::SystemTestCase
     initial_value = slider.value
 
     # Click at a different position than current
-    target_value = initial_value < 50 ? 80 : 20
+    target_value = (initial_value < 50) ? 80 : 20
     slider.click_track_at(target_value)
 
     # Value should have changed
@@ -545,7 +545,7 @@ class SliderTest < UI::SystemTestCase
     slider1 = volume_slider
     slider2 = brightness_slider
 
-    initial1 = slider1.value
+    slider1.value
     initial2 = slider2.value
 
     slider1.set_value(90)

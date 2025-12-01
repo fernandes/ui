@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-    class UI::ItemSeparatorComponent < ViewComponent::Base
-      include UI::ItemSeparatorBehavior
+class UI::ItemSeparatorComponent < ViewComponent::Base
+  include UI::ItemSeparatorBehavior
 
-      def initialize(classes: "", **attributes)
-        @classes = classes
-        @attributes = attributes
-      end
+  def initialize(classes: "", **attributes)
+    @classes = classes
+    @attributes = attributes
+  end
 
-      def call
-        content_tag :hr, nil, **item_separator_html_attributes
-      end
+  def call
+    content_tag :hr, nil, **item_separator_html_attributes
+  end
 
-      private
+  private
 
-      attr_reader :classes, :attributes
-    end
+  attr_reader :classes, :attributes
+end

@@ -314,7 +314,7 @@ module UI
           return true if selected_text == expected_text
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected selected text '#{expected_text}', got '#{selected_text}' after #{timeout}s"
+              "Expected selected text '#{expected_text}', got '#{selected_text}' after #{timeout}s"
           end
 
           sleep 0.05

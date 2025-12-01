@@ -9,6 +9,7 @@ module UI
 
     def call
       extend UI::LargeBehavior
+
       attrs = large_html_attributes
       content_tag :div, **attrs.merge(@attributes) do
         content

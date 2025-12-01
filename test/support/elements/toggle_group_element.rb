@@ -54,7 +54,7 @@ module UI
       #
       def selected_items
         items.select { |item| item["data-state"] == "on" }
-             .map { |item| item["data-value"] }
+          .map { |item| item["data-value"] }
       end
 
       # Get the first selected item (useful for single selection mode)
@@ -149,13 +149,13 @@ module UI
       # Navigate to next item (right arrow in horizontal, down arrow in vertical)
       def navigate_next
         orientation = node["data-orientation"] || "horizontal"
-        orientation == "horizontal" ? press_arrow_right : press_arrow_down
+        (orientation == "horizontal") ? press_arrow_right : press_arrow_down
       end
 
       # Navigate to previous item (left arrow in horizontal, up arrow in vertical)
       def navigate_previous
         orientation = node["data-orientation"] || "horizontal"
-        orientation == "horizontal" ? press_arrow_left : press_arrow_up
+        (orientation == "horizontal") ? press_arrow_left : press_arrow_up
       end
 
       # === ARIA Queries ===
@@ -201,7 +201,7 @@ module UI
           return true if selected?(value)
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected item '#{value}' to be selected after #{timeout}s"
+              "Expected item '#{value}' to be selected after #{timeout}s"
           end
 
           sleep 0.05
@@ -214,7 +214,7 @@ module UI
           return true unless selected?(value)
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected item '#{value}' to not be selected after #{timeout}s"
+              "Expected item '#{value}' to not be selected after #{timeout}s"
           end
 
           sleep 0.05

@@ -1,0 +1,17 @@
+---
+name: Skeleton
+slug: skeleton
+category: feedback
+description: Skeleton - Phlex implementation
+anatomy:
+- name: Skeleton
+  description: A simple loading placeholder component with pulsing animation.
+  required: true
+api:
+  Skeleton:
+    description: A simple loading placeholder component with pulsing animation.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+related:
+- progress

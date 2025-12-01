@@ -1,0 +1,16 @@
+---
+name: Item Actions
+slug: item_actions
+category: other
+anatomy:
+- name: Item Actions
+  description: Individual item element
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Item Actions:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

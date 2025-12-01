@@ -229,7 +229,7 @@ module UI
           return true if selected?(value)
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Radio option '#{value}' not selected after #{timeout}s. Current: #{selected_value}"
+              "Radio option '#{value}' not selected after #{timeout}s. Current: #{selected_value}"
           end
 
           sleep 0.05

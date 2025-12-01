@@ -1,0 +1,75 @@
+---
+name: Hover Card
+slug: hover_card
+category: overlay
+description: HoverCard - Phlex implementation
+anatomy:
+- name: Hover Card
+  description: Container for hover card trigger and content.
+  required: true
+- name: Content
+  description: The content that appears on hover.
+  required: true
+- name: Trigger
+  description: Element that triggers the hover card on hover.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Hover Card:
+    description: Container for hover card trigger and content.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: The content that appears on hover.
+    parameters:
+    - name: align
+      type: String
+      default: center
+      description: Alignment within container
+    - name: side_offset
+      type: Integer
+      default: '4'
+      description: The side offset
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Element that triggers the hover card on hover.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: tag
+      type: Symbol
+      default: ":span"
+      description: The tag
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Tooltip
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/
+  description: Implements the WAI-ARIA Tooltip pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+javascript:
+  controller: ui--hover-card
+  targets:
+  - trigger
+  - content
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - show
+  - hide
+  - keepOpen
+  - scheduleHide
+  - clearTimeouts
+  - positionContent
+  events: []
+related:
+- popover
+- tooltip

@@ -1,0 +1,51 @@
+---
+name: Input
+slug: input
+category: forms
+anatomy:
+- name: Input
+  description: Text input field
+  required: true
+- name: Group
+  description: A wrapper component for grouping inputs with addons, buttons, and text.
+  required: false
+features:
+- Custom styling with Tailwind classes
+- Form integration
+- Disabled state support
+- ARIA attributes for accessibility
+api:
+  Input:
+    description: ''
+    parameters:
+    - name: type
+      type: String
+      default: text
+      description: The type
+    - name: placeholder
+      type: String
+      default: nil
+      description: Placeholder text when no value is selected
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    - name: id
+      type: String
+      default: nil
+      description: HTML id attribute
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: Shared behavior for InputGroup component across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+related:
+- textarea
+- field

@@ -1,0 +1,17 @@
+---
+name: Field Set
+slug: field_set
+category: other
+description: Set - Phlex implementation
+anatomy:
+- name: Field Set
+  description: Semantic fieldset container for grouped fields.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Field Set:
+    description: Semantic fieldset container for grouped fields.
+    parameters: []
+    data_attributes: []
+    css_variables: []

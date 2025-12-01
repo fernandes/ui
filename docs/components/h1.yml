@@ -1,0 +1,16 @@
+---
+name: H1
+slug: h1
+category: typography
+anatomy:
+- name: H1
+  description: H1 component part
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  H1:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

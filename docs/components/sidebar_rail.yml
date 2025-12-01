@@ -1,0 +1,17 @@
+---
+name: Sidebar Rail
+slug: sidebar_rail
+category: other
+description: Rail - Phlex implementation
+anatomy:
+- name: Sidebar Rail
+  description: Invisible rail on the sidebar edge for drag-to-expand interaction.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Sidebar Rail:
+    description: Invisible rail on the sidebar edge for drag-to-expand interaction.
+    parameters: []
+    data_attributes: []
+    css_variables: []

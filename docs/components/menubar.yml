@@ -1,0 +1,201 @@
+---
+name: Menubar
+slug: menubar
+category: navigation
+description: Menubar - Phlex implementation
+anatomy:
+- name: Menubar
+  description: Container for horizontal menu bar with Stimulus controller for interactivity.
+  required: true
+- name: Content
+  description: Container for menu items that appears when trigger is activated.
+  required: true
+- name: Item
+  description: A selectable menu item.
+  required: false
+- name: Label
+  description: Non-interactive label/header for menu sections.
+  required: false
+- name: Separator
+  description: Visual divider between menu items.
+  required: false
+- name: Shortcut
+  description: Displays keyboard shortcut hint for menu items.
+  required: false
+- name: Sub
+  description: Container for submenu within the menubar menu.
+  required: false
+- name: Sub Content
+  description: Container for submenu items.
+  required: true
+- name: Sub Trigger
+  description: Menu item that opens a submenu.
+  required: true
+- name: Trigger
+  description: Button that toggles the menu content open/closed.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- ARIA attributes for accessibility
+- Keyboard navigation with arrow keys
+- Click outside to close
+api:
+  Menubar:
+    description: Container for horizontal menu bar with Stimulus controller for interactivity.
+    parameters:
+    - name: loop
+      type: Boolean
+      default: 'false'
+      description: The loop
+    - name: aria_label
+      type: String
+      default: nil
+      description: The aria label
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Container for menu items that appears when trigger is activated.
+    parameters:
+    - name: align
+      type: String
+      default: start
+      description: Alignment within container
+    - name: side
+      type: String
+      default: bottom
+      description: Which side to display on
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: A selectable menu item.
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":default"
+      description: Visual style variant
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    data_attributes: []
+    css_variables: []
+  Label:
+    description: Non-interactive label/header for menu sections.
+    parameters:
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: Visual divider between menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Shortcut:
+    description: Displays keyboard shortcut hint for menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub:
+    description: Container for submenu within the menubar menu.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub Content:
+    description: Container for submenu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub Trigger:
+    description: Menu item that opens a submenu.
+    parameters:
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Button that toggles the menu content open/closed.
+    parameters:
+    - name: first
+      type: Boolean
+      default: 'false'
+      description: The first
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Menu Bar
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/menubar/
+  description: Implements the WAI-ARIA Menu Bar pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes:
+  - aria-label
+  - role="menubar"
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: Space
+  description: Activates the focused element
+- key: Escape
+  description: Closes the component
+- key: ArrowDown
+  description: Moves focus to next item
+- key: ArrowUp
+  description: Moves focus to previous item
+- key: ArrowLeft
+  description: Moves focus left or decreases value
+- key: ArrowRight
+  description: Moves focus right or increases value
+- key: Home
+  description: Moves focus to first item
+- key: End
+  description: Moves focus to last item
+- key: Tab
+  description: Moves focus to next focusable element
+javascript:
+  controller: ui--menubar
+  targets:
+  - trigger
+  - content
+  - item
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - initializeTriggers
+  - toggle
+  - openMenu
+  - closeAll
+  - trackHoveredItem
+  - selectItem
+  - openSubmenu
+  - openSubmenuWithAutoUpdate
+  - closeSubmenuAndCleanup
+  - closeSubmenu
+  - cancelSubmenuClose
+  - closeSiblingSubmenus
+  - teardownKeyboardNavigation
+  - navigateToNextMenu
+  - navigateToPreviousMenu
+  - openSubmenuWithKeyboard
+  - closeCurrentSubmenu
+  - activateCurrentItem
+  - toggleCheckbox
+  - selectRadio
+  events: []
+related:
+- dropdown_menu
+- context_menu
+- navigation_menu

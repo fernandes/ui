@@ -1,0 +1,105 @@
+---
+name: Popover
+slug: popover
+category: overlay
+description: Popover - Phlex implementation
+anatomy:
+- name: Popover
+  description: Container for popover trigger and content.
+  required: true
+- name: Content
+  description: The floating content panel.
+  required: true
+- name: Trigger
+  description: Button or element that triggers the popover.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Click outside to close
+api:
+  Popover:
+    description: Container for popover trigger and content.
+    parameters:
+    - name: placement
+      type: String
+      default: bottom
+      description: The placement
+    - name: offset
+      type: Integer
+      default: '4'
+      description: The offset
+    - name: trigger
+      type: String
+      default: click
+      description: The trigger
+    - name: hover_delay
+      type: Integer
+      default: '200'
+      description: The hover delay
+    - name: align
+      type: String
+      default: nil
+      description: Alignment within container
+    - name: side_offset
+      type: String
+      default: nil
+      description: The side offset
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: The floating content panel.
+    parameters:
+    - name: side
+      type: String
+      default: bottom
+      description: Which side to display on
+    - name: align
+      type: String
+      default: center
+      description: Alignment within container
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Button or element that triggers the popover.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Dialog (Non-modal)
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-non-modal/
+  description: Implements the WAI-ARIA Dialog (Non-modal) pattern with proper roles,
+    states, and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: Escape
+  description: Closes the component
+javascript:
+  controller: ui--popover
+  targets:
+  - trigger
+  - content
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - teardownKeyboardNavigation
+  - toggle
+  - show
+  - findTriggerElementToFocus
+  - hide
+  events:
+  - name: popover:show
+    description: Fired when popover show
+  - name: popover:hide
+    description: Fired when popover hide
+related:
+- tooltip
+- hover_card
+- dropdown_menu

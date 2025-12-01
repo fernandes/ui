@@ -1,0 +1,53 @@
+---
+name: Empty
+slug: empty
+category: data
+description: Empty - Phlex implementation
+anatomy:
+- name: Empty
+  description: Displays empty states in applications with customizable media, titles,
+    descriptions, and actions.
+  required: true
+- name: Content
+  description: Displays the content of the empty state such as a button, input or
+    a link.
+  required: true
+- name: Description
+  description: Displays the description of the empty state.
+  required: false
+- name: Header
+  description: Wraps the empty media, title, and description.
+  required: false
+- name: Title
+  description: Displays the title of the empty state.
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Empty:
+    description: Displays empty states in applications with customizable media, titles,
+      descriptions, and actions.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Displays the content of the empty state such as a button, input or
+      a link.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: Displays the description of the empty state.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: Wraps the empty media, title, and description.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: Displays the title of the empty state.
+    parameters: []
+    data_attributes: []
+    css_variables: []

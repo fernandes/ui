@@ -284,7 +284,11 @@ class ToggleTest < UI::SystemTestCase
     assert toggle.disabled?
 
     # Try to toggle (should do nothing)
-    toggle.node.click rescue nil # Click anyway despite disabled
+    begin
+      toggle.node.click
+    rescue
+      nil
+    end # Click anyway despite disabled
     sleep 0.1
 
     # Should remain released
@@ -299,7 +303,11 @@ class ToggleTest < UI::SystemTestCase
     assert toggle.disabled?
 
     # Try to toggle
-    toggle.node.click rescue nil
+    begin
+      toggle.node.click
+    rescue
+      nil
+    end
     sleep 0.1
 
     # Should remain pressed

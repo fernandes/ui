@@ -1,0 +1,52 @@
+---
+name: Responsive Dialog
+slug: responsive_dialog
+category: other
+description: ResponsiveDialog - Renders Dialog on desktop, Drawer on mobile Uses hybrid
+  CSS + Stimulus approach for responsive switching at 768px (md breakpoint)
+anatomy:
+- name: Responsive Dialog
+  description: Root container with state management
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Focus management
+- Animation support
+api:
+  Responsive Dialog:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    - name: breakpoint
+      type: Integer
+      default: '768'
+      description: The breakpoint
+    - name: direction
+      type: String
+      default: bottom
+      description: The direction
+    data_attributes: []
+    css_variables: []
+javascript:
+  controller: ui--responsive-dialog
+  targets:
+  - drawer
+  - dialog
+  values:
+  - name: breakpoint
+    type: Number
+    description: The breakpoint
+  actions:
+  - open
+  - close
+  - toggle
+  - syncState
+  - openComponent
+  - ensureClosedComponent
+  - transferFocus
+  events:
+  - name: responsive-dialog:resize
+    description: Fired when responsive-dialog resize

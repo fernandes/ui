@@ -1,0 +1,109 @@
+---
+name: Accordion
+slug: accordion
+category: data
+description: Accordion container component (Phlex) Wraps collapsible accordion items
+  with Stimulus controller
+anatomy:
+- name: Accordion
+  description: Root container with state management
+  required: true
+- name: Content
+  description: Main content container
+  required: true
+- name: Item
+  description: Individual item element
+  required: false
+- name: Trigger
+  description: Button or element that activates the component
+  required: true
+features:
+- Keyboard navigation with arrow keys
+- Animation support
+api:
+  Accordion:
+    description: ''
+    parameters:
+    - name: type
+      type: String
+      default: single
+      description: The type
+    - name: collapsible
+      type: Boolean
+      default: 'false'
+      description: The collapsible
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters:
+    - name: item_value
+      type: String
+      default: nil
+      description: The item value
+    - name: initial_open
+      type: Boolean
+      default: 'false'
+      description: The initial open
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: ''
+    parameters:
+    - name: value
+      type: String
+      default: ''
+      description: The current value
+    - name: initial_open
+      type: Boolean
+      default: 'false'
+      description: The initial open
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: ''
+    parameters:
+    - name: item_value
+      type: String
+      default: nil
+      description: The item value
+    - name: initial_open
+      type: Boolean
+      default: 'false'
+      description: The initial open
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Accordion
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
+  description: Implements the WAI-ARIA Accordion pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: ArrowDown
+  description: Moves focus to next item
+- key: ArrowUp
+  description: Moves focus to previous item
+- key: Home
+  description: Moves focus to first item
+- key: End
+  description: Moves focus to last item
+javascript:
+  controller: ui--accordion
+  targets:
+  - item
+  - trigger
+  - content
+  values:
+  - name: type
+    type: String
+    description: The type
+  actions:
+  - removeKeyboardNavigation
+  - toggle
+  events: []
+related:
+- collapsible
+- tabs

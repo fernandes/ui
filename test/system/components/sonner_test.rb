@@ -188,7 +188,7 @@ class SonnerTest < UI::SystemTestCase
 
   test "toaster detects and applies theme" do
     theme = sonner.theme
-    assert_includes [ "light", "dark" ], theme
+    assert_includes ["light", "dark"], theme
   end
 
   # === JavaScript API Tests ===

@@ -1,0 +1,47 @@
+---
+name: Alert
+slug: alert
+category: feedback
+description: Alert - Phlex implementation
+anatomy:
+- name: Alert
+  description: A callout component for displaying important information to users.
+  required: true
+- name: Description
+  description: Description text for an alert component.
+  required: false
+- name: Title
+  description: Title text for an alert component.
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Alert:
+    description: A callout component for displaying important information to users.
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":default"
+      description: Visual style variant
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: Description text for an alert component.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: Title text for an alert component.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Alert
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/alert/
+  description: Implements the WAI-ARIA Alert pattern with proper roles, states, and
+    keyboard navigation.
+  aria_attributes:
+  - role="alert"
+related:
+- alert_dialog
+- toast

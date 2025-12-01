@@ -1,0 +1,55 @@
+---
+name: Avatar
+slug: avatar
+category: data
+description: Avatar - Phlex implementation
+anatomy:
+- name: Avatar
+  description: Displays an image element with a fallback for representing users.
+  required: true
+- name: Fallback
+  description: Displays fallback content when the image hasn't loaded or fails to
+    load.
+  required: false
+- name: Image
+  description: Displays the avatar image. Only renders when it has loaded successfully.
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Avatar:
+    description: Displays an image element with a fallback for representing users.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Fallback:
+    description: Displays fallback content when the image hasn't loaded or fails to
+      load.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Image:
+    description: Displays the avatar image. Only renders when it has loaded successfully.
+    parameters:
+    - name: alt
+      type: String
+      default: ''
+      description: The alt
+    data_attributes: []
+    css_variables: []
+javascript:
+  controller: ui--avatar
+  targets:
+  - image
+  - fallback
+  values: []
+  actions:
+  - onImageLoad
+  - onImageError
+  - showImage
+  - hideImage
+  - hideFallback
+  - showFallback
+  events: []
+related:
+- badge

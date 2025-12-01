@@ -1,0 +1,44 @@
+---
+name: Resizable Panel
+slug: resizable_panel
+category: other
+description: ResizablePanel component (Phlex) Individual resizable panel within a
+  panel group
+anatomy:
+- name: Resizable Panel
+  description: Resizable Panel component part
+  required: true
+- name: Group
+  description: Container for grouping related items
+  required: false
+api:
+  Resizable Panel:
+    description: ''
+    parameters:
+    - name: default_size
+      type: String
+      default: nil
+      description: The default size
+    - name: min_size
+      type: String
+      default: nil
+      description: The min size
+    - name: max_size
+      type: String
+      default: nil
+      description: The max size
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: ''
+    parameters:
+    - name: direction
+      type: String
+      default: horizontal
+      description: The direction
+    - name: keyboard_resize_by
+      type: Integer
+      default: '10'
+      description: The keyboard resize by
+    data_attributes: []
+    css_variables: []

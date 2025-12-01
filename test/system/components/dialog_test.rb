@@ -150,7 +150,7 @@ class DialogTest < UI::SystemTestCase
 
     # Check that something inside the dialog has focus
     # The dialog controller should focus the first focusable element
-    focused_element = page.evaluate_script("document.activeElement")
+    page.evaluate_script("document.activeElement")
     focused_tag = page.evaluate_script("document.activeElement.tagName")
 
     # Should be an input, button, or other focusable element
@@ -266,7 +266,7 @@ class DialogTest < UI::SystemTestCase
     dialog = default_dialog
 
     # Check initial body overflow style
-    initial_overflow = page.evaluate_script("document.body.style.overflow")
+    page.evaluate_script("document.body.style.overflow")
 
     dialog.open
 

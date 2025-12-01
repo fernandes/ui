@@ -8,8 +8,8 @@ Custom select component with keyboard navigation, scrollable viewport, and form 
 <%= render UI::Select::SelectComponent.new(value: "apple") do %>
   <%= render UI::Select::TriggerComponent.new(placeholder: "Select a fruit...") %>
   <%= render UI::Select::ContentComponent.new do %>
-    <%= render UI::Select::ItemComponent.new(value: "apple") { "Apple" } %>
-    <%= render UI::Select::ItemComponent.new(value: "banana") { "Banana" } %>
+    <%= render(UI::Select::ItemComponent.new(value: "apple")) { "Apple" } %>
+    <%= render(UI::Select::ItemComponent.new(value: "banana")) { "Banana" } %>
   <% end %>
 <% end %>
 ```
@@ -56,8 +56,8 @@ Custom select component with keyboard navigation, scrollable viewport, and form 
 <%= render UI::Select::SelectComponent.new(value: "apple") do %>
   <%= render UI::Select::TriggerComponent.new(placeholder: "Select a fruit...") %>
   <%= render UI::Select::ContentComponent.new do %>
-    <%= render UI::Select::ItemComponent.new(value: "apple") { "Apple" } %>
-    <%= render UI::Select::ItemComponent.new(value: "banana") { "Banana" } %>
+    <%= render(UI::Select::ItemComponent.new(value: "apple")) { "Apple" } %>
+    <%= render(UI::Select::ItemComponent.new(value: "banana")) { "Banana" } %>
   <% end %>
 <% end %>
 ```
@@ -69,9 +69,9 @@ Custom select component with keyboard navigation, scrollable viewport, and form 
   <%= render UI::Select::TriggerComponent.new(placeholder: "Select timezone...") %>
   <%= render UI::Select::ContentComponent.new do %>
     <%= render UI::Select::GroupComponent.new do %>
-      <%= render UI::Select::LabelComponent.new { "North America" } %>
-      <%= render UI::Select::ItemComponent.new(value: "america/new_york") { "Eastern Time (ET)" } %>
-      <%= render UI::Select::ItemComponent.new(value: "america/chicago") { "Central Time (CT)" } %>
+      <%= render(UI::Select::LabelComponent.new) { "North America" } %>
+      <%= render(UI::Select::ItemComponent.new(value: "america/new_york")) { "Eastern Time (ET)" } %>
+      <%= render(UI::Select::ItemComponent.new(value: "america/chicago")) { "Central Time (CT)" } %>
     <% end %>
   <% end %>
 <% end %>
@@ -83,8 +83,8 @@ Custom select component with keyboard navigation, scrollable viewport, and form 
 <%= render UI::Select::SelectComponent.new(value: "react") do %>
   <%= render UI::Select::TriggerComponent.new(placeholder: "Select framework...") %>
   <%= render UI::Select::ContentComponent.new do %>
-    <%= render UI::Select::ItemComponent.new(value: "react") { "React" } %>
-    <%= render UI::Select::ItemComponent.new(value: "angular", disabled: true) { "Angular (Coming Soon)" } %>
+    <%= render(UI::Select::ItemComponent.new(value: "react")) { "React" } %>
+    <%= render(UI::Select::ItemComponent.new(value: "angular", disabled: true)) { "Angular (Coming Soon)" } %>
   <% end %>
 <% end %>
 ```
@@ -103,3 +103,28 @@ Custom select component with keyboard navigation, scrollable viewport, and form 
 ```ruby
 <%= render UI::Select::SelectComponent.new { ... } %>
 ```
+
+### ❌ Wrong: Curly braces without parentheses
+
+```ruby
+<%= render UI::Select::ItemComponent.new(value: "apple") { "Apple" } %>
+# ERROR: {} block goes to .new, not to render - content won't render!
+```
+
+### ✅ Correct: Use parentheses with curly braces
+
+```ruby
+<%= render(UI::Select::ItemComponent.new(value: "apple")) { "Apple" } %>
+```
+
+### ✅ Also correct: do...end doesn't need parentheses
+
+```ruby
+<%= render UI::Select::SelectComponent.new(value: "apple") do %>
+  ...
+<% end %>
+```
+
+**Ruby precedence rules:**
+- `do...end` has low precedence → binds to `render` ✅
+- `{}` has high precedence → binds to `.new` ❌ (needs parentheses)

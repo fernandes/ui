@@ -1,0 +1,151 @@
+---
+name: Alert Dialog
+slug: alert_dialog
+category: feedback
+description: AlertDialog - Phlex implementation
+anatomy:
+- name: Alert Dialog
+  description: A modal alert dialog component for important confirmations and alerts.
+  required: true
+- name: Action
+  description: Primary action button for the alert dialog.
+  required: false
+- name: Cancel
+  description: Cancel button for the alert dialog.
+  required: false
+- name: Content
+  description: Main alert dialog content area with proper ARIA attributes.
+  required: true
+- name: Description
+  description: Description text for the alert dialog.
+  required: false
+- name: Footer
+  description: Footer section with action buttons for the alert dialog.
+  required: false
+- name: Header
+  description: Header section of the alert dialog.
+  required: false
+- name: Overlay
+  description: Container wrapper with backdrop and content for the alert dialog overlay.
+  required: false
+- name: Title
+  description: Title text for the alert dialog.
+  required: false
+- name: Trigger
+  description: A wrapper that adds the alert dialog open action to its child element.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Focus management
+api:
+  Alert Dialog:
+    description: A modal alert dialog component for important confirmations and alerts.
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    - name: close_on_escape
+      type: Boolean
+      default: 'true'
+      description: The close on escape
+    data_attributes: []
+    css_variables: []
+  Action:
+    description: Primary action button for the alert dialog.
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":default"
+      description: Visual style variant
+    - name: size
+      type: Symbol
+      default: ":default"
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+  Cancel:
+    description: Cancel button for the alert dialog.
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":outline"
+      description: Visual style variant
+    - name: size
+      type: Symbol
+      default: ":default"
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Main alert dialog content area with proper ARIA attributes.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: Description text for the alert dialog.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Footer:
+    description: Footer section with action buttons for the alert dialog.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: Header section of the alert dialog.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Overlay:
+    description: Container wrapper with backdrop and content for the alert dialog
+      overlay.
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: Title text for the alert dialog.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: A wrapper that adds the alert dialog open action to its child element.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Alert Dialog
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/
+  description: Implements the WAI-ARIA Alert Dialog pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Escape
+  description: Closes the component
+javascript:
+  controller: ui--alert-dialog
+  targets:
+  - container
+  - overlay
+  - content
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - open
+  - close
+  - show
+  - hide
+  - preventOverlayClose
+  events:
+  - name: alertdialog:open
+    description: Fired when alertdialog open
+  - name: alertdialog:close
+    description: Fired when alertdialog close
+related:
+- dialog

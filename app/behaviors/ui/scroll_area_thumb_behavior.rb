@@ -2,8 +2,14 @@
 
 # UI::ScrollAreaThumbBehavior
 #
-# Shared behavior for ScrollArea thumb across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent HTML attribute generation and styling.
+# @ui_component Scroll Area Thumb
+# @ui_description Thumb - Phlex implementation
+# @ui_category other
+#
+# @ui_anatomy Scroll Area Thumb - Draggable scroll indicator inside the scrollbar. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+#
 module UI::ScrollAreaThumbBehavior
   # Returns HTML attributes for the thumb element
   def scroll_area_thumb_html_attributes

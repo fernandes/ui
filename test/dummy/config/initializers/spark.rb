@@ -13,7 +13,6 @@ Rails.application.config.to_prepare do
             ::Rails.root.join("app/javascript/controllers").to_s
           )
           puts file
-          file
         end
 
         # code from original class

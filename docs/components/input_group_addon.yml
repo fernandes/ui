@@ -1,0 +1,24 @@
+---
+name: Input Group Addon
+slug: input_group_addon
+category: other
+description: Addon - Phlex implementation
+anatomy:
+- name: Input Group Addon
+  description: An addon element for input groups that can contain text, icons, or
+    other elements.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Disabled state support
+api:
+  Input Group Addon:
+    description: An addon element for input groups that can contain text, icons, or
+      other elements.
+    parameters:
+    - name: align
+      type: String
+      default: inline-start
+      description: Alignment within container
+    data_attributes: []
+    css_variables: []

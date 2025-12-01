@@ -1,0 +1,84 @@
+---
+name: Item
+slug: item
+category: data
+anatomy:
+- name: Item
+  description: Individual item element
+  required: true
+- name: Content
+  description: Main content container
+  required: true
+- name: Description
+  description: Descriptive text element
+  required: false
+- name: Footer
+  description: Footer section with actions
+  required: false
+- name: Group
+  description: Container for grouping related items
+  required: false
+- name: Header
+  description: Header section with title and controls
+  required: false
+- name: Separator
+  description: Visual divider between sections
+  required: false
+- name: Title
+  description: Title text element
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Item:
+    description: ''
+    parameters:
+    - name: variant
+      type: String
+      default: default
+      description: Visual style variant
+    - name: size
+      type: String
+      default: default
+      description: Size of the element
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Footer:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

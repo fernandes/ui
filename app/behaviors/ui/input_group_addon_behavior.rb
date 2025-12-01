@@ -2,8 +2,15 @@
 
 # UI::InputGroupAddonBehavior
 #
-# Shared behavior for InputGroupAddon component across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent styling and HTML attribute generation for input group addons.
+# @ui_component Input Group Addon
+# @ui_description Addon - Phlex implementation
+# @ui_category other
+#
+# @ui_anatomy Input Group Addon - An addon element for input groups that can contain text, icons, or other elements. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+# @ui_feature Disabled state support
+#
 module UI::InputGroupAddonBehavior
   # Returns HTML attributes for the addon element
   def input_group_addon_html_attributes

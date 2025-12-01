@@ -1,0 +1,21 @@
+---
+name: Aspect Ratio
+slug: aspect_ratio
+category: layout
+description: AspectRatio - Phlex implementation
+anatomy:
+- name: Aspect Ratio
+  description: Displays content within a desired aspect ratio.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Aspect Ratio:
+    description: Displays content within a desired aspect ratio.
+    parameters:
+    - name: ratio
+      type: Float
+      default: '1.0'
+      description: The ratio
+    data_attributes: []
+    css_variables: []

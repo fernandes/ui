@@ -95,7 +95,7 @@ module UI
         return nil unless panel
 
         min = panel["data-min-size"]
-        min ? min.to_f : nil
+        min&.to_f
       end
 
       # Get a panel's max size constraint
@@ -108,7 +108,7 @@ module UI
         return nil unless panel
 
         max = panel["data-max-size"]
-        max ? max.to_f : nil
+        max&.to_f
       end
 
       # Get a panel's default size
@@ -121,7 +121,7 @@ module UI
         return nil unless panel
 
         default = panel["data-default-size"]
-        default ? default.to_f : nil
+        default&.to_f
       end
 
       # === Sub-elements ===
@@ -393,7 +393,7 @@ module UI
 
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Panel #{panel_index} did not reach size #{expected_size}% after #{timeout}s (current: #{current_size}%)"
+              "Panel #{panel_index} did not reach size #{expected_size}% after #{timeout}s (current: #{current_size}%)"
           end
 
           sleep 0.05

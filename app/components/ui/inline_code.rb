@@ -9,6 +9,7 @@ module UI
 
     def view_template(&block)
       extend UI::InlineCodeBehavior
+
       code(**inline_code_html_attributes.merge(@attributes), &block)
     end
   end

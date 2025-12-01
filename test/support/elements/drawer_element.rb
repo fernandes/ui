@@ -272,7 +272,7 @@ module UI
       #
       def content
         # Content is a sibling of container, not inside it
-        find_within('[data-vaul-drawer]', visible: :all)
+        find_within("[data-vaul-drawer]", visible: :all)
       end
 
       # Get the handle element (drag indicator)
@@ -362,7 +362,7 @@ module UI
         # Try to find the active element within content
         begin
           content.has_css?("*:focus", wait: 0)
-        rescue StandardError
+        rescue
           false
         end
       end
@@ -395,7 +395,7 @@ module UI
           return true if at_snap_point?(index)
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Drawer did not snap to point #{index} after #{timeout}s (current: #{current_snap_point})"
+              "Drawer did not snap to point #{index} after #{timeout}s (current: #{current_snap_point})"
           end
 
           sleep 0.05

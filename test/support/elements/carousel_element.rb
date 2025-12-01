@@ -308,7 +308,7 @@ module UI
           return true if current_slide_index == index
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected slide #{index} to be active, got #{current_slide_index} after #{timeout}s"
+              "Expected slide #{index} to be active, got #{current_slide_index} after #{timeout}s"
           end
 
           sleep 0.05

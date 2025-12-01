@@ -186,13 +186,13 @@ module UI
       # Navigate to next tab (right arrow in horizontal, down arrow in vertical)
       def navigate_next
         orientation = node["data-ui--tabs-orientation-value"] || "horizontal"
-        orientation == "horizontal" ? press_arrow_right : press_arrow_down
+        (orientation == "horizontal") ? press_arrow_right : press_arrow_down
       end
 
       # Navigate to previous tab (left arrow in horizontal, up arrow in vertical)
       def navigate_previous
         orientation = node["data-ui--tabs-orientation-value"] || "horizontal"
-        orientation == "horizontal" ? press_arrow_left : press_arrow_up
+        (orientation == "horizontal") ? press_arrow_left : press_arrow_up
       end
 
       # Navigate to first tab
@@ -254,7 +254,7 @@ module UI
           return true if active_tab == text
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected tab '#{text}' to be active, got '#{active_tab}' after #{timeout}s"
+              "Expected tab '#{text}' to be active, got '#{active_tab}' after #{timeout}s"
           end
 
           sleep 0.05
@@ -267,7 +267,7 @@ module UI
           return true if panel_visible?(value)
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected panel '#{value}' to be visible after #{timeout}s"
+              "Expected panel '#{value}' to be visible after #{timeout}s"
           end
 
           sleep 0.05

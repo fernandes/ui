@@ -1,0 +1,31 @@
+---
+name: Sidebar Menu Sub Button
+slug: sidebar_menu_sub_button
+category: other
+description: MenuSubButton - Phlex implementation
+anatomy:
+- name: Sidebar Menu Sub Button
+  description: Interactive button within a sidebar submenu item.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Disabled state support
+- ARIA attributes for accessibility
+api:
+  Sidebar Menu Sub Button:
+    description: Interactive button within a sidebar submenu item.
+    parameters:
+    - name: size
+      type: Symbol
+      default: ":md"
+      description: Size of the element
+    - name: active
+      type: Boolean
+      default: 'false'
+      description: The active
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []

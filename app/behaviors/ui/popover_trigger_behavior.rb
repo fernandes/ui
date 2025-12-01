@@ -10,7 +10,7 @@ module UI::PopoverTriggerBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     {
       class: popover_trigger_classes,
-      data: { ui__popover_target: "trigger" }
+      data: {ui__popover_target: "trigger"}
     }.merge(attributes_value)
   end
 

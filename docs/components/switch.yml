@@ -1,0 +1,72 @@
+---
+name: Switch
+slug: switch
+category: forms
+description: Switch - Phlex implementation
+anatomy:
+- name: Switch
+  description: A toggle control that allows the user to switch between checked and
+    unchecked states.
+  required: true
+features:
+- Keyboard navigation
+- Custom styling with Tailwind classes
+- Form integration
+- Disabled state support
+- ARIA attributes for accessibility
+- Animation support
+api:
+  Switch:
+    description: A toggle control that allows the user to switch between checked and
+      unchecked states.
+    parameters:
+    - name: checked
+      type: Boolean
+      default: 'false'
+      description: Whether the element is checked
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    - name: id
+      type: String
+      default: nil
+      description: HTML id attribute
+    - name: value
+      type: String
+      default: '1'
+      description: The current value
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Switch
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/switch/
+  description: Implements the WAI-ARIA Switch pattern with proper roles, states, and
+    keyboard navigation.
+  aria_attributes:
+  - aria-checked
+  - aria-disabled
+  - role="switch"
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: Space
+  description: Activates the focused element
+javascript:
+  controller: ui--switch
+  targets:
+  - thumb
+  values:
+  - name: checked
+    type: Boolean
+    description: The checked
+  actions:
+  - toggle
+  events: []
+related:
+- checkbox
+- toggle

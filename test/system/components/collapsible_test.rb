@@ -435,7 +435,7 @@ class CollapsibleTest < UI::SystemTestCase
     collapsible.collapse
 
     # Height should be set to 0px during animation
-    content = collapsible.content
+    collapsible.content
     sleep 0.1 # Wait a bit for animation to start
 
     assert collapsible.collapsed?

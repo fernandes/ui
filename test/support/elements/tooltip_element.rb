@@ -33,7 +33,7 @@ module UI
         return if hidden?
 
         # Move mouse to body (away from tooltip)
-        page.find('body').hover
+        page.find("body").hover
         wait_for_hidden_content
       end
 
@@ -128,12 +128,12 @@ module UI
             const controller = Stimulus.getControllerForElementAndIdentifier(tooltip, 'ui--tooltip');
             if (controller && controller.content) {
               // Mark the content element for identification
-              controller.content.setAttribute('data-tooltip-test-id', '#{node['id'] || object_id}');
+              controller.content.setAttribute('data-tooltip-test-id', '#{node["id"] || object_id}');
             }
           JS
 
           # Now find the marked content element
-          find_in_page("[data-tooltip-test-id='#{node['id'] || object_id}']", visible: :all)
+          find_in_page("[data-tooltip-test-id='#{node["id"] || object_id}']", visible: :all)
         end
       end
 
@@ -196,7 +196,7 @@ module UI
           return true if content["data-state"] == expected_state
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected content data-state='#{expected_state}', got '#{content["data-state"]}' after #{timeout}s"
+              "Expected content data-state='#{expected_state}', got '#{content["data-state"]}' after #{timeout}s"
           end
 
           sleep 0.05

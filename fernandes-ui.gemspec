@@ -1,14 +1,14 @@
 require_relative "lib/ui/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "fernandes-ui"
-  spec.version     = UI::VERSION
-  spec.authors     = [ "Celso Fernandes" ]
-  spec.email       = [ "fernandes@coding.com.br" ]
-  spec.homepage    = "https://ui.coding.com.br"
-  spec.summary     = "A Rails UI component library with ERB, Phlex, and ViewComponent support"
+  spec.name = "fernandes-ui"
+  spec.version = UI::VERSION
+  spec.authors = ["Celso Fernandes"]
+  spec.email = ["fernandes@coding.com.br"]
+  spec.homepage = "https://ui.coding.com.br"
+  spec.summary = "A Rails UI component library with ERB, Phlex, and ViewComponent support"
   spec.description = "A comprehensive UI component library for Rails applications. Provides reusable components in three formats: ERB partials, Phlex components, and ViewComponents. Built with Tailwind CSS 4 and Stimulus.js."
-  spec.license     = "MIT"
+  spec.license = "MIT"
 
   spec.required_ruby_version = ">= 3.0"
 

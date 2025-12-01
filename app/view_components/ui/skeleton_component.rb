@@ -1,30 +1,30 @@
 # frozen_string_literal: true
 
-    class UI::SkeletonComponent < ViewComponent::Base
-      def initialize(**attributes)
-        @attributes = attributes
-      end
+class UI::SkeletonComponent < ViewComponent::Base
+  def initialize(**attributes)
+    @attributes = attributes
+  end
 
-      def call
-        attrs = component_html_attributes.deep_merge(@attributes)
+  def call
+    attrs = component_html_attributes.deep_merge(@attributes)
 
-        # Merge Tailwind classes intelligently
-        attrs[:class] = TailwindMerge::Merger.new.merge([
-          component_html_attributes[:class],
-          @attributes[:class]
-        ].compact.join(" "))
+    # Merge Tailwind classes intelligently
+    attrs[:class] = TailwindMerge::Merger.new.merge([
+      component_html_attributes[:class],
+      @attributes[:class]
+    ].compact.join(" "))
 
-        content_tag :div, "", **attrs
-      end
+    content_tag :div, "", **attrs
+  end
 
-      private
+  private
 
-      def component_html_attributes
-        {
-          data: {
-            slot: "skeleton"
-          },
-          class: "bg-accent animate-pulse rounded-md"
-        }
-      end
-    end
+  def component_html_attributes
+    {
+      data: {
+        slot: "skeleton"
+      },
+      class: "bg-accent animate-pulse rounded-md"
+    }
+  end
+end

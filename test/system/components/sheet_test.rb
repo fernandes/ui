@@ -162,7 +162,7 @@ class SheetTest < UI::SystemTestCase
     sleep 0.2
 
     # Check that something inside the sheet has focus
-    focused_element = page.evaluate_script("document.activeElement")
+    page.evaluate_script("document.activeElement")
     focused_tag = page.evaluate_script("document.activeElement.tagName")
 
     # Should be an input, button, or other focusable element
@@ -243,7 +243,7 @@ class SheetTest < UI::SystemTestCase
 
     # Should NOT have the built-in X button in the corner
     # The X button has a specific class pattern
-    has_x_button = sheet.content.has_css?('button.absolute.top-4.right-4', visible: :all)
+    has_x_button = sheet.content.has_css?("button.absolute.top-4.right-4", visible: :all)
     refute has_x_button, "Sheet should not have X button when show_close is false"
 
     # Should still be able to close via overlay or escape
@@ -285,7 +285,7 @@ class SheetTest < UI::SystemTestCase
     sheet = default_sheet
 
     # Check initial body overflow style
-    initial_overflow = page.evaluate_script("document.body.style.overflow")
+    page.evaluate_script("document.body.style.overflow")
 
     sheet.open
 

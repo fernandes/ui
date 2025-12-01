@@ -1,0 +1,37 @@
+---
+name: Input Group Textarea
+slug: input_group_textarea
+category: other
+description: Textarea - Phlex implementation
+anatomy:
+- name: Input Group Textarea
+  description: A textarea element styled for use within input groups.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Input Group Textarea:
+    description: A textarea element styled for use within input groups.
+    parameters:
+    - name: placeholder
+      type: String
+      default: nil
+      description: Placeholder text when no value is selected
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    - name: id
+      type: String
+      default: nil
+      description: HTML id attribute
+    - name: rows
+      type: String
+      default: nil
+      description: The rows
+    data_attributes: []
+    css_variables: []

@@ -2,8 +2,14 @@
 
 # UI::ScrollAreaScrollbarBehavior
 #
-# Shared behavior for ScrollArea scrollbar across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent HTML attribute generation and styling.
+# @ui_component Scroll Area Scrollbar
+# @ui_description Scrollbar - Phlex implementation
+# @ui_category other
+#
+# @ui_anatomy Scroll Area Scrollbar - Custom scrollbar track that contains the draggable thumb. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+#
 module UI::ScrollAreaScrollbarBehavior
   # Returns HTML attributes for the scrollbar element
   def scroll_area_scrollbar_html_attributes

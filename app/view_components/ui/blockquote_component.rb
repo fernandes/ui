@@ -9,6 +9,7 @@ module UI
 
     def call
       extend UI::BlockquoteBehavior
+
       attrs = blockquote_html_attributes
       content_tag :blockquote, **attrs.merge(@attributes) do
         content

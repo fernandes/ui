@@ -440,7 +440,7 @@ class ResizableTest < UI::SystemTestCase
 
     assert_equal 2, sizes.count
     assert sizes.all? { |s| s.is_a?(Float) }
-    assert sizes.all? { |s| s >= 0 && s <= 100 }
+    assert sizes.all? { |s| s.between?(0, 100) }
   end
 
   # === Focus Tests ===

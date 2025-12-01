@@ -1,0 +1,86 @@
+---
+name: Pagination
+slug: pagination
+category: navigation
+description: Pagination component (Phlex) Container for pagination navigation
+anatomy:
+- name: Pagination
+  description: Root container for pagination
+  required: true
+- name: Content
+  description: Main content container
+  required: true
+- name: Ellipsis
+  description: Indicator for truncated items
+  required: false
+- name: Item
+  description: Individual item element
+  required: false
+- name: Link
+  description: Clickable navigation link
+  required: false
+- name: Next
+  description: Navigate to next item
+  required: false
+- name: Previous
+  description: Navigate to previous item
+  required: false
+features:
+- Custom styling with Tailwind classes
+- ARIA attributes for accessibility
+api:
+  Pagination:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Ellipsis:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Link:
+    description: ''
+    parameters:
+    - name: href
+      type: String
+      default: "#"
+      description: The href
+    - name: active
+      type: Boolean
+      default: 'false'
+      description: The active
+    - name: size
+      type: String
+      default: icon
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+  Next:
+    description: ''
+    parameters:
+    - name: href
+      type: String
+      default: "#"
+      description: The href
+    data_attributes: []
+    css_variables: []
+  Previous:
+    description: ''
+    parameters:
+    - name: href
+      type: String
+      default: "#"
+      description: The href
+    data_attributes: []
+    css_variables: []

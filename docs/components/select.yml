@@ -1,0 +1,195 @@
+---
+name: Select
+slug: select
+category: forms
+description: Displays a list of options for the user to pick from, triggered by a
+  button.
+anatomy:
+- name: Select
+  description: Root container with state management
+  required: true
+- name: Trigger
+  description: Button that opens the dropdown
+  required: true
+- name: Content
+  description: Container for the dropdown options
+  required: true
+- name: Item
+  description: Individual selectable option
+  required: true
+- name: Group
+  description: Groups related items with a label
+  required: false
+- name: Label
+  description: Label for item groups
+  required: false
+- name: Separator
+  description: Visual separator between items
+  required: false
+features:
+- Single selection from a list of options
+- Keyboard navigation with arrow keys
+- Type-ahead search functionality
+- Grouped options with labels
+- Disabled items support
+- Custom trigger with asChild pattern
+- Placeholder text when no selection
+- Form integration with hidden input
+api:
+  Select:
+    description: Shared behavior for Select component across ERB, ViewComponent, and
+      Phlex implementations.
+    parameters:
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    data_attributes:
+    - name: data-state
+      values:
+      - open
+      - closed
+      description: Current open/closed state
+    - name: data-placeholder
+      values:
+      - 'true'
+      description: Present when showing placeholder
+    css_variables:
+    - name: "--trigger-width"
+      description: Width of the trigger element
+  Content:
+    description: Shared behavior for Select dropdown content across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: Shared behavior for Select options group across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: Shared behavior for Individual select option across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    data_attributes: []
+    css_variables: []
+  Label:
+    description: Shared behavior for Select group label across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Scroll Down Button:
+    description: Shared behavior for Select scroll down button across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Scroll Up Button:
+    description: Shared behavior for Select scroll up button across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Shared behavior for Select trigger button across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: placeholder
+      type: String
+      default: Select...
+      description: Placeholder text when no value is selected
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Listbox
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/listbox/
+  description: Implements the WAI-ARIA Listbox pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes:
+  - role="combobox" on the trigger
+  - role="listbox" on the content container
+  - role="option" on each item
+  - aria-expanded on trigger
+  - aria-selected on the selected item
+  - aria-disabled on disabled items
+  - aria-labelledby for label association
+keyboard:
+- key: Space
+  description: Opens dropdown when trigger is focused
+- key: Enter
+  description: Opens dropdown / selects highlighted item
+- key: ArrowDown
+  description: Opens dropdown / moves to next item
+- key: ArrowUp
+  description: Moves to previous item
+- key: Home
+  description: Moves to first item
+- key: End
+  description: Moves to last item
+- key: Escape
+  description: Closes dropdown
+- key: A-Z,a-z
+  description: Type-ahead to find matching item
+javascript:
+  controller: ui--select
+  targets:
+  - trigger
+  - content
+  - item
+  - valueDisplay
+  - hiddenInput
+  - scrollUpButton
+  - scrollDownButton
+  - viewport
+  - itemCheck
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  - name: value
+    type: String
+    description: Current selected value
+  actions:
+  - toggle
+  - close
+  - selectItem
+  events: []
+related:
+- combobox
+- dropdown_menu
+- radio_group

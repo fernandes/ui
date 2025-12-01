@@ -1,0 +1,26 @@
+---
+name: Kbd
+slug: kbd
+category: data
+description: Kbd - Phlex implementation
+anatomy:
+- name: Kbd
+  description: Displays textual user input from keyboard, helping users understand
+  required: true
+- name: Group
+  description: Groups multiple keyboard keys together with consistent spacing.
+  required: false
+features:
+- Keyboard navigation
+- Custom styling with Tailwind classes
+api:
+  Kbd:
+    description: Displays textual user input from keyboard, helping users understand
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: Groups multiple keyboard keys together with consistent spacing.
+    parameters: []
+    data_attributes: []
+    css_variables: []

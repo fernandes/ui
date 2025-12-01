@@ -29,8 +29,7 @@ module UI
         args: [
           "--disable-dev-shm-usage",
           "--no-sandbox"
-        ]
-      )
+        ])
     end
 
     driven_by :playwright
@@ -140,7 +139,7 @@ module UI
     #
     def save_debug_screenshot(name)
       path = Rails.root.join("tmp/capybara/#{name}-#{Time.now.to_i}.png")
-      page.save_screenshot(path)
+      page.save_screenshot(path) # standard:disable Lint/Debugger
       path
     end
 

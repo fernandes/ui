@@ -1,0 +1,166 @@
+---
+name: Calendar
+slug: calendar
+category: forms
+description: Calendar component (Phlex) A date picker calendar with support for single,
+  range, and multiple selection
+anatomy:
+- name: Calendar
+  description: Root container for calendar
+  required: true
+features:
+- Keyboard navigation
+- Form integration
+- Disabled state support
+- ARIA attributes for accessibility
+- Keyboard navigation with arrow keys
+- Click outside to close
+- Animation support
+api:
+  Calendar:
+    description: ''
+    parameters:
+    - name: mode
+      type: Symbol
+      default: ":single"
+      description: The mode
+    - name: selected
+      type: String
+      default: nil
+      description: The selected
+    - name: month
+      type: String
+      default: Date.today
+      description: The month
+    - name: number_of_months
+      type: Integer
+      default: '1'
+      description: The number of months
+    - name: week_starts_on
+      type: Integer
+      default: '0'
+      description: The week starts on
+    - name: locale
+      type: String
+      default: en-US
+      description: The locale
+    - name: min_date
+      type: String
+      default: nil
+      description: The min date
+    - name: max_date
+      type: String
+      default: nil
+      description: The max date
+    - name: disabled_dates
+      type: Array
+      default: "[]"
+      description: The disabled dates
+    - name: show_outside_days
+      type: Boolean
+      default: 'true'
+      description: The show outside days
+    - name: fixed_weeks
+      type: Boolean
+      default: 'false'
+      description: The fixed weeks
+    - name: show_dropdowns
+      type: Boolean
+      default: 'false'
+      description: The show dropdowns
+    - name: year_range
+      type: Integer
+      default: '100'
+      description: The year range
+    - name: min_range_days
+      type: Integer
+      default: '0'
+      description: The min range days
+    - name: max_range_days
+      type: Integer
+      default: '0'
+      description: The max range days
+    - name: exclude_disabled
+      type: Boolean
+      default: 'false'
+      description: The exclude disabled
+    - name: use_native_select
+      type: Boolean
+      default: 'true'
+      description: The use native select
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    data_attributes: []
+    css_variables: []
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: Space
+  description: Activates the focused element
+- key: ArrowDown
+  description: Moves focus to next item
+- key: ArrowUp
+  description: Moves focus to previous item
+- key: ArrowLeft
+  description: Moves focus left or decreases value
+- key: ArrowRight
+  description: Moves focus right or increases value
+- key: Home
+  description: Moves focus to first item
+- key: End
+  description: Moves focus to last item
+- key: PageUp
+  description: Moves focus up by page
+- key: PageDown
+  description: Moves focus down by page
+javascript:
+  controller: ui--calendar
+  targets:
+  - grid
+  - monthLabel
+  - input
+  - monthSelect
+  - yearSelect
+  - liveRegion
+  - weekdaysHeader
+  - monthContainer
+  values:
+  - name: mode
+    type: String
+    description: The mode
+  actions:
+  - initializeLocale
+  - previousMonth
+  - nextMonth
+  - previousYear
+  - nextYear
+  - goToMonth
+  - goToYear
+  - goToToday
+  - dispatchMonthChange
+  - announceMonthChange
+  - announceSelection
+  - selectDate
+  - selectRange
+  - hasDisabledDatesInRange
+  - toggleDate
+  - isInRangePreview
+  - isRangePreviewStart
+  - isRangePreviewEnd
+  - animateMonthTransition
+  - isSelected
+  - isDisabled
+  - isInRange
+  - isRangeStart
+  - isRangeEnd
+  - moveFocus
+  - selectFocusedDate
+  - restoreFocus
+  - navigateAndFocus
+  - moveToStartOfWeek
+  - moveToEndOfWeek
+  events: []
+related:
+- date_picker

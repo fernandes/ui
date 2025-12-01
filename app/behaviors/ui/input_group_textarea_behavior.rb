@@ -2,8 +2,14 @@
 
 # UI::InputGroupTextareaBehavior
 #
-# Shared behavior for InputGroupTextarea component across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent styling and HTML attribute generation for input group textareas.
+# @ui_component Input Group Textarea
+# @ui_description Textarea - Phlex implementation
+# @ui_category other
+#
+# @ui_anatomy Input Group Textarea - A textarea element styled for use within input groups. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+#
 module UI::InputGroupTextareaBehavior
   # Returns HTML attributes for the input group textarea
   def input_group_textarea_html_attributes
@@ -15,7 +21,7 @@ module UI::InputGroupTextareaBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     # Merge data-slot to override the default textarea slot with "input-group-control"
     # For Phlex: merge at top level, for ERB/VC: merge inside attributes hash
-    data_slot_override = { data: { slot: "input-group-control" } }
+    data_slot_override = {data: {slot: "input-group-control"}}
 
     # Merge the data-slot both at top level (for Phlex) and in attributes (for ERB/VC)
     merged_attrs = attributes_value.deep_merge(data_slot_override)

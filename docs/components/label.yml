@@ -1,0 +1,26 @@
+---
+name: Label
+slug: label
+category: forms
+description: Label - Phlex implementation
+anatomy:
+- name: Label
+  description: Accessible label for form inputs following shadcn/ui design patterns.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Form integration
+- Disabled state support
+api:
+  Label:
+    description: Accessible label for form inputs following shadcn/ui design patterns.
+    parameters:
+    - name: for_id
+      type: String
+      default: nil
+      description: The for id
+    data_attributes: []
+    css_variables: []
+related:
+- field
+- input

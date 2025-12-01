@@ -2,8 +2,14 @@
 
 # UI::ScrollAreaCornerBehavior
 #
-# Shared behavior for ScrollArea corner across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent HTML attribute generation and styling.
+# @ui_component Scroll Area Corner
+# @ui_description Corner - Phlex implementation
+# @ui_category other
+#
+# @ui_anatomy Scroll Area Corner - Intersection element between vertical and horizontal scrollbars. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+#
 module UI::ScrollAreaCornerBehavior
   # Returns HTML attributes for the corner element
   def scroll_area_corner_html_attributes

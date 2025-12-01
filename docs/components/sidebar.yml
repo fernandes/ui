@@ -1,0 +1,138 @@
+---
+name: Sidebar
+slug: sidebar
+category: navigation
+description: Sidebar - Phlex implementation
+anatomy:
+- name: Sidebar
+  description: Main sidebar container with support for variants and collapsible modes.
+  required: true
+- name: Content
+  description: Scrollable content area in the middle of the sidebar.
+  required: true
+- name: Footer
+  description: Fixed footer section at the bottom of the sidebar.
+  required: false
+- name: Group
+  description: Container for grouping related sidebar items.
+  required: false
+- name: Group Action
+  description: Action button within a sidebar group header.
+  required: false
+- name: Group Content
+  description: Container for content within a sidebar group.
+  required: true
+- name: Header
+  description: Fixed header section at the top of the sidebar.
+  required: false
+- name: Input
+  description: Input field styled for sidebar usage.
+  required: false
+- name: Separator
+  description: Visual divider within the sidebar.
+  required: false
+- name: Trigger
+  description: Button that toggles the sidebar open/closed.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Sidebar:
+    description: Main sidebar container with support for variants and collapsible
+      modes.
+    parameters:
+    - name: variant
+      type: String
+      default: sidebar
+      description: Visual style variant
+    - name: side
+      type: String
+      default: left
+      description: Which side to display on
+    - name: collapsible
+      type: String
+      default: icon
+      description: The collapsible
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Scrollable content area in the middle of the sidebar.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Footer:
+    description: Fixed footer section at the bottom of the sidebar.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: Container for grouping related sidebar items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Group Action:
+    description: Action button within a sidebar group header.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Group Content:
+    description: Container for content within a sidebar group.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: Fixed header section at the top of the sidebar.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Input:
+    description: Input field styled for sidebar usage.
+    parameters:
+    - name: type
+      type: String
+      default: text
+      description: The type
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: Visual divider within the sidebar.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Button that toggles the sidebar open/closed.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+javascript:
+  controller: ui--sidebar
+  targets:
+  - sidebar
+  - trigger
+  - mobileSheet
+  - mobileDrawer
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - toggle
+  - open
+  - close
+  - toggleDesktop
+  - openDesktop
+  - closeDesktop
+  - toggleMobile
+  - openMobile
+  - closeMobile
+  - isMobile
+  - saveCookie
+  - loadCookie
+  - dispatchToggleEvent
+  events:
+  - name: sidebar:toggle
+    description: Fired when sidebar toggle

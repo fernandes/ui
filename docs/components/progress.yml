@@ -1,0 +1,37 @@
+---
+name: Progress
+slug: progress
+category: feedback
+description: Progress - Phlex implementation
+anatomy:
+- name: Progress
+  description: A progress indicator component for displaying task completion or loading
+    status.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Form integration
+- ARIA attributes for accessibility
+api:
+  Progress:
+    description: A progress indicator component for displaying task completion or
+      loading status.
+    parameters:
+    - name: value
+      type: Integer
+      default: '0'
+      description: The current value
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Meter
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/meter/
+  description: Implements the WAI-ARIA Meter pattern with proper roles, states, and
+    keyboard navigation.
+  aria_attributes:
+  - aria-valuemin
+  - aria-valuemax
+  - aria-valuenow
+  - role="progressbar"
+related:
+- skeleton

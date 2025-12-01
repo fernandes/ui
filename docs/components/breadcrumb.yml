@@ -1,0 +1,76 @@
+---
+name: Breadcrumb
+slug: breadcrumb
+category: navigation
+description: Breadcrumb - Phlex implementation
+anatomy:
+- name: Breadcrumb
+  description: A navigation breadcrumb component for displaying hierarchical navigation.
+  required: true
+- name: Ellipsis
+  description: Indicator for collapsed/hidden breadcrumb items.
+  required: false
+- name: Item
+  description: Individual breadcrumb entry within the breadcrumb list.
+  required: false
+- name: Link
+  description: Clickable breadcrumb link for navigation.
+  required: false
+- name: List
+  description: Container for breadcrumb items, rendered as an ordered list.
+  required: false
+- name: Page
+  description: Current page indicator (non-clickable) for breadcrumbs.
+  required: false
+- name: Separator
+  description: Visual divider between breadcrumb items with default chevron icon.
+  required: false
+features:
+- ARIA attributes for accessibility
+api:
+  Breadcrumb:
+    description: A navigation breadcrumb component for displaying hierarchical navigation.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Ellipsis:
+    description: Indicator for collapsed/hidden breadcrumb items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: Individual breadcrumb entry within the breadcrumb list.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Link:
+    description: Clickable breadcrumb link for navigation.
+    parameters:
+    - name: href
+      type: String
+      default: "#"
+      description: The href
+    data_attributes: []
+    css_variables: []
+  List:
+    description: Container for breadcrumb items, rendered as an ordered list.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Page:
+    description: Current page indicator (non-clickable) for breadcrumbs.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: Visual divider between breadcrumb items with default chevron icon.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Breadcrumb
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/
+  description: Implements the WAI-ARIA Breadcrumb pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes:
+  - aria-label

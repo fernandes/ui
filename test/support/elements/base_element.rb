@@ -165,7 +165,7 @@ module UI
           return true if data_state == expected_state
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected state '#{expected_state}', got '#{data_state}' after #{timeout}s"
+              "Expected state '#{expected_state}', got '#{data_state}' after #{timeout}s"
           end
 
           sleep 0.05
@@ -178,7 +178,7 @@ module UI
           return true if aria(attribute) == value.to_s
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected aria-#{attribute}='#{value}', got '#{aria(attribute)}' after #{timeout}s"
+              "Expected aria-#{attribute}='#{value}', got '#{aria(attribute)}' after #{timeout}s"
           end
 
           sleep 0.05
@@ -208,7 +208,7 @@ module UI
       end
 
       def press_tab(shift: false)
-        shift ? send_keys([ :shift, :tab ]) : send_keys(:tab)
+        shift ? send_keys([:shift, :tab]) : send_keys(:tab)
       end
 
       def press_arrow(direction)

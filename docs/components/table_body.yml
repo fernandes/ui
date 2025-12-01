@@ -1,0 +1,16 @@
+---
+name: Table Body
+slug: table_body
+category: other
+anatomy:
+- name: Table Body
+  description: Main body content area
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Table Body:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

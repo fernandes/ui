@@ -189,7 +189,7 @@ class AlertDialogTest < UI::SystemTestCase
 
     # Check that something inside the alert dialog has focus
     # The alert dialog controller should focus the first focusable element
-    focused_element = page.evaluate_script("document.activeElement")
+    page.evaluate_script("document.activeElement")
     focused_tag = page.evaluate_script("document.activeElement.tagName")
 
     # Should be a button (cancel or action button)
@@ -298,7 +298,7 @@ class AlertDialogTest < UI::SystemTestCase
     alert_dialog = default_alert_dialog
 
     # Check initial body overflow style
-    initial_overflow = page.evaluate_script("document.body.style.overflow")
+    page.evaluate_script("document.body.style.overflow")
 
     alert_dialog.open
 

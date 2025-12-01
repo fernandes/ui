@@ -33,7 +33,7 @@ module UI
         return if hidden?
 
         # Move mouse to body (away from hover card)
-        page.find('body').hover
+        page.find("body").hover
         wait_for_hidden_content
       end
 
@@ -170,7 +170,7 @@ module UI
           return true if content["data-state"] == expected_state
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected content data-state='#{expected_state}', got '#{content["data-state"]}' after #{timeout}s"
+              "Expected content data-state='#{expected_state}', got '#{content["data-state"]}' after #{timeout}s"
           end
 
           sleep 0.05

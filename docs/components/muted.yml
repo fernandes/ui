@@ -1,0 +1,16 @@
+---
+name: Muted
+slug: muted
+category: typography
+anatomy:
+- name: Muted
+  description: Muted component part
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Muted:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

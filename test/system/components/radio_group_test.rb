@@ -151,7 +151,7 @@ class RadioGroupTest < UI::SystemTestCase
     assert group.disabled?("2")
 
     # Try to select disabled option "2" using force (Playwright won't click disabled elements normally)
-    disabled_option = group.find_option_by_value("2")
+    group.find_option_by_value("2")
 
     # Disabled elements cannot be clicked through normal interaction
     # Playwright will timeout/error when trying to click disabled elements

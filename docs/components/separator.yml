@@ -1,0 +1,26 @@
+---
+name: Separator
+slug: separator
+category: layout
+description: Separator - Phlex implementation
+anatomy:
+- name: Separator
+  description: Visually or semantically separates content.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- ARIA attributes for accessibility
+api:
+  Separator:
+    description: Visually or semantically separates content.
+    parameters:
+    - name: orientation
+      type: Symbol
+      default: ":horizontal"
+      description: Orientation (horizontal or vertical)
+    - name: decorative
+      type: Boolean
+      default: 'true'
+      description: The decorative
+    data_attributes: []
+    css_variables: []

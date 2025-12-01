@@ -9,6 +9,7 @@ module UI
 
     def call
       extend UI::ListBehavior
+
       attrs = list_html_attributes
       content_tag :ul, **attrs.merge(@attributes) do
         content

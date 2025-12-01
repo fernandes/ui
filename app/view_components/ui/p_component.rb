@@ -9,6 +9,7 @@ module UI
 
     def call
       extend UI::PBehavior
+
       attrs = p_html_attributes
       content_tag :p, **attrs.merge(@attributes) do
         content

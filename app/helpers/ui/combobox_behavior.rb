@@ -39,7 +39,7 @@ module UI::ComboboxBehavior
   # @return [Hash] HTML attributes marking element as text target
   def combobox_text_html_attributes
     {
-      data: { ui__combobox_target: "text" }
+      data: {ui__combobox_target: "text"}
     }
   end
 

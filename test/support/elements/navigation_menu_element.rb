@@ -55,7 +55,7 @@ module UI
         # Navigation menu closes on escape OR click outside
         # Let's try clicking outside which is more reliable
         # Find an element outside the navigation menu and click it
-        page.find('h1').click
+        page.find("h1").click
         sleep 0.3 # Wait for close animation
       end
 
@@ -65,7 +65,7 @@ module UI
       #
       def click_link(link_text)
         active_content = find_active_content
-        link = active_content.find('a', text: link_text)
+        link = active_content.find("a", text: link_text)
         link.click
       end
 
@@ -73,7 +73,7 @@ module UI
       def click_outside
         # Find an element outside the navigation menu and click it
         # Use the h1 heading which is outside the nav element
-        page.find('h1').click
+        page.find("h1").click
         sleep 0.2 # Wait for event to process
         wait_for_all_closed
       end
@@ -152,7 +152,7 @@ module UI
         return [] unless any_menu_open?
 
         active_content = find_active_content
-        active_content.all('a', minimum: 0).map { |link| link.text.strip }
+        active_content.all("a", minimum: 0).map { |link| link.text.strip }
       end
 
       # Check if content has a specific link
@@ -164,7 +164,7 @@ module UI
         return false unless any_menu_open?
 
         active_content = find_active_content
-        active_content.has_css?('a', text: link_text)
+        active_content.has_css?("a", text: link_text)
       end
 
       # === Viewport Queries ===

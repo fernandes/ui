@@ -72,7 +72,7 @@ module UI
       # This might have overflow depending on exact sizing
       # Just verify the method works without error
       result = scroll_area.has_vertical_overflow?
-      assert [ true, false ].include?(result)
+      assert [true, false].include?(result)
     end
 
     # === Scroll Position ===
@@ -318,7 +318,7 @@ module UI
       # Just verify position changed or is at top
       final_position = scroll_area.scroll_top
       assert(scroll_area.at_top? || final_position < initial_position,
-             "Expected to scroll up with Home key")
+        "Expected to scroll up with Home key")
     end
 
     test "scrolls to bottom with end key" do
@@ -331,7 +331,7 @@ module UI
       # Just verify position changed or is at bottom
       final_position = scroll_area.scroll_top
       assert(scroll_area.at_bottom? || final_position > initial_position,
-             "Expected to scroll down with End key")
+        "Expected to scroll down with End key")
     end
 
     # === Horizontal Keyboard Scrolling ===

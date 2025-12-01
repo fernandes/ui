@@ -1,0 +1,16 @@
+---
+name: Large
+slug: large
+category: typography
+anatomy:
+- name: Large
+  description: Large component part
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Large:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

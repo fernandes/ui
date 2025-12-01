@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-    class UI::ItemContentComponent < ViewComponent::Base
-      include UI::ItemContentBehavior
+class UI::ItemContentComponent < ViewComponent::Base
+  include UI::ItemContentBehavior
 
-      def initialize(classes: "", **attributes)
-        @classes = classes
-        @attributes = attributes
-      end
+  def initialize(classes: "", **attributes)
+    @classes = classes
+    @attributes = attributes
+  end
 
-      def call
-        content_tag :div, content, **item_content_html_attributes
-      end
+  def call
+    content_tag :div, content, **item_content_html_attributes
+  end
 
-      private
+  private
 
-      attr_reader :classes, :attributes
-    end
+  attr_reader :classes, :attributes
+end

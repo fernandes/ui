@@ -1,0 +1,124 @@
+---
+name: Context Menu
+slug: context_menu
+category: overlay
+description: ContextMenu - Phlex implementation
+anatomy:
+- name: Context Menu
+  description: Container for context menus triggered by right-click.
+  required: true
+- name: Content
+  description: Menu items container with animations and positioning.
+  required: true
+- name: Item
+  description: Individual menu item that can be rendered as a link or div.
+  required: false
+- name: Label
+  description: Non-interactive label for grouping menu items.
+  required: false
+- name: Separator
+  description: A visual divider between menu items.
+  required: false
+- name: Shortcut
+  description: Displays keyboard shortcut text for a menu item.
+  required: false
+- name: Trigger
+  description: The element that triggers the context menu on right-click.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Keyboard navigation with arrow keys
+- Click outside to close
+api:
+  Context Menu:
+    description: Container for context menus triggered by right-click.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Menu items container with animations and positioning.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: Individual menu item that can be rendered as a link or div.
+    parameters:
+    - name: href
+      type: String
+      default: nil
+      description: The href
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    - name: variant
+      type: String
+      default: default
+      description: Visual style variant
+    data_attributes: []
+    css_variables: []
+  Label:
+    description: Non-interactive label for grouping menu items.
+    parameters:
+    - name: inset
+      type: Boolean
+      default: 'false'
+      description: The inset
+    data_attributes: []
+    css_variables: []
+  Separator:
+    description: A visual divider between menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Shortcut:
+    description: Displays keyboard shortcut text for a menu item.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: The element that triggers the context menu on right-click.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Menu
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/menu/
+  description: Implements the WAI-ARIA Menu pattern with proper roles, states, and
+    keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: Escape
+  description: Closes the component
+- key: ArrowDown
+  description: Moves focus to next item
+- key: ArrowUp
+  description: Moves focus to previous item
+- key: Home
+  description: Moves focus to first item
+- key: End
+  description: Moves focus to last item
+javascript:
+  controller: ui--context-menu
+  targets:
+  - trigger
+  - content
+  - item
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - open
+  - close
+  - closeAllContextMenus
+  - teardownKeyboardNavigation
+  - findCurrentItemIndex
+  - trackHoveredItem
+  - positionContextMenu
+  events: []
+related:
+- dropdown_menu
+- menubar

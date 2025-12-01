@@ -100,7 +100,7 @@ module UI
 
       # "Docs" is a simple link element within the navigation
       # It's not a trigger, so we need to find it differently
-      docs_link = nav_menu.node.find('a', text: 'Docs')
+      docs_link = nav_menu.node.find("a", text: "Docs")
 
       assert_equal "a", docs_link.tag_name
       assert docs_link["href"].end_with?("#")

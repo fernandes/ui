@@ -217,7 +217,7 @@ module UI
           return true if data_state == expected_state
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected data-state='#{expected_state}', got '#{data_state}' after #{timeout}s"
+              "Expected data-state='#{expected_state}', got '#{data_state}' after #{timeout}s"
           end
 
           sleep 0.05

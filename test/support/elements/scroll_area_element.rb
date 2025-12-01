@@ -493,7 +493,7 @@ module UI
       # Remove focus from viewport by clicking outside
       def blur_viewport
         # Find the page title or body to click outside
-        page.find('h1').click
+        page.find("h1").click
         sleep 0.05
       end
 
@@ -508,12 +508,12 @@ module UI
       def wait_for_scroll_position(position, orientation, timeout: 2.0)
         start_time = Time.now
         loop do
-          current = orientation == :vertical ? scroll_top : scroll_left
+          current = (orientation == :vertical) ? scroll_top : scroll_left
           return true if (current - position).abs <= 1 # Allow 1px tolerance
 
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected scroll position #{position}, got #{current} after #{timeout}s"
+              "Expected scroll position #{position}, got #{current} after #{timeout}s"
           end
 
           sleep 0.05
@@ -528,12 +528,12 @@ module UI
       def wait_for_scrollbar_visible(orientation, timeout: 2.0)
         start_time = Time.now
         loop do
-          scrollbar = orientation == :vertical ? vertical_scrollbar : horizontal_scrollbar
+          scrollbar = (orientation == :vertical) ? vertical_scrollbar : horizontal_scrollbar
           return true if scrollbar && scrollbar["data-state"] == "visible"
 
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected #{orientation} scrollbar to be visible after #{timeout}s"
+              "Expected #{orientation} scrollbar to be visible after #{timeout}s"
           end
 
           sleep 0.05
@@ -548,12 +548,12 @@ module UI
       def wait_for_scrollbar_hidden(orientation, timeout: 2.0)
         start_time = Time.now
         loop do
-          scrollbar = orientation == :vertical ? vertical_scrollbar : horizontal_scrollbar
+          scrollbar = (orientation == :vertical) ? vertical_scrollbar : horizontal_scrollbar
           return true if scrollbar && scrollbar["data-state"] == "hidden"
 
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Expected #{orientation} scrollbar to be hidden after #{timeout}s"
+              "Expected #{orientation} scrollbar to be hidden after #{timeout}s"
           end
 
           sleep 0.05

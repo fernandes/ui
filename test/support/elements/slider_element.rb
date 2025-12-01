@@ -153,7 +153,8 @@ module UI
         return unless thumb_element
 
         # Calculate the percentage of the slider
-        percentage = ((new_value - min).to_f / (max - min).to_f) * 100
+        (new_value - min).to_f
+        (max - min).to_f
 
         # Use JavaScript to set the value directly
         script = <<~JS

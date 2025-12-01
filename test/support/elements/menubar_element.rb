@@ -206,7 +206,7 @@ module UI
         open_menu(menu_name) unless menu_open?(menu_name)
         content = find_content(menu_name)
         item = find_checkbox_item_in_content(content, item_text)
-        current_state = item["data-state"]
+        item["data-state"]
         item.click
         # Wait for state to actually change
         sleep 0.3
@@ -254,7 +254,7 @@ module UI
 
         # Find the wrapper div that contains both trigger and submenu
         # Structure: div.relative > [role="menuitem"] + [role="menu"]
-        wrappers = content.all('.relative', visible: :all, minimum: 0)
+        wrappers = content.all(".relative", visible: :all, minimum: 0)
         wrapper = wrappers.find do |div|
           # Match exact text (first line only, without shortcuts)
           div.has_css?('[role="menuitem"]', exact_text: item_text, wait: false)

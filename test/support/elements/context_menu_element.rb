@@ -218,7 +218,7 @@ module UI
       def item_shortcut(item_text)
         ensure_open
         item = find_item(item_text)
-        shortcut = item.first('.text-muted-foreground.ml-auto', wait: false)
+        shortcut = item.first(".text-muted-foreground.ml-auto", wait: false)
         shortcut&.text&.strip
       rescue Capybara::ElementNotFound
         nil

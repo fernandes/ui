@@ -1,0 +1,219 @@
+---
+name: Drawer
+slug: drawer
+category: overlay
+anatomy:
+- name: Drawer
+  description: Root container with state management
+  required: true
+- name: Close
+  description: Button to close/dismiss the component
+  required: false
+- name: Content
+  description: Main content container
+  required: true
+- name: Description
+  description: Descriptive text element
+  required: false
+- name: Footer
+  description: Footer section with actions
+  required: false
+- name: Handle
+  description: Draggable handle element
+  required: false
+- name: Header
+  description: Header section with title and controls
+  required: false
+- name: Overlay
+  description: Background overlay that dims the page
+  required: false
+- name: Title
+  description: Title text element
+  required: false
+- name: Trigger
+  description: Button or element that activates the component
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Focus management
+- Animation support
+api:
+  Drawer:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    - name: direction
+      type: String
+      default: bottom
+      description: The direction
+    - name: dismissible
+      type: Boolean
+      default: 'true'
+      description: The dismissible
+    - name: modal
+      type: Boolean
+      default: 'true'
+      description: The modal
+    - name: snap_points
+      type: String
+      default: nil
+      description: The snap points
+    - name: active_snap_point
+      type: String
+      default: nil
+      description: The active snap point
+    - name: fade_from_index
+      type: String
+      default: nil
+      description: The fade from index
+    - name: snap_to_sequential_point
+      type: Boolean
+      default: 'false'
+      description: The snap to sequential point
+    - name: handle_only
+      type: Boolean
+      default: 'false'
+      description: The handle only
+    - name: reposition_inputs
+      type: Boolean
+      default: 'true'
+      description: The reposition inputs
+    data_attributes: []
+    css_variables: []
+  Close:
+    description: ''
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":outline"
+      description: Visual style variant
+    - name: size
+      type: Symbol
+      default: ":default"
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    - name: direction
+      type: String
+      default: bottom
+      description: The direction
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Footer:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Handle:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Overlay:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: ''
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: variant
+      type: Symbol
+      default: ":outline"
+      description: Visual style variant
+    - name: size
+      type: Symbol
+      default: ":default"
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Dialog (Modal)
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+  description: Implements the WAI-ARIA Dialog (Modal) pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Escape
+  description: Closes the component
+- key: End
+  description: Moves focus to last item
+javascript:
+  controller: ui--drawer
+  targets:
+  - container
+  - overlay
+  - content
+  - handle
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - open
+  - close
+  - closeOnOverlayClick
+  - startDrag
+  - endDrag
+  - snapPointToPixels
+  - calculateSnapPosition
+  - findClosestSnapPointIndex
+  - snapTo
+  - snapPointToPercentage
+  - isHorizontalDirection
+  - isVerticalDirection
+  - isClosingDirection
+  - calculateVelocity
+  - applyDamping
+  - shouldIgnoreDrag
+  - isHandleEvent
+  - resetPosition
+  - calculateOverlayOpacity
+  - show
+  - hide
+  - animateToClosedPosition
+  - cleanupAfterClose
+  - isMobile
+  - hasSnapPoints
+  - positionAtClosed
+  - animateToOpen
+  - cleanupEscapeHandler
+  - applyTransform
+  - dispatchEvent
+  events: []
+related:
+- dialog
+- sheet

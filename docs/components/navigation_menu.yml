@@ -1,0 +1,161 @@
+---
+name: Navigation Menu
+slug: navigation_menu
+category: navigation
+description: NavigationMenu - Phlex implementation
+anatomy:
+- name: Navigation Menu
+  description: A collection of links for navigating websites. Built on Radix UI patterns.
+  required: true
+- name: Content
+  description: Container for navigation menu content that appears when trigger is
+    activated.
+  required: true
+- name: Item
+  description: Wrapper for individual navigation menu item.
+  required: false
+- name: Link
+  description: Navigation link component. Supports asChild pattern for composition
+    with link_to.
+  required: false
+- name: List
+  description: Container for navigation menu items.
+  required: false
+- name: Trigger
+  description: Button that toggles the navigation menu content.
+  required: true
+- name: Viewport
+  description: Container for navigation menu content when viewport mode is enabled.
+  required: false
+features:
+- Custom styling with Tailwind classes
+- Keyboard navigation with arrow keys
+- Click outside to close
+- Animation support
+api:
+  Navigation Menu:
+    description: A collection of links for navigating websites. Built on Radix UI
+      patterns.
+    parameters:
+    - name: viewport
+      type: Boolean
+      default: 'true'
+      description: The viewport
+    - name: delay_duration
+      type: Integer
+      default: '200'
+      description: The delay duration
+    - name: skip_delay_duration
+      type: Integer
+      default: '300'
+      description: The skip delay duration
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: Container for navigation menu content that appears when trigger is
+      activated.
+    parameters:
+    - name: viewport
+      type: Boolean
+      default: 'true'
+      description: The viewport
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: Wrapper for individual navigation menu item.
+    parameters:
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    data_attributes: []
+    css_variables: []
+  Link:
+    description: Navigation link component. Supports asChild pattern for composition
+      with link_to.
+    parameters:
+    - name: href
+      type: String
+      default: nil
+      description: The href
+    - name: active
+      type: Boolean
+      default: 'false'
+      description: The active
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: trigger_style
+      type: Boolean
+      default: 'false'
+      description: The trigger style
+    data_attributes: []
+    css_variables: []
+  List:
+    description: Container for navigation menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: Button that toggles the navigation menu content.
+    parameters:
+    - name: first
+      type: Boolean
+      default: 'false'
+      description: The first
+    data_attributes: []
+    css_variables: []
+  Viewport:
+    description: Container for navigation menu content when viewport mode is enabled.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Navigation
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/navigation/
+  description: Implements the WAI-ARIA Navigation pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: Escape
+  description: Closes the component
+- key: ArrowDown
+  description: Moves focus to next item
+- key: ArrowLeft
+  description: Moves focus left or decreases value
+- key: ArrowRight
+  description: Moves focus right or increases value
+- key: Home
+  description: Moves focus to first item
+- key: End
+  description: Moves focus to last item
+- key: Tab
+  description: Moves focus to next focusable element
+javascript:
+  controller: ui--navigation-menu
+  targets:
+  - trigger
+  - content
+  - viewport
+  - item
+  values:
+  - name: viewport
+    type: Boolean
+    description: The viewport
+  actions:
+  - initializeTriggers
+  - clearTimers
+  - toggle
+  - openMenu
+  - animateContentOut
+  - closeMenu
+  - closeAll
+  - calculateEnterMotion
+  - calculateExitMotion
+  events: []
+related:
+- menubar
+- tabs

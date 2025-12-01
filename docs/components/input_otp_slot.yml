@@ -1,0 +1,39 @@
+---
+name: Input OTP Slot
+slug: input_otp_slot
+category: other
+description: Slot - Phlex implementation
+anatomy:
+- name: Input OTP Slot
+  description: Individual OTP input slot for a single character.
+  required: true
+features:
+- Keyboard navigation
+- Custom styling with Tailwind classes
+- Disabled state support
+api:
+  Input OTP Slot:
+    description: Individual OTP input slot for a single character.
+    parameters:
+    - name: index
+      type: Integer
+      default: '0'
+      description: The index
+    - name: value
+      type: String
+      default: ''
+      description: The current value
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    - name: id
+      type: String
+      default: nil
+      description: HTML id attribute
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    data_attributes: []
+    css_variables: []

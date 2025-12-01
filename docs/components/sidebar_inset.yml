@@ -1,0 +1,17 @@
+---
+name: Sidebar Inset
+slug: sidebar_inset
+category: other
+description: SidebarInset - Phlex implementation
+anatomy:
+- name: Sidebar Inset
+  description: Main content area that sits alongside the sidebar.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Sidebar Inset:
+    description: Main content area that sits alongside the sidebar.
+    parameters: []
+    data_attributes: []
+    css_variables: []

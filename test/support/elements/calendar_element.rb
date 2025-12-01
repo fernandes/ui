@@ -358,7 +358,7 @@ module UI
           return true if date_selected?(date)
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Date #{date} was not selected after #{timeout}s"
+              "Date #{date} was not selected after #{timeout}s"
           end
 
           sleep 0.05
@@ -378,7 +378,7 @@ module UI
           return true if current.month == month && current.year == year
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Calendar did not navigate to #{month}/#{year} after #{timeout}s"
+              "Calendar did not navigate to #{month}/#{year} after #{timeout}s"
           end
 
           sleep 0.05

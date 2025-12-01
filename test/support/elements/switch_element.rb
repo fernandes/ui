@@ -143,9 +143,7 @@ module UI
         sleep 0.05
 
         check_script = "document.activeElement === document.evaluate('#{node.path}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue"
-        is_focused = page.evaluate_script(check_script)
-
-        is_focused
+        page.evaluate_script(check_script)
       end
 
       # Toggle using Space key

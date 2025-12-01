@@ -169,8 +169,6 @@ module UI
             rescue Capybara::ElementNotFound
               nil
             end
-          else
-            nil
           end
         end.compact.reject(&:empty?)
       end

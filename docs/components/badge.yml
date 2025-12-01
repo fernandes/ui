@@ -1,0 +1,24 @@
+---
+name: Badge
+slug: badge
+category: data
+description: Badge - Phlex implementation
+anatomy:
+- name: Badge
+  description: Displays a badge or a component that looks like a badge.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- ARIA attributes for accessibility
+api:
+  Badge:
+    description: Displays a badge or a component that looks like a badge.
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":default"
+      description: Visual style variant
+    data_attributes: []
+    css_variables: []
+related:
+- avatar

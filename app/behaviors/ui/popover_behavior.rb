@@ -1,9 +1,28 @@
 # frozen_string_literal: true
 
-# PopoverBehavior
+# UI::PopoverBehavior
 #
-# Shared behavior for Popover component across ERB, ViewComponent, and Phlex implementations.
-# This module provides consistent styling and HTML attribute generation.
+# @ui_component Popover
+# @ui_description Popover - Phlex implementation
+# @ui_category overlay
+#
+# @ui_anatomy Popover - Container for popover trigger and content. (required)
+# @ui_anatomy Content - The floating content panel. (required)
+# @ui_anatomy Trigger - Button or element that triggers the popover. (required)
+#
+# @ui_feature Custom styling with Tailwind classes
+# @ui_feature Click outside to close
+#
+# @ui_aria_pattern Dialog (Non-modal)
+# @ui_aria_reference https://www.w3.org/WAI/ARIA/apg/patterns/dialog-non-modal/
+#
+# @ui_keyboard Enter Activates the focused element
+# @ui_keyboard Escape Closes the component
+#
+# @ui_related tooltip
+# @ui_related hover_card
+# @ui_related dropdown_menu
+#
 module UI::PopoverBehavior
   # Returns HTML attributes for the popover container element
   def popover_html_attributes

@@ -9,6 +9,7 @@ module UI
 
     def call
       extend UI::SmallBehavior
+
       attrs = small_html_attributes
       content_tag :small, **attrs.merge(@attributes) do
         content

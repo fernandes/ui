@@ -1,0 +1,25 @@
+---
+name: Scroll Area Scrollbar
+slug: scroll_area_scrollbar
+category: other
+description: Scrollbar - Phlex implementation
+anatomy:
+- name: Scroll Area Scrollbar
+  description: Custom scrollbar track that contains the draggable thumb.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Scroll Area Scrollbar:
+    description: Custom scrollbar track that contains the draggable thumb.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: orientation
+      type: String
+      default: vertical
+      description: Orientation (horizontal or vertical)
+    data_attributes: []
+    css_variables: []

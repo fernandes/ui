@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
-    class UI::TableHeaderComponent < ViewComponent::Base
-      include UI::TableHeaderBehavior
+class UI::TableHeaderComponent < ViewComponent::Base
+  include UI::TableHeaderBehavior
 
-      renders_many :rows, RowComponent
+  renders_many :rows, RowComponent
 
-      # Alias amigável
-      alias_method :row, :with_row
+  # Alias amigável
+  alias_method :row, :with_row
 
-      def initialize(classes: "", **attributes)
-        @classes = classes
-        @attributes = attributes
-      end
+  def initialize(classes: "", **attributes)
+    @classes = classes
+    @attributes = attributes
+  end
 
-      def call
-        content_tag :thead, **header_html_attributes.deep_merge(@attributes) do
-          safe_join(rows)
-        end
-      end
+  def call
+    content_tag :thead, **header_html_attributes.deep_merge(@attributes) do
+      safe_join(rows)
     end
+  end
+end

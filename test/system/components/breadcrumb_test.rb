@@ -70,7 +70,7 @@ class BreadcrumbTest < UI::SystemTestCase
 
     # Verify we're in a breadcrumb link
     assert page.evaluate_script("document.activeElement?.closest('nav[aria-label=\"breadcrumb\"]')"),
-           "Focus should be within breadcrumb navigation"
+      "Focus should be within breadcrumb navigation"
   end
 
   test "breadcrumb links have visible focus ring" do
@@ -82,7 +82,7 @@ class BreadcrumbTest < UI::SystemTestCase
 
     # Verify focus-visible classes are present
     assert breadcrumb.link_has_focus_classes?(link),
-           "Breadcrumb link should have focus-visible:ring classes"
+      "Breadcrumb link should have focus-visible:ring classes"
   end
 
   # === Dropdown Presence Tests ===
@@ -127,7 +127,7 @@ class BreadcrumbTest < UI::SystemTestCase
 
     # Verify the dropdown item link has correct href
     content = breadcrumb.node.find('[data-ui--dropdown-target="content"]')
-    doc_link = content.find('a', text: "Documentation")
+    doc_link = content.find("a", text: "Documentation")
     assert doc_link[:href].end_with?("/docs"), "Documentation link should point to /docs"
   end
 
@@ -137,7 +137,7 @@ class BreadcrumbTest < UI::SystemTestCase
     breadcrumb = dropdown_breadcrumb
 
     # Focus should be achievable on trigger via Tab
-    trigger = breadcrumb.dropdown_trigger
+    breadcrumb.dropdown_trigger
 
     # Verify trigger has correct accessibility attributes
     aria = breadcrumb.dropdown_trigger_aria
@@ -192,7 +192,7 @@ class BreadcrumbTest < UI::SystemTestCase
 
     # Focus should return to trigger
     assert breadcrumb.dropdown_trigger_focused?,
-           "Focus should return to dropdown trigger after Escape"
+      "Focus should return to dropdown trigger after Escape"
   end
 
   test "ArrowDown navigates dropdown items" do

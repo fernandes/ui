@@ -1,0 +1,76 @@
+---
+name: Scroll Area
+slug: scroll_area
+category: layout
+description: ScrollArea - Phlex implementation
+anatomy:
+- name: Scroll Area
+  description: Augments native scroll functionality for custom, cross-browser styling.
+  required: true
+- name: Viewport
+  description: Scrollable content container with hidden native scrollbar.
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Scroll Area:
+    description: Augments native scroll functionality for custom, cross-browser styling.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: type
+      type: String
+      default: hover
+      description: The type
+    - name: scroll_hide_delay
+      type: Integer
+      default: '600'
+      description: The scroll hide delay
+    data_attributes: []
+    css_variables: []
+  Viewport:
+    description: Shared behavior for ScrollArea viewport across ERB, ViewComponent,
+      and Phlex implementations.
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Scrollable Region
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/
+  description: Implements the WAI-ARIA Scrollable Region pattern with proper roles,
+    states, and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Enter
+  description: Activates the focused element
+- key: End
+  description: Moves focus to last item
+javascript:
+  controller: ui--scroll-area
+  targets:
+  - viewport
+  - scrollbar
+  - thumb
+  values:
+  - name: type
+    type: String
+    description: The type
+  actions:
+  - applyViewportOverflow
+  - initializeScrollbarBehavior
+  - initializeHoverScrollbar
+  - initializeScrollScrollbar
+  - initializeAutoScrollbar
+  - initializeAlwaysScrollbar
+  - startScrollSync
+  - syncThumbPosition
+  - startDrag
+  events: []
+related:
+- carousel

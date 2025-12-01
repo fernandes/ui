@@ -24,7 +24,7 @@ module UI
       space: :space,
       escape: :escape,
       tab: :tab,
-      shift_tab: [ :shift, :tab ],
+      shift_tab: [:shift, :tab],
       arrow_up: :up,
       arrow_down: :down,
       arrow_left: :left,
@@ -64,7 +64,7 @@ module UI
     # @param modifiers [Array<Symbol>] Modifier keys (:control, :alt, :shift, :meta)
     #
     def press_key_with_modifiers(key, *modifiers)
-      combo = modifiers + [ key ]
+      combo = modifiers + [key]
       page.send_keys(combo)
     end
 
@@ -164,7 +164,7 @@ module UI
 
       sleep 0.05
 
-      is_focused = page.evaluate_script(<<~JS)
+      page.evaluate_script(<<~JS)
         document.activeElement === document.evaluate(
           '#{node.path}',
           document,
@@ -173,8 +173,6 @@ module UI
           null
         ).singleNodeValue
       JS
-
-      is_focused
     end
 
     # Get information about the currently focused element

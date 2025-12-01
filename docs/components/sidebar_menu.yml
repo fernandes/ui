@@ -1,0 +1,57 @@
+---
+name: Sidebar Menu
+slug: sidebar_menu
+category: other
+description: Menu - Phlex implementation
+anatomy:
+- name: Sidebar Menu
+  description: List container for sidebar menu items.
+  required: true
+- name: Action
+  description: Action button within a sidebar menu item, appears on hover/focus.
+  required: false
+- name: Item
+  description: List item container for a sidebar menu entry.
+  required: false
+- name: Sub
+  description: Nested submenu container for hierarchical navigation.
+  required: false
+- name: Sub Item
+  description: List item container for a sidebar submenu entry.
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Sidebar Menu:
+    description: List container for sidebar menu items.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Action:
+    description: Action button within a sidebar menu item, appears on hover/focus.
+    parameters:
+    - name: show_on_hover
+      type: Boolean
+      default: 'false'
+      description: The show on hover
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: List item container for a sidebar menu entry.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub:
+    description: Nested submenu container for hierarchical navigation.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Sub Item:
+    description: List item container for a sidebar submenu entry.
+    parameters: []
+    data_attributes: []
+    css_variables: []

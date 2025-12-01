@@ -12,7 +12,7 @@ module UI
         class: spinner_classes,
         role: "status",
         "aria-label": "Loading",
-        data: { slot: "spinner" }
+        data: {slot: "spinner"}
       }
     end
 

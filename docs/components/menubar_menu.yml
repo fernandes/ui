@@ -1,0 +1,21 @@
+---
+name: Menubar Menu
+slug: menubar_menu
+category: other
+description: Menu - Phlex implementation
+anatomy:
+- name: Menubar Menu
+  description: Wrapper for each top-level menu in the menubar.
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Menubar Menu:
+    description: Wrapper for each top-level menu in the menubar.
+    parameters:
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    data_attributes: []
+    css_variables: []

@@ -1,0 +1,92 @@
+---
+name: Toggle
+slug: toggle
+category: forms
+description: Toggle - Phlex implementation
+anatomy:
+- name: Toggle
+  description: A two-state button that can be either on or off.
+  required: true
+- name: Group
+  description: A container for a set of toggle items that can be toggled on or off.
+  required: false
+features:
+- Custom styling with Tailwind classes
+- Disabled state support
+- ARIA attributes for accessibility
+api:
+  Toggle:
+    description: A two-state button that can be either on or off.
+    parameters:
+    - name: variant
+      type: String
+      default: default
+      description: Visual style variant
+    - name: size
+      type: String
+      default: default
+      description: Size of the element
+    - name: type
+      type: String
+      default: button
+      description: The type
+    - name: pressed
+      type: Boolean
+      default: 'false'
+      description: The pressed
+    - name: disabled
+      type: Boolean
+      default: 'false'
+      description: Whether the element is disabled
+    data_attributes: []
+    css_variables: []
+  Group:
+    description: A container for a set of toggle items that can be toggled on or off.
+    parameters:
+    - name: type
+      type: String
+      default: single
+      description: The type
+    - name: variant
+      type: String
+      default: default
+      description: Visual style variant
+    - name: size
+      type: String
+      default: default
+      description: Size of the element
+    - name: value
+      type: String
+      default: nil
+      description: The current value
+    - name: spacing
+      type: Integer
+      default: '0'
+      description: The spacing
+    - name: orientation
+      type: String
+      default: nil
+      description: Orientation (horizontal or vertical)
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Button
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/button/
+  description: Implements the WAI-ARIA Button pattern with proper roles, states, and
+    keyboard navigation.
+  aria_attributes:
+  - aria-pressed
+javascript:
+  controller: ui--toggle
+  targets: []
+  values:
+  - name: pressed
+    type: Boolean
+    description: The pressed
+  actions:
+  - toggle
+  events: []
+related:
+- checkbox
+- switch
+- toggle_group

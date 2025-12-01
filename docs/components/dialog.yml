@@ -1,0 +1,155 @@
+---
+name: Dialog
+slug: dialog
+category: overlay
+anatomy:
+- name: Dialog
+  description: Root container with state management
+  required: true
+- name: Close
+  description: Button to close/dismiss the component
+  required: false
+- name: Content
+  description: Main content container
+  required: true
+- name: Description
+  description: Descriptive text element
+  required: false
+- name: Footer
+  description: Footer section with actions
+  required: false
+- name: Header
+  description: Header section with title and controls
+  required: false
+- name: Overlay
+  description: Background overlay that dims the page
+  required: false
+- name: Title
+  description: Title text element
+  required: false
+- name: Trigger
+  description: Button or element that activates the component
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Focus management
+api:
+  Dialog:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    - name: close_on_escape
+      type: Boolean
+      default: 'true'
+      description: The close on escape
+    - name: close_on_overlay_click
+      type: Boolean
+      default: 'true'
+      description: The close on overlay click
+    data_attributes: []
+    css_variables: []
+  Close:
+    description: ''
+    parameters:
+    - name: variant
+      type: Symbol
+      default: ":outline"
+      description: Visual style variant
+    - name: size
+      type: Symbol
+      default: ":default"
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Footer:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Overlay:
+    description: ''
+    parameters:
+    - name: open
+      type: Boolean
+      default: 'false'
+      description: Whether the element is open
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: ''
+    parameters:
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to block instead of rendering wrapper
+    - name: variant
+      type: Symbol
+      default: ":outline"
+      description: Visual style variant
+    - name: size
+      type: Symbol
+      default: ":default"
+      description: Size of the element
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Dialog (Modal)
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+  description: Implements the WAI-ARIA Dialog (Modal) pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes: []
+keyboard:
+- key: Escape
+  description: Closes the component
+javascript:
+  controller: ui--dialog
+  targets:
+  - container
+  - overlay
+  - content
+  values:
+  - name: open
+    type: Boolean
+    description: Controls open state
+  actions:
+  - open
+  - close
+  - show
+  - hide
+  - closeOnOverlayClick
+  events:
+  - name: dialog:open
+    description: Fired when dialog open
+  - name: dialog:close
+    description: Fired when dialog close
+related:
+- alert_dialog
+- drawer
+- sheet

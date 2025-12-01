@@ -1,0 +1,66 @@
+---
+name: Card
+slug: card
+category: layout
+anatomy:
+- name: Card
+  description: Root container for card
+  required: true
+- name: Action
+  description: Primary action button
+  required: false
+- name: Content
+  description: Main content container
+  required: true
+- name: Description
+  description: Descriptive text element
+  required: false
+- name: Footer
+  description: Footer section with actions
+  required: false
+- name: Header
+  description: Header section with title and controls
+  required: false
+- name: Title
+  description: Title text element
+  required: false
+features:
+- Custom styling with Tailwind classes
+api:
+  Card:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Action:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Description:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Footer:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Header:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Title:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+related:
+- dialog

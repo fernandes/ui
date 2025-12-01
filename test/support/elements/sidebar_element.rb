@@ -86,7 +86,7 @@ module UI
         # Find the collapsible containing a span with this exact text
         collapsibles = desktop_sidebar.all('[data-controller="ui--collapsible"]', visible: :all)
         target_collapsible = collapsibles.find do |c|
-          c.has_selector?('span', text: name, exact_text: true, visible: :all)
+          c.has_selector?("span", text: name, exact_text: true, visible: :all)
         end
 
         return unless target_collapsible
@@ -108,7 +108,7 @@ module UI
         # Find the collapsible containing a span with this exact text
         collapsibles = desktop_sidebar.all('[data-controller="ui--collapsible"]', visible: :all)
         target_collapsible = collapsibles.find do |c|
-          c.has_selector?('span', text: name, exact_text: true, visible: :all)
+          c.has_selector?("span", text: name, exact_text: true, visible: :all)
         end
 
         return unless target_collapsible
@@ -182,7 +182,7 @@ module UI
         # Find the collapsible containing a span with this exact text
         collapsibles = desktop_sidebar.all('[data-controller="ui--collapsible"]', visible: :all)
         target_collapsible = collapsibles.find do |c|
-          c.has_selector?('span', text: name, exact_text: true, visible: :all)
+          c.has_selector?("span", text: name, exact_text: true, visible: :all)
         end
 
         return false unless target_collapsible

@@ -238,7 +238,7 @@ module UI
         # Try to find the active element within content
         begin
           content.has_css?("*:focus", wait: 0)
-        rescue StandardError
+        rescue
           false
         end
       end

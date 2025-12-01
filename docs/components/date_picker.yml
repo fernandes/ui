@@ -1,0 +1,158 @@
+---
+name: Date Picker
+slug: date_picker
+category: forms
+description: DatePicker Phlex component A date picker that combines a popover trigger
+  with a calendar.
+anatomy:
+- name: Date Picker
+  description: Root container with state management
+  required: true
+- name: Input
+  description: Text input field
+  required: false
+- name: Trigger
+  description: Button or element that activates the component
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Form integration
+- Keyboard navigation with arrow keys
+api:
+  Date Picker:
+    description: ''
+    parameters:
+    - name: mode
+      type: Symbol
+      default: ":single"
+      description: The mode
+    - name: selected
+      type: String
+      default: nil
+      description: The selected
+    - name: locale
+      type: String
+      default: en-US
+      description: The locale
+    - name: format
+      type: String
+      default: long
+      description: The format
+    - name: placeholder
+      type: String
+      default: Select date
+      description: Placeholder text when no value is selected
+    - name: range_placeholder
+      type: String
+      default: Select date range
+      description: The range placeholder
+    - name: close_on_select
+      type: Boolean
+      default: 'true'
+      description: The close on select
+    - name: name
+      type: String
+      default: nil
+      description: Form field name
+    - name: label
+      type: String
+      default: nil
+      description: The label
+    - name: label_for
+      type: String
+      default: nil
+      description: The label for
+    - name: show_dropdowns
+      type: Boolean
+      default: 'false'
+      description: The show dropdowns
+    - name: min_date
+      type: String
+      default: nil
+      description: The min date
+    - name: max_date
+      type: String
+      default: nil
+      description: The max date
+    - name: disabled_dates
+      type: Array
+      default: "[]"
+      description: The disabled dates
+    - name: number_of_months
+      type: Integer
+      default: '1'
+      description: The number of months
+    - name: week_starts_on
+      type: Integer
+      default: '0'
+      description: The week starts on
+    data_attributes: []
+    css_variables: []
+  Input:
+    description: ''
+    parameters:
+    - name: placeholder
+      type: String
+      default: Select date
+      description: Placeholder text when no value is selected
+    - name: value
+      type: String
+      default: ''
+      description: The current value
+    - name: id
+      type: String
+      default: nil
+      description: HTML id attribute
+    - name: icon_classes
+      type: String
+      default: ''
+      description: The icon classes
+    data_attributes: []
+    css_variables: []
+  Trigger:
+    description: ''
+    parameters:
+    - name: placeholder
+      type: String
+      default: Select date
+      description: Placeholder text when no value is selected
+    - name: selected
+      type: String
+      default: nil
+      description: The selected
+    - name: icon
+      type: Symbol
+      default: ":chevron"
+      description: The icon
+    data_attributes: []
+    css_variables: []
+keyboard:
+- key: ArrowDown
+  description: Moves focus to next item
+javascript:
+  controller: ui--date-picker
+  targets:
+  - trigger
+  - label
+  - input
+  - hiddenInput
+  - calendar
+  values:
+  - name: format
+    type: String
+    description: The format
+  actions:
+  - parseInputDate
+  - formatSingleDate
+  - formatRangeDate
+  - formatMultipleDates
+  - shouldClosePopover
+  - closePopover
+  - openPopover
+  - syncCalendarMonth
+  - syncCalendarSelection
+  - toggle
+  events: []
+related:
+- calendar
+- popover

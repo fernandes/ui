@@ -1,0 +1,16 @@
+---
+name: Table Cell
+slug: table_cell
+category: other
+anatomy:
+- name: Table Cell
+  description: Table cell element
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Table Cell:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []

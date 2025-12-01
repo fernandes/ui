@@ -235,8 +235,8 @@ class CarouselTest < UI::SystemTestCase
     sleep 2.5
 
     assert carousel.current_slide_index > initial_index ||
-           (carousel.loop_enabled? && carousel.current_slide_index == 0),
-           "Autoplay should advance slides"
+      (carousel.loop_enabled? && carousel.current_slide_index == 0),
+      "Autoplay should advance slides"
   end
 
   # === ARIA Accessibility Tests ===

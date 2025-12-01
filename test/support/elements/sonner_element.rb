@@ -33,7 +33,7 @@ module UI
       #
       # @return [Array<Capybara::Node::Element>] Array of all toast elements
       def all_toasts
-        all_within('[data-sonner-toast]', minimum: 0)
+        all_within("[data-sonner-toast]", minimum: 0)
       end
 
       # Get the number of visible toasts
@@ -50,7 +50,7 @@ module UI
         first_toast = toasts.first
         return nil unless first_toast
 
-        first_toast.find('[data-title]', wait: 1).text
+        first_toast.find("[data-title]", wait: 1).text
       end
 
       # Get the description of the first (most recent) visible toast
@@ -60,7 +60,7 @@ module UI
         first_toast = toasts.first
         return nil unless first_toast
 
-        desc = first_toast.first('[data-description]', minimum: 0, wait: 1)
+        desc = first_toast.first("[data-description]", minimum: 0, wait: 1)
         desc&.text
       end
 
@@ -82,7 +82,7 @@ module UI
         toast = toasts[index]
         return nil unless toast
 
-        title = toast.first('[data-title]', minimum: 0, wait: 1)
+        title = toast.first("[data-title]", minimum: 0, wait: 1)
         title&.text
       end
 
@@ -94,7 +94,7 @@ module UI
         toast = toasts[index]
         return nil unless toast
 
-        desc = toast.first('[data-description]', minimum: 0, wait: 1)
+        desc = toast.first("[data-description]", minimum: 0, wait: 1)
         desc&.text
       end
 
@@ -117,7 +117,7 @@ module UI
         toast = toasts[index]
         return unless toast
 
-        close_button = toast.find('[data-close-button]', wait: 1)
+        close_button = toast.find("[data-close-button]", wait: 1)
         close_button.click
         wait_for_toast_to_disappear
       end
@@ -129,7 +129,7 @@ module UI
         first_toast = toasts.first
         return nil unless first_toast
 
-        first_toast.first('[data-button]', minimum: 0, wait: 1)
+        first_toast.first("[data-button]", minimum: 0, wait: 1)
       end
 
       # Click the action button in the first toast
@@ -163,7 +163,7 @@ module UI
         toast = toasts[index]
         return false unless toast
 
-        toast.has_css?('[data-button]', wait: 1)
+        toast.has_css?("[data-button]", wait: 1)
       end
 
       # Check if toast has a close button
@@ -174,7 +174,7 @@ module UI
         toast = toasts[index]
         return false unless toast
 
-        toast.has_css?('[data-close-button]', wait: 1)
+        toast.has_css?("[data-close-button]", wait: 1)
       end
 
       # Wait for a toast to appear
@@ -226,7 +226,7 @@ module UI
 
           if Time.now - start_time > timeout
             raise Capybara::ExpectationNotMet,
-                  "Toasts still visible after #{timeout}s (count: #{toast_count})"
+              "Toasts still visible after #{timeout}s (count: #{toast_count})"
           end
 
           sleep 0.1

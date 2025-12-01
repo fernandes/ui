@@ -1,0 +1,46 @@
+---
+name: Sonner Toaster
+slug: sonner_toaster
+category: other
+description: Sonner Toaster component (Phlex) Container for toast notifications -
+  render once in your layout
+anatomy:
+- name: Sonner Toaster
+  description: Sonner Toaster component part
+  required: true
+features:
+- Custom styling with Tailwind classes
+api:
+  Sonner Toaster:
+    description: ''
+    parameters:
+    - name: position
+      type: String
+      default: bottom-right
+      description: The position
+    - name: theme
+      type: String
+      default: system
+      description: The theme
+    - name: rich_colors
+      type: Boolean
+      default: 'false'
+      description: The rich colors
+    - name: expand
+      type: Boolean
+      default: 'false'
+      description: The expand
+    - name: duration
+      type: Integer
+      default: '4000'
+      description: The duration
+    - name: close_button
+      type: Boolean
+      default: 'false'
+      description: The close button
+    - name: visible_toasts
+      type: Integer
+      default: '3'
+      description: The visible toasts
+    data_attributes: []
+    css_variables: []

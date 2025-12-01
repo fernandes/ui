@@ -1,0 +1,100 @@
+---
+name: Carousel
+slug: carousel
+category: data
+anatomy:
+- name: Carousel
+  description: Root container with state management
+  required: true
+- name: Content
+  description: Main content container
+  required: true
+- name: Item
+  description: Individual item element
+  required: false
+- name: Next
+  description: Navigate to next item
+  required: false
+- name: Previous
+  description: Navigate to previous item
+  required: false
+features:
+- Custom styling with Tailwind classes
+- ARIA attributes for accessibility
+- Keyboard navigation with arrow keys
+api:
+  Carousel:
+    description: ''
+    parameters:
+    - name: orientation
+      type: String
+      default: horizontal
+      description: Orientation (horizontal or vertical)
+    - name: opts
+      type: Hash
+      default: "{}"
+      description: The opts
+    - name: plugins
+      type: String
+      default: nil
+      description: The plugins
+    data_attributes: []
+    css_variables: []
+  Content:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Item:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Next:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+  Previous:
+    description: ''
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Carousel
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/carousel/
+  description: Implements the WAI-ARIA Carousel pattern with proper roles, states,
+    and keyboard navigation.
+  aria_attributes:
+  - aria-roledescription
+  - role="region"
+keyboard:
+- key: ArrowDown
+  description: Moves focus to next item
+- key: ArrowUp
+  description: Moves focus to previous item
+- key: ArrowLeft
+  description: Moves focus left or decreases value
+- key: ArrowRight
+  description: Moves focus right or increases value
+javascript:
+  controller: ui--carousel
+  targets:
+  - viewport
+  - prevButton
+  - nextButton
+  - container
+  values:
+  - name: orientation
+    type: String
+    description: Layout orientation
+  actions:
+  - initializeCarousel
+  - buildPlugins
+  - applyOrientationClasses
+  - keydown
+  events:
+  - name: carousel:init
+    description: Fired when carousel init
+related:
+- scroll_area
