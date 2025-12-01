@@ -1,6 +1,6 @@
 ---
-name: Resizable Panel
-slug: resizable_panel
+name: Resizable
+slug: resizable
 category: other
 description: ResizablePanel component (Phlex) Individual resizable panel within a
   panel group
