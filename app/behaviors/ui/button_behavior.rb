@@ -77,7 +77,7 @@ module UI::ButtonBehavior
     when "destructive"
       "bg-destructive text-destructive-foreground hover:bg-destructive/90 text-white"
     when "outline"
-      "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+      "!border !border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:hover:bg-input/50"
     when "secondary"
       "bg-secondary text-secondary-foreground hover:bg-secondary/80"
     when "ghost"

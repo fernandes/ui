@@ -1,0 +1,67 @@
+---
+name: Button Group
+slug: button_group
+category: forms
+description: A container that groups related buttons together with consistent styling and shared borders.
+anatomy:
+- name: Button Group
+  description: A container that groups related buttons together with consistent styling.
+  required: true
+- name: Separator
+  description: A visual separator between buttons within the group.
+  required: false
+- name: Text
+  description: A styled text element for use within button groups.
+  required: false
+features:
+- Custom styling with Tailwind classes
+- Horizontal and vertical orientations
+- Automatic border radius handling for grouped elements
+- ARIA group role for accessibility
+api:
+  Button Group:
+    description: A container that groups related buttons together with consistent styling.
+    parameters:
+    - name: orientation
+      type: Symbol
+      default: ":horizontal"
+      description: Orientation of the group (horizontal or vertical)
+    data_attributes:
+    - name: data-slot
+      value: button-group
+      description: Identifies this element as a button group
+    - name: data-orientation
+      value: horizontal | vertical
+      description: The current orientation of the group
+    css_variables: []
+  Separator:
+    description: A visual separator between buttons within the group.
+    parameters:
+    - name: orientation
+      type: Symbol
+      default: ":horizontal"
+      description: Orientation of the separator (horizontal or vertical)
+    data_attributes:
+    - name: data-slot
+      value: button-group-separator
+      description: Identifies this element as a button group separator
+    - name: data-orientation
+      value: horizontal | vertical
+      description: The current orientation of the separator
+    css_variables: []
+  Text:
+    description: A styled text element for use within button groups.
+    parameters: []
+    data_attributes: []
+    css_variables: []
+accessibility:
+  aria_pattern: Group
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/
+  description: Uses role="group" to semantically group related buttons together.
+  aria_attributes:
+  - name: role
+    value: group
+    description: Indicates this is a group of related elements
+related:
+- button
+- toggle

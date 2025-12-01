@@ -1,0 +1,106 @@
+---
+name: Toggle Group
+slug: toggle_group
+category: forms
+description: A set of two-state buttons that can be toggled on or off, supporting single or multiple selection.
+anatomy:
+- name: Toggle Group
+  description: A container that groups related toggle items together with consistent styling.
+  required: true
+- name: Item
+  description: An individual toggle button within the group.
+  required: true
+features:
+- Custom styling with Tailwind classes
+- Single or multiple selection modes
+- Variant styles (default, outline)
+- Multiple sizes (sm, default, lg)
+- Spacing control between items
+- Disabled state support
+- ARIA attributes for accessibility
+api:
+  Toggle Group:
+    description: A container that groups related toggle items together with consistent styling.
+    parameters:
+    - name: type
+      type: String
+      default: single
+      description: Selection mode (single or multiple)
+    - name: value
+      type: String | Array
+      default: nil
+      description: Initial selected value(s)
+    - name: variant
+      type: String
+      default: default
+      description: Visual style variant (default or outline)
+    - name: orientation
+      type: Symbol
+      default: ":horizontal"
+      description: Orientation of the group (horizontal or vertical)
+    - name: spacing
+      type: Integer
+      default: "0"
+      description: Gap spacing between items (0, 1, 2, etc.)
+    data_attributes:
+    - name: data-controller
+      value: ui--toggle-group
+      description: Stimulus controller for toggle group behavior
+    - name: data-orientation
+      value: horizontal | vertical
+      description: The current orientation of the group
+    - name: data-spacing
+      value: 0, 1, 2, etc.
+      description: Spacing between items
+    - name: data-variant
+      value: default | outline
+      description: Visual style variant
+    css_variables: []
+  Item:
+    description: An individual toggle button within the group.
+    parameters:
+    - name: value
+      type: String
+      default: nil
+      description: The value associated with this item
+    - name: pressed
+      type: Boolean
+      default: "false"
+      description: Whether the item is currently pressed/selected
+    - name: disabled
+      type: Boolean
+      default: "false"
+      description: Whether the item is disabled
+    - name: size
+      type: String
+      default: default
+      description: Size of the item (sm, default, lg)
+    data_attributes:
+    - name: data-state
+      value: on | off
+      description: Current pressed state of the item
+    - name: data-value
+      value: string
+      description: The value of this item
+    - name: data-disabled
+      value: ""
+      description: Present when item is disabled
+    css_variables: []
+accessibility:
+  aria_pattern: Checkbox Group / Radio Group
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/
+  description: Uses role="radiogroup" for single selection or role="group" for multiple selection, with appropriate aria-checked/aria-pressed states.
+  aria_attributes:
+  - name: role
+    value: radiogroup | group
+    description: radiogroup for single selection, group for multiple
+  - name: aria-checked
+    value: true | false
+    description: Used for single selection mode (radio behavior)
+  - name: aria-pressed
+    value: true | false
+    description: Used for multiple selection mode (toggle behavior)
+related:
+- toggle
+- button_group
+- radio_button
