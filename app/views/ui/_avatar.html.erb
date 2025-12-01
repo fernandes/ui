@@ -1,13 +1,17 @@
 <%
-  classes ||= ""
+  # Avatar - ERB Partial
+  #
+  # Displays an image element with a fallback for representing users.
+  #
+  # @param classes [String] Additional CSS classes to merge
+
+  @classes = local_assigns.fetch(:classes, "")
 
   # Include behavior module
   extend UI::AvatarBehavior
 
   # Get HTML attributes from behavior
   attrs = avatar_html_attributes
-  all_classes = attrs[:class]
-  data_attrs = attrs[:data]
-%><span class="<%= all_classes %>" data-controller="<%= data_attrs[:controller] %>" data-slot="<%= data_attrs[:slot] %>">
+%><span class="<%= attrs[:class] %>" data-controller="<%= attrs[:data][:controller] %>" data-slot="<%= attrs[:data][:slot] %>">
   <%= yield %>
 </span>

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Table] Fix rendering for Phlex/VC implementations
 - [Menubar] Fix checkboxes / radio groups not being selected
 - [Sonner] Fix behavior wrong name
+- [Avatar] Fix classes not being passed correctly
 
 ## 0.1.2
 
