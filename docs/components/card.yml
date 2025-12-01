@@ -2,65 +2,98 @@
 name: Card
 slug: card
 category: layout
+description: A container component for displaying content in a structured, visually distinct box with optional header, footer, and actions.
 anatomy:
 - name: Card
-  description: Root container for card
+  description: Root container for card with border, shadow, and background styling.
   required: true
-- name: Action
-  description: Primary action button
-  required: false
-- name: Content
-  description: Main content container
-  required: true
-- name: Description
-  description: Descriptive text element
-  required: false
-- name: Footer
-  description: Footer section with actions
-  required: false
 - name: Header
-  description: Header section with title and controls
+  description: Header section containing title, description, and optional actions.
   required: false
 - name: Title
-  description: Title text element
+  description: The main title text element within the header.
+  required: false
+- name: Description
+  description: Secondary descriptive text element within the header.
+  required: false
+- name: Action
+  description: Container for action buttons positioned in the header.
+  required: false
+- name: Content
+  description: Main content area of the card.
+  required: true
+- name: Footer
+  description: Footer section typically containing action buttons.
   required: false
 features:
 - Custom styling with Tailwind classes
+- Flexible layout with header, content, and footer sections
+- Action button support in header
+- Responsive grid layout in header
+- Border separator support for header and footer
 api:
   Card:
-    description: ''
+    description: Root container for card with border, shadow, and background styling.
     parameters: []
-    data_attributes: []
-    css_variables: []
-  Action:
-    description: ''
-    parameters: []
-    data_attributes: []
-    css_variables: []
-  Content:
-    description: ''
-    parameters: []
-    data_attributes: []
-    css_variables: []
-  Description:
-    description: ''
-    parameters: []
-    data_attributes: []
-    css_variables: []
-  Footer:
-    description: ''
-    parameters: []
-    data_attributes: []
+    data_attributes:
+    - name: data-slot
+      value: card
+      description: Identifies this element as a card container
     css_variables: []
   Header:
-    description: ''
+    description: Header section with grid layout that automatically adjusts when actions are present.
     parameters: []
-    data_attributes: []
+    data_attributes:
+    - name: data-slot
+      value: card-header
+      description: Identifies this element as a card header
     css_variables: []
   Title:
-    description: ''
+    description: The main title text element with semibold font styling.
     parameters: []
-    data_attributes: []
+    data_attributes:
+    - name: data-slot
+      value: card-title
+      description: Identifies this element as a card title
     css_variables: []
+  Description:
+    description: Secondary descriptive text with muted foreground color.
+    parameters: []
+    data_attributes:
+    - name: data-slot
+      value: card-description
+      description: Identifies this element as a card description
+    css_variables: []
+  Action:
+    description: Container for action buttons, positioned at top-right of header using CSS grid.
+    parameters: []
+    data_attributes:
+    - name: data-slot
+      value: card-action
+      description: Identifies this element as a card action container
+    css_variables: []
+  Content:
+    description: Main content area with horizontal padding.
+    parameters: []
+    data_attributes:
+    - name: data-slot
+      value: card-content
+      description: Identifies this element as the card content area
+    css_variables: []
+  Footer:
+    description: Footer section with flexbox layout for action buttons.
+    parameters: []
+    data_attributes:
+    - name: data-slot
+      value: card-footer
+      description: Identifies this element as a card footer
+    css_variables: []
+accessibility:
+  aria_pattern: Landmark
+  w3c_reference: https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/
+  description: Card is a presentational container. Use appropriate semantic elements within (headings, paragraphs, buttons) for accessibility.
+  aria_attributes: []
 related:
 - dialog
+- sheet
+- alert
