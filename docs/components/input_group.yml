@@ -1,6 +1,6 @@
 ---
-name: Input Group Textarea
-slug: input_group_textarea
+name: Input Group
+slug: input_group
 category: other
 description: Textarea - Phlex implementation
 anatomy:

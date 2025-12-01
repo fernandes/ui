@@ -1,6 +1,6 @@
 ---
-name: Combobox Wrapper
-slug: combobox_wrapper
+name: Combobox
+slug: combobox
 category: other
 description: Wrapper - Phlex implementation
 anatomy:
