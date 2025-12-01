@@ -8,11 +8,6 @@
 @import "../../../../../app/assets/stylesheets/ui/application.css";
 
 /**
- * Import Sonner CSS directly (bypasses Tailwind processing)
- */
-@import "../../../../../app/assets/stylesheets/ui/sonner.css";
-
-/**
  * Tailwind 4 configuration using CSS-based approach
  * Register source paths (base directories) for Tailwind to scan
  */
