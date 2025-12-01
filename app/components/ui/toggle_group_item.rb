@@ -37,9 +37,10 @@ class UI::ToggleGroupItem < Phlex::HTML
   end
 
   def before_template
-    # Try to inherit from parent ToggleGroup context
-    if helpers.respond_to?(:current_component) && helpers.current_component.respond_to?(:context)
-      parent_context = helpers.current_component.context
+    # Try to inherit from parent ToggleGroup context using thread-local
+    # This works across both Phlex internal render and Rails render calls
+    parent_context = Thread.current[:ui_toggle_group_context]
+    if parent_context
       @variant ||= parent_context[:variant]
       @size ||= parent_context[:size]
       @group_type = parent_context[:type]

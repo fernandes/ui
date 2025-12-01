@@ -3,8 +3,8 @@
 class UI::TableRowComponent < ViewComponent::Base
   include UI::TableRowBehavior
 
-  renders_many :heads, HeadComponent
-  renders_many :cells, CellComponent
+  renders_many :heads, UI::TableHeadComponent
+  renders_many :cells, UI::TableCellComponent
 
   # Aliases amigáveis
   alias_method :head, :with_head

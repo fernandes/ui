@@ -41,7 +41,8 @@ class UI::ToggleGroup < Phlex::HTML
 
   def view_template(&block)
     div(**toggle_group_html_attributes.deep_merge(@attributes)) do
-      # Store context for child items to access
+      # Store context for child items to access via thread-local
+      # This works across both Phlex internal render and Rails render calls
       @context = {
         variant: @variant,
         size: @size,
@@ -49,7 +50,12 @@ class UI::ToggleGroup < Phlex::HTML
         spacing: @spacing,
         value: @value
       }
-      yield if block_given?
+      Thread.current[:ui_toggle_group_context] = @context
+      begin
+        yield if block_given?
+      ensure
+        Thread.current[:ui_toggle_group_context] = nil
+      end
     end
   end
 

@@ -3,7 +3,7 @@
 class UI::TableFooterComponent < ViewComponent::Base
   include UI::TableFooterBehavior
 
-  renders_many :rows, RowComponent
+  renders_many :rows, UI::TableRowComponent
 
   # Alias amigável
   alias_method :row, :with_row

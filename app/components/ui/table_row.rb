@@ -16,10 +16,10 @@ class UI::TableRow < Phlex::HTML
 
   # DSL methods
   def head(classes: "", **attributes, &block)
-    render Head.new(classes: classes, **attributes, &block)
+    render UI::TableHead.new(classes: classes, **attributes, &block)
   end
 
   def cell(classes: "", **attributes, &block)
-    render Cell.new(classes: classes, **attributes, &block)
+    render UI::TableCell.new(classes: classes, **attributes, &block)
   end
 end

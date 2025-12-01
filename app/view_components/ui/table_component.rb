@@ -3,10 +3,10 @@
 class UI::TableComponent < ViewComponent::Base
   include UI::TableBehavior
 
-  renders_one :table_header, HeaderComponent
-  renders_one :table_body, BodyComponent
-  renders_one :table_footer, FooterComponent
-  renders_one :table_caption, CaptionComponent
+  renders_one :table_header, UI::TableHeaderComponent
+  renders_one :table_body, UI::TableBodyComponent
+  renders_one :table_footer, UI::TableFooterComponent
+  renders_one :table_caption, UI::TableCaptionComponent
 
   # Aliases amigáveis
   alias_method :header, :with_table_header

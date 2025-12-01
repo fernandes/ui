@@ -3,7 +3,7 @@
 class UI::TableBodyComponent < ViewComponent::Base
   include UI::TableBodyBehavior
 
-  renders_many :rows, RowComponent
+  renders_many :rows, UI::TableRowComponent
 
   # Alias amigável
   alias_method :row, :with_row

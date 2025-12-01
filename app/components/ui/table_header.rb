@@ -16,14 +16,14 @@ class UI::TableHeader < Phlex::HTML
 
   # DSL methods
   def row(classes: "", **attributes, &block)
-    render Row.new(classes: classes, **attributes, &block)
+    render UI::TableRow.new(classes: classes, **attributes, &block)
   end
 
   def head(classes: "", **attributes, &block)
-    render Head.new(classes: classes, **attributes, &block)
+    render UI::TableHead.new(classes: classes, **attributes, &block)
   end
 
   def cell(classes: "", **attributes, &block)
-    render Cell.new(classes: classes, **attributes, &block)
+    render UI::TableCell.new(classes: classes, **attributes, &block)
   end
 end
