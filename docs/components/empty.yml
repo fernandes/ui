@@ -2,52 +2,87 @@
 name: Empty
 slug: empty
 category: data
-description: Empty - Phlex implementation
+description: Displays empty states in applications with customizable media, titles, descriptions, and actions.
 anatomy:
 - name: Empty
-  description: Displays empty states in applications with customizable media, titles,
-    descriptions, and actions.
+  description: Root container for empty state display with centered layout and dashed border.
   required: true
-- name: Content
-  description: Displays the content of the empty state such as a button, input or
-    a link.
-  required: true
-- name: Description
-  description: Displays the description of the empty state.
-  required: false
 - name: Header
-  description: Wraps the empty media, title, and description.
+  description: Wraps the media, title, and description elements with proper spacing and alignment.
+  required: false
+- name: Media
+  description: Displays visual content like icons, images, or avatars.
   required: false
 - name: Title
-  description: Displays the title of the empty state.
+  description: Displays the main heading text of the empty state.
+  required: false
+- name: Description
+  description: Displays secondary text explaining the empty state or providing guidance.
+  required: false
+- name: Content
+  description: Container for action elements such as buttons, links, or inputs.
   required: false
 features:
 - Custom styling with Tailwind classes
+- Flexible composition with optional sub-components
+- Icon variant for media with background styling
+- Centered layout with responsive padding
 api:
   Empty:
-    description: Displays empty states in applications with customizable media, titles,
-      descriptions, and actions.
+    description: Root container that provides centered flexbox layout with dashed border styling.
     parameters: []
-    data_attributes: []
-    css_variables: []
-  Content:
-    description: Displays the content of the empty state such as a button, input or
-      a link.
-    parameters: []
-    data_attributes: []
-    css_variables: []
-  Description:
-    description: Displays the description of the empty state.
-    parameters: []
-    data_attributes: []
+    data_attributes:
+    - name: data-slot
+      value: '"empty"'
+      description: Identifies the empty state container
     css_variables: []
   Header:
-    description: Wraps the empty media, title, and description.
+    description: Groups media, title, and description with centered alignment and consistent spacing.
     parameters: []
-    data_attributes: []
+    data_attributes:
+    - name: data-slot
+      value: '"empty-header"'
+      description: Identifies the header container
+    css_variables: []
+  Media:
+    description: Container for visual content with optional icon variant styling.
+    parameters:
+    - name: variant
+      type: String
+      default: '"default"'
+      description: Visual style variant ("default" for transparent background, "icon" for muted background with rounded corners)
+    data_attributes:
+    - name: data-slot
+      value: '"empty-media"'
+      description: Identifies the media container
     css_variables: []
   Title:
-    description: Displays the title of the empty state.
+    description: Renders an h3 heading element with semibold font styling.
     parameters: []
-    data_attributes: []
+    data_attributes:
+    - name: data-slot
+      value: '"empty-title"'
+      description: Identifies the title element
     css_variables: []
+  Description:
+    description: Renders a paragraph element with muted text color for secondary information.
+    parameters: []
+    data_attributes:
+    - name: data-slot
+      value: '"empty-description"'
+      description: Identifies the description element
+    css_variables: []
+  Content:
+    description: Container for action elements like buttons or links placed below the header.
+    parameters: []
+    data_attributes:
+    - name: data-slot
+      value: '"empty-content"'
+      description: Identifies the content container
+    css_variables: []
+accessibility:
+  description: Empty states should provide clear, descriptive text to help users understand why content is missing and what actions they can take.
+  aria_attributes: []
+related:
+- card
+- alert
