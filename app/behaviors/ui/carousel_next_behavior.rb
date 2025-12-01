@@ -6,7 +6,7 @@ require "tailwind_merge"
 module UI::CarouselNextBehavior
   # Base CSS classes for next button (default horizontal positioning)
   def carousel_next_base_classes
-    "absolute size-8 rounded-lg top-1/2 -translate-y-1/2 -right-12"
+    "absolute size-8 !rounded-full top-1/2 -translate-y-1/2 -right-12"
   end
 
   # Merge base classes with custom classes

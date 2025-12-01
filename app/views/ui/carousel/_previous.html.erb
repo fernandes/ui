@@ -7,7 +7,7 @@
   extend UI::CarouselPreviousBehavior
   all_attributes = carousel_previous_html_attributes
 %>
-<%= render "ui/button", attributes: all_attributes, classes: carousel_previous_classes, variant: :ghost, size: :icon do %>
+<%= render "ui/button", attributes: all_attributes, classes: carousel_previous_classes, variant: :outline, size: :icon do %>
   <%= lucide_icon("arrow-left", class: "size-4") %>
   <span class="sr-only">Previous slide</span>
 <% end %>

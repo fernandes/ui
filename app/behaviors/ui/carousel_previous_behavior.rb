@@ -6,7 +6,7 @@ require "tailwind_merge"
 module UI::CarouselPreviousBehavior
   # Base CSS classes for previous button (default horizontal positioning)
   def carousel_previous_base_classes
-    "absolute size-8 rounded-lg top-1/2 -translate-y-1/2 -left-12"
+    "absolute size-8 !rounded-full top-1/2 -translate-y-1/2 -left-12"
   end
 
   # Merge base classes with custom classes
