@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Components YAML to help on documentation
+- Components aspect ratios for aspect ration component
 
 ## [0.1.1] - 2025-11-28
 

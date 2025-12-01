@@ -9,6 +9,22 @@ anatomy:
   required: true
 features:
 - Custom styling with Tailwind classes
+common_ratios:
+  - ratio: "16:9"
+    calculation: "16.0/9.0"
+    use_case: "Widescreen videos, modern displays"
+  - ratio: "4:3"
+    calculation: "4.0/3.0"
+    use_case: "Traditional TV, older content"
+  - ratio: "1:1"
+    calculation: "1.0"
+    use_case: "Square images, avatars"
+  - ratio: "21:9"
+    calculation: "21.0/9.0"
+    use_case: "Ultrawide displays, cinematic"
+  - ratio: "9:16"
+    calculation: "9.0/16.0"
+    use_case: "Portrait/mobile, stories"
 api:
   Aspect Ratio:
     description: Displays content within a desired aspect ratio.
