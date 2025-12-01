@@ -14,7 +14,7 @@
 #     close_button: true
 #   ) %>
 class UI::SonnerToaster < Phlex::HTML
-  include UI::ToasterBehavior
+  include UI::SonnerToasterBehavior
 
   # @param position [String] Toast position (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right)
   # @param theme [String] Theme (light, dark, system)
