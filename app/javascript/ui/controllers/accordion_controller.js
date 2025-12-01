@@ -88,9 +88,13 @@ export default class extends Controller {
 
       if (content) {
         const isOpen = item.dataset.state === "open"
-        content.style.height = isOpen ? `${content.scrollHeight}px` : '0px'
 
-        if (!isOpen) {
+        if (isOpen) {
+          // Use auto for initially open items to handle cases where
+          // the element is inside a hidden container (scrollHeight would be 0)
+          content.style.height = 'auto'
+        } else {
+          content.style.height = '0px'
           content.setAttribute('hidden', '')
         }
       }
@@ -146,7 +150,15 @@ export default class extends Controller {
       content.removeAttribute('hidden')
       content.style.height = `${content.scrollHeight}px`
     } else {
-      // Closing: animate to 0, then add hidden after transition
+      // Closing: first set explicit height (for items with height: auto),
+      // then animate to 0. CSS can't transition from 'auto' to '0px'.
+      const currentHeight = content.scrollHeight
+      content.style.height = `${currentHeight}px`
+
+      // Force reflow to ensure the browser registers the height change
+      content.offsetHeight
+
+      // Now animate to 0
       content.style.height = '0px'
 
       content.addEventListener('transitionend', () => {

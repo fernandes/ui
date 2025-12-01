@@ -2211,8 +2211,10 @@
         const content = this.contentTargets[index];
         if (content) {
           const isOpen = item.dataset.state === "open";
-          content.style.height = isOpen ? `${content.scrollHeight}px` : "0px";
-          if (!isOpen) {
+          if (isOpen) {
+            content.style.height = "auto";
+          } else {
+            content.style.height = "0px";
             content.setAttribute("hidden", "");
           }
         }
@@ -2247,6 +2249,9 @@
         content.removeAttribute("hidden");
         content.style.height = `${content.scrollHeight}px`;
       } else {
+        const currentHeight = content.scrollHeight;
+        content.style.height = `${currentHeight}px`;
+        content.offsetHeight;
         content.style.height = "0px";
         content.addEventListener("transitionend", () => {
           if (content.dataset.state === "closed") {
