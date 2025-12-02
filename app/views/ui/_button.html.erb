@@ -11,6 +11,9 @@
   # @param disabled [Boolean] Whether the button is disabled
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
+  #
+  # Supports splatting attributes from parent components (e.g., **trigger_attrs)
+  # When attributes are splatted, data/class/id are merged from local_assigns
 
   @variant = local_assigns.fetch(:variant, "default")
   @size = local_assigns.fetch(:size, "default")
@@ -19,6 +22,19 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
   content_param = local_assigns.fetch(:content, nil)
+
+  # Support for splatted attributes (e.g., **trigger_attrs)
+  # Merge data and class from local_assigns if present (from splatting)
+  splatted_data = local_assigns.fetch(:data, {})
+  splatted_class = local_assigns.fetch(:class, nil)
+
+  # Merge splatted attributes into @attributes
+  if splatted_data.present?
+    @attributes = @attributes.deep_merge(data: splatted_data)
+  end
+  if splatted_class.present?
+    @attributes[:class] = TailwindMerge::Merger.new.merge([@attributes[:class], splatted_class].compact.join(" "))
+  end
 
   extend UI::ButtonBehavior
   base_attrs = button_html_attributes

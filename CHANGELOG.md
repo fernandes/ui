@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Menubar] Fix checkboxes / radio groups not being selected
 - [Sonner] Fix behavior wrong name
 - [Avatar] Fix classes not being passed correctly
+- [Button] (ERB) process attributes received as child correctly
 
 ## 0.1.2
 
