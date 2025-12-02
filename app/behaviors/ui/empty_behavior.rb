@@ -18,7 +18,7 @@ module UI::EmptyBehavior
   def empty_html_attributes
     {
       class: empty_classes,
-      data: { slot: "empty" }
+      data: {slot: "empty"}
     }
   end
 
@@ -36,7 +36,7 @@ module UI::EmptyHeaderBehavior
   def empty_header_html_attributes
     {
       class: empty_header_classes,
-      data: { slot: "empty-header" }
+      data: {slot: "empty-header"}
     }
   end
 
@@ -54,7 +54,7 @@ module UI::EmptyMediaBehavior
   def empty_media_html_attributes
     {
       class: empty_media_classes,
-      data: { slot: "empty-media" }
+      data: {slot: "empty-media"}
     }
   end
 
@@ -86,7 +86,7 @@ module UI::EmptyTitleBehavior
   def empty_title_html_attributes
     {
       class: empty_title_classes,
-      data: { slot: "empty-title" }
+      data: {slot: "empty-title"}
     }
   end
 
@@ -104,7 +104,7 @@ module UI::EmptyDescriptionBehavior
   def empty_description_html_attributes
     {
       class: empty_description_classes,
-      data: { slot: "empty-description" }
+      data: {slot: "empty-description"}
     }
   end
 
@@ -122,7 +122,7 @@ module UI::EmptyContentBehavior
   def empty_content_html_attributes
     {
       class: empty_content_classes,
-      data: { slot: "empty-content" }
+      data: {slot: "empty-content"}
     }
   end
 

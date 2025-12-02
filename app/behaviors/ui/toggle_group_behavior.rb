@@ -11,11 +11,11 @@ module UI::ToggleGroupBehavior
   def toggle_group_html_attributes
     attrs = {
       class: toggle_group_classes,
-      role: @type == "single" ? "radiogroup" : "group",
+      role: (@type == "single") ? "radiogroup" : "group",
       data: {
         controller: "ui--toggle-group",
         "ui--toggle-group-type-value": @type || "single",
-        "ui--toggle-group-value-value": @value&.to_json || (@type == "multiple" ? "[]" : "null")
+        "ui--toggle-group-value-value": @value&.to_json || ((@type == "multiple") ? "[]" : "null")
       }
     }
 

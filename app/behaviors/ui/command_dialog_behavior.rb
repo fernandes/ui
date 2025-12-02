@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
-
 # UI::CommandDialogBehavior
-
-#
 
 # @ui_component Command Dialog
 
 # @ui_category other
 
-#
-
 # @ui_anatomy Command Dialog - Root container with state management (required)
-
-#
 
 # @ui_feature Keyboard navigation
 
@@ -23,7 +16,6 @@
 
 # @ui_feature Animation support
 
-#
 module UI::CommandDialogBehavior
   def command_dialog_base_classes
     ""

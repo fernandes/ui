@@ -12,10 +12,14 @@ module UI::ToggleGroupItemBehavior
     attrs = {
       class: toggle_group_item_classes,
       type: "button",
-      role: @group_type == "single" ? "radio" : "button",
+      role: (@group_type == "single") ? "radio" : "button",
       disabled: @disabled ? true : nil,
-      "aria-pressed": @group_type == "multiple" ? (@pressed ? "true" : "false") : nil,
-      "aria-checked": @group_type == "single" ? (@pressed ? "true" : "false") : nil,
+      "aria-pressed": if @group_type == "multiple"
+                        @pressed ? "true" : "false"
+                      end,
+      "aria-checked": if @group_type == "single"
+                        @pressed ? "true" : "false"
+                      end,
       data: {
         "ui--toggle-group-target": "item",
         action: "click->ui--toggle-group#toggle",

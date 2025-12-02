@@ -27,7 +27,7 @@ module UI::InputBehavior
       name: @name,
       id: @id,
       readonly: @readonly,
-      data: { slot: "input" }
+      data: {slot: "input"}
     }.compact
   end
 
