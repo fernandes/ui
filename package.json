@@ -53,6 +53,7 @@
     "@tailwindcss/cli": "^4.1.17",
     "@testing-library/dom": "^10.4.1",
     "happy-dom": "^20.0.10",
+    "playwright": "^1.49.0",
     "rollup": "^4.53.2",
     "rollup-plugin-terser": "^7.0.2"
   }
