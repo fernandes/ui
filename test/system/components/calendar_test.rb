@@ -381,17 +381,47 @@ class CalendarTest < UI::SystemTestCase
   test "highlights today's date" do
     calendar = basic_calendar
 
-    assert calendar.day_today?(Date.today)
+    # Get the real system date (JavaScript uses real time, not Ruby's travel_to)
+    real_today = Date.parse(page.evaluate_script("new Date().toISOString().split('T')[0]"))
+
+    # Navigate to the month containing today if needed
+    if real_today.month != Date.new(2025, 6, 15).month || real_today.year != 2025
+      # Navigate to real today's month
+      target_month = real_today.beginning_of_month
+      current_month = Date.new(2025, 6, 1)
+
+      months_diff = (target_month.year * 12 + target_month.month) - (current_month.year * 12 + current_month.month)
+      if months_diff > 0
+        months_diff.times { calendar.next_month }
+      elsif months_diff < 0
+        months_diff.abs.times { calendar.previous_month }
+      end
+    end
+
+    assert calendar.day_today?(real_today)
   end
 
   test "does not highlight other dates as today" do
     calendar = basic_calendar
 
-    yesterday = Date.today - 1
-    tomorrow = Date.today + 1
+    # Get the real system date (JavaScript uses real time, not Ruby's travel_to)
+    real_today = Date.parse(page.evaluate_script("new Date().toISOString().split('T')[0]"))
+
+    # Navigate to real today's month first
+    target_month = real_today.beginning_of_month
+    current_month = Date.new(2025, 6, 1)
+    months_diff = (target_month.year * 12 + target_month.month) - (current_month.year * 12 + current_month.month)
+    if months_diff > 0
+      months_diff.times { calendar.next_month }
+    elsif months_diff < 0
+      months_diff.abs.times { calendar.previous_month }
+    end
+
+    yesterday = real_today - 1
+    tomorrow = real_today + 1
 
     # Navigate if needed to show these dates
-    if yesterday.month != Date.today.month
+    if yesterday.month != real_today.month
       calendar.previous_month
       refute calendar.day_today?(yesterday) if calendar.has_date?(yesterday)
       calendar.next_month

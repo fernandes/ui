@@ -145,7 +145,7 @@ module UI
 
         button = day_button(date)
         classes = button[:class]&.split(/\s+/) || []
-        date == Date.today && classes.include?("bg-accent")
+        classes.include?("bg-accent")
       end
 
       # Check if a specific date is visible in the calendar
