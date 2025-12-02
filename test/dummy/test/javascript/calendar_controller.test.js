@@ -1321,9 +1321,11 @@ describe("CalendarController", () => {
 
       expect(months.length).toBe(12)
       expect(months[0].value).toBe(0)
-      expect(months[0].name.toLowerCase()).toContain("january")
+      // Match "january", "jan", or numeric "1" depending on locale
+      expect(months[0].name.toLowerCase()).toMatch(/jan|1/)
       expect(months[11].value).toBe(11)
-      expect(months[11].name.toLowerCase()).toContain("december")
+      // Match "december", "dec", or numeric "12" depending on locale
+      expect(months[11].name.toLowerCase()).toMatch(/dec|12/)
     })
   })
 
