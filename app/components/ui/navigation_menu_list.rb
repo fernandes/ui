@@ -11,7 +11,7 @@
 #     end
 #   end
 class UI::NavigationMenuList < Phlex::HTML
-  include UI::ListBehavior
+  include UI::NavigationMenuListBehavior
 
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes

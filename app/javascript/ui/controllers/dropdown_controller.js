@@ -82,17 +82,14 @@ export default class extends Controller {
     const trigger = event.currentTarget
     const submenu = trigger.nextElementSibling
 
-    // Remove DOM focus from currently focused element to clear :focus pseudo-class
-    if (document.activeElement && document.activeElement.hasAttribute('role') &&
-        document.activeElement.getAttribute('role') === 'menuitem') {
-      document.activeElement.blur()
-    }
-
     // Remove keyboard focus from all items, except this one
     clearAllTabindexes(this.element)
 
-    // Set tabindex="0" on the hovered trigger
+    // Set tabindex="0" on the hovered trigger and focus it
+    // Focusing the new item instead of blurring the old one keeps focus inside
+    // the dropdown, preventing handleFocusOut from closing the menu
     trigger.setAttribute('tabindex', '0')
+    trigger.focus()
 
     // Track the hovered item for keyboard navigation continuity
     this.lastHoveredItem = trigger
@@ -147,17 +144,14 @@ export default class extends Controller {
   trackHoveredItem(event) {
     const item = event.currentTarget
 
-    // Remove DOM focus from currently focused element to clear :focus pseudo-class
-    if (document.activeElement && document.activeElement.hasAttribute('role') &&
-        document.activeElement.getAttribute('role') === 'menuitem') {
-      document.activeElement.blur()
-    }
-
     // Remove keyboard focus from all items, except this one
     clearAllTabindexes(this.element)
 
-    // Set tabindex="0" on the hovered item
+    // Set tabindex="0" on the hovered item and focus it
+    // Focusing the new item instead of blurring the old one keeps focus inside
+    // the dropdown, preventing handleFocusOut from closing the menu
     item.setAttribute('tabindex', '0')
+    item.focus()
 
     // Track the hovered item for keyboard navigation continuity
     this.lastHoveredItem = item

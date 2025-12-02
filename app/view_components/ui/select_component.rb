@@ -18,14 +18,25 @@ class UI::SelectComponent < ViewComponent::Base
 
   # @param value [String] Currently selected value
   # @param classes [String] Additional CSS classes to merge
+  # @param as_child [Boolean] If true, renders without wrapper div but preserves controller on inner element
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(value: nil, classes: "", **attributes)
+  def initialize(value: nil, classes: "", as_child: false, **attributes)
     @value = value
     @classes = classes
+    @as_child = as_child
     @attributes = attributes
   end
 
   def call
-    content_tag :div, content, **select_html_attributes.deep_merge(@attributes)
+    attrs = select_html_attributes.deep_merge(@attributes)
+    if @as_child
+      # When as_child, we still need a wrapper for the Stimulus controller
+      # but we use a minimal inline wrapper that doesn't break flex layouts
+      # Override class to use 'contents' which makes the element invisible to layout
+      attrs[:class] = "contents"
+      content_tag :span, content, **attrs
+    else
+      content_tag :div, content, **attrs
+    end
   end
 end

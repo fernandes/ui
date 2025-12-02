@@ -4,7 +4,7 @@
 #
 # Container for navigation menu items.
 class UI::NavigationMenuListComponent < ViewComponent::Base
-  include UI::ListBehavior
+  include UI::NavigationMenuListBehavior
 
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes

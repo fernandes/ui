@@ -25,12 +25,20 @@
 #
 module UI::PopoverBehavior
   # Returns HTML attributes for the popover container element
+  # When used with asChild, only data attributes are returned (no classes)
   def popover_html_attributes
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
-    {
-      class: popover_classes,
+    attrs = {
       data: popover_data_attributes
-    }.merge(attributes_value)
+    }
+
+    # Only add container classes if not using asChild
+    # When asChild is true, the child component handles its own styling
+    unless instance_variable_defined?(:@as_child) && @as_child
+      attrs[:class] = popover_classes
+    end
+
+    attrs.merge(attributes_value)
   end
 
   # Returns combined CSS classes for the popover

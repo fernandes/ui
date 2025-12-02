@@ -32,8 +32,9 @@ module UI::InputGroupBehavior
   private
 
   # Base classes - exact match from shadcn/ui
+  # Uses CSS variable --radius for customizable border radius (defaults to 0.375rem / rounded-md)
   def input_group_base_classes
-    "group/input-group border-input dark:bg-input/30 relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none"
+    "group/input-group border-input dark:bg-input/30 relative flex w-full items-center rounded-[var(--radius,0.375rem)] border shadow-xs transition-[color,box-shadow] outline-none"
   end
 
   # Height classes
@@ -52,6 +53,7 @@ module UI::InputGroupBehavior
   end
 
   # Focus state classes
+  # Uses box-shadow for focus ring which automatically follows border-radius
   def input_group_focus_classes
     "has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]"
   end

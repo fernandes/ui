@@ -22,10 +22,20 @@ require "tailwind_merge"
 #
 module UI::TooltipBehavior
   # Returns HTML attributes for the tooltip root element
+  # When as_child is true, don't include the "contents" class since
+  # the parent element will handle its own styling
   def tooltip_html_attributes
-    {
+    attrs = {
       data: tooltip_data_attributes
-    }.compact
+    }
+
+    # Only add "contents" class when not using asChild
+    # asChild mode passes data attributes to parent, which handles its own styling
+    unless instance_variable_defined?(:@as_child) && @as_child
+      attrs[:class] = "contents"
+    end
+
+    attrs.compact
   end
 
   # Returns data attributes for the tooltip controller

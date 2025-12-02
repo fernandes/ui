@@ -4,7 +4,7 @@
 #
 # Wrapper for individual navigation menu item.
 class UI::NavigationMenuItemComponent < ViewComponent::Base
-  include UI::ItemBehavior
+  include UI::NavigationMenuItemBehavior
 
   # @param value [String] Optional value for controlled state
   # @param classes [String] Additional CSS classes to merge

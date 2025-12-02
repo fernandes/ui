@@ -14,7 +14,7 @@
 #     end
 #   end
 class UI::NavigationMenuContent < Phlex::HTML
-  include UI::ContentBehavior
+  include UI::NavigationMenuContentBehavior
 
   # @param viewport [Boolean] Whether content should be rendered in viewport (inherited from parent)
   # @param classes [String] Additional CSS classes to merge

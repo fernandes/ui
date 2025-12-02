@@ -138,6 +138,14 @@ class UI::Calendar < Phlex::HTML
   end
 
   def render_dropdowns
+    if use_native_select?
+      render_native_dropdowns
+    else
+      render_ui_select_dropdowns
+    end
+  end
+
+  def render_native_dropdowns
     div(class: "flex items-center gap-1") do
       select(
         data: {ui__calendar_target: "monthSelect", action: "change->ui--calendar#goToMonth"},
@@ -156,6 +164,49 @@ class UI::Calendar < Phlex::HTML
         ((current_year - @year_range)..(current_year + 10)).each do |y|
           option(value: y) { y.to_s }
         end
+      end
+    end
+  end
+
+  def render_ui_select_dropdowns
+    div(class: "flex items-center gap-1 px-8 flex-1") do
+      # Month select
+      render UI::Select.new(classes: "flex-1", value: (@month.month - 1).to_s) do
+        render UI::SelectTrigger.new(classes: "h-9 w-full gap-1 px-2 text-sm font-medium border-0 shadow-none")
+        render UI::SelectContent.new(classes: "min-w-[8rem]") do
+          Date::MONTHNAMES.compact.each_with_index do |name, i|
+            render UI::SelectItem.new(value: i.to_s) { name }
+          end
+        end
+        input(
+          type: "hidden",
+          value: (@month.month - 1).to_s,
+          data: {
+            ui__select_target: "hiddenInput",
+            ui__calendar_target: "monthSelect",
+            action: "change->ui--calendar#goToMonth"
+          }
+        )
+      end
+
+      # Year select
+      render UI::Select.new(value: @month.year.to_s) do
+        render UI::SelectTrigger.new(classes: "min-w-[75px] h-9 w-auto gap-1 px-2 text-sm font-medium border-0 shadow-none")
+        render UI::SelectContent.new(classes: "min-w-[5rem] max-h-[200px]") do
+          current_year = Date.today.year
+          ((current_year - @year_range)..(current_year + 10)).each do |y|
+            render UI::SelectItem.new(value: y.to_s) { y.to_s }
+          end
+        end
+        input(
+          type: "hidden",
+          value: @month.year.to_s,
+          data: {
+            ui__select_target: "hiddenInput",
+            ui__calendar_target: "yearSelect",
+            action: "change->ui--calendar#goToYear"
+          }
+        )
       end
     end
   end

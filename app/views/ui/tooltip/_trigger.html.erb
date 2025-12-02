@@ -1,4 +1,19 @@
 <%# Tooltip Trigger - Interactive element that shows/hides tooltip %>
+<%#
+  Supports asChild pattern for composition without wrapper elements.
+
+  @example Basic usage
+    render "ui/tooltip/trigger" do
+      "Hover me"
+    end
+
+  @example With asChild
+    render "ui/tooltip/trigger", as_child: true do |trigger_attrs|
+      render "ui/input_group/button", attributes: trigger_attrs do
+        "Info"
+      end
+    end
+%>
 <%
   @as_child = local_assigns.fetch(:as_child, false)
   @attributes = local_assigns.fetch(:attributes, {})
@@ -10,27 +25,7 @@
   trigger_attrs = tooltip_trigger_html_attributes.deep_merge(@attributes)
 -%>
 <% if @as_child %>
-  <%# asChild mode: capture block and inject attributes into first element %>
-  <% captured_content = capture { yield } %>
-  <%= raw captured_content.sub(/(<[a-z][a-z0-9]*)([\s>])/i) do |match|
-    tag_start, tag_end = $1, $2
-
-    # Build attributes string manually
-    attrs_array = trigger_attrs.map do |key, value|
-      if key == :data && value.is_a?(Hash)
-        # Handle data attributes
-        value.map { |k, v| "data-#{k.to_s.dasherize}=\"#{ERB::Util.html_escape(v)}\"" }.join(" ")
-      elsif value.is_a?(TrueClass)
-        key.to_s.dasherize
-      elsif value.is_a?(FalseClass) || value.nil?
-        nil
-      else
-        "#{key.to_s.dasherize}=\"#{ERB::Util.html_escape(value)}\""
-      end
-    end.compact.join(" ")
-
-    "#{tag_start} #{attrs_array}#{tag_end}"
-  end %>
+  <%= yield(trigger_attrs) %>
 <% else %>
   <%# Default mode: render as button %>
   <%= content_tag :button, trigger_attrs do %>

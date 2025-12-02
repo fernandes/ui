@@ -29,14 +29,26 @@ class UI::Select < Phlex::HTML
 
   # @param value [String] Currently selected value
   # @param classes [String] Additional CSS classes to merge
+  # @param as_child [Boolean] If true, renders without wrapper div but preserves controller on inner element
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(value: nil, classes: "", **attributes)
+  def initialize(value: nil, classes: "", as_child: false, **attributes)
     @value = value
     @classes = classes
+    @as_child = as_child
     @attributes = attributes
   end
 
   def view_template(&block)
-    div(**select_html_attributes.deep_merge(@attributes), &block)
+    select_attrs = select_html_attributes.deep_merge(@attributes)
+
+    if @as_child
+      # When as_child, we still need a wrapper for the Stimulus controller
+      # but we use a minimal inline wrapper that doesn't break flex layouts
+      # Override class to use 'contents' which makes the element invisible to layout
+      select_attrs[:class] = "contents"
+      span(**select_attrs, &block)
+    else
+      div(**select_attrs, &block)
+    end
   end
 end

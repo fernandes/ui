@@ -31,8 +31,9 @@ class UI::DropdownMenuTrigger < Phlex::HTML
     trigger_attrs = dropdown_menu_trigger_html_attributes.deep_merge(@attributes)
 
     if @as_child
-      # Yield attributes to block - child receives trigger behavior
-      yield(trigger_attrs) if block_given?
+      # When as_child is true, only pass functional attributes (data, aria, tabindex, role)
+      # The child component handles its own styling (following shadcn pattern)
+      yield(trigger_attrs.except(:class)) if block_given?
     else
       # Default: render wrapper div with trigger behavior
       div(**trigger_attrs) do

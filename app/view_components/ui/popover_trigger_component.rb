@@ -26,6 +26,11 @@ class UI::PopoverTriggerComponent < ViewComponent::Base
     @attributes = attributes
   end
 
+  # Returns trigger attributes for as_child mode
+  def trigger_attrs
+    popover_trigger_html_attributes.deep_merge(@attributes)
+  end
+
   def call
     trigger_attrs = popover_trigger_html_attributes.deep_merge(@attributes)
 

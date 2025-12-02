@@ -31,6 +31,21 @@ class UI::InputGroupButtonComponent < ViewComponent::Base
   end
 
   def call
-    render partial: "ui/button", locals: input_group_button_attributes.merge(content: content)
+    # Get base attributes from behavior (type, variant, classes)
+    base_attrs = input_group_button_attributes
+
+    # Extract button-specific params that ui/button accepts as direct arguments
+    button_params = {
+      type: base_attrs[:type],
+      variant: base_attrs[:variant],
+      classes: base_attrs[:classes],
+      content: content
+    }
+
+    # Merge additional HTML attributes (data, role, aria, tabindex, etc.) into attributes hash
+    html_attrs = base_attrs.except(:type, :variant, :classes, :"data-size")
+    button_params[:attributes] = html_attrs unless html_attrs.empty?
+
+    render partial: "ui/button", locals: button_params
   end
 end

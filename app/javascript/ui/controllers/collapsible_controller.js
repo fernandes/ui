@@ -45,6 +45,8 @@ export default class extends Controller {
       if (isOpen) {
         // Opening: remove hidden and set height
         content.removeAttribute("hidden")
+        // Force reflow to get correct scrollHeight after removing hidden
+        void content.offsetHeight
         content.style.height = `${content.scrollHeight}px`
       } else {
         // Closing: animate to 0, then add hidden after transition

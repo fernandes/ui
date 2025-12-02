@@ -5,7 +5,7 @@
 # Button that toggles the navigation menu content.
 # Includes an animated chevron icon.
 class UI::NavigationMenuTriggerComponent < ViewComponent::Base
-  include UI::TriggerBehavior
+  include UI::NavigationMenuTriggerBehavior
 
   # @param first [Boolean] Whether this is the first trigger (gets tabindex=0)
   # @param classes [String] Additional CSS classes to merge

@@ -12,7 +12,9 @@
   all_attributes = dropdown_menu_trigger_html_attributes.deep_merge(@attributes)
 -%>
 <% if as_child %>
-  <%= yield(all_attributes) %>
+  <%# When as_child is true, only pass functional attributes (data, aria, tabindex, role)
+      The child component handles its own styling (following shadcn pattern) %>
+  <%= yield(all_attributes.except(:class)) %>
 <% else %>
   <%= content_tag :div, all_attributes do %>
     <%= content || yield %>

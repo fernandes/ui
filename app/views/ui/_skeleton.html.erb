@@ -13,7 +13,7 @@ html_class = local_assigns.fetch(:class, "")
 attributes = local_assigns.except(:class)
 
 default_classes = "bg-accent animate-pulse rounded-md"
-merged_classes = [default_classes, html_class].compact_blank.join(" ")
+merged_classes = TailwindMerge::Merger.new.merge([default_classes, html_class].compact_blank.join(" "))
 %>
 
 <div data-slot="skeleton" class="<%= merged_classes %>" <%= attributes.map { |k, v| "#{k}=\"#{v}\"" }.join(" ").html_safe %>></div>

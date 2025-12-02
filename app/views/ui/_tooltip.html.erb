@@ -1,5 +1,27 @@
 <%# Tooltip Component - Root container for tooltip %>
+<%#
+  Supports asChild pattern for composition without wrapper elements.
+
+  @example Basic usage
+    render "ui/tooltip" do
+      render "ui/tooltip/trigger" { "Hover me" }
+      render "ui/tooltip/content" { "Tooltip text" }
+    end
+
+  @example With asChild (no wrapper div)
+    render "ui/tooltip", as_child: true do |tooltip_attrs|
+      render "ui/input_group/addon", attributes: tooltip_attrs do
+        render "ui/tooltip/trigger", as_child: true do |trigger_attrs|
+          render "ui/input_group/button", attributes: trigger_attrs do
+            "Info"
+          end
+        end
+        render "ui/tooltip/content" { "Content" }
+      end
+    end
+%>
 <%
+  @as_child = local_assigns.fetch(:as_child, false)
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Extend behavior for shared logic
@@ -8,6 +30,10 @@
   # Get HTML attributes from behavior
   all_attributes = tooltip_html_attributes.deep_merge(@attributes)
 -%>
-<%= content_tag :div, all_attributes do %>
-  <%= yield %>
+<% if @as_child %>
+  <%= yield(all_attributes) %>
+<% else %>
+  <%= content_tag :div, all_attributes do %>
+    <%= yield %>
+  <% end %>
 <% end %>

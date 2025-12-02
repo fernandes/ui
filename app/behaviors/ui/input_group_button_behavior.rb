@@ -25,7 +25,7 @@ module UI::InputGroupButtonBehavior
       variant: @variant,
       classes: input_group_button_classes,
       "data-size": @size
-    }.merge(attributes_value).compact
+    }.deep_merge(attributes_value).compact
   end
 
   # Returns combined CSS classes for the button
@@ -72,18 +72,19 @@ module UI::InputGroupButtonBehavior
   end
 
   # Size-specific classes
+  # Uses calc(var(--radius, 0.375rem) - 5px) to create slightly smaller rounded corners for nested buttons
   def input_group_button_size_classes
     case @size.to_s
     when "xs"
-      "h-6 gap-1 px-2 rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2"
+      "h-6 gap-1 px-2 rounded-[calc(var(--radius,0.375rem)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2"
     when "sm"
-      "h-8 px-2.5 gap-1.5 rounded-md has-[>svg]:px-2.5"
+      "h-8 px-2.5 gap-1.5 rounded-[calc(var(--radius,0.375rem)-5px)] has-[>svg]:px-2.5"
     when "icon-xs"
-      "size-6 rounded-[calc(var(--radius)-5px)] p-0 has-[>svg]:p-0"
+      "size-6 rounded-[calc(var(--radius,0.375rem)-5px)] p-0 has-[>svg]:p-0"
     when "icon-sm"
-      "size-8 p-0 has-[>svg]:p-0"
+      "size-8 rounded-[calc(var(--radius,0.375rem)-5px)] p-0 has-[>svg]:p-0"
     else
-      "h-6 gap-1 px-2 rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2"
+      "h-6 gap-1 px-2 rounded-[calc(var(--radius,0.375rem)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2"
     end
   end
 end

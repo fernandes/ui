@@ -10,9 +10,20 @@
   # Extend behavior for shared logic
   extend UI::InputGroupButtonBehavior
 
-  # Get HTML attributes from behavior
-  all_attributes = input_group_button_html_attributes.deep_merge(@attributes)
+  # Get base attributes from behavior (type, variant, classes)
+  base_attrs = input_group_button_attributes
+
+  # Extract button-specific params that ui/button accepts as direct arguments
+  button_params = {
+    type: base_attrs[:type],
+    variant: base_attrs[:variant],
+    classes: base_attrs[:classes]
+  }
+
+  # Merge additional HTML attributes (data, role, aria, tabindex, etc.) into attributes hash
+  html_attrs = @attributes.except(:type, :variant, :classes)
+  button_params[:attributes] = html_attrs unless html_attrs.empty?
 -%>
-<%= render "ui/button", **all_attributes do %>
+<%= render "ui/button", **button_params do %>
   <%= content || yield %>
 <% end %>

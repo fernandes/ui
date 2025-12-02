@@ -7,8 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.1.3
 
+### Added
+
+- [Tooltip] Support `as_child` pattern for composition without wrapper elements
+- [Popover] Support `as_child` pattern for composition without wrapper elements
+- [Select] Support `as_child` pattern for seamless integration in flex layouts
+- [Calendar] Option to use UI::Select dropdowns instead of native selects
+
+### Changed
+
+- [InputGroup] Use CSS variable `--radius` for customizable border-radius
+- [InputGroupButton] Properly merge classes when receiving attributes from asChild parents
+- [DropdownMenuTrigger] asChild now only passes functional attributes (data, aria), not classes
+- [NavigationMenu] Rename behaviors to avoid naming conflicts (e.g., `ContentBehavior` → `NavigationMenuContentBehavior`)
+
 ### Fixed
 
+- [Collapsible] Force reflow to get correct height after removing hidden
+- [Dropdown] Focus new item on hover instead of blur to prevent menu from closing
+- [Skeleton] Use TailwindMerge for proper class merging
 - [Avatar] ERB partial now properly merges custom classes (e.g., `size-16 grayscale`)
 - [Table] Fix rendering for Phlex/VC implementations
 - [Menubar] Fix checkboxes / radio groups not being selected

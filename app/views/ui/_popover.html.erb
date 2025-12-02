@@ -1,5 +1,25 @@
 <%# Popover Component - Container for popover trigger and content %>
+<%#
+  Supports asChild pattern for composition without wrapper elements.
+
+  @example Basic usage
+    render "ui/popover" do
+      render "ui/popover/trigger" { "Open" }
+      render "ui/popover/content" { "Content" }
+    end
+
+  @example With asChild (no wrapper div)
+    render "ui/popover", as_child: true do |popover_attrs|
+      render "ui/input_group/addon", attributes: popover_attrs do
+        render "ui/popover/trigger", as_child: true do |trigger_attrs|
+          ...
+        end
+        render "ui/popover/content" { "Content" }
+      end
+    end
+%>
 <%
+  @as_child = local_assigns.fetch(:as_child, false)
   @trigger = local_assigns.fetch(:trigger, "click")
   @placement = local_assigns.fetch(:placement, "bottom")
   @offset = local_assigns.fetch(:offset, 8)
@@ -7,13 +27,19 @@
   @align = local_assigns.fetch(:align, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
+  @data = local_assigns.fetch(:data, {})
 
   # Extend behavior for shared logic
   extend UI::PopoverBehavior
 
-  # Get HTML attributes from behavior
+  # Get HTML attributes from behavior and deep merge with passed data and attributes
   all_attributes = popover_html_attributes.deep_merge(@attributes)
+  all_attributes[:data] = (all_attributes[:data] || {}).merge(@data) if @data.present?
 -%>
-<%= content_tag :div, all_attributes do %>
-  <%= yield %>
+<% if @as_child %>
+  <%= yield(all_attributes) %>
+<% else %>
+  <%= content_tag :div, all_attributes do %>
+    <%= yield %>
+  <% end %>
 <% end %>

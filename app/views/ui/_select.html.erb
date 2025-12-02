@@ -4,6 +4,7 @@
   @attributes = local_assigns.fetch(:attributes, {})
   @value = local_assigns.fetch(:value, nil)
   @id = local_assigns.fetch(:id, nil)
+  as_child = local_assigns.fetch(:as_child, false)
 
   # Extend behavior for shared logic
   extend ::UI::SelectBehavior
@@ -12,6 +13,16 @@
   all_attributes = select_html_attributes.deep_merge(@attributes)
   all_attributes[:id] = @id if @id.present?
 -%>
-<%= content_tag :div, all_attributes do %>
-  <%= yield %>
+<% if as_child %>
+  <%# When as_child, we still need a wrapper for the Stimulus controller
+      but we use a minimal inline wrapper that doesn't break flex layouts
+      Override class to use 'contents' which makes the element invisible to layout %>
+  <% all_attributes[:class] = "contents" %>
+  <%= content_tag :span, all_attributes do %>
+    <%= yield %>
+  <% end %>
+<% else %>
+  <%= content_tag :div, all_attributes do %>
+    <%= yield %>
+  <% end %>
 <% end %>

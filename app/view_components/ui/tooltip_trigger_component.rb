@@ -4,6 +4,18 @@
 #
 # The interactive element that shows/hides the tooltip on hover/focus.
 # Supports asChild pattern for composition with other components.
+#
+# @example Basic usage
+#   <%= render UI::TooltipTriggerComponent.new do %>
+#     Hover me
+#   <% end %>
+#
+# @example As child (yields attributes to block)
+#   <%= render UI::TooltipTriggerComponent.new(as_child: true) do |trigger| %>
+#     <%= render UI::InputGroupButtonComponent.new(**trigger.trigger_attrs) do %>
+#       Info
+#     <% end %>
+#   <% end %>
 class UI::TooltipTriggerComponent < ViewComponent::Base
   include UI::TooltipTriggerBehavior
 
@@ -14,12 +26,20 @@ class UI::TooltipTriggerComponent < ViewComponent::Base
     @attributes = attributes
   end
 
-  def call
-    trigger_attrs = tooltip_trigger_html_attributes.merge(@attributes.except(:data))
+  # Returns trigger attributes for as_child mode
+  def trigger_attrs
+    tooltip_trigger_html_attributes.deep_merge(@attributes)
+  end
 
-    # Default mode: render as button with proper styling
-    content_tag :button, **trigger_attrs do
+  def call
+    if @as_child
+      # asChild mode: yield self so caller can access trigger_attrs
       content
+    else
+      # Default mode: render as button with proper styling
+      content_tag :button, **trigger_attrs do
+        content
+      end
     end
   end
 end

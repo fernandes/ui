@@ -11,7 +11,7 @@
 # @example First trigger (receives initial focus)
 #   render UI::Trigger.new(first: true) { "Home" }
 class UI::NavigationMenuTrigger < Phlex::HTML
-  include UI::TriggerBehavior
+  include UI::NavigationMenuTriggerBehavior
 
   # @param first [Boolean] Whether this is the first trigger (gets tabindex=0)
   # @param classes [String] Additional CSS classes to merge

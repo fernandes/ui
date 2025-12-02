@@ -1588,11 +1588,9 @@
     openSubmenuHandler(event) {
       const trigger = event.currentTarget;
       const submenu = trigger.nextElementSibling;
-      if (document.activeElement && document.activeElement.hasAttribute("role") && document.activeElement.getAttribute("role") === "menuitem") {
-        document.activeElement.blur();
-      }
       clearAllTabindexes(this.element);
       trigger.setAttribute("tabindex", "0");
+      trigger.focus();
       this.lastHoveredItem = trigger;
       if (this.closeSubmenuTimeouts.has(trigger)) {
         clearTimeout(this.closeSubmenuTimeouts.get(trigger));
@@ -1625,11 +1623,9 @@
     }
     trackHoveredItem(event) {
       const item = event.currentTarget;
-      if (document.activeElement && document.activeElement.hasAttribute("role") && document.activeElement.getAttribute("role") === "menuitem") {
-        document.activeElement.blur();
-      }
       clearAllTabindexes(this.element);
       item.setAttribute("tabindex", "0");
+      item.focus();
       this.lastHoveredItem = item;
     }
     toggleCheckbox(event) {
@@ -2661,6 +2657,7 @@
         content.dataset.state = state;
         if (isOpen) {
           content.removeAttribute("hidden");
+          void content.offsetHeight;
           content.style.height = `${content.scrollHeight}px`;
         } else {
           if (animate) {

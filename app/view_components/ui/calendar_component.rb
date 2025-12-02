@@ -121,6 +121,14 @@ class UI::CalendarComponent < ViewComponent::Base
   end
 
   def dropdowns_html
+    if use_native_select?
+      native_dropdowns_html
+    else
+      ui_select_dropdowns_html
+    end
+  end
+
+  def native_dropdowns_html
     content_tag(:div, class: "flex items-center gap-1") do
       safe_join([month_select_html, year_select_html])
     end
@@ -140,6 +148,60 @@ class UI::CalendarComponent < ViewComponent::Base
       data: {ui__calendar_target: "yearSelect", action: "change->ui--calendar#goToYear"},
       class: "text-sm font-medium h-7 px-2 rounded-md border border-input bg-background") do
       safe_join(((current_year - @year_range)..(current_year + 10)).map { |y| tag.option(y.to_s, value: y) })
+    end
+  end
+
+  def ui_select_dropdowns_html
+    content_tag(:div, class: "flex items-center gap-1 px-8 flex-1") do
+      safe_join([
+        ui_month_select_html,
+        ui_year_select_html
+      ])
+    end
+  end
+
+  def ui_month_select_html
+    render(UI::SelectComponent.new(classes: "flex-1", value: (@month.month - 1).to_s)) do
+      safe_join([
+        render(UI::SelectTriggerComponent.new(classes: "h-9 w-full gap-1 px-2 text-sm font-medium border-0 shadow-none")),
+        render(UI::SelectContentComponent.new(classes: "min-w-[8rem]")) {
+          safe_join(Date::MONTHNAMES.compact.each_with_index.map { |name, i|
+            render(UI::SelectItemComponent.new(value: i.to_s)) { name }
+          })
+        },
+        tag.input(
+          type: "hidden",
+          value: (@month.month - 1).to_s,
+          data: {
+            ui__select_target: "hiddenInput",
+            ui__calendar_target: "monthSelect",
+            action: "change->ui--calendar#goToMonth"
+          }
+        )
+      ])
+    end
+  end
+
+  def ui_year_select_html
+    current_year = Date.today.year
+    render(UI::SelectComponent.new(value: @month.year.to_s)) do
+      safe_join([
+        render(UI::SelectTriggerComponent.new(classes: "min-w-[75px] h-9 w-auto gap-1 px-2 text-sm font-medium border-0 shadow-none")),
+        render(UI::SelectContentComponent.new(classes: "min-w-[5rem] max-h-[200px]")) {
+          safe_join(((current_year - @year_range)..(current_year + 10)).map { |y|
+            render(UI::SelectItemComponent.new(value: y.to_s)) { y.to_s }
+          })
+        },
+        tag.input(
+          type: "hidden",
+          value: @month.year.to_s,
+          data: {
+            ui__select_target: "hiddenInput",
+            ui__calendar_target: "yearSelect",
+            action: "change->ui--calendar#goToYear"
+          }
+        )
+      ])
     end
   end
 

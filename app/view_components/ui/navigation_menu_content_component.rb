@@ -4,7 +4,7 @@
 #
 # Container for navigation menu content that appears when trigger is activated.
 class UI::NavigationMenuContentComponent < ViewComponent::Base
-  include UI::ContentBehavior
+  include UI::NavigationMenuContentBehavior
 
   # @param viewport [Boolean] Whether content should be rendered in viewport
   # @param classes [String] Additional CSS classes to merge

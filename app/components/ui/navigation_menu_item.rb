@@ -17,7 +17,7 @@
 #     render UI::Link.new(href: "/about") { "About" }
 #   end
 class UI::NavigationMenuItem < Phlex::HTML
-  include UI::ItemBehavior
+  include UI::NavigationMenuItemBehavior
 
   # @param value [String] Optional value for controlled state
   # @param classes [String] Additional CSS classes to merge

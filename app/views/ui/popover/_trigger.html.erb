@@ -1,6 +1,22 @@
 <%# Popover Trigger - Button or element that triggers the popover %>
+<%#
+  Supports asChild pattern for composition without wrapper elements.
+
+  @example Basic usage
+    render "ui/popover/trigger" do
+      button { "Click me" }
+    end
+
+  @example With asChild
+    render "ui/popover/trigger", as_child: true do |trigger_attrs|
+      render "ui/input_group/button", attributes: trigger_attrs do
+        "Info"
+      end
+    end
+%>
 <%
   content ||= local_assigns.fetch(:content, nil)
+  as_child = local_assigns.fetch(:as_child, false)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
@@ -10,6 +26,10 @@
   # Get HTML attributes from behavior
   all_attributes = popover_trigger_html_attributes.deep_merge(@attributes)
 -%>
-<%= content_tag :div, all_attributes do %>
-  <%= content || yield %>
+<% if as_child %>
+  <%= yield(all_attributes) %>
+<% else %>
+  <%= content_tag :div, all_attributes do %>
+    <%= content || yield %>
+  <% end %>
 <% end %>

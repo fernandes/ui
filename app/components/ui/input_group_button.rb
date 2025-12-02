@@ -28,11 +28,18 @@ class UI::InputGroupButton < Phlex::HTML
   end
 
   def view_template(&block)
+    # Merge classes from @attributes[:class] with input_group_button_classes
+    # This is needed when as_child patterns pass classes through attributes
+    merged_classes = TailwindMerge::Merger.new.merge([
+      input_group_button_classes,
+      @attributes[:class]
+    ].compact.join(" "))
+
     # Use input_group_button_classes which includes button behavior + input group styling
     button(
       type: @type,
-      class: input_group_button_classes,
-      **@attributes.except(:type, :variant, :size)
+      class: merged_classes,
+      **@attributes.except(:type, :variant, :size, :class)
     ) do
       yield if block_given?
     end

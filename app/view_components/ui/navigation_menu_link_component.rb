@@ -21,7 +21,7 @@ require "nokogiri"
 #     <%= link_to "About", about_path %>
 #   <% end %>
 class UI::NavigationMenuLinkComponent < ViewComponent::Base
-  include UI::LinkBehavior
+  include UI::NavigationMenuLinkBehavior
   include UI::SharedAsChildBehavior
 
   # @param href [String] URL for the link (ignored when as_child: true)
