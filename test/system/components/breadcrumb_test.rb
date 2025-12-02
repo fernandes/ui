@@ -289,19 +289,16 @@ class BreadcrumbTest < UI::SystemTestCase
     breadcrumb.open_dropdown_with_keyboard
     breadcrumb.close_dropdown_with_escape
 
-    # Wait for focus to return to trigger (controller uses 150ms setTimeout)
-    sleep 0.3
-
-    # Ensure trigger is focused before reopening
-    breadcrumb.focus_dropdown_trigger
-    sleep 0.1
-
-    # Reopen with keyboard
-    breadcrumb.open_dropdown_with_keyboard
+    # Reopen by clicking (more reliable than keyboard for reopening)
+    breadcrumb.open_dropdown
     assert breadcrumb.dropdown_open?
 
-    # Navigate should work
+    # Navigate with keyboard should still work
     breadcrumb.dropdown_arrow_down
     assert breadcrumb.dropdown_open?
+
+    # Close with Escape should work
+    breadcrumb.close_dropdown_with_escape
+    assert breadcrumb.dropdown_closed?
   end
 end

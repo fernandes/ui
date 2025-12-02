@@ -156,6 +156,7 @@ module UI
       #
       def open_dropdown_with_keyboard
         focus_dropdown_trigger
+        sleep 0.1 # Give focus time to settle
         press_key_via_keyboard("Enter")
         wait_for_dropdown_open
       end
