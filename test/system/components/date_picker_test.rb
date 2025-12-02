@@ -7,7 +7,7 @@ module UI
     test "renders date picker with trigger button" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       assert picker.visible?
       assert picker.closed?
@@ -17,7 +17,7 @@ module UI
     test "opens date picker on trigger click" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       refute picker.open?
 
@@ -30,7 +30,7 @@ module UI
     test "closes date picker on escape key" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       picker.open
       assert picker.open?
@@ -43,7 +43,7 @@ module UI
     test "closes date picker on outside click" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       picker.open
       assert picker.open?
@@ -56,7 +56,7 @@ module UI
     test "selects a date and displays formatted text" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       # Select today's date
@@ -75,7 +75,7 @@ module UI
     test "closes popover after single date selection when close_on_select is true" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       assert picker.open?
@@ -90,7 +90,7 @@ module UI
     test "navigates months with next/previous buttons" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       current_month = picker.calendar.current_month
@@ -113,7 +113,7 @@ module UI
     test "renders date picker with label" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#labeled-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#labeled-date-picker")
 
       assert picker.has_label?
       assert_equal "Date of birth", picker.label_text
@@ -122,7 +122,7 @@ module UI
     test "renders date picker with form field and pre-selected date" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#form-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#form-date-picker")
 
       # Check that it has a pre-selected date (Date.today + 7)
       selected_date = Date.today + 7
@@ -138,7 +138,7 @@ module UI
     test "updates displayed date on selection" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#form-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#form-date-picker")
 
       initial_text = picker.selected_text
 
@@ -160,7 +160,7 @@ module UI
     test "selects date range in range mode" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#range-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#range-date-picker")
 
       assert picker.range_mode?
       assert_equal "range", picker.mode
@@ -191,7 +191,7 @@ module UI
     test "displays date range with formatted text" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#range-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#range-date-picker")
       picker.open
 
       start_date = Date.today
@@ -211,7 +211,7 @@ module UI
     test "shows multiple months for range picker" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#range-multi-month-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#range-multi-month-date-picker")
       picker.open
 
       # Verify 2 months are displayed
@@ -221,7 +221,7 @@ module UI
     test "renders date picker with calendar icon" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#calendar-icon-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#calendar-icon-date-picker")
 
       assert picker.has_calendar_icon?
       refute picker.has_chevron_icon?
@@ -230,7 +230,7 @@ module UI
     test "renders date picker with chevron icon by default" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       assert picker.has_chevron_icon?
       refute picker.has_calendar_icon?
@@ -239,7 +239,7 @@ module UI
     test "respects date constraints (min/max)" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#constrained-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#constrained-date-picker")
       picker.open
 
       # Test that dates outside range are disabled
@@ -260,7 +260,7 @@ module UI
     test "navigates to specific month and year" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       # Navigate to a specific month
@@ -277,7 +277,7 @@ module UI
     test "supports keyboard navigation in calendar" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       # Focus a date
@@ -302,7 +302,7 @@ module UI
     test "displays placeholder text when no date selected" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       assert picker.has_placeholder?
       assert_equal "Pick a date", picker.selected_text
@@ -311,7 +311,7 @@ module UI
     test "shows correct locale formatting" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       # Default locale should be en-US
       assert_equal "en-US", picker.locale
@@ -320,7 +320,7 @@ module UI
     test "maintains state when reopening date picker" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       # Select a date
       picker.open
@@ -338,7 +338,7 @@ module UI
     test "calendar shows current month by default" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       current_date = Date.today
@@ -350,7 +350,7 @@ module UI
     test "pre-selected date is displayed on initial render" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#form-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#form-date-picker")
 
       # This picker has Date.today + 7 pre-selected
       expected_date = Date.today + 7
@@ -363,7 +363,7 @@ module UI
     test "calendar opens to pre-selected date's month" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#form-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#form-date-picker")
       picker.open
       sleep 0.2 # Wait for calendar to render
 
@@ -379,7 +379,7 @@ module UI
     test "date picker popover positions correctly" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
       picker.open
 
       # Verify popover is positioned
@@ -392,7 +392,7 @@ module UI
     test "clicking trigger toggles date picker" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#basic-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
 
       # First click opens
       picker.trigger.click
@@ -408,7 +408,7 @@ module UI
     test "date picker works with dropdowns enabled" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#dropdowns-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#dropdowns-date-picker")
       picker.open
 
       # Just verify it opens successfully with dropdowns
@@ -419,7 +419,7 @@ module UI
     test "range mode shows appropriate placeholder" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#range-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#range-date-picker")
 
       # Should show range placeholder
       assert picker.has_placeholder?
@@ -431,7 +431,7 @@ module UI
     test "partial range selection shows formatting" do
       visit_component("date_picker")
 
-      picker = find_element(UI::TestingDatePickerElement, "#range-date-picker")
+      picker = find_element(UI::Testing::DatePickerElement, "#range-date-picker")
       picker.open
 
       # Select only start date

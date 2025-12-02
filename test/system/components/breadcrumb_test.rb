@@ -9,12 +9,12 @@ class BreadcrumbTest < UI::SystemTestCase
 
   # Helper to get the basic breadcrumb
   def basic_breadcrumb
-    find_element(UI::TestingBreadcrumbElement, "#basic-breadcrumb nav")
+    find_element(UI::Testing::BreadcrumbElement, "#basic-breadcrumb nav")
   end
 
   # Helper to get the breadcrumb with dropdown
   def dropdown_breadcrumb
-    find_element(UI::TestingBreadcrumbElement, "#dropdown-breadcrumb nav")
+    find_element(UI::Testing::BreadcrumbElement, "#dropdown-breadcrumb nav")
   end
 
   # === Basic Rendering Tests ===

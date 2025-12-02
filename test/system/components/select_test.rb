@@ -9,17 +9,17 @@ class SelectTest < UI::SystemTestCase
 
   # Helper to get the basic fruits select by ID
   def fruits_select
-    find_element(UI::TestingSelectElement, "#fruits-select")
+    find_element(UI::Testing::SelectElement, "#fruits-select")
   end
 
   # Helper to get the timezone select by ID
   def timezone_select
-    find_element(UI::TestingSelectElement, "#timezone-select")
+    find_element(UI::Testing::SelectElement, "#timezone-select")
   end
 
   # Helper to get the frameworks select by ID
   def frameworks_select
-    find_element(UI::TestingSelectElement, "#frameworks-select")
+    find_element(UI::Testing::SelectElement, "#frameworks-select")
   end
 
   # === Basic Interaction Tests ===

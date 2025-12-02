@@ -9,32 +9,32 @@ class SwitchTest < UI::SystemTestCase
 
   # Helper to get the airplane mode switch (Phlex, unchecked by default)
   def airplane_switch
-    find_element(UI::TestingSwitchElement, "#phlex-airplane-mode")
+    find_element(UI::Testing::SwitchElement, "#phlex-airplane-mode")
   end
 
   # Helper to get the notifications switch (Phlex, checked by default)
   def notifications_switch
-    find_element(UI::TestingSwitchElement, "#phlex-notifications")
+    find_element(UI::Testing::SwitchElement, "#phlex-notifications")
   end
 
   # Helper to get the disabled off switch (ViewComponent)
   def disabled_off_switch
-    find_element(UI::TestingSwitchElement, "#vc-disabled-off")
+    find_element(UI::Testing::SwitchElement, "#vc-disabled-off")
   end
 
   # Helper to get the disabled on switch (ViewComponent)
   def disabled_on_switch
-    find_element(UI::TestingSwitchElement, "#vc-disabled-on")
+    find_element(UI::Testing::SwitchElement, "#vc-disabled-on")
   end
 
   # Helper to get the marketing switch (ERB, form integration)
   def marketing_switch
-    find_element(UI::TestingSwitchElement, "#marketing")
+    find_element(UI::Testing::SwitchElement, "#marketing")
   end
 
   # Helper to get the keyboard test switch
   def keyboard_switch
-    find_element(UI::TestingSwitchElement, "#keyboard-test")
+    find_element(UI::Testing::SwitchElement, "#keyboard-test")
   end
 
   # === Basic Interaction Tests ===

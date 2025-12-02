@@ -70,26 +70,26 @@ describe("DatepickerController", () => {
         data-ui--datepicker-placeholder-value="Select date"
         data-ui--datepicker-close-on-select-value="true"
       >
-        <div class="relative">
-          <input
-            type="text"
-            placeholder="June 01, 2025"
-            data-ui--datepicker-target="input"
-            data-action="input->ui--datepicker#handleInput keydown->ui--datepicker#handleInputKeydown"
-          >
-          <button
-            type="button"
-            data-ui--datepicker-target="trigger"
-            data-ui--popover-target="trigger"
-          >
-            Calendar Icon
-          </button>
-        </div>
-
         <div
           data-controller="ui--popover"
           data-ui--popover-trigger-value="manual"
         >
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="June 01, 2025"
+              data-ui--datepicker-target="input"
+              data-action="input->ui--datepicker#handleInput keydown->ui--datepicker#handleInputKeydown"
+            >
+            <button
+              type="button"
+              data-ui--datepicker-target="trigger"
+              data-ui--popover-target="trigger"
+            >
+              Calendar Icon
+            </button>
+          </div>
+
           <div data-ui--popover-target="content" data-state="closed" style="position: absolute;">
             <div
               data-controller="ui--calendar"

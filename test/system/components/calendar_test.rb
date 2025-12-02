@@ -4,32 +4,37 @@ require "test_helper"
 
 class CalendarTest < UI::SystemTestCase
   setup do
+    travel_to Date.new(2025, 6, 15)
     visit_component("calendar")
+  end
+
+  teardown do
+    travel_back
   end
 
   # Helper methods to get different calendar instances
   def basic_calendar
-    find_element(UI::TestingCalendarElement, "#basic-calendar")
+    find_element(UI::Testing::CalendarElement, "#basic-calendar")
   end
 
   def selected_calendar
-    find_element(UI::TestingCalendarElement, "#selected-calendar")
+    find_element(UI::Testing::CalendarElement, "#selected-calendar")
   end
 
   def range_calendar
-    find_element(UI::TestingCalendarElement, "#range-calendar")
+    find_element(UI::Testing::CalendarElement, "#range-calendar")
   end
 
   def multiple_months_calendar
-    find_element(UI::TestingCalendarElement, "#multiple-months-calendar")
+    find_element(UI::Testing::CalendarElement, "#multiple-months-calendar")
   end
 
   def min_max_calendar
-    find_element(UI::TestingCalendarElement, "#min-max-calendar")
+    find_element(UI::Testing::CalendarElement, "#min-max-calendar")
   end
 
   def form_calendar
-    find_element(UI::TestingCalendarElement, "#form-calendar")
+    find_element(UI::Testing::CalendarElement, "#form-calendar")
   end
 
   # === Basic Interaction Tests ===

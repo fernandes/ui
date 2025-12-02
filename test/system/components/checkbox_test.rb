@@ -11,22 +11,22 @@ class CheckboxTest < UI::SystemTestCase
 
   # Helper to get the basic unchecked checkbox
   def basic_checkbox
-    find_element(UI::TestingCheckboxElement, "#basic-checkbox")
+    find_element(UI::Testing::CheckboxElement, "#basic-checkbox")
   end
 
   # Helper to get the pre-checked checkbox
   def checked_checkbox
-    find_element(UI::TestingCheckboxElement, "#checked-checkbox")
+    find_element(UI::Testing::CheckboxElement, "#checked-checkbox")
   end
 
   # Helper to get the disabled checkbox
   def disabled_checkbox
-    find_element(UI::TestingCheckboxElement, "#disabled-checkbox")
+    find_element(UI::Testing::CheckboxElement, "#disabled-checkbox")
   end
 
   # Helper to get a checkbox from the interest group
   def interest_checkbox(interest)
-    find_element(UI::TestingCheckboxElement, "#interest-#{interest}")
+    find_element(UI::Testing::CheckboxElement, "#interest-#{interest}")
   end
 
   # === Basic Interaction Tests ===

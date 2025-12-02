@@ -10,23 +10,23 @@ class ResizableTest < UI::SystemTestCase
   # === Helper Methods ===
 
   def basic_horizontal
-    find_element(UI::TestingResizableElement, "#erb-basic-horizontal")
+    find_element(UI::Testing::ResizableElement, "#erb-basic-horizontal")
   end
 
   def vertical_resizable
-    find_element(UI::TestingResizableElement, "#erb-vertical")
+    find_element(UI::Testing::ResizableElement, "#erb-vertical")
   end
 
   def handle_grip_resizable
-    find_element(UI::TestingResizableElement, "#erb-handle-grip")
+    find_element(UI::Testing::ResizableElement, "#erb-handle-grip")
   end
 
   def constrained_resizable
-    find_element(UI::TestingResizableElement, "#erb-with-constraints")
+    find_element(UI::Testing::ResizableElement, "#erb-with-constraints")
   end
 
   def sidebar_resizable
-    find_element(UI::TestingResizableElement, "#erb-sidebar")
+    find_element(UI::Testing::ResizableElement, "#erb-sidebar")
   end
 
   # === Basic Structure Tests ===

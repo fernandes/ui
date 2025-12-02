@@ -11,7 +11,7 @@ module UI
     # === Basic Rendering ===
 
     test "renders scroll area with content" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       assert scroll_area.visible?
       assert scroll_area.has_text?("Tags")
@@ -19,7 +19,7 @@ module UI
     end
 
     test "renders viewport element" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
       viewport = scroll_area.viewport
 
       assert viewport.visible?
@@ -27,7 +27,7 @@ module UI
     end
 
     test "renders vertical scrollbar" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
       scrollbar = scroll_area.vertical_scrollbar
 
       assert scrollbar
@@ -36,7 +36,7 @@ module UI
     end
 
     test "renders horizontal scrollbar" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
       scrollbar = scroll_area.horizontal_scrollbar
 
       assert scrollbar
@@ -44,7 +44,7 @@ module UI
     end
 
     test "renders scrollbar thumb" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
       thumb = scroll_area.vertical_thumb
 
       assert thumb
@@ -54,20 +54,20 @@ module UI
     # === Overflow Detection ===
 
     test "detects vertical overflow when content exceeds height" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       assert scroll_area.has_vertical_overflow?
     end
 
     test "detects horizontal overflow when content exceeds width" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       assert scroll_area.has_horizontal_overflow?
     end
 
     test "detects no overflow when content fits" do
       # Small scroll area with only 10 items that should fit
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#small-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#small-scroll-area")
 
       # This might have overflow depending on exact sizing
       # Just verify the method works without error
@@ -78,14 +78,14 @@ module UI
     # === Scroll Position ===
 
     test "starts at top position" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       assert scroll_area.at_top?
       assert_equal 0, scroll_area.scroll_top
     end
 
     test "scrolls to bottom" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       scroll_area.scroll_to_bottom
       assert scroll_area.at_bottom?
@@ -93,7 +93,7 @@ module UI
     end
 
     test "scrolls to top after scrolling down" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       scroll_area.scroll_to_bottom
       assert scroll_area.at_bottom?
@@ -103,14 +103,14 @@ module UI
     end
 
     test "scrolls to specific position" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to(100)
       assert_in_delta 100, scroll_area.scroll_top, 2
     end
 
     test "scrolls by specific amount" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       initial_position = scroll_area.scroll_top
       scroll_area.scroll_by(50)
@@ -121,14 +121,14 @@ module UI
     # === Horizontal Scrolling ===
 
     test "scrolls horizontally to the left" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       assert scroll_area.at_left?
       assert_equal 0, scroll_area.scroll_left
     end
 
     test "scrolls horizontally to the right" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       scroll_area.scroll_to_right
       assert scroll_area.at_right?
@@ -136,14 +136,14 @@ module UI
     end
 
     test "scrolls horizontally to specific position" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       scroll_area.scroll_to_x(100)
       assert_in_delta 100, scroll_area.scroll_left, 2
     end
 
     test "scrolls horizontally by amount" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       initial_position = scroll_area.scroll_left
       scroll_area.scroll_by(0, 50)
@@ -154,14 +154,14 @@ module UI
     # === Scrollbar Visibility (Hover Type) ===
 
     test "scrollbar starts hidden with hover type" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       # Default type is "hover", scrollbar should be hidden initially
       refute scroll_area.vertical_scrollbar_visible?
     end
 
     test "scrollbar shows on hover" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       # Hover over the scroll area
       scroll_area.node.hover
@@ -174,7 +174,7 @@ module UI
     # === Scrollbar Visibility (Keyboard Focus) ===
 
     test "scrollbar shows on viewport focus" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       # Initially hidden
       refute scroll_area.vertical_scrollbar_visible?
@@ -188,7 +188,7 @@ module UI
     end
 
     test "scrollbar hides on viewport focusout" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       # Focus and verify visible
       scroll_area.focus_viewport
@@ -204,7 +204,7 @@ module UI
     end
 
     test "scrollbar remains visible during keyboard navigation" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       # Focus and verify visible
       scroll_area.focus_viewport
@@ -218,7 +218,7 @@ module UI
     end
 
     test "thumb position updates during keyboard navigation" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.focus_viewport
       scroll_area.wait_for_scrollbar_visible(:vertical)
@@ -236,7 +236,7 @@ module UI
     # === Thumb Position Reflection ===
 
     test "thumb position reflects scroll position at top" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to_top
       ratio = scroll_area.vertical_thumb_position_ratio
@@ -245,7 +245,7 @@ module UI
     end
 
     test "thumb position reflects scroll position at bottom" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to_bottom
       ratio = scroll_area.vertical_thumb_position_ratio
@@ -254,7 +254,7 @@ module UI
     end
 
     test "thumb position reflects scroll position in middle" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       # Scroll to middle
       max = scroll_area.max_scroll_top
@@ -267,7 +267,7 @@ module UI
     # === Keyboard Scrolling ===
 
     test "scrolls down with arrow down key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       initial_position = scroll_area.scroll_top
       scroll_area.scroll_down_with_arrow
@@ -277,7 +277,7 @@ module UI
     end
 
     test "scrolls up with arrow up key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       # First scroll down
       scroll_area.scroll_to(100)
@@ -288,7 +288,7 @@ module UI
     end
 
     test "scrolls with page down key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       initial_position = scroll_area.scroll_top
       scroll_area.press_page_down
@@ -297,7 +297,7 @@ module UI
     end
 
     test "scrolls with page up key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to(200)
       current_position = scroll_area.scroll_top
@@ -307,7 +307,7 @@ module UI
     end
 
     test "scrolls to top with home key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to(100)
       initial_position = scroll_area.scroll_top
@@ -322,7 +322,7 @@ module UI
     end
 
     test "scrolls to bottom with end key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       initial_position = scroll_area.scroll_top
       scroll_area.scroll_to_bottom_with_end
@@ -337,7 +337,7 @@ module UI
     # === Horizontal Keyboard Scrolling ===
 
     test "scrolls right with arrow right key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       initial_position = scroll_area.scroll_left
       scroll_area.scroll_right_with_arrow
@@ -346,7 +346,7 @@ module UI
     end
 
     test "scrolls left with arrow left key" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       scroll_area.scroll_to_x(100)
       scroll_area.scroll_left_with_arrow
@@ -357,7 +357,7 @@ module UI
     # === Mouse Wheel Scrolling ===
 
     test "scrolls with mouse wheel down" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       initial_position = scroll_area.scroll_top
       scroll_area.wheel_scroll(100)
@@ -366,7 +366,7 @@ module UI
     end
 
     test "scrolls with mouse wheel up" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to(200)
       current_position = scroll_area.scroll_top
@@ -377,7 +377,7 @@ module UI
     end
 
     test "scrolls horizontally with mouse wheel" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       initial_position = scroll_area.scroll_left
       scroll_area.wheel_scroll(0, 100)
@@ -388,7 +388,7 @@ module UI
     # === Scrollbar Click-to-Scroll ===
 
     test "clicking scrollbar scrolls to position" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       # Click at 50% of scrollbar height
       scroll_area.click_vertical_scrollbar_at(0.5)
@@ -399,7 +399,7 @@ module UI
     end
 
     test "clicking horizontal scrollbar scrolls to position" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       # Click at 50% of scrollbar width
       scroll_area.click_horizontal_scrollbar_at(0.5)
@@ -412,7 +412,7 @@ module UI
     # === Thumb Dragging ===
 
     test "dragging vertical thumb scrolls content" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       # Make sure we start at top
       scroll_area.scroll_to_top
@@ -431,7 +431,7 @@ module UI
     end
 
     test "dragging horizontal thumb scrolls content" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       # Make sure we start at left
       scroll_area.scroll_to_left
@@ -452,14 +452,14 @@ module UI
     # === Different Sizes ===
 
     test "works with small scroll area" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#small-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#small-scroll-area")
 
       assert scroll_area.visible?
       assert scroll_area.viewport.visible?
     end
 
     test "works with large scroll area" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       assert scroll_area.visible?
       assert scroll_area.has_vertical_overflow?
@@ -469,7 +469,7 @@ module UI
     end
 
     test "works with long content scroll area" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#long-content-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#long-content-scroll-area")
 
       assert scroll_area.visible?
       assert scroll_area.has_text?("About Scroll Area")
@@ -482,7 +482,7 @@ module UI
     # === Max Scroll Calculations ===
 
     test "calculates max scroll top correctly" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       max = scroll_area.max_scroll_top
       assert max > 0
@@ -492,7 +492,7 @@ module UI
     end
 
     test "calculates max scroll left correctly" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#horizontal-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#horizontal-scroll-area")
 
       max = scroll_area.max_scroll_left
       assert max > 0
@@ -504,7 +504,7 @@ module UI
     # === Edge Cases ===
 
     test "handles scrolling when already at top" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       scroll_area.scroll_to_top
       assert scroll_area.at_top?
@@ -514,7 +514,7 @@ module UI
     end
 
     test "handles scrolling when already at bottom" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       scroll_area.scroll_to_bottom
       assert scroll_area.at_bottom?
@@ -524,7 +524,7 @@ module UI
     end
 
     test "handles rapid scroll changes" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#large-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
 
       scroll_area.scroll_to(50)
       scroll_area.scroll_to(100)
@@ -538,14 +538,14 @@ module UI
     # === Content Queries ===
 
     test "can query content text" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#basic-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
 
       assert scroll_area.has_text?("v1.2.0")
       assert scroll_area.has_text?("v0.3.0")
     end
 
     test "reveals content when scrolling" do
-      scroll_area = find_element(UI::TestingScrollAreaElement, "#long-content-scroll-area")
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#long-content-scroll-area")
 
       # At top, should see beginning content
       scroll_area.scroll_to_top

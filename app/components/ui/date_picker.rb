@@ -116,7 +116,7 @@ class UI::DatePicker < Phlex::HTML
 
   # Render the trigger button
   def trigger(placeholder: @placeholder, selected: @selected, icon: :chevron, classes: "", **attributes, &block)
-    render Trigger.new(
+    render UI::DatePickerTrigger.new(
       placeholder: placeholder,
       selected: selected,
       icon: icon,

@@ -9,17 +9,17 @@ class ComboboxTest < UI::SystemTestCase
 
   # Helper to get the framework combobox (ERB example)
   def framework_combobox
-    find_element(UI::TestingComboboxElement, "#framework-combobox-erb")
+    find_element(UI::Testing::ComboboxElement, "#framework-combobox-erb")
   end
 
   # Helper to get the status combobox (ERB example)
   def status_combobox
-    find_element(UI::TestingComboboxElement, "#status-combobox-erb")
+    find_element(UI::Testing::ComboboxElement, "#status-combobox-erb")
   end
 
   # Helper to get the labels combobox (DropdownMenu example)
   def labels_combobox
-    find_element(UI::TestingComboboxElement, "#labels-combobox-erb")
+    find_element(UI::Testing::ComboboxElement, "#labels-combobox-erb")
   end
 
   # === Basic Interaction Tests ===
@@ -270,7 +270,7 @@ class ComboboxTest < UI::SystemTestCase
   # === Different Syntax Tests ===
 
   test "phlex syntax works correctly" do
-    combobox = find_element(UI::TestingComboboxElement, "#framework-combobox-phlex")
+    combobox = find_element(UI::Testing::ComboboxElement, "#framework-combobox-phlex")
 
     combobox.select_option("Nuxt.js")
 
@@ -279,7 +279,7 @@ class ComboboxTest < UI::SystemTestCase
   end
 
   test "view component syntax works correctly" do
-    combobox = find_element(UI::TestingComboboxElement, "#framework-combobox-vc")
+    combobox = find_element(UI::Testing::ComboboxElement, "#framework-combobox-vc")
 
     combobox.select_option("Remix")
 

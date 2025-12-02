@@ -9,12 +9,12 @@ class CommandTest < UI::SystemTestCase
 
   # Helper to get the basic Phlex command
   def basic_command
-    find_element(UI::TestingCommandElement, "#phlex-basic-command")
+    find_element(UI::Testing::CommandElement, "#phlex-basic-command")
   end
 
   # Helper to get the disabled items command
   def disabled_command
-    find_element(UI::TestingCommandElement, "#disabled-items-command")
+    find_element(UI::Testing::CommandElement, "#disabled-items-command")
   end
 
   # === Basic Interaction Tests ===
@@ -417,7 +417,7 @@ class CommandTest < UI::SystemTestCase
   # === ERB Implementation Test ===
 
   test "ERB implementation works identically" do
-    erb_command = find_element(UI::TestingCommandElement, "#erb-basic-command")
+    erb_command = find_element(UI::Testing::CommandElement, "#erb-basic-command")
 
     # Test basic functionality (ERB has 5 items - no Billing)
     assert_equal 5, erb_command.visible_item_count
@@ -433,7 +433,7 @@ class CommandTest < UI::SystemTestCase
   # === ViewComponent Implementation Test ===
 
   test "ViewComponent implementation works identically" do
-    vc_command = find_element(UI::TestingCommandElement, "#vc-basic-command")
+    vc_command = find_element(UI::Testing::CommandElement, "#vc-basic-command")
 
     # Test basic functionality
     assert_equal 5, vc_command.visible_item_count # VC example has fewer items

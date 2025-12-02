@@ -258,7 +258,7 @@ module UI
 
       # Get the Popover container (if using Popover)
       #
-      # @return [UI::TestingBaseElement, nil]
+      # @return [UI::Testing::BaseElement, nil]
       #
       def popover_container
         return @popover_container if defined?(@popover_container)
@@ -273,7 +273,7 @@ module UI
           end
         end
 
-        @popover_container = popover_node ? UI::TestingBaseElement.new(popover_node) : nil
+        @popover_container = popover_node ? UI::Testing::BaseElement.new(popover_node) : nil
       end
 
       # Get the Drawer container (if using Drawer)
@@ -291,12 +291,12 @@ module UI
           # No drawer found, that's OK
         end
 
-        @drawer_container = drawer ? UI::TestingBaseElement.new(drawer) : nil
+        @drawer_container = drawer ? UI::Testing::BaseElement.new(drawer) : nil
       end
 
       # Get the DropdownMenu container (if using DropdownMenu)
       #
-      # @return [UI::TestingBaseElement, nil]
+      # @return [UI::Testing::BaseElement, nil]
       #
       def dropdown_container
         return @dropdown_container if defined?(@dropdown_container)
@@ -311,7 +311,7 @@ module UI
           end
         end
 
-        @dropdown_container = dropdown_node ? UI::TestingBaseElement.new(dropdown_node) : nil
+        @dropdown_container = dropdown_node ? UI::Testing::BaseElement.new(dropdown_node) : nil
       end
 
       # Get the Popover content element

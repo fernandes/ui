@@ -9,12 +9,12 @@ class AccordionTest < UI::SystemTestCase
 
   # Helper to get the basic accordion (single type)
   def basic_accordion
-    find_element(UI::TestingAccordionElement, "#basic-accordion")
+    find_element(UI::Testing::AccordionElement, "#basic-accordion")
   end
 
   # Helper to get the multiple type accordion
   def multiple_accordion
-    find_element(UI::TestingAccordionElement, "#multiple-accordion")
+    find_element(UI::Testing::AccordionElement, "#multiple-accordion")
   end
 
   # Note: The multiple accordion has initial_open: true on multi-1 and multi-2

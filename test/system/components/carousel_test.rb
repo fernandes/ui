@@ -9,23 +9,23 @@ class CarouselTest < UI::SystemTestCase
 
   # Helper methods for different carousels
   def basic_carousel
-    find_element(UI::TestingCarouselElement, "#erb-basic-carousel")
+    find_element(UI::Testing::CarouselElement, "#erb-basic-carousel")
   end
 
   def sizes_carousel
-    find_element(UI::TestingCarouselElement, "#erb-sizes-carousel")
+    find_element(UI::Testing::CarouselElement, "#erb-sizes-carousel")
   end
 
   def spacing_carousel
-    find_element(UI::TestingCarouselElement, "#erb-spacing-carousel")
+    find_element(UI::Testing::CarouselElement, "#erb-spacing-carousel")
   end
 
   def orientation_carousel
-    find_element(UI::TestingCarouselElement, "#erb-orientation-carousel")
+    find_element(UI::Testing::CarouselElement, "#erb-orientation-carousel")
   end
 
   def autoplay_carousel
-    find_element(UI::TestingCarouselElement, "#erb-autoplay-carousel")
+    find_element(UI::Testing::CarouselElement, "#erb-autoplay-carousel")
   end
 
   # === Basic Navigation Tests ===

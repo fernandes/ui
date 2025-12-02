@@ -61,14 +61,14 @@
 -%>
 <%= content_tag :div, all_attributes do %>
   <% if @label %>
-    <%= render "ui/label/label", content: @label, for: @label_for, classes: "px-1" %>
+    <%= render "ui/label", content: @label, for: @label_for, classes: "px-1" %>
   <% end %>
 
-  <%= render "ui/popover/popover", trigger: "click", placement: "bottom-start", offset: 4 do %>
+  <%= render "ui/popover", trigger: "click", placement: "bottom-start", offset: 4 do %>
     <%= yield %>
 
-    <%= render "ui/popover/popover_content", classes: "w-auto overflow-hidden p-0" do %>
-      <%= render "ui/calendar/calendar",
+    <%= render "ui/popover/content", classes: "w-auto overflow-hidden p-0" do %>
+      <%= render "ui/calendar",
         mode: @mode,
         selected: @selected,
         locale: @locale,

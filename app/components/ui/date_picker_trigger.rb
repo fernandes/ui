@@ -7,7 +7,7 @@
 #   render UI::Trigger.new(placeholder: "Pick a date")
 #
 class UI::DatePickerTrigger < Phlex::HTML
-  include DatePickerTriggerBehavior
+  include UI::DatePickerTriggerBehavior
 
   # @param placeholder [String] Placeholder text when no date selected
   # @param selected [Date, Range, Array] Currently selected date(s) for display

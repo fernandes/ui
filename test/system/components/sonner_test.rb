@@ -9,7 +9,7 @@ class SonnerTest < UI::SystemTestCase
 
   # Helper to get the sonner (toaster) element
   def sonner
-    find_element(UI::TestingSonnerElement)
+    find_element(UI::Testing::SonnerElement)
   end
 
   # === Basic Toast Type Tests ===

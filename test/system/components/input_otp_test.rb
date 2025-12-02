@@ -9,49 +9,49 @@ class InputOtpTest < UI::SystemTestCase
 
   # Helper methods to get different OTP examples
   def default_otp
-    element = find_element(UI::TestingInputOtpElement, "#default-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#default-otp")
     scroll_to_element(element)
     element
   end
 
   def prefilled_otp
-    element = find_element(UI::TestingInputOtpElement, "#prefilled-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#prefilled-otp")
     scroll_to_element(element)
     element
   end
 
   def four_digit_otp
-    element = find_element(UI::TestingInputOtpElement, "#four-digit-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#four-digit-otp")
     scroll_to_element(element)
     element
   end
 
   def three_groups_otp
-    element = find_element(UI::TestingInputOtpElement, "#three-groups-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#three-groups-otp")
     scroll_to_element(element)
     element
   end
 
   def no_separator_otp
-    element = find_element(UI::TestingInputOtpElement, "#no-separator-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#no-separator-otp")
     scroll_to_element(element)
     element
   end
 
   def alphanumeric_otp
-    element = find_element(UI::TestingInputOtpElement, "#alphanumeric-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#alphanumeric-otp")
     scroll_to_element(element)
     element
   end
 
   def disabled_otp
-    element = find_element(UI::TestingInputOtpElement, "#disabled-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#disabled-otp")
     scroll_to_element(element)
     element
   end
 
   def auto_generated_otp
-    element = find_element(UI::TestingInputOtpElement, "#auto-generated-otp")
+    element = find_element(UI::Testing::InputOtpElement, "#auto-generated-otp")
     scroll_to_element(element)
     element
   end

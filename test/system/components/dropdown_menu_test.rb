@@ -10,7 +10,7 @@ class DropdownMenuTest < UI::SystemTestCase
   # Helper to get the basic dropdown menu
   def basic_menu
     all_elements = all('[data-controller="ui--dropdown"]')
-    UI::TestingDropdownMenuElement.new(all_elements[0])
+    UI::Testing::DropdownMenuElement.new(all_elements[0])
   end
 
   # === Basic Interaction Tests ===
@@ -105,8 +105,8 @@ class DropdownMenuTest < UI::SystemTestCase
 
   test "multiple menus operate independently" do
     all_menus = all('[data-controller="ui--dropdown"]')
-    menu1 = UI::TestingDropdownMenuElement.new(all_menus[0])
-    menu2 = UI::TestingDropdownMenuElement.new(all_menus[1]) if all_menus.length > 1
+    menu1 = UI::Testing::DropdownMenuElement.new(all_menus[0])
+    menu2 = UI::Testing::DropdownMenuElement.new(all_menus[1]) if all_menus.length > 1
 
     skip "Need at least 2 menus" unless menu2
 
