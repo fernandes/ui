@@ -1215,9 +1215,10 @@ describe("CalendarController", () => {
 
       // Live region should announce the selection
       expect(liveRegion.textContent).toContain("Selected:")
-      expect(liveRegion.textContent).toContain("November")
-      expect(liveRegion.textContent).toContain("15")
-      expect(liveRegion.textContent).toContain("2024")
+      // Using regex for locale flexibility
+      expect(liveRegion.textContent).toMatch(/Nov|11/)
+      expect(liveRegion.textContent).toMatch(/15/)
+      expect(liveRegion.textContent).toMatch(/2024/)
     })
   })
 
