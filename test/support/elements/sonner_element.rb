@@ -214,6 +214,25 @@ module UI
         end
       end
 
+      # Wait for a specific number of visible toasts
+      #
+      # @param count [Integer] Expected number of toasts
+      # @param timeout [Integer] Timeout in seconds
+      # @return [Boolean] True if count matches
+      def wait_for_toast_count(count, timeout: 2)
+        start_time = Time.now
+        loop do
+          return true if toast_count >= count
+
+          if Time.now - start_time > timeout
+            raise Capybara::ExpectationNotMet,
+              "Expected #{count} toasts, but found #{toast_count} after #{timeout}s"
+          end
+
+          sleep 0.05
+        end
+      end
+
       # Wait for all toasts to auto-dismiss
       #
       # @param timeout [Integer] Timeout in seconds

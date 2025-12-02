@@ -112,11 +112,11 @@ class SonnerTest < UI::SystemTestCase
 
   test "shows multiple toasts stacked" do
     page.find("#success-toast-btn").click
-    sleep 0.05
+    sonner.wait_for_toast_count(1)
     page.find("#error-toast-btn").click
-    sleep 0.05
+    sonner.wait_for_toast_count(2)
     page.find("#info-toast-btn").click
-    sleep 0.2 # Wait for all toasts to render
+    sonner.wait_for_toast_count(3)
 
     # Should have at least 2 toasts visible (3rd might be outside visible limit)
     assert_operator sonner.toast_count, :>=, 2
@@ -393,9 +393,9 @@ class SonnerTest < UI::SystemTestCase
 
   test "most recent toast appears at index 0" do
     page.find("#success-toast-btn").click
-    sleep 0.15
+    sonner.wait_for_toast_count(1)
     page.find("#error-toast-btn").click
-    sleep 0.3
+    sonner.wait_for_toast_count(2)
 
     # Most recent (error) should be at index 0
     assert_equal "Error occurred", sonner.toast_title_at(0)
