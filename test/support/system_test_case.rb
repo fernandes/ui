@@ -26,6 +26,7 @@ module UI
         browser_type: :chromium,
         headless: ENV["HEADLESS"] != "false",
         timeout: 30,
+        playwright_cli_executable_path: "bunx playwright",
         args: [
           "--disable-dev-shm-usage",
           "--no-sandbox"
