@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.1.5
 
+### Added
+
+- [Item] Support `as_child` pattern in ERB partial for composition without wrapper elements
+
 ### Fixed
 
 - [Field Separator] Now uses separator internally to render it correctly

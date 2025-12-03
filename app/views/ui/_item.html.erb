@@ -1,9 +1,14 @@
 <% extend UI::ItemBehavior -%>
 <% @variant = local_assigns.fetch(:variant, "default") -%>
 <% @size = local_assigns.fetch(:size, "default") -%>
+<% @as_child = local_assigns.fetch(:as_child, false) -%>
 <% @classes = local_assigns.fetch(:classes, "") -%>
-<% @attributes = local_assigns.except(:variant, :size, :classes) -%>
+<% @attributes = local_assigns.except(:variant, :size, :as_child, :classes) -%>
 <% attrs = item_html_attributes.merge(@attributes) -%>
+<% if @as_child -%>
+<%= yield(attrs) %>
+<% else -%>
 <div class="<%= attrs[:class] %>" data-slot="<%= attrs[:"data-slot"] %>" data-variant="<%= attrs[:"data-variant"] %>" data-size="<%= attrs[:"data-size"] %>">
   <%= yield %>
 </div>
+<% end -%>
