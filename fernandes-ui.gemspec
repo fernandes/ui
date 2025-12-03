@@ -43,5 +43,5 @@ Gem::Specification.new do |spec|
 
   # Development dependencies for component libraries
   spec.add_development_dependency "phlex-rails", "~> 2.0"
-  spec.add_development_dependency "view_component", "~> 3.0"
+  spec.add_development_dependency "view_component", "~> 4.0"
 end

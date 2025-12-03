@@ -11,7 +11,7 @@ class UI::CarouselNextComponent < ViewComponent::Base
 
     render UI::ButtonComponent.new(**carousel_next_html_attributes, classes: carousel_next_classes, variant: :outline, size: :icon) do
       safe_join([
-        lucide_icon("arrow-right", class: "size-4"),
+        helpers.lucide_icon("arrow-right", class: "size-4"),
         content_tag(:span, "Next slide", class: "sr-only")
       ])
     end
