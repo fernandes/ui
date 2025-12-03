@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [Field Separator] Now uses separator internally to render it correctly
+- [Button] Use CSS variable `--radius` for customizable border-radius (matches InputGroup behavior)
 
 ## 0.1.4
 
