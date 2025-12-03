@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.1.3
+## 0.1.5
+
+### Fixed
+
+- [Field Separator] Now uses separator internally to render it correctly
+
+## 0.1.4
 
 ### Added
 
@@ -33,6 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Avatar] Fix classes not being passed correctly
 - [Button] (ERB) process attributes received as child correctly
 - [Combobox] Set default offset to 4 on all implementations
+
+## 0.1.3
+
+Didn't happen lol
 
 ## 0.1.2
 

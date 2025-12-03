@@ -9,7 +9,13 @@
 
   # Get HTML attributes from behavior
   all_attributes = field_separator_html_attributes.deep_merge(@attributes)
+  has_children = content.present? || block_given?
 -%>
 <%= content_tag :div, all_attributes do %>
-  <%= content || yield %>
+  <%= render "ui/separator", classes: "absolute inset-0 top-1/2" %>
+  <% if has_children %>
+    <span data-slot="field-separator-content" class="bg-background text-muted-foreground relative mx-auto block w-fit px-2">
+      <%= content || yield %>
+    </span>
+  <% end %>
 <% end %>
