@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Sonner] Fix behavior wrong name
 - [Avatar] Fix classes not being passed correctly
 - [Button] (ERB) process attributes received as child correctly
+- [Combobox] Set default offset to 4 on all implementations
 
 ## 0.1.2
 

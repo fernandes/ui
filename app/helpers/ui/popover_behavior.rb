@@ -8,10 +8,13 @@ module UI::PopoverBehavior
   # Returns HTML attributes for the popover container element
   def popover_html_attributes
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
+    user_data = attributes_value[:data] || {}
+    other_attributes = attributes_value.except(:data)
+
     {
       class: popover_classes,
-      data: popover_data_attributes
-    }.merge(attributes_value)
+      data: popover_data_attributes.merge(user_data)
+    }.merge(other_attributes)
   end
 
   # Returns combined CSS classes for the popover
