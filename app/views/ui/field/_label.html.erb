@@ -1,6 +1,7 @@
 <%# FieldLabel Component - Label styled for form fields %>
 <%
   content ||= local_assigns.fetch(:content, nil)
+  @for_id = local_assigns.fetch(:for_id, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
@@ -10,6 +11,6 @@
   # Get HTML attributes from behavior
   all_attributes = field_label_html_attributes.deep_merge(@attributes)
 -%>
-<%= content_tag :div, all_attributes do %>
+<%= content_tag :label, all_attributes do %>
   <%= content || yield %>
 <% end %>

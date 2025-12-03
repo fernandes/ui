@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [ButtonGroup] Exclude popover/tooltip content (`[data-state]`) from border/radius rules
 - [Field Separator] Now uses separator internally to render it correctly
+- [Field Label] Render as `<label>` instead of `<div>` so clicking anywhere toggles the associated input
+- [Field Label] Pass `for_id` parameter to `@for_id` so the `for` attribute is correctly set
 - [Button] Use CSS variable `--radius` for customizable border-radius (matches InputGroup behavior)
 - [Button] Normalize size parameter to accept both underscore (`:icon_sm`) and hyphen (`"icon-sm"`) formats
 - [Button] Remove `!important` from outline variant border to allow ButtonGroup to override with `border-l-0`
