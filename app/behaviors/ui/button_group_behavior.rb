@@ -42,14 +42,14 @@ module UI::ButtonGroupBehavior
 
   # Orientation-specific classes based on @orientation
   # Matches shadcn/ui v4 exactly
-  # Note: We exclude [role=menu] elements from border-radius rules (dropdown content)
+  # Note: We exclude [role=menu] and nested [data-slot=button-group] elements from border-radius rules
   def button_group_orientation_classes
     case @orientation.to_s
     when "vertical"
-      "flex-col [&>*:not(:first-child):not([role=menu])]:rounded-t-none [&>*:not(:first-child):not([role=menu])]:border-t-0 [&>*:not(:last-child):not([role=menu])]:rounded-b-none"
+      "flex-col [&>*:not(:first-child):not([role=menu]):not([data-slot=button-group])]:rounded-t-none [&>*:not(:first-child):not([role=menu]):not([data-slot=button-group])]:border-t-0 [&>*:not(:last-child):not([role=menu]):not([data-slot=button-group])]:rounded-b-none"
     else # horizontal (default)
-      "[&>*:not(:first-child):not([role=menu])]:rounded-l-none [&>*:not(:first-child):not([role=menu])]:border-l-0 " \
-      "[&>*:not(:last-child):not(:has(+[role=menu])):not([role=menu])]:rounded-r-none"
+      "[&>*:not(:first-child):not([role=menu]):not([data-slot=button-group])]:rounded-l-none [&>*:not(:first-child):not([role=menu]):not([data-slot=button-group])]:border-l-0 " \
+      "[&>*:not(:last-child):not(:has(+[role=menu])):not([role=menu]):not([data-slot=button-group])]:rounded-r-none"
     end
   end
 end

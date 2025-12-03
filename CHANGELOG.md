@@ -11,11 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Item] Support `as_child` pattern in ERB partial for composition without wrapper elements
 
+### Changed
+
+- [ButtonGroup] Exclude nested button-groups from border/radius rules to prevent double borders
+
 ### Fixed
 
 - [Field Separator] Now uses separator internally to render it correctly
 - [Button] Use CSS variable `--radius` for customizable border-radius (matches InputGroup behavior)
 - [Button] Normalize size parameter to accept both underscore (`:icon_sm`) and hyphen (`"icon-sm"`) formats
+- [Button] Remove `!important` from outline variant border to allow ButtonGroup to override with `border-l-0`
 - [InputGroupButton] Normalize size parameter to accept both underscore (`:icon_xs`) and hyphen (`"icon-xs"`) formats
 
 ## 0.1.4
