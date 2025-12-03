@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [ButtonGroup] Exclude popover/tooltip content (`[data-state]`) from border/radius rules
+- [ButtonGroup] Preserve right border-radius on elements followed by popover/tooltip content (`:has(+[data-state])`)
+- [ButtonGroup] Use `!important` on border-radius rules to override button's shorthand `rounded-[var(--radius)]`
 - [Field Separator] Now uses separator internally to render it correctly
 - [Field Label] Render as `<label>` instead of `<div>` so clicking anywhere toggles the associated input
 - [Field Label] Pass `for_id` parameter to `@for_id` so the `for` attribute is correctly set
