@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Field Separator] Now uses separator internally to render it correctly
 - [Button] Use CSS variable `--radius` for customizable border-radius (matches InputGroup behavior)
+- [Button] Normalize size parameter to accept both underscore (`:icon_sm`) and hyphen (`"icon-sm"`) formats
+- [InputGroupButton] Normalize size parameter to accept both underscore (`:icon_xs`) and hyphen (`"icon-xs"`) formats
 
 ## 0.1.4
 

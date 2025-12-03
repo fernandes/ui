@@ -73,15 +73,17 @@ module UI::InputGroupButtonBehavior
 
   # Size-specific classes
   # Uses calc(var(--radius, 0.375rem) - 5px) to create slightly smaller rounded corners for nested buttons
+  # Normalizes size to handle both :icon_xs (underscore) and "icon-xs" (hyphen) formats
   def input_group_button_size_classes
-    case @size.to_s
+    normalized_size = @size.to_s.tr("-", "_")
+    case normalized_size
     when "xs"
       "h-6 gap-1 px-2 rounded-[calc(var(--radius,0.375rem)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2"
     when "sm"
       "h-8 px-2.5 gap-1.5 rounded-[calc(var(--radius,0.375rem)-5px)] has-[>svg]:px-2.5"
-    when "icon-xs"
+    when "icon_xs"
       "size-6 rounded-[calc(var(--radius,0.375rem)-5px)] p-0 has-[>svg]:p-0"
-    when "icon-sm"
+    when "icon_sm"
       "size-8 rounded-[calc(var(--radius,0.375rem)-5px)] p-0 has-[>svg]:p-0"
     else
       "h-6 gap-1 px-2 rounded-[calc(var(--radius,0.375rem)-5px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2"

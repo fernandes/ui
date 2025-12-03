@@ -90,8 +90,10 @@ module UI::ButtonBehavior
   end
 
   # Size-specific classes based on @size
+  # Normalizes size to handle both :icon_sm (underscore) and "icon-sm" (hyphen) formats
   def button_size_classes
-    case @size.to_s
+    normalized_size = @size.to_s.tr("-", "_")
+    case normalized_size
     when "default"
       "h-9 px-4 py-2"
     when "sm"
@@ -100,9 +102,9 @@ module UI::ButtonBehavior
       "h-10 px-8"
     when "icon"
       "h-9 w-9"
-    when "icon-sm"
+    when "icon_sm"
       "h-8 w-8"
-    when "icon-lg"
+    when "icon_lg"
       "h-10 w-10"
     else
       "h-9 px-4 py-2"
