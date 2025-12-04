@@ -132,6 +132,81 @@
       </div>
     </section>
 
+    <!-- Phlex - Basic Single Value -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Phlex - Basic Single Value</h2>
+      <p class="text-sm text-muted-foreground">A simple Phlex slider with one thumb for selecting a single value.</p>
+      <div class="max-w-md space-y-2">
+        <label class="text-sm font-medium">Opacity: <span id="opacity-value">75</span>%</label>
+        <%= render UI::Slider.new(default_value: [75], max: 100, step: 1, attributes: { id: "opacity-slider" }) do %>
+          <%= render UI::SliderTrack.new do %>
+            <%= render UI::SliderRange.new %>
+          <% end %>
+          <%= render UI::SliderThumb.new %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Phlex - Range Slider -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Phlex - Range Slider</h2>
+      <p class="text-sm text-muted-foreground">Phlex implementation with two thumbs for selecting a range.</p>
+      <div class="max-w-md space-y-2">
+        <div class="flex justify-between text-sm">
+          <span>Age Min: <span id="age-min">18</span></span>
+          <span>Age Max: <span id="age-max">65</span></span>
+        </div>
+        <%= render UI::Slider.new(default_value: [18, 65], max: 100, attributes: { id: "age-slider" }) do %>
+          <%= render UI::SliderTrack.new do %>
+            <%= render UI::SliderRange.new %>
+          <% end %>
+          <%= render UI::SliderThumb.new %>
+          <%= render UI::SliderThumb.new %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Phlex - Disabled State -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Phlex - Disabled State</h2>
+      <p class="text-sm text-muted-foreground">A disabled Phlex slider that cannot be interacted with.</p>
+      <div class="max-w-md space-y-2">
+        <label class="text-sm font-medium text-muted-foreground">Locked Value: 60%</label>
+        <%= render UI::Slider.new(default_value: [60], disabled: true, attributes: { id: "phlex-disabled-slider" }) do %>
+          <%= render UI::SliderTrack.new do %>
+            <%= render UI::SliderRange.new %>
+          <% end %>
+          <%= render UI::SliderThumb.new(disabled: true) %>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Phlex - Vertical Slider -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Phlex - Vertical Slider</h2>
+      <p class="text-sm text-muted-foreground">Phlex slider with vertical orientation.</p>
+      <div class="flex gap-8">
+        <div class="h-64 flex flex-col items-center gap-2">
+          <label class="text-sm font-medium">Channel 1</label>
+          <%= render UI::Slider.new(default_value: [40], orientation: "vertical", attributes: { id: "phlex-vertical-1" }) do %>
+            <%= render UI::SliderTrack.new do %>
+              <%= render UI::SliderRange.new %>
+            <% end %>
+            <%= render UI::SliderThumb.new %>
+          <% end %>
+        </div>
+        <div class="h-64 flex flex-col items-center gap-2">
+          <label class="text-sm font-medium">Channel 2</label>
+          <%= render UI::Slider.new(default_value: [80], orientation: "vertical", attributes: { id: "phlex-vertical-2" }) do %>
+            <%= render UI::SliderTrack.new do %>
+              <%= render UI::SliderRange.new %>
+            <% end %>
+            <%= render UI::SliderThumb.new %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
     <!-- ERB Partial - Vertical Slider -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ERB Partial - Vertical Slider</h2>
@@ -242,6 +317,17 @@
       // Update balance display
       if (slider.id === 'balance-slider') {
         document.getElementById('balance-value').textContent = value[0]
+      }
+
+      // Update opacity display (Phlex)
+      if (slider.id === 'opacity-slider') {
+        document.getElementById('opacity-value').textContent = value[0]
+      }
+
+      // Update age range display (Phlex)
+      if (slider.id === 'age-slider') {
+        document.getElementById('age-min').textContent = value[0]
+        document.getElementById('age-max').textContent = value[1]
       }
     })
   </script>

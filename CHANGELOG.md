@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.1.6
 
+### Added
+
+- [Slider] Phlex implementation (UI::Slider, UI::SliderTrack, UI::SliderRange, UI::SliderThumb)
+
 ## 0.1.5
 
 ### Added
