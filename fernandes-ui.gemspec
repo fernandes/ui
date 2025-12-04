@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   end
+  spec.files += Dir["docs/components/**/*"]
 
   # Core dependency - support Rails 6.0 through 8.x
   spec.add_dependency "rails", ">= 6.0", "< 9.0"
