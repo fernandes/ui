@@ -14341,7 +14341,6 @@ function registerControllersInto(application, controllers) {
   for (const [name, controller] of Object.entries(controllers)) {
     try {
       application.register(name, controller);
-      console.log(`Registered Stimulus controller: ${name}`);
     } catch (error) {
       console.error(`Failed to register controller ${name}:`, error);
     }
