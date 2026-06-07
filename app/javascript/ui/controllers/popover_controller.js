@@ -25,6 +25,14 @@ export default class extends Controller {
       setState(this.contentTarget, this.openValue ? 'open' : 'closed')
     }
 
+    // A11y: `inert` impede tab/interação dentro do content enquanto fechado.
+    // Safari mobile (iPad/iOS) não honra `visibility:hidden` consistentemente
+    // pro tab order — sem `inert` o user pode tabular pra dentro de um
+    // popover invisível.
+    if (this.contentTarget.dataset.state === "closed") {
+      this.contentTarget.inert = true
+    }
+
     // Setup positioner
     this.positioner = createPositioner(this.triggerTarget, this.contentTarget, {
       placement: this.placementValue,
@@ -207,6 +215,10 @@ export default class extends Controller {
 
     // Also add hidden class like dropdown does for immediate hide
     this.contentTarget.classList.add('hidden')
+
+    // A11y: bloqueia tab/interação dentro do content enquanto fechado.
+    // Safari mobile não honra `visibility:hidden` consistentemente.
+    this.contentTarget.inert = true
 
     // Stop positioning when hiding
     if (this.positioner) {
