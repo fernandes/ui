@@ -4,7 +4,7 @@ PATH
     fernandes-ui (0.1.6)
       lucide-rails (~> 0.1)
       rails (>= 6.0, < 9.0)
-      tailwind_merge (~> 0.13)
+      tailwind_merge (>= 0.13, < 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -109,6 +109,7 @@ GEM
     drb (2.2.3)
     erb (6.0.0)
     erubi (1.13.1)
+    ffi (1.17.2)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -162,6 +163,7 @@ GEM
       mime-types-data (~> 3.2025, >= 3.2025.0507)
     mime-types-data (3.2025.0924)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     minitest (5.26.2)
     net-imap (0.5.12)
       date
@@ -173,6 +175,9 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.5)
+    nokogiri (1.18.10)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.10-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.10-aarch64-linux-musl)
@@ -298,6 +303,8 @@ GEM
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     sin_lru_redux (2.5.2)
+    sqlite3 (2.8.0)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (2.8.0-aarch64-linux-gnu)
     sqlite3 (2.8.0-aarch64-linux-musl)
     sqlite3 (2.8.0-arm-linux-gnu)
@@ -321,7 +328,7 @@ GEM
     standardrb (1.0.1)
       standard
     stringio (3.1.8)
-    tailwind_merge (0.16.0)
+    tailwind_merge (1.5.1)
       sin_lru_redux (~> 2.5)
     thor (1.4.0)
     timeout (0.4.4)
@@ -333,7 +340,7 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
-    unicode-emoji (4.1.0)
+    unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
     view_component (3.24.0)

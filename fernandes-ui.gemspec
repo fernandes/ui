@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 
   # Core dependency - support Rails 6.0 through 8.x
   spec.add_dependency "rails", ">= 6.0", "< 9.0"
-  spec.add_dependency "tailwind_merge", "~> 0.13"
+  spec.add_dependency "tailwind_merge", ">= 0.13", "< 2.0"
   spec.add_dependency "lucide-rails", "~> 0.1"
 
   # Optional dependencies for different asset pipelines
