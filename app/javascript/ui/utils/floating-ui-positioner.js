@@ -84,6 +84,14 @@ function applyPosition(content, position, options = {}) {
     content.setAttribute('data-align', align)
   }
 
+  // Expor largura do trigger como CSS var pra que comboboxes possam usar
+  // `w-[var(--ui-popover-trigger-width)]` e casar a largura do content com
+  // a do trigger. Padrão shadcn (--radix-popover-trigger-width).
+  if (options.reference && options.reference.offsetWidth) {
+    content.style.setProperty('--ui-popover-trigger-width',
+      `${options.reference.offsetWidth}px`)
+  }
+
   // Position arrow if present
   if (options.arrowElement && middlewareData.arrow) {
     const { x: arrowX, y: arrowY } = middlewareData.arrow
@@ -128,7 +136,8 @@ export function createPositioner(reference, floating, options = {}) {
 
     applyPosition(floating, position, {
       strategy: config.strategy,
-      arrowElement: config.arrowElement
+      arrowElement: config.arrowElement,
+      reference
     })
 
     return position
@@ -254,7 +263,8 @@ export async function positionOnce(reference, floating, options = {}) {
 
   applyPosition(floating, position, {
     strategy: config.strategy,
-    arrowElement: config.arrowElement
+    arrowElement: config.arrowElement,
+    reference
   })
 
   return position
