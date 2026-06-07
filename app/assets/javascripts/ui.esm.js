@@ -2959,7 +2959,12 @@ class CommandController extends Controller {
     if (this.hasEmptyTarget) {
       this.emptyTarget.classList.toggle("hidden", hasVisibleItems || query === "");
     }
-    this.selectedIndex = -1;
+    const visibleItems = this.visibleItems;
+    if (query !== "" && visibleItems.length > 0) {
+      this.selectedIndex = 0;
+    } else {
+      this.selectedIndex = -1;
+    }
     this.updateSelection();
   }
   handleKeydown(event) {
@@ -4303,6 +4308,9 @@ function applyPosition(content, position, options = {}) {
   if (align) {
     content.setAttribute("data-align", align);
   }
+  if (options.reference && options.reference.offsetWidth) {
+    content.style.setProperty("--ui-popover-trigger-width", `${options.reference.offsetWidth}px`);
+  }
   if (options.arrowElement && middlewareData.arrow) {
     const {x: arrowX, y: arrowY} = middlewareData.arrow;
     const staticSide = {
@@ -4337,7 +4345,8 @@ function createPositioner(reference, floating, options = {}) {
     });
     applyPosition(floating, position, {
       strategy: config.strategy,
-      arrowElement: config.arrowElement
+      arrowElement: config.arrowElement,
+      reference: reference
     });
     return position;
   };
@@ -4551,6 +4560,9 @@ class PopoverController extends Controller {
     if (!this.contentTarget.hasAttribute("data-state")) {
       setState(this.contentTarget, this.openValue ? "open" : "closed");
     }
+    if (this.contentTarget.dataset.state === "closed") {
+      this.contentTarget.inert = true;
+    }
     this.positioner = createPositioner(this.triggerTarget, this.contentTarget, {
       placement: this.placementValue,
       offsetValue: this.offsetValue
@@ -4672,6 +4684,7 @@ class PopoverController extends Controller {
     this.openValue = false;
     setState(this.contentTarget, "closed");
     this.contentTarget.classList.add("hidden");
+    this.contentTarget.inert = true;
     if (this.positioner) {
       this.positioner.stop();
     }
