@@ -163,6 +163,24 @@ describe("CommandController", () => {
       controller.filter()
       await new Promise(resolve => setTimeout(resolve, 10))
 
+      // Com query não-vazia + items visíveis, auto-seleciona o primeiro pra
+      // que Enter ative direto (UX de command palette).
+      expect(controller.selectedIndex).toBe(0)
+    })
+
+    test("clears selection when query becomes empty", async () => {
+      container.innerHTML = createCommand()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const element = container.querySelector('[data-testid="command"]')
+      const controller = application.getControllerForElementAndIdentifier(element, "ui--command")
+      const input = container.querySelector('[data-testid="input"]')
+
+      controller.selectedIndex = 1
+      input.value = ""
+      controller.filter()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
       expect(controller.selectedIndex).toBe(-1)
     })
   })

@@ -61,8 +61,14 @@ export default class extends Controller {
       this.emptyTarget.classList.toggle("hidden", hasVisibleItems || query === "")
     }
 
-    // Reset selection when filtering
-    this.selectedIndex = -1
+    // Auto-select first visible item ao digitar — assim Enter ativa direto.
+    // Quando query é vazio, mantém sem seleção (estado neutro).
+    const visibleItems = this.visibleItems
+    if (query !== "" && visibleItems.length > 0) {
+      this.selectedIndex = 0
+    } else {
+      this.selectedIndex = -1
+    }
     this.updateSelection()
   }
 
