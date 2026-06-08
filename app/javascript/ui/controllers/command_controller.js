@@ -13,14 +13,30 @@ export default class extends Controller {
     this.selectedIndex = -1
     this.updateVisibility()
 
-    // Listen for popover/drawer show events to focus input and select first item
-    this.element.addEventListener('popover:show', this.handleShow.bind(this))
-    this.element.addEventListener('drawer:show', this.handleShow.bind(this))
+    // Listen at the document level because popover:show / drawer:show are
+    // dispatched on the popover/drawer root — an ANCESTOR of this Command.
+    // Events bubble up, so a direct listener on `this.element` never fires.
+    // We filter by checking whether the dispatcher contains us.
+    //
+    // Also: bind once and store the references so removeEventListener
+    // actually matches in disconnect.
+    this._boundHandleShow = (event) => {
+      if (event.target.contains(this.element)) this.handleShow()
+    }
+    this._boundHandleHide = (event) => {
+      if (event.target.contains(this.element)) this.handleHide()
+    }
+    document.addEventListener("popover:show", this._boundHandleShow)
+    document.addEventListener("drawer:show",  this._boundHandleShow)
+    document.addEventListener("popover:hide", this._boundHandleHide)
+    document.addEventListener("drawer:hide",  this._boundHandleHide)
   }
 
   disconnect() {
-    this.element.removeEventListener('popover:show', this.handleShow.bind(this))
-    this.element.removeEventListener('drawer:show', this.handleShow.bind(this))
+    document.removeEventListener("popover:show", this._boundHandleShow)
+    document.removeEventListener("drawer:show",  this._boundHandleShow)
+    document.removeEventListener("popover:hide", this._boundHandleHide)
+    document.removeEventListener("drawer:hide",  this._boundHandleHide)
   }
 
   handleShow() {
@@ -35,6 +51,18 @@ export default class extends Controller {
       this.selectedIndex = 0
       this.updateSelection()
     }
+  }
+
+  // Reset filter when popover/drawer closes so the next open shows everything.
+  // Sem isso, o usuário fecha com "role" digitado e na próxima vez só vê o
+  // que casa com "role" — UX confusa.
+  handleHide() {
+    if (this.hasInputTarget && this.inputTarget.value !== "") {
+      this.inputTarget.value = ""
+      this.filter()
+    }
+    this.selectedIndex = -1
+    this.updateSelection()
   }
 
   filter() {

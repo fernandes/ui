@@ -408,6 +408,84 @@ describe("CommandController", () => {
     })
   })
 
+  describe("Popover lifecycle", () => {
+    // Helper: nest Command inside a wrapper that mimics a Popover root, so
+    // popover:show / popover:hide bubble through it.
+    function nestedCommand(autofocus = true) {
+      return `
+        <div data-testid="popover">
+          ${createCommand().replace(
+            'data-controller="ui--command"',
+            `data-controller="ui--command" data-ui--command-autofocus-value="${autofocus}"`
+          )}
+        </div>
+      `
+    }
+
+    test("autofocus input on popover:show when enabled", async () => {
+      container.innerHTML = nestedCommand(true)
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const popover = container.querySelector('[data-testid="popover"]')
+      const input = container.querySelector('[data-testid="input"]')
+
+      popover.dispatchEvent(new CustomEvent("popover:show", { bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).toBe(input)
+    })
+
+    test("does not autofocus when autofocus is disabled", async () => {
+      container.innerHTML = nestedCommand(false)
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const popover = container.querySelector('[data-testid="popover"]')
+      const input = container.querySelector('[data-testid="input"]')
+
+      popover.dispatchEvent(new CustomEvent("popover:show", { bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).not.toBe(input)
+    })
+
+    test("clears search filter on popover:hide", async () => {
+      container.innerHTML = nestedCommand(true)
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const popover = container.querySelector('[data-testid="popover"]')
+      const input = container.querySelector('[data-testid="input"]')
+      const item0 = container.querySelector('[data-testid="item-0"]')
+
+      // Filter to one item.
+      input.value = "ban"
+      input.dispatchEvent(new Event("input", { bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+      expect(item0.hidden).toBe(true)
+
+      // Close → input should clear and all items show again.
+      popover.dispatchEvent(new CustomEvent("popover:hide", { bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(input.value).toBe("")
+      expect(item0.hidden).toBe(false)
+    })
+
+    test("ignores popover events from unrelated popovers", async () => {
+      container.innerHTML = nestedCommand(true)
+      const otherPopover = document.createElement("div")
+      document.body.appendChild(otherPopover)
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const input = container.querySelector('[data-testid="input"]')
+
+      // Unrelated popover dispatches → must NOT focus our input.
+      otherPopover.dispatchEvent(new CustomEvent("popover:show", { bubbles: true }))
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      expect(document.activeElement).not.toBe(input)
+    })
+  })
+
   describe("Disconnect", () => {
     test("cleans up on disconnect", async () => {
       container.innerHTML = createCommand()

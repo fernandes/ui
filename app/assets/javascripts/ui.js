@@ -2782,12 +2782,22 @@
     connect() {
       this.selectedIndex = -1;
       this.updateVisibility();
-      this.element.addEventListener("popover:show", this.handleShow.bind(this));
-      this.element.addEventListener("drawer:show", this.handleShow.bind(this));
+      this._boundHandleShow = event => {
+        if (event.target.contains(this.element)) this.handleShow();
+      };
+      this._boundHandleHide = event => {
+        if (event.target.contains(this.element)) this.handleHide();
+      };
+      document.addEventListener("popover:show", this._boundHandleShow);
+      document.addEventListener("drawer:show", this._boundHandleShow);
+      document.addEventListener("popover:hide", this._boundHandleHide);
+      document.addEventListener("drawer:hide", this._boundHandleHide);
     }
     disconnect() {
-      this.element.removeEventListener("popover:show", this.handleShow.bind(this));
-      this.element.removeEventListener("drawer:show", this.handleShow.bind(this));
+      document.removeEventListener("popover:show", this._boundHandleShow);
+      document.removeEventListener("drawer:show", this._boundHandleShow);
+      document.removeEventListener("popover:hide", this._boundHandleHide);
+      document.removeEventListener("drawer:hide", this._boundHandleHide);
     }
     handleShow() {
       if (this.autofocusValue && this.hasInputTarget) {
@@ -2798,6 +2808,14 @@
         this.selectedIndex = 0;
         this.updateSelection();
       }
+    }
+    handleHide() {
+      if (this.hasInputTarget && this.inputTarget.value !== "") {
+        this.inputTarget.value = "";
+        this.filter();
+      }
+      this.selectedIndex = -1;
+      this.updateSelection();
     }
     filter() {
       const query = this.inputTarget.value.toLowerCase().trim();
