@@ -2801,7 +2801,7 @@
     }
     handleShow() {
       if (this.autofocusValue && this.hasInputTarget) {
-        this.inputTarget.focus();
+        queueMicrotask(() => this.inputTarget.focus());
       }
       const visibleItems = this.visibleItems;
       if (visibleItems.length > 0) {

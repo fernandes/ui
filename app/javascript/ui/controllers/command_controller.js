@@ -40,9 +40,14 @@ export default class extends Controller {
   }
 
   handleShow() {
-    // Focus the input when popover/drawer opens (only if autofocus is enabled)
+    // Focus the input when popover/drawer opens (only if autofocus is enabled).
+    // Defer to the next microtask: the popover transitions from
+    // visibility:hidden → visible right before this event, and focus() on a
+    // not-yet-painted element silently no-ops in some browsers. queueMicrotask
+    // runs after the current task finishes, after the browser has applied the
+    // visibility change.
     if (this.autofocusValue && this.hasInputTarget) {
-      this.inputTarget.focus()
+      queueMicrotask(() => this.inputTarget.focus())
     }
 
     // Select first visible item
