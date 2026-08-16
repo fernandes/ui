@@ -2,16 +2,19 @@
   Sonner Toaster partial (ERB)
   Container for toast notifications - render once in your layout
 
+  NOTE: the examples below intentionally omit ERB output tags. A closing ERB
+  tag written literally inside this comment would terminate the comment early
+  and execute the example, which re-renders this partial and recurses forever.
+
   @example Basic usage
-    <%= render "ui/sonner/toaster" %>
+    render "ui/sonner/toaster"
 
   @example With options
-    <%= render "ui/sonner/toaster",
+    render "ui/sonner/toaster",
       position: "top-center",
       theme: "dark",
       rich_colors: true,
       close_button: true
-    %>
 
   @param position [String] Toast position (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right)
   @param theme [String] Theme (light, dark, system)
