@@ -53,7 +53,12 @@ module UI::SidebarBehavior
   def sidebar_base_classes
     # Base classes for the sidebar container
     # Using group to allow child components to respond to sidebar state
-    "group peer"
+    #
+    # `relative` makes this the containing block for SidebarRail, which is
+    # absolutely positioned at `-right-4`. Without it the rail resolves against
+    # the initial containing block and lands 8px past the right edge of the
+    # viewport, so every page with a sidebar overflows horizontally.
+    "group peer relative"
   end
 
   def sidebar_variant_classes
