@@ -37,10 +37,17 @@ module UI::SidebarMenuBadgeBehavior
   private
 
   def sidebar_menu_badge_base_classes
+    # The badge is absolutely positioned over the menu button, so it needs a
+    # `top` to sit on. It comes from the button's own `data-size`, matched
+    # through the `peer/menu-button` class — without these three variants the
+    # badge falls to its static position, below the button instead of on it.
     "pointer-events-none absolute right-1 flex h-5 min-w-5 select-none " \
     "items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums " \
     "text-sidebar-foreground peer-hover/menu-button:text-sidebar-accent-foreground " \
     "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground " \
+    "peer-data-[size=sm]/menu-button:top-1 " \
+    "peer-data-[size=default]/menu-button:top-1.5 " \
+    "peer-data-[size=lg]/menu-button:top-2.5 " \
     "group-data-[state=collapsed]:group-data-[collapsible=icon]:hidden"
   end
 end
