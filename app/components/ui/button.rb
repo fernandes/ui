@@ -13,6 +13,11 @@
 #
 # @example Disabled state
 #   render UI::Button.new(disabled: true) { "Disabled" }
+#
+# @example As a link, with asChild
+#   render UI::Button.new(variant: :outline, as_child: true) do |attrs|
+#     link_to "Settings", settings_path, **attrs
+#   end
 class UI::Button < Phlex::HTML
   include UI::ButtonBehavior
 
@@ -20,33 +25,54 @@ class UI::Button < Phlex::HTML
   # @param size [String] Size variant (default, sm, lg, icon, icon-sm, icon-lg)
   # @param type [String] Button type attribute (button, submit, reset)
   # @param disabled [Boolean] Whether the button is disabled
+  # @param as_child [Boolean] When true, yields attributes to the block instead
+  #   of rendering a <button>, so a link or a form helper can carry the styling
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(variant: "default", size: "default", type: "button", disabled: false, classes: "", **attributes)
+  def initialize(variant: "default", size: "default", type: "button", disabled: false,
+                 as_child: false, classes: "", **attributes)
     @variant = variant
     @size = size
     @type = type
     @disabled = disabled
+    @as_child = as_child
     @classes = classes
     @attributes = attributes
   end
 
   def view_template(&block)
-    all_attributes = button_html_attributes
+    if @as_child
+      yield(as_child_attributes) if block_given?
+    else
+      button(**resolved_attributes, &block)
+    end
+  end
 
-    # Merge classes with TailwindMerge before deep_merge
+  private
+
+  # Button styling merged with whatever the caller passed. TailwindMerge
+  # resolves class conflicts so a caller can override padding or colour.
+  def resolved_attributes
+    attributes = button_html_attributes
+
     if @attributes.key?(:class)
-      button_class = all_attributes[:class] || ""
-      attr_class = @attributes[:class] || ""
-      merged_class = TailwindMerge::Merger.new.merge([button_class, attr_class].join(" "))
-      all_attributes = all_attributes.merge(class: merged_class)
+      merged = TailwindMerge::Merger.new.merge(
+        [ attributes[:class], @attributes[:class] ].compact.join(" ")
+      )
+      attributes = attributes.merge(class: merged)
     end
 
-    # Deep merge other attributes (excluding class which we already handled)
-    all_attributes = all_attributes.deep_merge(@attributes.except(:class))
+    attributes.deep_merge(@attributes.except(:class))
+  end
 
-    button(**all_attributes) do
-      yield if block_given?
-    end
+  # When composing, the child element decides its own semantics: `type` belongs
+  # to <button>, and `disabled` is not a valid attribute on an <a>. The styling
+  # and any custom attributes are handed over; a disabled button becomes
+  # aria-disabled so the intent survives on whatever element the block renders.
+  def as_child_attributes
+    attributes = resolved_attributes.except(:type, :disabled)
+    return attributes unless @disabled
+
+    attributes.deep_merge(aria: { disabled: "true" })
   end
 end

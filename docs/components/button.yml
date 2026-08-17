@@ -34,6 +34,11 @@ api:
       type: Boolean
       default: 'false'
       description: Whether the element is disabled
+    - name: as_child
+      type: Boolean
+      default: 'false'
+      description: When true, yields attributes to the block instead of rendering
+        a button, so a link or form helper can carry the styling
     data_attributes: []
     css_variables: []
   Group:

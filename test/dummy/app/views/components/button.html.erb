@@ -25,6 +25,22 @@
       </div>
     </section>
 
+    <!-- asChild: the styling lands on a link, not a button -->
+    <section class="space-y-4" id="as-child">
+      <h2 class="text-2xl font-semibold">asChild</h2>
+      <div class="flex flex-wrap items-center gap-4">
+        <%= render UI::Button.new(as_child: true) do |attrs| %>
+          <%= link_to "Link as button", "/components/button", **attrs %>
+        <% end %>
+        <%= render UI::Button.new(variant: "outline", size: "sm", as_child: true) do |attrs| %>
+          <%= link_to "Outline small", "/components/button", **attrs %>
+        <% end %>
+        <%= render UI::Button.new(disabled: true, as_child: true) do |attrs| %>
+          <%= link_to "Disabled link", "/components/button", **attrs %>
+        <% end %>
+      </div>
+    </section>
+
     <!-- ViewComponent Implementation -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent Implementation</h2>

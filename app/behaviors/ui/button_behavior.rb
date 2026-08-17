@@ -64,9 +64,13 @@ module UI::ButtonBehavior
 
   private
 
-  # Base classes applied to all buttons
+  # Base classes applied to all buttons.
+  #
+  # `aria-disabled:` mirrors `disabled:` so the disabled look survives when the
+  # button is composed onto an <a> with as_child — an anchor cannot carry the
+  # `disabled` attribute, only aria-disabled.
   def button_base_classes
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius,0.5rem)] text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none ring-offset-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:ring-offset-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive has-[>svg]:px-3"
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius,0.5rem)] text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none ring-offset-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:ring-offset-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive has-[>svg]:px-3"
   end
 
   # Variant-specific classes based on @variant
