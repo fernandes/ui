@@ -44,7 +44,7 @@ class UI::SheetContentComponent < ViewComponent::Base
       class: sheet_content_close_button_classes,
       data: {action: "click->ui--dialog#close"} do
       safe_join([
-        lucide_icon("x", class: "size-4"),
+        helpers.lucide_icon("x", class: "size-4"),
         content_tag(:span, "Close", class: "sr-only")
       ])
     end
