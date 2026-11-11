@@ -8,7 +8,9 @@
   # @param size [String] Size variant (default, sm, lg)
   # @param value [String, Array] Current selected value(s)
   # @param spacing [Integer] Gap between items (0 means items touch)
-  # @param orientation [String] Layout direction (horizontal, vertical)
+  # @param orientation [String] Layout direction (horizontal, vertical); limits arrow keys to that axis
+  # @param disabled [Boolean] Disable every item in the group
+  # @param loop [Boolean] Whether arrow-key focus wraps around at the ends (default true)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
 
@@ -18,19 +20,15 @@
   @value = local_assigns.fetch(:value, nil)
   @spacing = local_assigns.fetch(:spacing, 0)
   @orientation = local_assigns.fetch(:orientation, nil)
+  @disabled = local_assigns.fetch(:disabled, false)
+  @loop = local_assigns.fetch(:loop, true)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  # Store context for child items
-  @toggle_group_context = {
-    variant: @variant,
-    size: @size,
-    type: @type,
-    spacing: @spacing,
-    value: @value
-  }
-
   extend UI::ToggleGroupBehavior
+
+  # Store context for child items
+  @toggle_group_context = toggle_group_context
   all_attributes = toggle_group_html_attributes.deep_merge(@attributes)
 %>
 <%= content_tag :div, all_attributes do %>

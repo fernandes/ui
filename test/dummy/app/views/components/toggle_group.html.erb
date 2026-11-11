@@ -138,6 +138,17 @@
       <% end %>
     </section>
 
+    <!-- Vertical, with a disabled item -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Vertical with a Disabled Item (ERB)</h2>
+      <p class="text-sm text-muted-foreground">Tab enters once; Up/Down move focus and skip the disabled item.</p>
+      <%= render "ui/toggle_group", type: "single", variant: "outline", orientation: "vertical", classes: "flex-col", attributes: { id: "vertical-group", "aria-label": "Alignment" } do %>
+        <%= render "ui/toggle_group/item", value: "top" do %>Top<% end %>
+        <%= render "ui/toggle_group/item", value: "middle", disabled: true do %>Middle<% end %>
+        <%= render "ui/toggle_group/item", value: "bottom" do %>Bottom<% end %>
+      <% end %>
+    </section>
+
     <!-- Interactive Example -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Interactive Example</h2>

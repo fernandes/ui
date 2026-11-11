@@ -33,7 +33,9 @@ A set of two-state buttons that can be toggled on or off, supporting single and 
 | `size` | String | `"default"` | Size variant (default, sm, lg) |
 | `value` | String/Array | `nil` | Current selected value(s) |
 | `spacing` | Integer | `0` | Gap between items (0 means items touch) |
-| `orientation` | String | `nil` | Layout direction (horizontal, vertical) |
+| `orientation` | String | `nil` | Layout direction (horizontal, vertical); limits arrow keys to that axis |
+| `disabled` | Boolean | `false` | Disables every item in the group |
+| `loop` | Boolean | `true` | Arrow-key focus wraps around at the ends |
 | `classes` | String | `""` | Additional CSS classes |
 | `attributes` | Hash | `{}` | Additional HTML attributes |
 
@@ -169,7 +171,9 @@ The Toggle Group automatically handles ARIA attributes:
 
 - **Single mode**: Uses `role="radiogroup"` with `role="radio"` and `aria-checked` for items
 - **Multiple mode**: Uses `role="group"` with `role="button"` and `aria-pressed` for items
-- Full keyboard navigation support (Arrow keys, Space, Enter)
+- **Keyboard**: the group is one tab stop (the focused, else pressed, else first enabled item). Arrow keys move focus without selecting — Left/Right for `orientation: "horizontal"`, Up/Down for `"vertical"`, both when unset — and wrap around unless `loop: false`. Home/End jump to the ends. Disabled items are skipped. Space/Enter toggle.
+- `orientation` is exposed as `aria-orientation` in single mode (radiogroup) and as `data-orientation` in both.
+- Give the group an accessible name (`"aria-label"` in the attributes) so screen readers announce what it controls.
 
 ## State Management
 

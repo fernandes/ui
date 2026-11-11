@@ -25,6 +25,7 @@
     @size ||= @toggle_group_context[:size]
     @group_type = @toggle_group_context[:type]
     @spacing = @toggle_group_context[:spacing]
+    @disabled ||= @toggle_group_context[:disabled]
 
     # Check if this item should be pressed based on parent value
     parent_value = @toggle_group_context[:value]

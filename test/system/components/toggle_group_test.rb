@@ -272,6 +272,43 @@ class ToggleGroupTest < UI::SystemTestCase
     assert group.selected?("2")
   end
 
+  # === Roving focus ===
+
+  test "the group is a single tab stop and arrow keys move focus" do
+    group = interactive_single_group
+    group.item("1").native.focus
+
+    page.send_keys(:tab)
+    assert_not_includes group.item_values, focused_value, "Tab should leave the group, not walk its items"
+
+    page.send_keys([:shift, :tab])
+    assert_equal "1", focused_value
+
+    page.send_keys(:right)
+    assert_equal "2", focused_value
+    assert_not group.selected?("2"), "arrow keys move focus only"
+
+    page.send_keys(:end)
+    assert_equal "3", focused_value
+    page.send_keys(:right)
+    assert_equal "1", focused_value
+  end
+
+  test "vertical group uses Up/Down and skips disabled items" do
+    group = find_element(UI::Testing::ToggleGroupElement, "#vertical-group")
+    assert_equal "vertical", group.node["aria-orientation"]
+
+    group.item("top").native.focus
+    page.send_keys(:down)
+    assert_equal "bottom", focused_value
+    page.send_keys(:up)
+    assert_equal "top", focused_value
+  end
+
+  def focused_value
+    page.evaluate_script("document.activeElement.dataset.value")
+  end
+
   # === Size Variant Tests ===
 
   test "different size variants render correctly" do

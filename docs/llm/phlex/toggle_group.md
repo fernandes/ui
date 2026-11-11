@@ -33,7 +33,9 @@ end
 | `size` | String | `"default"` | Size (default, sm, lg) |
 | `value` | String/Array | `nil` | Current selected value(s) |
 | `spacing` | Integer | `0` | Gap between items |
-| `orientation` | String | `nil` | Layout direction |
+| `orientation` | String | `nil` | Layout direction (horizontal, vertical); limits arrow keys to that axis |
+| `disabled` | Boolean | `false` | Disables every item in the group |
+| `loop` | Boolean | `true` | Arrow-key focus wraps around at the ends |
 | `classes` | String | `""` | Additional CSS classes |
 | `**attributes` | Hash | `{}` | Additional HTML attributes |
 
@@ -167,7 +169,9 @@ end
 
 - **Single mode**: `role="radiogroup"` with `aria-checked`
 - **Multiple mode**: `role="group"` with `aria-pressed`
-- Full keyboard navigation support
+- **Keyboard**: the group is one tab stop (the focused, else pressed, else first enabled item). Arrow keys move focus without selecting — Left/Right for `orientation: "horizontal"`, Up/Down for `"vertical"`, both when unset — and wrap around unless `loop: false`. Home/End jump to the ends. Disabled items are skipped. Space/Enter toggle.
+- `orientation` is exposed as `aria-orientation` in single mode (radiogroup) and as `data-orientation` in both.
+- Give the group an accessible name (`"aria-label"` in the attributes) so screen readers announce what it controls.
 
 ## Error Prevention
 

@@ -23,8 +23,7 @@ module UI::ToggleGroupItemBehavior
       data: {
         "ui--toggle-group-target": "item",
         action: "click->ui--toggle-group#toggle",
-        value: @value,
-        state: @pressed ? "on" : "off"
+        value: @value
       }
     }
 

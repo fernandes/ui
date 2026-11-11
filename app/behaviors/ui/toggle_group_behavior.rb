@@ -6,7 +6,22 @@ require "tailwind_merge"
 #
 # Shared behavior for ToggleGroup (Root) component across ERB, ViewComponent, and Phlex implementations.
 # This module provides consistent variant and size styling for the group container.
+#
+# Keyboard: roving tabindex (one tab stop), arrow keys move focus (by
+# orientation), Home/End, disabled items skipped, loop by default.
 module UI::ToggleGroupBehavior
+  # Context handed to the items (variant, size, selection, disabled).
+  def toggle_group_context
+    {
+      variant: @variant,
+      size: @size,
+      type: @type,
+      spacing: @spacing,
+      value: @value,
+      disabled: @disabled
+    }
+  end
+
   # Returns HTML attributes for the toggle group container element
   def toggle_group_html_attributes
     attrs = {
@@ -15,12 +30,18 @@ module UI::ToggleGroupBehavior
       data: {
         controller: "ui--toggle-group",
         "ui--toggle-group-type-value": @type || "single",
-        "ui--toggle-group-value-value": @value&.to_json || ((@type == "multiple") ? "[]" : "null")
-      }
+        "ui--toggle-group-value-value": @value&.to_json || ((@type == "multiple") ? "[]" : "null"),
+        "ui--toggle-group-loop-value": ((@loop == false) ? "false" : nil)
+      }.compact
     }
 
-    # Add orientation for accessibility
-    attrs[:"data-orientation"] = @orientation if @orientation
+    # Orientation drives which arrow keys move focus. aria-orientation is only
+    # valid on the radiogroup role; a plain group exposes it as data only.
+    if @orientation
+      attrs[:"data-orientation"] = @orientation
+      attrs[:"aria-orientation"] = @orientation if @type != "multiple"
+    end
+    attrs[:"data-disabled"] = "" if @disabled
     attrs[:"data-spacing"] = @spacing.to_s if @spacing
     attrs[:"data-variant"] = @variant if @variant
 

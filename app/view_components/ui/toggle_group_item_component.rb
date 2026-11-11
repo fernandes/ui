@@ -44,6 +44,7 @@ class UI::ToggleGroupItemComponent < ViewComponent::Base
       @size ||= parent_context[:size]
       @group_type = parent_context[:type]
       @spacing = parent_context[:spacing]
+      @disabled ||= parent_context[:disabled]
 
       # Check if this item should be pressed based on parent value
       parent_value = parent_context[:value]

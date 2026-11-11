@@ -28,16 +28,20 @@ class UI::ToggleGroupComponent < ViewComponent::Base
   # @param size [String] Size variant (default, sm, lg)
   # @param value [String, Array] Current selected value(s)
   # @param spacing [Integer] Gap between items (0 means items touch)
-  # @param orientation [String] Layout direction (horizontal, vertical)
+  # @param orientation [String] Layout direction (horizontal, vertical); limits arrow keys to that axis
+  # @param disabled [Boolean] Disable every item in the group
+  # @param loop [Boolean] Whether arrow-key focus wraps around at the ends (default true)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(type: "single", variant: "default", size: "default", value: nil, spacing: 0, orientation: nil, classes: "", **attributes)
+  def initialize(type: "single", variant: "default", size: "default", value: nil, spacing: 0, orientation: nil, disabled: false, loop: true, classes: "", **attributes)
     @type = type
     @variant = variant
     @size = size
     @value = value
     @spacing = spacing
     @orientation = orientation
+    @disabled = disabled
+    @loop = loop
     @classes = classes
     @attributes = attributes
   end
@@ -47,13 +51,7 @@ class UI::ToggleGroupComponent < ViewComponent::Base
     attrs[:data] = attrs[:data].merge(@attributes.fetch(:data, {}))
 
     # Store context for child components
-    set_toggle_group_context({
-      variant: @variant,
-      size: @size,
-      type: @type,
-      spacing: @spacing,
-      value: @value
-    })
+    set_toggle_group_context(toggle_group_context)
 
     content_tag :div, content, **attrs.merge(@attributes.except(:data))
   end

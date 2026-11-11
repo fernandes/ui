@@ -25,16 +25,20 @@ class UI::ToggleGroup < Phlex::HTML
   # @param size [String] Size variant (default, sm, lg)
   # @param value [String, Array] Current selected value(s)
   # @param spacing [Integer] Gap between items (0 means items touch)
-  # @param orientation [String] Layout direction (horizontal, vertical)
+  # @param orientation [String] Layout direction (horizontal, vertical); limits arrow keys to that axis
+  # @param disabled [Boolean] Disable every item in the group
+  # @param loop [Boolean] Whether arrow-key focus wraps around at the ends (default true)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(type: "single", variant: "default", size: "default", value: nil, spacing: 0, orientation: nil, classes: "", **attributes)
+  def initialize(type: "single", variant: "default", size: "default", value: nil, spacing: 0, orientation: nil, disabled: false, loop: true, classes: "", **attributes)
     @type = type
     @variant = variant
     @size = size
     @value = value
     @spacing = spacing
     @orientation = orientation
+    @disabled = disabled
+    @loop = loop
     @classes = classes
     @attributes = attributes
   end
@@ -43,13 +47,7 @@ class UI::ToggleGroup < Phlex::HTML
     div(**toggle_group_html_attributes.deep_merge(@attributes)) do
       # Store context for child items to access via thread-local
       # This works across both Phlex internal render and Rails render calls
-      @context = {
-        variant: @variant,
-        size: @size,
-        type: @type,
-        spacing: @spacing,
-        value: @value
-      }
+      @context = toggle_group_context
       Thread.current[:ui_toggle_group_context] = @context
       begin
         yield if block_given?
