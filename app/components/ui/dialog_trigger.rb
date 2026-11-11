@@ -2,6 +2,7 @@
 
 class UI::DialogTrigger < Phlex::HTML
   include UI::SharedAsChildBehavior
+  include UI::DialogTriggerBehavior
 
   # @param as_child [Boolean] When true, yields attributes to block instead of rendering button
   # @param variant [Symbol] Button variant (when not using as_child)
@@ -17,10 +18,8 @@ class UI::DialogTrigger < Phlex::HTML
   end
 
   def view_template(&block)
-    trigger_attrs = {
-      data: {action: "click->ui--dialog#open"},
-      **@attributes
-    }
+    # aria-haspopup, aria-expanded, the open action and the trigger target
+    trigger_attrs = dialog_trigger_attributes
 
     if @as_child
       # Yield attributes to block - child must accept and use them

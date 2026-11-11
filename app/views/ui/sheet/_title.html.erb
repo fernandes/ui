@@ -2,6 +2,7 @@
 <%
   content ||= local_assigns.fetch(:content, nil)
   @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
 
   # Build title classes
   title_classes = UI::ClassMerger.merge([
@@ -9,6 +10,7 @@
     @classes
   ].compact.join(" "))
 -%>
-<%= content_tag :h2, class: title_classes do %>
+<%# The title target lets ui--dialog wire aria-labelledby; a caller id is kept %>
+<%= content_tag :h2, **@attributes.except(:class, :data), class: title_classes, data: @attributes.fetch(:data, {}).merge(ui__dialog_target: "title") do %>
   <%= content || yield %>
 <% end %>

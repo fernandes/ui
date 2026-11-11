@@ -1,14 +1,11 @@
-<%# Dialog Description Component %>
+<%# Dialog Description Component - describes the dialog (aria-describedby is wired by the controller) %>
 <%
   content ||= local_assigns.fetch(:content, nil)
   @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
 
-  # Build description classes
-  description_classes = UI::ClassMerger.merge([
-    "text-muted-foreground text-sm",
-    @classes
-  ].compact.join(" "))
+  extend UI::DialogDescriptionBehavior
 -%>
-<%= content_tag :p, class: description_classes do %>
+<%= content_tag :p, **dialog_description_html_attributes do %>
   <%= content || yield %>
 <% end %>

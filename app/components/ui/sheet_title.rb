@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
 class UI::SheetTitle < Phlex::HTML
-  def initialize(classes: nil)
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes (an `id` is kept)
+  def initialize(classes: nil, **attributes)
     @classes = classes
+    @attributes = attributes
   end
 
   def view_template(&block)
-    h2(class: title_classes) do
+    # The title target lets ui--dialog wire aria-labelledby
+    data = @attributes.fetch(:data, {}).merge(ui__dialog_target: "title")
+    h2(**@attributes.except(:class, :data), class: title_classes, data: data) do
       yield if block_given?
     end
   end

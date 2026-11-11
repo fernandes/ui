@@ -118,8 +118,9 @@ module UI
       # @return [Capybara::Node::Element]
       #
       def container
-        # Container is rendered within page, use all_within to allow :all visibility
-        find_within('[data-ui--dialog-target="container"]', visible: :all)
+        # Own container only (a nested dialog has its own); :all visibility
+        # because it is visibility:hidden while closed
+        find_within(':scope > [data-ui--dialog-target="container"]', visible: :all)
       end
 
       # Get the overlay backdrop element
@@ -243,7 +244,68 @@ module UI
         end
       end
 
+      # === Scoped to this dialog (safe when it contains a nested dialog) ===
+
+      # This dialog's own trigger (not a nested dialog's)
+      def own_trigger
+        page.find(trigger_selector)
+      end
+
+      # This dialog's own content element
+      def own_content
+        page.find(content_selector, visible: :all)
+      end
+
+      # data-state of this dialog's own content
+      def own_state
+        own_content["data-state"]
+      end
+
+      # Text (or aria-label / value) of the element that has focus, anywhere on the page
+      def focused_label
+        page.evaluate_script(<<~JS).to_s.strip
+          (() => {
+            const el = document.activeElement
+            return el.getAttribute("aria-label") || el.id || el.textContent || el.tagName
+          })()
+        JS
+      end
+
+      # Whether the focused element is inside this dialog's content
+      def focus_inside?
+        page.evaluate_script(<<~JS)
+          document.querySelector(#{content_selector.to_json}).contains(document.activeElement)
+        JS
+      end
+
+      # Whether the trigger has focus
+      def trigger_focused?
+        page.evaluate_script(<<~JS)
+          document.activeElement === document.querySelector(#{trigger_selector.to_json})
+        JS
+      end
+
+      # Whether a page element outside the dialog is inert (unreachable)
+      def inert?(selector)
+        page.evaluate_script("!!document.querySelector(#{selector.to_json})?.closest('[inert]')")
+      end
+
+      # Press a key on whatever has focus (unlike press_* which target the root)
+      def keyboard(*keys)
+        page.send_keys(*keys)
+      end
+
       # === Waiters ===
+
+      def wait_for_focus_inside(timeout: Capybara.default_max_wait_time)
+        start_time = Time.now
+        loop do
+          return true if focus_inside?
+          raise Capybara::ExpectationNotMet, "Focus did not move into the dialog after #{timeout}s" if Time.now - start_time > timeout
+
+          sleep 0.05
+        end
+      end
 
       def wait_for_open(timeout: Capybara.default_max_wait_time)
         start_time = Time.now
@@ -263,6 +325,25 @@ module UI
 
           sleep 0.05
         end
+      end
+
+      private
+
+      # CSS selectors scoped to this dialog's root (its own content and trigger,
+      # not a nested dialog's)
+      def root_selector
+        id = node[:id]
+        raise ArgumentError, "focus helpers need the dialog root to have an id" if id.blank?
+
+        "##{id}"
+      end
+
+      def content_selector
+        "#{root_selector} > [data-ui--dialog-target='container'] > [data-ui--dialog-target='content']"
+      end
+
+      def trigger_selector
+        "#{root_selector} > [data-ui--dialog-target='trigger']"
       end
     end
   end

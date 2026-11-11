@@ -11,6 +11,8 @@
 #     <%= render UI::ButtonComponent.new(variant: :outline) { "Open" } %>
 #   <% end %>
 class UI::DialogTriggerComponent < ViewComponent::Base
+  include UI::DialogTriggerBehavior
+
   # @param as_child [Boolean] merge attributes into child element
   # @param variant [Symbol] button variant (when not using as_child)
   # @param size [Symbol] button size (when not using as_child)
@@ -25,9 +27,8 @@ class UI::DialogTriggerComponent < ViewComponent::Base
   end
 
   def call
-    trigger_attrs = {
-      data: {action: "click->ui--dialog#open"}
-    }.deep_merge(@attributes)
+    # aria-haspopup, aria-expanded, the open action and the trigger target
+    trigger_attrs = dialog_trigger_attributes
 
     if @as_child
       # asChild mode: merge attributes into child element

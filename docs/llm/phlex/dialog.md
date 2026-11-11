@@ -742,3 +742,16 @@ end
 - Radix UI: https://www.radix-ui.com/primitives/docs/components/dialog
 - Button component: `docs/llm/phlex/button.md`
 - Pattern docs: `docs/patterns/as_child.md`
+
+## Accessibility
+
+Wired by the `ui--dialog` controller on connect (same for ERB, Phlex and ViewComponent, and for Sheet):
+
+- Content gets `aria-labelledby` → Title and `aria-describedby` → Description. Ids are generated
+  per instance; an `id` you pass to Title/Description (`attributes: { id: "..." }` in ERB,
+  `id:` in Phlex/VC) is kept. Always render a Title (use `classes: "sr-only"` to hide it).
+- Trigger renders `aria-haspopup="dialog"` and `aria-expanded`; the controller adds `aria-controls`
+  and keeps `aria-expanded` in sync. With `as_child`, pass the yielded attributes to your element.
+- While open: focus moves to the first field (`[autofocus]` wins; hidden inputs are skipped), Tab is
+  trapped, the rest of the page is `inert`, Escape closes only the topmost dialog. Closing returns
+  focus to the trigger. Nested dialogs work.

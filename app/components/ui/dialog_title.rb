@@ -1,22 +1,18 @@
 # frozen_string_literal: true
 
 class UI::DialogTitle < Phlex::HTML
-  def initialize(classes: nil)
+  include UI::DialogTitleBehavior
+
+  # @param classes [String] Additional CSS classes
+  # @param attributes [Hash] Additional HTML attributes (an `id` is kept)
+  def initialize(classes: nil, **attributes)
     @classes = classes
+    @attributes = attributes
   end
 
   def view_template(&block)
-    h2(class: title_classes) do
+    h2(**dialog_title_html_attributes) do
       yield if block_given?
     end
-  end
-
-  private
-
-  def title_classes
-    UI::ClassMerger.merge([
-      "text-lg font-semibold",
-      @classes
-    ].compact.join(" "))
   end
 end

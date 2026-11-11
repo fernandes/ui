@@ -11,6 +11,8 @@
 #     <%= render UI::ButtonComponent.new { "Open" } %>
 #   <% end %>
 class UI::SheetTriggerComponent < ViewComponent::Base
+  include UI::DialogTriggerBehavior
+
   # @param as_child [Boolean] merge attributes into child element
   # @param attributes [Hash] additional HTML attributes
   def initialize(as_child: false, **attributes)
@@ -19,9 +21,8 @@ class UI::SheetTriggerComponent < ViewComponent::Base
   end
 
   def call
-    trigger_attrs = {
-      data: {action: "click->ui--dialog#open"}
-    }.deep_merge(@attributes)
+    # aria-haspopup, aria-expanded, the open action and the trigger target
+    trigger_attrs = dialog_trigger_attributes
 
     if @as_child
       # asChild mode: merge attributes into child element

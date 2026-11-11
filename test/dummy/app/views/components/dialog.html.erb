@@ -220,6 +220,68 @@
         <% end %>
       </div>
 
+      <!-- ERB Form Dialog with a nested dialog -->
+      <div class="space-y-4 mt-8">
+        <h3 class="text-2xl font-semibold">ERB with a form and a nested dialog</h3>
+        <p class="text-muted-foreground text-sm">
+          The form starts with a hidden field (like every Rails form's authenticity token); focus
+          still lands on the first field. The nested dialog closes on its own with Escape.
+        </p>
+
+        <%= render "ui/dialog", attributes: { id: "erb-form-dialog" } do %>
+          <%= render "ui/dialog/trigger" do %>
+            Edit account
+          <% end %>
+
+          <%= render "ui/dialog/overlay" do %>
+            <%= render "ui/dialog/content", classes: "sm:max-w-[425px]" do %>
+              <%= render "ui/dialog/header" do %>
+                <%= render "ui/dialog/title" do %>
+                  Edit account
+                <% end %>
+                <%= render "ui/dialog/description" do %>
+                  Update your account details.
+                <% end %>
+              <% end %>
+
+              <%= form_with url: "#", method: :post, class: "grid gap-4 py-4" do %>
+                <%= hidden_field_tag :authenticity_token, "demo-token" %>
+                <%= render "ui/field" do %>
+                  <%= render "ui/field/label", for_id: "account-email" do %>Email<% end %>
+                  <%= render "ui/input", type: "email", value: "jane@example.com", attributes: { id: "account-email" } %>
+                <% end %>
+              <% end %>
+
+              <%= render "ui/dialog", attributes: { id: "erb-nested-dialog" } do %>
+                <%= render "ui/dialog/trigger", variant: :destructive do %>
+                  Delete account
+                <% end %>
+                <%= render "ui/dialog/overlay" do %>
+                  <%= render "ui/dialog/content", classes: "sm:max-w-[360px]" do %>
+                    <%= render "ui/dialog/header" do %>
+                      <%= render "ui/dialog/title" do %>
+                        Delete account?
+                      <% end %>
+                    <% end %>
+                    <%= render "ui/dialog/footer" do %>
+                      <%= render "ui/dialog/close" do %>
+                        Keep account
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <% end %>
+
+              <%= render "ui/dialog/footer" do %>
+                <%= render "ui/dialog/close", variant: :default do %>
+                  Save
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
       <!-- ERB asChild Dialog -->
       <div class="space-y-4 mt-8">
         <h3 class="text-2xl font-semibold">ERB with asChild</h3>

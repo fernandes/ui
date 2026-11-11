@@ -7,10 +7,10 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  # Build trigger attributes
-  trigger_attrs = {
-    data: { action: "click->ui--dialog#open" }
-  }.deep_merge(@attributes)
+  extend UI::DialogTriggerBehavior
+
+  # aria-haspopup, aria-expanded, the open action and the trigger target
+  trigger_attrs = dialog_trigger_attributes
 -%>
 <% if @as_child %>
   <%# asChild pattern: yield attributes to block %>

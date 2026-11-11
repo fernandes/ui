@@ -1,14 +1,11 @@
-<%# Dialog Title Component %>
+<%# Dialog Title Component - names the dialog (aria-labelledby is wired by the controller) %>
 <%
   content ||= local_assigns.fetch(:content, nil)
   @classes = local_assigns.fetch(:classes, "")
+  @attributes = local_assigns.fetch(:attributes, {})
 
-  # Build title classes
-  title_classes = UI::ClassMerger.merge([
-    "text-lg font-semibold",
-    @classes
-  ].compact.join(" "))
+  extend UI::DialogTitleBehavior
 -%>
-<%= content_tag :h2, class: title_classes do %>
+<%= content_tag :h2, **dialog_title_html_attributes do %>
   <%= content || yield %>
 <% end %>

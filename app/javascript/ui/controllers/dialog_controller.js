@@ -1,24 +1,41 @@
 import { Controller } from "@hotwired/stimulus"
 import { setState } from "../utils/state-manager.js"
-import { createEscapeKeyHandler } from "../utils/escape-key-manager.js"
-import { focusFirstElement } from "../utils/focus-trap-manager.js"
-import { lockScroll, unlockScroll } from "../utils/scroll-lock-manager.js"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
+import { createModalSession } from "../utils/modal-session.js"
 
-// Dialog controller for general-purpose modal dialogs
-// Unlike AlertDialog, this DOES close when clicking overlay or pressing Escape
+// Dialog controller for general-purpose modal dialogs (also drives Sheet).
+// Unlike AlertDialog, this DOES close when clicking overlay or pressing Escape.
+//
+// While open (Radix Dialog / WAI-ARIA APG modal dialog):
+// - focus moves inside, Tab is trapped, the rest of the page is inert
+// - Escape closes only the topmost layer (nested dialogs, selects, ...)
+// - closing returns focus to the element that opened it
+// - content is named/described by its title/description; triggers carry
+//   aria-haspopup, aria-controls and aria-expanded
 export default class extends Controller {
-  static targets = ["container", "overlay", "content"]
+  static targets = ["container", "overlay", "content", "trigger", "title", "description"]
   static values = {
     open: { type: Boolean, default: false },
     closeOnEscape: { type: Boolean, default: true },
     closeOnOverlayClick: { type: Boolean, default: true }
   }
 
+  constructor() {
+    super(...arguments)
+  }
+
   connect() {
-    // Setup escape key handler
-    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
-      enabled: this.closeOnEscapeValue
-    })
+    this.wireAria()
+
+    if (this.hasContentTarget) {
+      this.session = createModalSession({
+        content: this.contentTarget,
+        isolate: this.hasContainerTarget ? this.containerTarget : this.contentTarget,
+        returnFocus: () => this.triggers[0],
+        // A dialog that ignores Escape still claims it, so a dialog below stays open
+        onEscape: () => { if (this.closeOnEscapeValue) this.close() }
+      })
+    }
 
     if (this.openValue) {
       this.show()
@@ -27,20 +44,54 @@ export default class extends Controller {
     }
   }
 
-  setInitialClosedState() {
-    // Set initial closed state with data-initial to prevent exit animations on page load
-    const targets = [
+  disconnect() {
+    this.session?.deactivate({ restoreFocus: false })
+  }
+
+  // Ids are wired on the client so ERB, Phlex and ViewComponent share one
+  // implementation; an id the author rendered is kept.
+  wireAria() {
+    if (!this.hasContentTarget) return
+    const content = this.contentTarget
+
+    ensureId(content, "dialog-content")
+    if (this.hasTitleTarget) setIdRefs(content, "aria-labelledby", this.titleTarget, { prefix: "dialog-title" })
+    if (this.hasDescriptionTarget) setIdRefs(content, "aria-describedby", this.descriptionTarget, { prefix: "dialog-description" })
+
+    this.triggers.forEach(trigger => {
+      if (!trigger.hasAttribute("aria-haspopup")) trigger.setAttribute("aria-haspopup", "dialog")
+      setIdRefs(trigger, "aria-controls", content)
+    })
+    this.syncTriggers(this.openValue)
+  }
+
+  // Trigger targets, plus hand-written triggers that only carry the action
+  get triggers() {
+    const own = el => el.closest("[data-controller~='ui--dialog']") === this.element
+    const byAction = Array.from(this.element.querySelectorAll("[data-action*='ui--dialog#open']")).filter(own)
+    return Array.from(new Set([...this.triggerTargets, ...byAction]))
+  }
+
+  syncTriggers(open) {
+    this.triggers.forEach(trigger => trigger.setAttribute("aria-expanded", open ? "true" : "false"))
+  }
+
+  get stateTargets() {
+    return [
       this.hasContainerTarget ? this.containerTarget : null,
       this.hasOverlayTarget ? this.overlayTarget : null,
       this.hasContentTarget ? this.contentTarget : null
     ].filter(Boolean)
+  }
 
-    targets.forEach(target => {
-      setState(target, 'closed')
+  setInitialClosedState() {
+    // data-initial prevents exit animations on page load
+    this.stateTargets.forEach(target => {
+      setState(target, "closed")
       target.setAttribute("data-initial", "")
     })
 
-    // Use inert to prevent focus on content when closed
+    // inert keeps closed content out of the Tab order and the a11y tree
     if (this.hasContentTarget) {
       this.contentTarget.inert = true
     }
@@ -57,35 +108,18 @@ export default class extends Controller {
   }
 
   show() {
-    // Remove data-initial and set open state
-    const targets = [
-      this.hasContainerTarget ? this.containerTarget : null,
-      this.hasOverlayTarget ? this.overlayTarget : null,
-      this.hasContentTarget ? this.contentTarget : null
-    ].filter(Boolean)
-
-    targets.forEach(target => {
+    this.stateTargets.forEach(target => {
       target.removeAttribute("data-initial")
-      setState(target, 'open')
+      setState(target, "open")
     })
 
-    // Remove inert to allow focus on content when open
     if (this.hasContentTarget) {
       this.contentTarget.inert = false
     }
+    this.syncTriggers(true)
 
-    // Lock body scroll
-    lockScroll()
-
-    // Setup focus trap
-    if (this.hasContentTarget) {
-      focusFirstElement(this.contentTarget)
-    }
-
-    // Attach escape handler
-    if (this.closeOnEscapeValue) {
-      this.escapeHandler.attach()
-    }
+    // Content is visible now: trap focus, inert the page, lock scroll, Escape layer
+    this.session?.activate()
 
     this.element.dispatchEvent(new CustomEvent("dialog:open", {
       bubbles: true,
@@ -94,27 +128,17 @@ export default class extends Controller {
   }
 
   hide() {
-    // Set closed state for exit animations
-    const targets = [
-      this.hasContainerTarget ? this.containerTarget : null,
-      this.hasOverlayTarget ? this.overlayTarget : null,
-      this.hasContentTarget ? this.contentTarget : null
-    ].filter(Boolean)
+    // Restores the background and focus before the content goes inert
+    this.session?.deactivate()
+    this.syncTriggers(false)
 
-    targets.forEach(target => {
-      setState(target, 'closed')
+    this.stateTargets.forEach(target => {
+      setState(target, "closed")
     })
 
-    // Use inert to prevent focus on content when closed
     if (this.hasContentTarget) {
       this.contentTarget.inert = true
     }
-
-    // Unlock body scroll
-    unlockScroll()
-
-    // Detach escape handler
-    this.escapeHandler.detach()
 
     this.element.dispatchEvent(new CustomEvent("dialog:close", {
       bubbles: true,
@@ -127,10 +151,5 @@ export default class extends Controller {
     if (this.closeOnOverlayClickValue) {
       this.close()
     }
-  }
-
-  disconnect() {
-    unlockScroll()
-    this.escapeHandler.detach()
   }
 }

@@ -12,6 +12,11 @@ class DialogTest < UI::SystemTestCase
     find_element(UI::Testing::DialogElement, "#erb-default-dialog")
   end
 
+  # ERB dialog with a form (hidden field first) and a nested dialog inside
+  def form_dialog
+    find_element(UI::Testing::DialogElement, "#erb-form-dialog")
+  end
+
   # Helper to get the asChild ERB dialog by ID (has close_on_overlay_click: false)
   def no_overlay_dialog
     find_element(UI::Testing::DialogElement, "#erb-aschild-dialog")
@@ -129,14 +134,28 @@ class DialogTest < UI::SystemTestCase
     assert_equal "dialog", dialog.content_role
   end
 
-  # ARIA labeling tests - Currently skipped as dialog component
-  # doesn't yet implement aria-labelledby/describedby with IDs
-  #
-  # test "content is properly labeled by title" do
-  #   dialog = default_dialog
-  #   dialog.open
-  #   assert dialog.aria_labeled_correctly?
-  # end
+  test "content is labelled by its title and described by its description" do
+    dialog = default_dialog
+
+    dialog.open
+
+    assert dialog.aria_labeled_correctly?
+  end
+
+  test "trigger exposes aria-haspopup, aria-controls and aria-expanded" do
+    dialog = default_dialog
+    trigger = dialog.trigger
+
+    assert_equal "dialog", trigger["aria-haspopup"]
+    assert_equal dialog.content["id"], trigger["aria-controls"]
+    assert_equal "false", trigger["aria-expanded"]
+
+    dialog.open
+    assert_equal "true", trigger["aria-expanded"]
+
+    dialog.close
+    assert_equal "false", trigger["aria-expanded"]
+  end
 
   # === Focus Management Tests ===
 
@@ -158,18 +177,90 @@ class DialogTest < UI::SystemTestCase
       "Expected a focusable element to be focused, got #{focused_tag}"
   end
 
-  test "traps focus within dialog when open" do
-    dialog = default_dialog
+  # --- Modal focus (X3/X4/X5): only a real browser knows Tab order and inert ---
 
-    dialog.open
+  test "focus skips the form's hidden field and lands on the first input" do
+    dialog = form_dialog
 
-    # Wait for focus trap to be set up
-    sleep 0.1
+    dialog.own_trigger.click
+    dialog.wait_for_focus_inside
 
-    # Tab through elements - focus should stay within dialog
-    # This is a basic check - a full implementation would tab through all elements
-    # and verify focus never escapes the dialog
-    assert dialog.content_visible?
+    assert_equal "account-email", dialog.focused_label
+  end
+
+  test "Tab and Shift+Tab wrap inside the dialog" do
+    dialog = form_dialog
+    dialog.own_trigger.click
+    dialog.wait_for_focus_inside
+
+    # Email -> Delete account -> Save -> (wrap) Email
+    dialog.keyboard(:tab)
+    assert_equal "Delete account", dialog.focused_label
+    dialog.keyboard(:tab)
+    assert_equal "Save", dialog.focused_label
+    dialog.keyboard(:tab)
+    assert_equal "account-email", dialog.focused_label
+
+    dialog.keyboard([:shift, :tab])
+    assert_equal "Save", dialog.focused_label
+
+    10.times { dialog.keyboard(:tab) }
+    assert dialog.focus_inside?, "focus escaped the dialog"
+  end
+
+  test "the page behind an open dialog is inert, and comes back on close" do
+    dialog = form_dialog
+    dialog.own_trigger.click
+    dialog.wait_for_focus_inside
+
+    assert dialog.inert?("#erb-default-dialog [data-ui--dialog-target='trigger']")
+    assert dialog.inert?("#erb-form-dialog > [data-ui--dialog-target='trigger']")
+    refute dialog.inert?("#erb-form-dialog [data-ui--dialog-target='overlay']")
+
+    dialog.keyboard(:escape)
+    dialog.wait_for_closed
+
+    refute dialog.inert?("#erb-default-dialog [data-ui--dialog-target='trigger']")
+  end
+
+  test "closing returns focus to the trigger" do
+    dialog = form_dialog
+
+    dialog.own_trigger.click
+    dialog.wait_for_focus_inside
+    dialog.keyboard(:escape)
+    dialog.wait_for_closed
+
+    assert dialog.trigger_focused?, "focus went to #{dialog.focused_label}"
+
+    dialog.own_trigger.click
+    dialog.wait_for_focus_inside
+    page.find("#erb-form-dialog button", exact_text: "Save").click
+    dialog.wait_for_closed
+
+    assert dialog.trigger_focused?, "focus went to #{dialog.focused_label}"
+  end
+
+  test "Escape in a nested dialog closes only the nested one" do
+    outer = form_dialog
+
+    outer.own_trigger.click
+    outer.wait_for_focus_inside
+    inner = find_element(UI::Testing::DialogElement, "#erb-nested-dialog")
+    inner.own_trigger.click
+    inner.wait_for_focus_inside
+    assert_equal "Keep account", inner.focused_label
+
+    inner.keyboard(:escape)
+    sleep 0.2
+
+    assert_equal "closed", inner.own_state
+    assert_equal "open", outer.own_state
+    assert inner.trigger_focused?, "focus went to #{inner.focused_label}"
+
+    outer.keyboard(:escape)
+    outer.wait_for_closed
+    assert outer.trigger_focused?
   end
 
   # === Overlay Tests ===
