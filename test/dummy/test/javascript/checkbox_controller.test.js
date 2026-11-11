@@ -1,6 +1,6 @@
-import { describe, test, expect } from "bun:test"
+import { describe, test, expect, afterAll } from "bun:test"
 import { screen } from "@testing-library/dom"
-import { render, settle } from "./support/render.js"
+import { render, settle, cleanup } from "./support/render.js"
 
 // Markup as UI::CheckboxBehavior renders it (classes and icons dropped).
 function checkbox({ id = "terms", label = "Accept terms", checked = false, indeterminate = false } = {}) {
@@ -87,3 +87,6 @@ describe("Checkbox", () => {
     expect(all).toHaveAttribute("data-state", "indeterminate")
   })
 })
+
+// Stop the Stimulus app after the last test so it doesn't leak into other files.
+afterAll(() => cleanup())

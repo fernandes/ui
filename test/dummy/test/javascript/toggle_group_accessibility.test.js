@@ -1,6 +1,6 @@
-import { describe, test, expect } from "bun:test"
+import { describe, test, expect, afterAll } from "bun:test"
 import { screen } from "@testing-library/dom"
-import { render } from "./support/render.js"
+import { render, cleanup } from "./support/render.js"
 
 // Markup as UI::ToggleGroupBehavior / UI::ToggleGroupItemBehavior render it
 // (classes dropped).
@@ -156,3 +156,6 @@ describe("Toggle Group keyboard", () => {
     expect(item("Underline")).toHaveFocus()
   })
 })
+
+// Stop the Stimulus app after the last test so it doesn't leak into other files.
+afterAll(() => cleanup())

@@ -1,6 +1,6 @@
-import { describe, test, expect } from "bun:test"
+import { describe, test, expect, afterAll } from "bun:test"
 import { screen } from "@testing-library/dom"
-import { render, settle } from "./support/render.js"
+import { render, settle, cleanup } from "./support/render.js"
 
 // Markup as UI::SwitchBehavior renders it (classes dropped).
 function switchHtml({ id = "airplane", checked = false, disabled = false, name = null, value = "1", label = "Airplane mode", extra = "" } = {}) {
@@ -100,3 +100,6 @@ describe("Switch", () => {
     expect(submitted(form)).toEqual({ wifi: "1" })
   })
 })
+
+// Stop the Stimulus app after the last test so it doesn't leak into other files.
+afterAll(() => cleanup())
