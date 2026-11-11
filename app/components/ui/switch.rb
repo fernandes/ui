@@ -29,9 +29,11 @@ class UI::Switch < Phlex::HTML
   # @param name [String] Name for form submission (creates hidden input)
   # @param id [String] ID attribute
   # @param value [String] Value for form submission when checked
+  # @param required [Boolean] Whether the switch is required (aria-required)
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(checked: false, disabled: false, classes: "", name: nil, id: nil, value: "1", **attributes)
+  def initialize(checked: false, disabled: false, classes: "", name: nil, id: nil, value: "1", required: false, **attributes)
     @checked = checked
+    @required = required
     @disabled = disabled
     @classes = classes
     @name = name
@@ -60,11 +62,6 @@ class UI::Switch < Phlex::HTML
   end
 
   def render_hidden_input
-    input(
-      type: "hidden",
-      name: @name,
-      value: @checked ? @value : "0",
-      id: @id
-    )
+    input(**switch_hidden_input_attributes)
   end
 end

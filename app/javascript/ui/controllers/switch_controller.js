@@ -11,6 +11,7 @@ import { syncCheckedState } from "../utils/state-manager.js"
 //
 // Values:
 //   checked - Boolean state of the switch
+//   value   - Value the hidden input submits when checked ("0" when unchecked)
 //
 // Actions:
 //   click->ui--switch#toggle - Toggle the switch state
@@ -25,11 +26,32 @@ import { syncCheckedState } from "../utils/state-manager.js"
 export default class extends Controller {
   static targets = ["thumb"]
   static values = {
-    checked: { type: Boolean, default: false }
+    checked: { type: Boolean, default: false },
+    value: { type: String, default: "1" }
+  }
+
+  constructor() {
+    super(...arguments)
   }
 
   connect() {
+    this.initialChecked = this.checkedValue
     this.updateState(this.checkedValue, false)
+
+    this.handleReset = this.handleReset.bind(this)
+    this.form = this.element.closest("form")
+    if (this.form) this.form.addEventListener("reset", this.handleReset)
+  }
+
+  disconnect() {
+    if (this.form) this.form.removeEventListener("reset", this.handleReset)
+    this.form = null
+  }
+
+  // A form reset doesn't touch a <button>; restore the rendered state ourselves,
+  // after the browser has reset the other controls.
+  handleReset() {
+    setTimeout(() => { this.checkedValue = this.initialChecked }, 0)
   }
 
   toggle(event) {
@@ -65,7 +87,7 @@ export default class extends Controller {
     // Update hidden input if it exists (for form submission)
     const hiddenInput = this.element.querySelector('input[type="hidden"]')
     if (hiddenInput) {
-      hiddenInput.value = isChecked ? "1" : "0"
+      hiddenInput.value = isChecked ? this.valueValue : "0"
     }
   }
 

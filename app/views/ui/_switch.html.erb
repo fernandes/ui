@@ -9,6 +9,7 @@
   # @param name [String] Name for form submission (creates hidden input)
   # @param id [String] ID attribute
   # @param value [String] Value when checked (default: "1")
+  # @param required [Boolean] Whether the switch is required (aria-required)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
 
@@ -17,6 +18,7 @@
   @name = local_assigns[:name]
   @id = local_assigns[:id]
   @value = local_assigns.fetch(:value, "1")
+  @required = local_assigns.fetch(:required, false)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
@@ -35,11 +37,6 @@
     class: switch_thumb_classes
   %>
   <% if @name.present? %>
-    <%= tag :input,
-      type: "hidden",
-      name: @name,
-      value: @checked ? @value : "0",
-      id: @id
-    %>
+    <%= tag :input, switch_hidden_input_attributes %>
   <% end %>
 <% end %>

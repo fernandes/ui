@@ -3,8 +3,9 @@
 class UI::SwitchComponent < ViewComponent::Base
   include UI::SwitchBehavior
 
-  def initialize(checked: false, disabled: false, name: nil, id: nil, value: "1", **attributes)
+  def initialize(checked: false, disabled: false, name: nil, id: nil, value: "1", required: false, **attributes)
     @checked = checked
+    @required = required
     @disabled = disabled
     @name = name
     @id = id
@@ -46,10 +47,6 @@ class UI::SwitchComponent < ViewComponent::Base
   def render_hidden_input
     return unless @name.present?
 
-    tag :input,
-      type: "hidden",
-      name: @name,
-      value: @checked ? @value : "0",
-      id: @id
+    tag :input, switch_hidden_input_attributes
   end
 end

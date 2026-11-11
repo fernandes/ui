@@ -25,6 +25,7 @@ A toggle control that allows the user to switch between checked and unchecked st
 | `name` | String | `nil` | Name for form submission (creates hidden input) |
 | `id` | String | `nil` | ID attribute |
 | `value` | String | `"1"` | Value for form submission when checked |
+| `required` | Boolean | `false` | Marks the switch `aria-required="true"` |
 | `**attributes` | Hash | `{}` | Additional HTML attributes |
 
 ## Examples
@@ -105,6 +106,9 @@ When the `name` parameter is provided, the component automatically creates a hid
 
 - **Checked**: hidden input value = `value` parameter (default: `"1"`)
 - **Unchecked**: hidden input value = `"0"`
+- The value is kept across toggles, and a form reset restores the rendered state
+- The hidden input has no `id` (the `id` is the button's, so `<label for>` points at it)
+- Pass `"aria-invalid": "true"` in the attributes to show the error state
 
 This ensures the switch state is properly submitted with forms, even when unchecked.
 

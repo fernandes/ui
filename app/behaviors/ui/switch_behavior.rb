@@ -19,6 +19,7 @@
 # @ui_aria_reference https://www.w3.org/WAI/ARIA/apg/patterns/switch/
 # @ui_aria_attr aria-checked
 # @ui_aria_attr aria-disabled
+# @ui_aria_attr aria-required
 # @ui_aria_attr role="switch"
 #
 # @ui_keyboard Enter Activates the focused element
@@ -44,7 +45,22 @@ module UI::SwitchBehavior
         attrs[:disabled] = true
         attrs["aria-disabled"] = "true"
       end
+      attrs["aria-required"] = "true" if @required
     end
+  end
+
+  # Attributes of the hidden input that carries the value to the form.
+  # It has no id: the id belongs to the button, so `<label for>` finds it.
+  def switch_hidden_input_attributes
+    {
+      type: "hidden",
+      name: @name,
+      value: @checked ? switch_on_value : "0"
+    }
+  end
+
+  def switch_on_value
+    @value.nil? ? "1" : @value.to_s
   end
 
   # Returns combined CSS classes for the switch
@@ -65,7 +81,7 @@ module UI::SwitchBehavior
 
   # Base classes applied to all switches
   def switch_base_classes
-    "peer data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+    "peer data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50"
   end
 
   # Returns the switch state (checked or unchecked)
@@ -83,6 +99,7 @@ module UI::SwitchBehavior
     {
       controller: "ui--switch",
       ui__switch_checked_value: @checked,
+      ui__switch_value_value: switch_on_value,
       action: "click->ui--switch#toggle keydown->ui--switch#handleKeydown"
     }
   end

@@ -1,180 +1,102 @@
-import { describe, test, expect, beforeEach, afterEach } from "bun:test"
-import { Application } from "@hotwired/stimulus"
-import SwitchController from "../../../../app/javascript/ui/controllers/switch_controller.js"
+import { describe, test, expect } from "bun:test"
+import { screen } from "@testing-library/dom"
+import { render, settle } from "./support/render.js"
 
-describe("SwitchController", () => {
-  let application
-  let container
+// Markup as UI::SwitchBehavior renders it (classes dropped).
+function switchHtml({ id = "airplane", checked = false, disabled = false, name = null, value = "1", label = "Airplane mode", extra = "" } = {}) {
+  const state = checked ? "checked" : "unchecked"
+  return `
+    <button role="switch" type="button" tabindex="${disabled ? -1 : 0}" aria-checked="${checked}"
+            data-state="${state}" data-slot="switch" id="${id}"
+            data-controller="ui--switch" data-ui--switch-checked-value="${checked}"
+            data-ui--switch-value-value="${value}"
+            data-action="click->ui--switch#toggle keydown->ui--switch#handleKeydown"
+            ${disabled ? 'disabled aria-disabled="true"' : ""} ${extra}>
+      <span data-ui--switch-target="thumb" data-slot="switch-thumb" data-state="${state}"></span>
+      ${name ? `<input type="hidden" name="${name}" value="${checked ? value : "0"}">` : ""}
+    </button>
+    <label for="${id}">${label}</label>
+  `
+}
 
-  beforeEach(() => {
-    application = Application.start()
-    application.register("ui--switch", SwitchController)
-    container = document.createElement("div")
-    document.body.appendChild(container)
+function submitted(form) {
+  return Object.fromEntries(new FormData(form).entries())
+}
+
+describe("Switch", () => {
+  test("click toggles aria-checked and data-state", async () => {
+    const { user } = await render(switchHtml())
+    const sw = screen.getByRole("switch", { name: "Airplane mode" })
+
+    expect(sw).not.toBeChecked()
+    await user.click(sw)
+    expect(sw).toBeChecked()
+    expect(sw).toHaveAttribute("data-state", "checked")
+
+    await user.click(screen.getByText("Airplane mode"))
+    expect(sw).not.toBeChecked()
+    expect(sw).toHaveAttribute("data-state", "unchecked")
   })
 
-  afterEach(() => {
-    application.stop()
-    document.body.innerHTML = ""
+  test("Space and Enter toggle exactly once", async () => {
+    const { user } = await render(switchHtml())
+    const sw = screen.getByRole("switch", { name: "Airplane mode" })
+
+    sw.focus()
+    await user.keyboard(" ")
+    expect(sw).toBeChecked()
+    await user.keyboard("{Enter}")
+    expect(sw).not.toBeChecked()
   })
 
-  function createSwitch(options = {}) {
-    const { checked = false, disabled = false } = options
+  test("a disabled switch does not toggle", async () => {
+    const { user } = await render(switchHtml({ disabled: true }))
+    const sw = screen.getByRole("switch", { name: "Airplane mode" })
 
-    return `
-      <button data-controller="ui--switch"
-              data-ui--switch-checked-value="${checked}"
-              ${disabled ? 'disabled' : ''}
-              data-action="click->ui--switch#toggle keydown->ui--switch#handleKeydown"
-              role="switch"
-              data-testid="switch">
-        <span data-ui--switch-target="thumb" data-testid="thumb"></span>
-        <input type="hidden" name="switch" value="${checked ? '1' : '0'}" />
-      </button>
-    `
-  }
-
-  describe("Initialization", () => {
-    test("connects with default values", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="switch"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--switch")
-
-      expect(controller).not.toBeNull()
-      expect(controller.checkedValue).toBe(false)
-    })
-
-    test("starts unchecked by default", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="switch"]')
-      expect(element.dataset.state).toBe("unchecked")
-      expect(element.getAttribute("aria-checked")).toBe("false")
-    })
-
-    test("starts checked when checked value is true", async () => {
-      container.innerHTML = createSwitch({ checked: true })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="switch"]')
-      expect(element.dataset.state).toBe("checked")
-      expect(element.getAttribute("aria-checked")).toBe("true")
-    })
+    await user.click(sw)
+    expect(sw).not.toBeChecked()
+    expect(sw).toBeDisabled()
   })
 
-  describe("Toggle", () => {
-    test("toggles state on click", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
+  test("dispatches a bubbling change event", async () => {
+    const { user } = await render(`<div id="host">${switchHtml()}</div>`)
+    let changes = 0
+    document.getElementById("host").addEventListener("change", () => changes++)
 
-      const element = container.querySelector('[data-testid="switch"]')
-      element.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(element.dataset.state).toBe("checked")
-      expect(element.getAttribute("aria-checked")).toBe("true")
-    })
-
-    test("toggles back on second click", async () => {
-      container.innerHTML = createSwitch({ checked: true })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="switch"]')
-      element.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(element.dataset.state).toBe("unchecked")
-      expect(element.getAttribute("aria-checked")).toBe("false")
-    })
-
-    test("does not toggle when disabled", async () => {
-      container.innerHTML = createSwitch({ disabled: true })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="switch"]')
-      element.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(element.dataset.state).toBe("unchecked")
-    })
+    await user.click(screen.getByRole("switch", { name: "Airplane mode" }))
+    expect(changes).toBe(1)
   })
 
-  describe("Keyboard support", () => {
-    test("toggles on Space key", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
+  test("keeps a custom value across toggles", async () => {
+    const { user } = await render(`<form>${switchHtml({ name: "plan", value: "pro", checked: true })}</form>`)
+    const form = document.querySelector("form")
+    const sw = screen.getByRole("switch", { name: "Airplane mode" })
 
-      const element = container.querySelector('[data-testid="switch"]')
-      const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true })
-      element.dispatchEvent(spaceEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(element.dataset.state).toBe("checked")
-    })
-
-    test("toggles on Enter key", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="switch"]')
-      const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      element.dispatchEvent(enterEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(element.dataset.state).toBe("checked")
-    })
+    expect(submitted(form)).toEqual({ plan: "pro" })
+    await user.click(sw)
+    expect(submitted(form)).toEqual({ plan: "0" })
+    await user.click(sw)
+    expect(submitted(form)).toEqual({ plan: "pro" })
   })
 
-  describe("Thumb target", () => {
-    test("updates thumb data-state", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
+  test("form reset restores the rendered state", async () => {
+    const { user } = await render(`
+      <form>
+        ${switchHtml({ name: "wifi", checked: true })}
+        <button type="reset">Reset</button>
+      </form>
+    `)
+    const form = document.querySelector("form")
+    const sw = screen.getByRole("switch", { name: "Airplane mode" })
 
-      const thumb = container.querySelector('[data-testid="thumb"]')
-      expect(thumb.dataset.state).toBe("unchecked")
+    await user.click(sw)
+    expect(sw).not.toBeChecked()
 
-      const element = container.querySelector('[data-testid="switch"]')
-      element.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
+    await user.click(screen.getByRole("button", { name: "Reset" }))
+    await settle(5)
 
-      expect(thumb.dataset.state).toBe("checked")
-    })
-  })
-
-  describe("Hidden input", () => {
-    test("updates hidden input value", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const hiddenInput = container.querySelector('input[type="hidden"]')
-      expect(hiddenInput.value).toBe("0")
-
-      const element = container.querySelector('[data-testid="switch"]')
-      element.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(hiddenInput.value).toBe("1")
-    })
-  })
-
-  describe("Events", () => {
-    test("dispatches change event on toggle", async () => {
-      container.innerHTML = createSwitch()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      let changeEventFired = false
-      const element = container.querySelector('[data-testid="switch"]')
-      element.addEventListener("change", () => {
-        changeEventFired = true
-      })
-
-      element.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(changeEventFired).toBe(true)
-    })
+    expect(sw).toBeChecked()
+    expect(sw).toHaveAttribute("data-state", "checked")
+    expect(submitted(form)).toEqual({ wifi: "1" })
   })
 })
