@@ -33,7 +33,7 @@ class UI::Slider < Phlex::HTML
   # @param disabled [Boolean] Whether the slider is disabled
   # @param orientation [String] Orientation (horizontal, vertical)
   # @param inverted [Boolean] Whether the slider is inverted
-  # @param name [String] Form field name
+  # @param name [String] Form field name (renders hidden inputs; a range submits as name[])
   # @param classes [String] Additional CSS classes
   # @param attributes [Hash] Additional HTML attributes
   def initialize(
@@ -74,7 +74,8 @@ class UI::Slider < Phlex::HTML
     all_attributes = all_attributes.merge(@attributes.except(:data))
 
     div(**all_attributes) do
-      yield if block_given?
+      with_slider_context { yield if block_given? }
+      slider_hidden_inputs.each { |input_attributes| input(**input_attributes) }
     end
   end
 end

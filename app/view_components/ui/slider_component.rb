@@ -30,7 +30,7 @@ class UI::SliderComponent < ViewComponent::Base
   # @param disabled [Boolean] whether slider is disabled
   # @param orientation [String] "horizontal" or "vertical" (default: "horizontal")
   # @param inverted [Boolean] whether to invert the slider direction
-  # @param name [String] form input name
+  # @param name [String] form input name (renders hidden inputs; a range submits as name[])
   # @param center_point [Integer, nil] center point for bidirectional sliders (e.g., 0 for balance)
   # @param classes [String] additional CSS classes
   # @param attributes [Hash] additional HTML attributes
@@ -55,7 +55,10 @@ class UI::SliderComponent < ViewComponent::Base
     attrs[:data] = attrs[:data].merge(@attributes.fetch(:data, {}))
 
     content_tag :div, **attrs.merge(@attributes.except(:data)) do
-      content
+      safe_join([
+        with_slider_context { content },
+        *slider_hidden_inputs.map { |input_attributes| tag.input(**input_attributes) }
+      ])
     end
   end
 end

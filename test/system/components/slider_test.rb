@@ -399,6 +399,34 @@ class SliderTest < UI::SystemTestCase
     assert slider.values[0] <= slider.values[1]
   end
 
+  test "a thumb stops at its neighbour instead of swapping" do
+    slider = find_element(UI::Testing::SliderElement, "#form-price-slider")
+
+    slider.focus_thumb(1)
+    page.send_keys(:home)
+
+    assert_equal [20, 20], slider.values
+    assert_equal 1, slider.focused_thumb_index
+    assert_equal "20", slider.thumb(1)["aria-valuenow"]
+  end
+
+  # === Accessible names and forms ===
+
+  test "range thumbs are announced as Minimum and Maximum" do
+    slider = find_element(UI::Testing::SliderElement, "#form-price-slider")
+
+    assert_equal %w[Minimum Maximum], slider.thumbs.map { |t| t["aria-label"] }
+  end
+
+  test "a named range submits name[] once per thumb and follows the keyboard" do
+    slider = find_element(UI::Testing::SliderElement, "#form-price-slider")
+
+    slider.focus_thumb(1)
+    page.send_keys(:end)
+
+    assert_equal %w[20 100], page.evaluate_script("new FormData(document.getElementById('slider-form')).getAll('price[]')")
+  end
+
   # === Sub-element Tests ===
 
   test "has track element" do

@@ -37,7 +37,7 @@ The slider component consists of 4 nested components:
 - `disabled:` - Boolean - Whether slider is disabled
 - `orientation:` - `"horizontal"` (default) or `"vertical"` - Slider orientation
 - `inverted:` - Boolean - Invert slider direction
-- `name:` - Form input name (for form submission)
+- `name:` - Form input name (for form submission). Renders one hidden input per value: `name` for a single thumb, `name[]` for a range (Rails array param)
 - `classes:` - Additional CSS classes
 - `attributes:` - Additional HTML attributes (Hash)
 
@@ -248,12 +248,15 @@ export default class extends Controller {
 
 ### All Orientations
 - **Tab** - Focus thumb
-- **ArrowRight/ArrowUp** - Increase value by step
+- **ArrowRight/ArrowUp** - Increase value by step (swapped with `inverted: true`: ArrowLeft/ArrowUp horizontally, ArrowDown/ArrowRight vertically)
 - **ArrowLeft/ArrowDown** - Decrease value by step
-- **PageUp** - Increase by 10% of range
-- **PageDown** - Decrease by 10% of range
-- **Home** - Set to minimum value
-- **End** - Set to maximum value
+- **Shift+Arrow** - Move by the large step
+- **PageUp** - Increase by the large step (10% of range, rounded down to a whole number of steps)
+- **PageDown** - Decrease by the large step
+- **Home** - Set to minimum value (or the previous thumb's value)
+- **End** - Set to maximum value (or the next thumb's value)
+
+In a range, a thumb stops at its neighbour instead of swapping with it.
 
 ## Mouse/Touch Interaction
 
@@ -369,6 +372,8 @@ For best UX, ensure `step` divides evenly into `max - min`:
 - Proper `aria-valuenow`, `aria-valuemin`, `aria-valuemax` attributes
 - Proper `aria-disabled` for disabled state
 - Proper `aria-orientation` for vertical sliders
+- ARIA values are rendered on the server, so they are right before JavaScript runs
+- **Accessible names**: two thumbs are "Minimum" and "Maximum", more are "Value n of m"; a single thumb takes the slider's `aria-labelledby` / `aria-label` (pass it in the slider's `attributes:`). An `aria-label` in a thumb's `attributes:` overrides the default
 - Keyboard navigation following WAI-ARIA Slider pattern
 - Focus visible ring on thumbs
 - Touch-friendly 16px×16px thumb size

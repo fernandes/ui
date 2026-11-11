@@ -52,6 +52,22 @@
       </div>
     </section>
 
+    <!-- ERB Partial - In a Form -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">ERB Partial - In a Form</h2>
+      <p class="text-sm text-muted-foreground">With <code>name</code>, a range submits <code>price[]</code> once per thumb.</p>
+      <form id="slider-form" class="max-w-md space-y-2">
+        <span id="form-price-label" class="text-sm font-medium">Price range</span>
+        <%= render "ui/slider", default_value: [20, 80], max: 100, name: "price", attributes: { id: "form-price-slider", "aria-labelledby": "form-price-label" } do %>
+          <%= render "ui/slider/track" do %>
+            <%= render "ui/slider/range" %>
+          <% end %>
+          <%= render "ui/slider/thumb" %>
+          <%= render "ui/slider/thumb" %>
+        <% end %>
+      </form>
+    </section>
+
     <!-- ViewComponent - Custom Step Increments -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">ViewComponent - Custom Step Increments</h2>

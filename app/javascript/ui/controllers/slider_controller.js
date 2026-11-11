@@ -2,8 +2,20 @@ import { Controller } from "@hotwired/stimulus"
 
 // Slider controller for range slider with draggable thumbs
 // Supports single or multiple thumbs, horizontal/vertical orientation
+//
+// Accessibility (Radix / React Aria / APG slider):
+// - Each thumb is role="slider" with aria-valuenow/min/max/orientation; the
+//   server renders them and this controller keeps them in sync.
+// - Thumbs without a name get Radix's defaults: "Minimum"/"Maximum" for two
+//   thumbs, "Value n of m" for more; a single thumb takes the slider's
+//   aria-labelledby / aria-label.
+// - Keys: Arrow keys move one step (Shift: a large step), PageUp/PageDown a
+//   large step (10% of the range, snapped to the step), Home/End go to min/max.
+//   `inverted` flips the arrow keys. A thumb stops at its neighbours instead of
+//   swapping with them, so the focused thumb always shows its own value.
+// - Form: one hidden input per value (`name`, or `name[]` for a range).
 export default class extends Controller {
-  static targets = ["track", "range", "thumb"]
+  static targets = ["track", "range", "thumb", "input"]
   static values = {
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
@@ -14,6 +26,14 @@ export default class extends Controller {
     inverted: { type: Boolean, default: false },
     name: { type: String, default: "" },
     centerPoint: { type: Number, default: null }
+  }
+
+  constructor() {
+    super(...arguments)
+    // Bound once, so removeEventListener removes the same function (X8).
+    this.handleKeyDown = this.handleKeyDown.bind(this)
+    this.handleMove = this.handleMove.bind(this)
+    this.endDrag = this.endDrag.bind(this)
   }
 
   connect() {
@@ -29,19 +49,20 @@ export default class extends Controller {
       this.rangeTarget.setAttribute("data-orientation", orientation)
     }
 
-    // Initialize thumb positions
+    this.syncInputs()
     this.updateUI()
-
-    // Add keyboard support to thumbs
-    this.thumbTargets.forEach((thumb, index) => {
-      thumb.addEventListener("keydown", this.handleKeyDown.bind(this, index))
-    })
   }
 
   disconnect() {
-    this.thumbTargets.forEach((thumb, index) => {
-      thumb.removeEventListener("keydown", this.handleKeyDown.bind(this, index))
-    })
+    this.stopDragListeners()
+  }
+
+  thumbTargetConnected(thumb) {
+    thumb.addEventListener("keydown", this.handleKeyDown)
+  }
+
+  thumbTargetDisconnected(thumb) {
+    thumb.removeEventListener("keydown", this.handleKeyDown)
   }
 
   // Start dragging when pointer down on thumb
@@ -54,13 +75,13 @@ export default class extends Controller {
     const thumbIndex = this.thumbTargets.indexOf(event.currentTarget)
     this.currentThumbIndex = thumbIndex
     this.isDragging = true
+    event.currentTarget.focus?.()
 
     // Capture pointer for smooth dragging
-    event.currentTarget.setPointerCapture(event.pointerId)
+    event.currentTarget.setPointerCapture?.(event.pointerId)
 
-    // Add move and up listeners
-    document.addEventListener("pointermove", this.handleMove.bind(this))
-    document.addEventListener("pointerup", this.endDrag.bind(this))
+    document.addEventListener("pointermove", this.handleMove)
+    document.addEventListener("pointerup", this.endDrag)
   }
 
   // Handle pointer move during drag
@@ -68,33 +89,23 @@ export default class extends Controller {
     if (!this.isDragging || this.currentThumbIndex === -1) return
 
     event.preventDefault()
-
-    // Calculate new value based on pointer position
-    const newValue = this.getValueFromPointer(event)
-
-    // Update the value array
-    const newValues = [...this.valueValue]
-    newValues[this.currentThumbIndex] = newValue
-
-    // Sort values to prevent thumbs from crossing
-    newValues.sort((a, b) => a - b)
-
-    this.valueValue = newValues
-    this.updateUI()
-    this.dispatchChangeEvent()
+    this.setThumbValue(this.currentThumbIndex, this.getValueFromPointer(event), { commit: false })
   }
 
   // End dragging
-  endDrag(event) {
+  endDrag() {
     if (!this.isDragging) return
 
     this.isDragging = false
     this.currentThumbIndex = -1
-
-    document.removeEventListener("pointermove", this.handleMove.bind(this))
-    document.removeEventListener("pointerup", this.endDrag.bind(this))
+    this.stopDragListeners()
 
     this.dispatchCommitEvent()
+  }
+
+  stopDragListeners() {
+    document.removeEventListener("pointermove", this.handleMove)
+    document.removeEventListener("pointerup", this.endDrag)
   }
 
   // Click on track to jump to position
@@ -106,19 +117,11 @@ export default class extends Controller {
 
     event.preventDefault()
 
-    // Find closest thumb to clicked position
+    // Move the closest thumb to the clicked position
     const clickValue = this.getValueFromPointer(event)
     const closestIndex = this.getClosestThumbIndex(clickValue)
-
-    // Update value
-    const newValues = [...this.valueValue]
-    newValues[closestIndex] = clickValue
-    newValues.sort((a, b) => a - b)
-
-    this.valueValue = newValues
-    this.updateUI()
-    this.dispatchChangeEvent()
-    this.dispatchCommitEvent()
+    this.setThumbValue(closestIndex, clickValue)
+    this.thumbTargets[closestIndex]?.focus()
   }
 
   // Get value from pointer position
@@ -141,14 +144,7 @@ export default class extends Controller {
     // Clamp percentage to 0-1
     percentage = Math.max(0, Math.min(1, percentage))
 
-    // Convert to value
-    const rawValue = this.minValue + percentage * (this.maxValue - this.minValue)
-
-    // Snap to step
-    const steppedValue = Math.round((rawValue - this.minValue) / this.stepValue) * this.stepValue + this.minValue
-
-    // Clamp to min/max
-    return Math.max(this.minValue, Math.min(this.maxValue, steppedValue))
+    return this.snap(this.minValue + percentage * (this.maxValue - this.minValue))
   }
 
   // Find closest thumb to a value
@@ -158,7 +154,8 @@ export default class extends Controller {
 
     for (let i = 1; i < this.valueValue.length; i++) {
       const distance = Math.abs(this.valueValue[i] - value)
-      if (distance < closestDistance) {
+      // On a tie (stacked thumbs), move the upper one when clicking above it
+      if (distance < closestDistance || (distance === closestDistance && value > this.valueValue[i])) {
         closestDistance = distance
         closestIndex = i
       }
@@ -168,60 +165,154 @@ export default class extends Controller {
   }
 
   // Keyboard navigation
-  handleKeyDown(thumbIndex, event) {
-    if (this.disabledValue) return
+  handleKeyDown(event) {
+    const thumbIndex = this.thumbTargets.indexOf(event.currentTarget)
+    if (thumbIndex === -1 || this.disabledValue) return
 
-    let newValue = this.valueValue[thumbIndex]
-    const largeStep = (this.maxValue - this.minValue) / 10
+    const current = this.valueValue[thumbIndex] ?? this.minValue
+    const largeStep = this.largeStep()
+    const arrowStep = event.shiftKey ? largeStep : this.stepValue
+    let newValue
 
     switch (event.key) {
       case "ArrowRight":
-      case "ArrowUp":
-        newValue += this.stepValue
-        event.preventDefault()
-        break
       case "ArrowLeft":
+      case "ArrowUp":
       case "ArrowDown":
-        newValue -= this.stepValue
-        event.preventDefault()
+        newValue = current + (this.isIncreaseKey(event.key) ? arrowStep : -arrowStep)
         break
       case "PageUp":
-        newValue += largeStep
-        event.preventDefault()
+        newValue = current + largeStep
         break
       case "PageDown":
-        newValue -= largeStep
-        event.preventDefault()
+        newValue = current - largeStep
         break
       case "Home":
         newValue = this.minValue
-        event.preventDefault()
         break
       case "End":
         newValue = this.maxValue
-        event.preventDefault()
         break
       default:
         return
     }
 
-    // Clamp value
-    newValue = Math.max(this.minValue, Math.min(this.maxValue, newValue))
+    event.preventDefault()
+    this.setThumbValue(thumbIndex, newValue)
+  }
 
-    // Update value array
-    const newValues = [...this.valueValue]
-    newValues[thumbIndex] = newValue
-    newValues.sort((a, b) => a - b)
+  // Which arrow keys increase the value. Radix: horizontal increases to the
+  // right, vertical upwards; `inverted` flips both axes.
+  isIncreaseKey(key) {
+    const horizontal = this.orientationValue !== "vertical"
+    let increases = horizontal
+      ? (key === "ArrowRight" || key === "ArrowUp")
+      : (key === "ArrowUp" || key === "ArrowRight")
+    if (this.invertedValue) {
+      increases = horizontal
+        ? (key === "ArrowLeft" || key === "ArrowUp")
+        : (key === "ArrowDown" || key === "ArrowRight")
+    }
+    return increases
+  }
 
-    this.valueValue = newValues
-    this.updateUI()
+  // 10% of the range, as a whole number of steps (at least one step).
+  largeStep() {
+    const steps = Math.max(1, Math.floor((this.maxValue - this.minValue) / 10 / this.stepValue))
+    return steps * this.stepValue
+  }
+
+  // Snap to the step grid, clamp to min/max, and drop float noise.
+  snap(value) {
+    const stepped = Math.round((value - this.minValue) / this.stepValue) * this.stepValue + this.minValue
+    const clamped = Math.max(this.minValue, Math.min(this.maxValue, stepped))
+    return this.roundToStepPrecision(clamped)
+  }
+
+  roundToStepPrecision(value) {
+    const decimals = Math.max(this.decimalCount(this.stepValue), this.decimalCount(this.minValue))
+    return Number(value.toFixed(decimals))
+  }
+
+  decimalCount(number) {
+    return (String(number).split(".")[1] || "").length
+  }
+
+  // Moves one thumb, clamped between its neighbours (React Aria), so thumbs
+  // never swap and the focused thumb keeps its own value.
+  setThumbValue(index, value, { commit = true } = {}) {
+    const values = [...this.valueValue]
+    const lower = index > 0 ? values[index - 1] : this.minValue
+    const upper = index < values.length - 1 ? values[index + 1] : this.maxValue
+    const next = Math.max(lower, Math.min(upper, this.snap(value)))
+    if (next === values[index]) return
+
+    values[index] = next
+    this.valueValue = values
     this.dispatchChangeEvent()
-    this.dispatchCommitEvent()
+    if (commit) this.dispatchCommitEvent()
+  }
+
+  // Hidden inputs that submit the value with the form (created if the
+  // markup didn't render them).
+  syncInputs() {
+    if (!this.nameValue) return
+
+    const values = this.valueValue
+    const inputName = values.length > 1 ? `${this.nameValue}[]` : this.nameValue
+    const inputs = this.inputTargets
+
+    while (inputs.length < values.length) {
+      const input = document.createElement("input")
+      input.type = "hidden"
+      input.setAttribute("data-ui--slider-target", "input")
+      this.element.appendChild(input)
+      inputs.push(input)
+    }
+
+    inputs.forEach((input, index) => {
+      if (index >= values.length) {
+        input.remove()
+        return
+      }
+      input.name = inputName
+      input.value = String(values[index])
+      input.disabled = this.disabledValue
+    })
+  }
+
+  // Radix defaults for thumbs that have no name of their own.
+  labelThumbs() {
+    const total = this.thumbTargets.length
+    this.thumbTargets.forEach((thumb, index) => {
+      const generated = thumb.dataset.uiSliderGeneratedLabel === "true"
+      if (!generated && (thumb.hasAttribute("aria-label") || thumb.hasAttribute("aria-labelledby"))) return
+
+      let label = null
+      if (total > 2) label = `Value ${index + 1} of ${total}`
+      else if (total === 2) label = ["Minimum", "Maximum"][index]
+
+      thumb.removeAttribute("aria-label")
+      thumb.removeAttribute("aria-labelledby")
+      if (label) {
+        thumb.setAttribute("aria-label", label)
+      } else if (this.element.hasAttribute("aria-labelledby")) {
+        thumb.setAttribute("aria-labelledby", this.element.getAttribute("aria-labelledby"))
+      } else if (this.element.hasAttribute("aria-label")) {
+        thumb.setAttribute("aria-label", this.element.getAttribute("aria-label"))
+      } else {
+        delete thumb.dataset.uiSliderGeneratedLabel
+        return
+      }
+      thumb.dataset.uiSliderGeneratedLabel = "true"
+    })
   }
 
   // Update UI based on current values
   updateUI() {
     if (!this.hasTrackTarget) return
+
+    const range = this.maxValue - this.minValue || 1
 
     // Update range visual
     if (this.hasRangeTarget) {
@@ -252,8 +343,11 @@ export default class extends Controller {
         endValue = Math.max(...this.valueValue)
       }
 
-      const startPercent = ((startValue - this.minValue) / (this.maxValue - this.minValue)) * 100
-      const endPercent = ((endValue - this.minValue) / (this.maxValue - this.minValue)) * 100
+      let startPercent = ((startValue - this.minValue) / range) * 100
+      let endPercent = ((endValue - this.minValue) / range) * 100
+      if (this.invertedValue) {
+        [startPercent, endPercent] = [100 - endPercent, 100 - startPercent]
+      }
 
       if (this.orientationValue === "horizontal") {
         this.rangeTarget.style.left = `${startPercent}%`
@@ -271,7 +365,8 @@ export default class extends Controller {
     // Update thumb positions
     this.thumbTargets.forEach((thumb, index) => {
       const value = this.valueValue[index] ?? this.minValue
-      const percent = ((value - this.minValue) / (this.maxValue - this.minValue)) * 100
+      let percent = ((value - this.minValue) / range) * 100
+      if (this.invertedValue) percent = 100 - percent
 
       if (this.orientationValue === "horizontal") {
         thumb.style.left = `${percent}%`
@@ -291,10 +386,14 @@ export default class extends Controller {
 
       if (this.disabledValue) {
         thumb.setAttribute("aria-disabled", "true")
+        thumb.setAttribute("tabindex", "-1")
       } else {
         thumb.removeAttribute("aria-disabled")
+        thumb.setAttribute("tabindex", "0")
       }
     })
+
+    this.labelThumbs()
   }
 
   // Dispatch change event
@@ -315,6 +414,7 @@ export default class extends Controller {
 
   // Watch for value changes
   valueValueChanged() {
+    this.syncInputs()
     this.updateUI()
   }
 
@@ -325,6 +425,7 @@ export default class extends Controller {
     } else {
       this.element.removeAttribute("data-disabled")
     }
+    this.syncInputs()
     this.updateUI()
   }
 

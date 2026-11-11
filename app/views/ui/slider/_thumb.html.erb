@@ -7,8 +7,12 @@
   # Extend behavior for shared logic
   extend UI::SliderThumbBehavior
 
+  # Partials share the view's ivars: drop the previous thumb's memoized ARIA.
+  @slider_thumb_aria_attributes = nil
+
   # Get HTML attributes from behavior
-  all_attributes = slider_thumb_html_attributes.deep_merge(@attributes.except(:data))
-  all_attributes[:data] = slider_thumb_html_attributes[:data].merge(@attributes.fetch(:data, {}))
+  thumb_attributes = slider_thumb_html_attributes
+  all_attributes = thumb_attributes.deep_merge(@attributes.except(:data))
+  all_attributes[:data] = thumb_attributes[:data].merge(@attributes.fetch(:data, {}))
 -%>
 <%= content_tag :div, "", all_attributes %>

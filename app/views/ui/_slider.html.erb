@@ -11,7 +11,7 @@
   @disabled = local_assigns.fetch(:disabled, false)
   @orientation = local_assigns.fetch(:orientation, "horizontal")
   @inverted = local_assigns.fetch(:inverted, false)
-  @name = local_assigns.fetch(:name, "")
+  @name = local_assigns.fetch(:name, "") # renders hidden inputs; a range submits as name[]
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
@@ -21,7 +21,13 @@
   # Get HTML attributes from behavior
   all_attributes = slider_html_attributes.deep_merge(@attributes.except(:data))
   all_attributes[:data] = slider_html_attributes[:data].merge(@attributes.fetch(:data, {}))
+
+  # Computed before the children render: their partials reuse @disabled and @attributes.
+  hidden_inputs = slider_hidden_inputs
 -%>
 <%= content_tag :div, all_attributes do %>
-  <%= content || yield %>
+  <%= with_slider_context { content || yield } %>
+  <% hidden_inputs.each do |input_attributes| %>
+    <%= tag.input(**input_attributes) %>
+  <% end %>
 <% end %>
