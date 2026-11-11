@@ -43,6 +43,7 @@ An interactive component which expands/collapses a panel.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `as_child` | Boolean | `false` | Yield attributes to child instead of rendering button |
+| `open` | Boolean | `false` | Pass the root's `open` so the server renders `aria-expanded` right (ERB does this automatically) |
 | `classes` | String | `""` | Additional CSS classes |
 | `**attributes` | Hash | `{}` | Additional HTML attributes |
 
@@ -51,6 +52,7 @@ An interactive component which expands/collapses a panel.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `force_mount` | Boolean | `false` | Always render in DOM even when closed |
+| `open` | Boolean | `false` | Pass the root's `open` so the content is rendered open (ERB does this automatically) |
 | `classes` | String | `""` | Additional CSS classes |
 | `**attributes` | Hash | `{}` | Additional HTML attributes |
 
@@ -151,3 +153,9 @@ With ViewComponent, the Trigger doesn't support `as_child` pattern directly. Ins
   <!-- content -->
 <% end %>
 ```
+
+## Accessibility
+
+- The trigger renders `aria-expanded`; the controller gives the content a per-instance id and points the trigger's `aria-controls` at it (an `id` you pass is kept).
+- `disabled: true` on the root disables the trigger (`aria-disabled` for a non-button `as_child` trigger) and adds `data-disabled` to every part.
+- Closed content always gets `hidden`, so it is not tabbable, even when no transition runs.

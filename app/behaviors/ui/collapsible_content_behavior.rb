@@ -6,12 +6,14 @@ require "tailwind_merge"
 #
 # Shared behavior for CollapsibleContent component across ERB, ViewComponent, and Phlex implementations.
 module UI::CollapsibleContentBehavior
+  # Id and the trigger's aria-controls are wired by the collapsible
+  # controller on connect (an id passed by the caller is kept).
   def collapsible_content_html_attributes
     attrs = {
       class: collapsible_content_classes,
       data: collapsible_content_data_attributes
     }
-    attrs[:hidden] = true unless @force_mount
+    attrs[:hidden] = true unless @force_mount || @open
     attrs
   end
 
@@ -26,7 +28,7 @@ module UI::CollapsibleContentBehavior
   def collapsible_content_data_attributes
     {
       slot: "collapsible-content",
-      state: "closed",
+      state: @open ? "open" : "closed",
       ui__collapsible_target: "content"
     }
   end

@@ -27,6 +27,51 @@ class CollapsibleTest < UI::SystemTestCase
     find_element(UI::Testing::CollapsibleElement, "#card-collapsible")
   end
 
+  def disabled_collapsible
+    find_element(UI::Testing::CollapsibleElement, "#disabled-collapsible")
+  end
+
+  # === Accessibility ===
+
+  test "every trigger controls its content by a unique id" do
+    result = page.evaluate_script(<<~JS)
+      (() => {
+        const triggers = Array.from(document.querySelectorAll("[data-ui--collapsible-target='trigger']"))
+        const ids = triggers.map(t => t.getAttribute("aria-controls"))
+        return {
+          count: triggers.length,
+          dangling: triggers.filter(t => {
+            const content = document.getElementById(t.getAttribute("aria-controls"))
+            return !content || content.getAttribute("data-ui--collapsible-target") !== "content"
+          }).length,
+          duplicates: ids.filter(id => document.querySelectorAll(`[id="${id}"]`).length !== 1).length
+        }
+      })()
+    JS
+
+    assert_operator result["count"], :>, 3
+    assert_equal 0, result["dangling"]
+    assert_equal 0, result["duplicates"]
+  end
+
+  test "a disabled collapsible has a disabled trigger" do
+    collapsible = disabled_collapsible
+
+    assert collapsible.trigger.disabled?
+    assert collapsible.collapsed?
+  end
+
+  test "collapsed content is hidden even when no transition runs" do
+    page.execute_script("const s = document.createElement('style'); s.textContent = '* { transition: none !important }'; document.head.appendChild(s)")
+    collapsible = basic_collapsible
+
+    collapsible.expand
+    collapsible.collapse
+    sleep 0.5
+
+    refute collapsible.content_visible?, "collapsed content must get the hidden attribute"
+  end
+
   # === Basic Interaction Tests ===
 
   test "expands when trigger is clicked" do

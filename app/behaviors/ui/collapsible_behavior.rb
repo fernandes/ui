@@ -40,13 +40,15 @@ module UI::CollapsibleBehavior
   end
 
   def collapsible_data_attributes
-    {
+    data = {
       controller: "ui--collapsible",
       slot: "collapsible",
       state: @open ? "open" : "closed",
       ui__collapsible_open_value: @open.to_s,
       ui__collapsible_disabled_value: @disabled.to_s
     }
+    data[:disabled] = "" if @disabled
+    data
   end
 
   private

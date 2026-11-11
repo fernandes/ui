@@ -89,6 +89,23 @@
       <% end %>
     </section>
 
+    <!-- Disabled -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-semibold">Disabled</h2>
+      <%= render "ui/collapsible", disabled: true, attributes: { id: "disabled-collapsible" }, classes: "w-[350px] space-y-2" do %>
+        <div class="flex items-center justify-between space-x-4 px-4">
+          <h4 class="text-sm font-semibold">Locked section</h4>
+          <%= render "ui/collapsible/trigger" do %>
+            <%= lucide_icon("chevrons-up-down", class: "h-4 w-4") %>
+            <span class="sr-only">Toggle</span>
+          <% end %>
+        </div>
+        <%= render "ui/collapsible/content", classes: "space-y-2" do %>
+          <div class="rounded-md border px-4 py-3 font-mono text-sm">Hidden while disabled</div>
+        <% end %>
+      <% end %>
+    </section>
+
     <!-- Initially Open -->
     <section class="space-y-4">
       <h2 class="text-2xl font-semibold">Initially Open</h2>

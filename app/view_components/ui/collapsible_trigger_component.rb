@@ -3,8 +3,9 @@
 class UI::CollapsibleTriggerComponent < ViewComponent::Base
   include UI::CollapsibleTriggerBehavior
 
-  def initialize(as_child: false, classes: "", **attributes)
+  def initialize(as_child: false, open: false, classes: "", **attributes)
     @as_child = as_child
+    @open = open
     @classes = classes
     @attributes = attributes
   end

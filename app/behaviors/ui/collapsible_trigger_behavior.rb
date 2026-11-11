@@ -22,10 +22,14 @@ module UI::CollapsibleTriggerBehavior
     "transition-colors"
   ].join(" ")
 
+  # aria-expanded is rendered so the markup is right before JS runs;
+  # aria-controls is wired by the collapsible controller on connect.
   def collapsible_trigger_html_attributes
     attrs = {
+      "aria-expanded": (@open ? "true" : "false"),
       data: collapsible_trigger_data_attributes
     }
+    attrs[:disabled] = true if @disabled
     trigger_classes = collapsible_trigger_classes
     attrs[:class] = trigger_classes unless trigger_classes.blank?
     attrs
@@ -46,10 +50,12 @@ module UI::CollapsibleTriggerBehavior
   end
 
   def collapsible_trigger_data_attributes
-    {
+    data = {
       slot: "collapsible-trigger",
       ui__collapsible_target: "trigger",
       action: "click->ui--collapsible#toggle"
     }
+    data[:disabled] = "" if @disabled
+    data
   end
 end

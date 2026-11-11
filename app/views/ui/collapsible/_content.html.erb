@@ -11,6 +11,7 @@
   @force_mount = local_assigns.fetch(:force_mount, false)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
+  @open = local_assigns.fetch(:open, @_collapsible_open || false)
 
   extend UI::CollapsibleContentBehavior
   all_attributes = collapsible_content_html_attributes.deep_merge(@attributes)

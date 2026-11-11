@@ -15,6 +15,10 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
+  # Context for the trigger and content partials
+  @_collapsible_open = @open
+  @_collapsible_disabled = @disabled
+
   extend UI::CollapsibleBehavior
   all_attributes = collapsible_html_attributes.deep_merge(@attributes)
 %>

@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { syncExpandedState } from "../utils/state-manager.js"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
 
 // Collapsible controller for expandable/collapsible content sections
 export default class extends Controller {
@@ -10,7 +11,39 @@ export default class extends Controller {
   }
 
   connect() {
+    if (this.hasTriggerTarget && this.hasContentTarget) {
+      ensureId(this.contentTarget, "collapsible-content")
+      setIdRefs(this.triggerTarget, "aria-controls", this.contentTarget)
+    }
+    this.syncDisabled()
     this.updateState(this.openValue, false)
+  }
+
+  disabledValueChanged() {
+    this.syncDisabled()
+  }
+
+  // Radix: a disabled collapsible disables its trigger and marks every
+  // part with data-disabled. A non-button trigger (as_child) gets
+  // aria-disabled instead.
+  syncDisabled() {
+    const disabled = this.disabledValue
+    const parts = [this.element]
+    if (this.hasContentTarget) parts.push(this.contentTarget)
+
+    if (this.hasTriggerTarget) {
+      const trigger = this.triggerTarget
+      parts.push(trigger)
+      if (trigger instanceof HTMLButtonElement) {
+        trigger.disabled = disabled
+      } else if (disabled) {
+        trigger.setAttribute("aria-disabled", "true")
+      } else {
+        trigger.removeAttribute("aria-disabled")
+      }
+    }
+
+    parts.forEach((el) => el.toggleAttribute("data-disabled", disabled))
   }
 
   toggle(event) {
@@ -50,18 +83,27 @@ export default class extends Controller {
         content.style.height = `${content.scrollHeight}px`
       } else {
         // Closing: animate to 0, then add hidden after transition
-        if (animate) {
-          content.style.height = "0px"
-          content.addEventListener("transitionend", () => {
-            if (content.dataset.state === "closed") {
-              content.setAttribute("hidden", "")
-            }
-          }, { once: true })
+        const hideIfClosed = () => {
+          if (content.dataset.state === "closed") {
+            content.setAttribute("hidden", "")
+          }
+        }
+
+        content.style.height = "0px"
+        // Without a running transition transitionend never fires and the
+        // content would stay tabbable (X10)
+        if (animate && this.isAnimating(content)) {
+          content.addEventListener("transitionend", hideIfClosed, { once: true })
+          content.addEventListener("transitioncancel", hideIfClosed, { once: true })
         } else {
-          content.style.height = "0px"
           content.setAttribute("hidden", "")
         }
       }
     }
+  }
+
+  isAnimating(element) {
+    if (typeof element.getAnimations !== "function") return true
+    return element.getAnimations().length > 0
   }
 }

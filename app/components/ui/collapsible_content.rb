@@ -3,8 +3,9 @@
 class UI::CollapsibleContent < Phlex::HTML
   include UI::CollapsibleContentBehavior
 
-  def initialize(force_mount: false, classes: "", **attributes)
+  def initialize(force_mount: false, open: false, classes: "", **attributes)
     @force_mount = force_mount
+    @open = open
     @classes = classes
     @attributes = attributes
   end
