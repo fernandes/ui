@@ -363,8 +363,9 @@ class TabsTest < UI::SystemTestCase
 
     account_aria = tabs.tab_aria_attributes("Account")
 
-    # Should have aria-controls attribute
+    # aria-controls must resolve to the Account panel
     assert account_aria[:controls].present?
+    assert_equal tabs.panel_aria_attributes("account")[:id], account_aria[:controls]
   end
 
   test "panel has correct ARIA role" do
@@ -380,8 +381,9 @@ class TabsTest < UI::SystemTestCase
 
     panel_aria = tabs.panel_aria_attributes("account")
 
-    # Should have aria-labelledby attribute
+    # aria-labelledby must resolve to the Account tab
     assert panel_aria[:labelledby].present?
+    assert_equal tabs.tab_aria_attributes("Account")[:id], panel_aria[:labelledby]
   end
 
   test "disabled tab has disabled attribute" do

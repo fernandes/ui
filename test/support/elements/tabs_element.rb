@@ -226,6 +226,7 @@ module UI
       def tab_aria_attributes(text)
         tab = find_tab_by_text(text)
         {
+          id: tab["id"],
           role: tab["role"],
           selected: tab["aria-selected"],
           controls: tab["aria-controls"],
@@ -241,6 +242,7 @@ module UI
       def panel_aria_attributes(value)
         panel = find_panel_by_value(value)
         {
+          id: panel["id"],
           role: panel["role"],
           labelledby: panel["aria-labelledby"]
         }

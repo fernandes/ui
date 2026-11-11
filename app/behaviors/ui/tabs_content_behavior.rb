@@ -12,7 +12,10 @@ module UI::TabsContentBehavior
     end
   end
 
-  # Build complete HTML attributes hash for content
+  # Build complete HTML attributes hash for content.
+  # No id / aria-labelledby here: the tabs controller generates per-instance
+  # ids on connect and links the panel to its tab (an id passed in
+  # attributes is kept).
   def content_html_attributes
     base_attrs = @attributes&.except(:data) || {}
     user_data = @attributes&.fetch(:data, {}) || {}
@@ -24,9 +27,7 @@ module UI::TabsContentBehavior
 
     base_attrs.merge(
       class: "flex-1 outline-none #{@classes}".strip,
-      id: "tabs-content-#{@value}",
       role: "tabpanel",
-      "aria-labelledby": "tabs-trigger-#{@value}",
       "data-state": content_state,
       "data-orientation": @orientation || "horizontal",
       "data-slot": "tabs-content",

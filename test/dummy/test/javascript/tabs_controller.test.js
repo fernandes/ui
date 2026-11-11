@@ -35,7 +35,7 @@ describe("TabsController", () => {
           <button role="tab"
                   data-ui--tabs-target="trigger"
                   data-value="tab1"
-                  data-action="click->ui--tabs#selectTab"
+                  data-action="click->ui--tabs#selectTab keydown->ui--tabs#handleKeyDown"
                   aria-selected="false"
                   data-testid="trigger-tab1">
             Tab 1
@@ -43,7 +43,7 @@ describe("TabsController", () => {
           <button role="tab"
                   data-ui--tabs-target="trigger"
                   data-value="tab2"
-                  data-action="click->ui--tabs#selectTab"
+                  data-action="click->ui--tabs#selectTab keydown->ui--tabs#handleKeyDown"
                   aria-selected="false"
                   data-testid="trigger-tab2">
             Tab 2
@@ -51,7 +51,7 @@ describe("TabsController", () => {
           <button role="tab"
                   data-ui--tabs-target="trigger"
                   data-value="tab3"
-                  data-action="click->ui--tabs#selectTab"
+                  data-action="click->ui--tabs#selectTab keydown->ui--tabs#handleKeyDown"
                   aria-selected="false"
                   data-testid="trigger-tab3">
             Tab 3

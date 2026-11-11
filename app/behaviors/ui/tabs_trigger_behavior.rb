@@ -12,7 +12,8 @@ module UI::TabsTriggerBehavior
     end
   end
 
-  # Build complete HTML attributes hash for trigger
+  # Build complete HTML attributes hash for trigger.
+  # aria-controls and the trigger id are wired by the tabs controller.
   def trigger_html_attributes
     base_attrs = @attributes&.except(:data) || {}
     user_data = @attributes&.fetch(:data, {}) || {}
@@ -20,8 +21,10 @@ module UI::TabsTriggerBehavior
     trigger_data = {
       ui__tabs_target: "trigger",
       value: @value,
-      action: "click->ui--tabs#selectTab"
-    }.merge(user_data)
+      action: "click->ui--tabs#selectTab keydown->ui--tabs#handleKeyDown"
+    }
+    trigger_data[:disabled] = "" if @disabled
+    trigger_data = trigger_data.merge(user_data)
 
     base_attrs.merge(
       class: [
@@ -35,7 +38,6 @@ module UI::TabsTriggerBehavior
       type: "button",
       role: "tab",
       "aria-selected": (trigger_state == "active") ? "true" : "false",
-      "aria-controls": "tabs-content-#{@value}",
       "data-state": trigger_state,
       "data-orientation": @orientation || "horizontal",
       "data-slot": "tabs-trigger",

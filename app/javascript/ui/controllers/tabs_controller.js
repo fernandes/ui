@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { setState } from "../utils/state-manager.js"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
 
 // Tabs controller for tabbed interface with keyboard navigation
 export default class extends Controller {
@@ -11,8 +12,22 @@ export default class extends Controller {
   }
 
   connect() {
+    this.wireIds()
     this.setupTabs()
-    this.setupKeyboardNavigation()
+  }
+
+  // Per-instance ids (X1): each tab controls its panel, each panel is
+  // labelled by its tab. Ids the author rendered are kept.
+  wireIds() {
+    this.triggerTargets.forEach((trigger) => {
+      const content = this.contentTargets.find((c) => c.dataset.value === trigger.dataset.value)
+      if (!content) return
+
+      ensureId(trigger, "tabs-trigger")
+      ensureId(content, "tabs-content")
+      setIdRefs(trigger, "aria-controls", content)
+      setIdRefs(content, "aria-labelledby", trigger)
+    })
   }
 
   setupTabs() {
@@ -25,8 +40,16 @@ export default class extends Controller {
 
       if (isActive) {
         this.activateTrigger(trigger)
+      } else {
+        this.deactivateTrigger(trigger)
       }
     })
+
+    // Keep the tablist reachable with Tab when no tab is active
+    if (!this.triggerTargets.some((t) => t.getAttribute("tabindex") === "0")) {
+      const first = this.enabledTriggers()[0]
+      if (first) first.setAttribute("tabindex", "0")
+    }
 
     this.contentTargets.forEach((content) => {
       const value = content.dataset.value
@@ -40,14 +63,17 @@ export default class extends Controller {
     })
   }
 
-  setupKeyboardNavigation() {
-    this.triggerTargets.forEach((trigger) => {
-      trigger.addEventListener("keydown", this.handleKeyDown.bind(this))
-    })
+  enabledTriggers() {
+    return this.triggerTargets.filter((t) => !this.isDisabled(t))
+  }
+
+  isDisabled(trigger) {
+    return trigger.disabled || trigger.hasAttribute("data-disabled") || trigger.getAttribute("aria-disabled") === "true"
   }
 
   selectTab(event) {
     const trigger = event.currentTarget
+    if (this.isDisabled(trigger)) return
     const value = trigger.dataset.value
 
     // Deactivate all triggers
@@ -95,10 +121,13 @@ export default class extends Controller {
     content.setAttribute("hidden", "")
   }
 
+  // Bound with data-action on each trigger (keydown->ui--tabs#handleKeyDown)
   handleKeyDown(event) {
-    const trigger = event.target
-    const triggers = this.triggerTargets
+    const trigger = event.currentTarget
+    // Disabled tabs are skipped (Radix focusable={!disabled})
+    const triggers = this.enabledTriggers()
     const currentIndex = triggers.indexOf(trigger)
+    if (currentIndex === -1 || triggers.length === 0) return
 
     let nextIndex = currentIndex
 
