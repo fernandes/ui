@@ -205,12 +205,14 @@ class CarouselTest < UI::SystemTestCase
     # Carousel should have all slides
     assert_equal 5, carousel.slides_count
 
-    # Should be able to navigate normally
+    # This demo runs autoplay with stopOnInteraction: false, so the slide index
+    # keeps moving on its own — asserting exact indices here would race with the
+    # 2s timer. Exact navigation is covered by the basic carousel tests; here we
+    # only check that the controls still move the carousel.
+    before = carousel.current_slide_index
     carousel.next_slide
-    assert_equal 1, carousel.current_slide_index
 
-    carousel.prev_slide
-    assert_equal 0, carousel.current_slide_index
+    refute_equal before, carousel.current_slide_index
   end
 
   # === Autoplay Tests ===

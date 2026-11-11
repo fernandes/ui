@@ -29,6 +29,25 @@ module UI
         all_within('[data-sonner-toast][data-visible="true"]').to_a.reverse
       end
 
+      # Snapshot every visible toast in a single round trip to the browser.
+      #
+      # Toasts auto-dismiss (4s by default), so asserting on several of them
+      # with one query per assertion races the dismiss timer whenever the
+      # machine is busy — which is exactly what happens with the parallel
+      # system test run. Reading them all at once removes that race.
+      #
+      # @return [Array<Hash>] Toast data ordered newest to oldest, with
+      #   "type", "title" and "description" keys
+      def toasts_snapshot
+        node.evaluate_script(<<~JS).reverse
+          Array.from(this.querySelectorAll('[data-sonner-toast][data-visible="true"]')).map(toast => ({
+            type: toast.getAttribute('data-type'),
+            title: toast.querySelector('[data-title]')?.textContent?.trim() ?? null,
+            description: toast.querySelector('[data-description]')?.textContent?.trim() ?? null
+          }))
+        JS
+      end
+
       # Get all toasts (visible and hidden)
       #
       # @return [Array<Capybara::Node::Element>] Array of all toast elements

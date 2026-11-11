@@ -166,12 +166,14 @@ class ComboboxTest < UI::SystemTestCase
 
     combobox.open
     combobox.search_input.click
-    combobox.navigate_down # First item
+
+    # Opening already highlights the first option (cmdk behavior), so a single
+    # arrow down moves the highlight to the second one.
+    combobox.navigate_down
     combobox.press_enter
 
-    # Should have selected first item
     assert combobox.closed?
-    assert_equal "Next.js", combobox.selected_text
+    assert_equal "SvelteKit", combobox.selected_text
   end
 
   # === State Persistence Tests ===

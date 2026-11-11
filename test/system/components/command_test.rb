@@ -217,8 +217,8 @@ class CommandTest < UI::SystemTestCase
     command.search("e")
     command.focus_input
 
-    # Should only navigate through visible items
-    command.navigate_down
+    # Filtering already selects the first match, and arrows only walk the
+    # remaining visible items
     assert command.selected_item_text.include?("Calendar") # "Calendar" has 'e'
 
     command.navigate_down

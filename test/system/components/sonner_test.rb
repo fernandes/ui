@@ -118,17 +118,19 @@ class SonnerTest < UI::SystemTestCase
     page.find("#info-toast-btn").click
     sonner.wait_for_toast_count(3)
 
+    toasts = sonner.toasts_snapshot
+
     # Should have at least 2 toasts visible (3rd might be outside visible limit)
-    assert_operator sonner.toast_count, :>=, 2
-    assert_operator sonner.toast_count, :<=, 3
+    assert_operator toasts.size, :>=, 2
+    assert_operator toasts.size, :<=, 3
 
     # Most recent toast (info) should be first
-    assert_equal "Did you know?", sonner.toast_title_at(0)
-    assert_equal "info", sonner.toast_type_at(0)
+    assert_equal "Did you know?", toasts[0]["title"]
+    assert_equal "info", toasts[0]["type"]
 
     # Second most recent toast (error) should be second
-    assert_equal "Error occurred", sonner.toast_title_at(1)
-    assert_equal "error", sonner.toast_type_at(1)
+    assert_equal "Error occurred", toasts[1]["title"]
+    assert_equal "error", toasts[1]["type"]
   end
 
   test "limits visible toasts to 3 by default" do
@@ -397,13 +399,15 @@ class SonnerTest < UI::SystemTestCase
     page.find("#error-toast-btn").click
     sonner.wait_for_toast_count(2)
 
+    toasts = sonner.toasts_snapshot
+
     # Most recent (error) should be at index 0
-    assert_equal "Error occurred", sonner.toast_title_at(0)
-    assert_equal "error", sonner.toast_type_at(0)
+    assert_equal "Error occurred", toasts[0]["title"]
+    assert_equal "error", toasts[0]["type"]
 
     # Older (success) should be at index 1
-    assert_equal "Profile updated", sonner.toast_title_at(1)
-    assert_equal "success", sonner.toast_type_at(1)
+    assert_equal "Profile updated", toasts[1]["title"]
+    assert_equal "success", toasts[1]["type"]
   end
 
   # === CSS Variables Tests ===
