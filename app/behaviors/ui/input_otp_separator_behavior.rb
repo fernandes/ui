@@ -6,12 +6,15 @@ require "tailwind_merge"
 #
 # Shared behavior for InputOtpSeparator component across ERB, ViewComponent, and Phlex implementations.
 # This module provides consistent HTML attribute generation for OTP slot separators.
+# Decorative: the OTP's single input carries the semantics, so it's aria-hidden.
 module UI::InputOtpSeparatorBehavior
   # Returns HTML attributes for the input OTP separator element
   def input_otp_separator_html_attributes
     {
       class: input_otp_separator_classes,
-      role: "separator"
+      role: "separator",
+      "aria-hidden": "true",
+      data: {slot: "input-otp-separator"}
     }
   end
 

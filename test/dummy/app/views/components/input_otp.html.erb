@@ -220,7 +220,21 @@
     </p>
   </div>
 
-  <%# Example 10: Event Handling Demo - ERB %>
+  <%# Example 10: In a Form - ERB %>
+  <div class="space-y-4 rounded-lg border p-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold">In a Form (ERB)</h2>
+      <p class="text-sm text-muted-foreground">
+        One real input: <code>&lt;label for&gt;</code> works, SMS autofill works, and the whole code is submitted under <code>name</code>.
+      </p>
+    </div>
+    <form id="otp-form" class="flex flex-col gap-2">
+      <%= render "ui/label", for: "form-otp" do %>One-time code<% end %>
+      <%= render "ui/input_otp", id: "form-otp", name: "user[otp]" %>
+    </form>
+  </div>
+
+  <%# Example 11: Event Handling Demo - ERB %>
   <div class="space-y-4 rounded-lg border p-6">
     <div class="space-y-2">
       <h2 class="text-2xl font-semibold">Event Handling Demo (ERB)</h2>

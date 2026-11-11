@@ -1,44 +1,67 @@
 <%# InputOtp - ERB partial
 
-  Accessible one-time password container component.
+  Accessible one-time password field: one real <input> (autocomplete="one-time-code")
+  laid over slots that draw its value, like shadcn's input-otp.
   Supports both composition (with group/slot/separator) and auto-generation.
 
   @param length [Integer] Maximum number of OTP characters (default: 6)
-  @param pattern [String] Regex pattern for valid characters (default: "\d")
-  @param name [String] Form input name
-  @param id [String] HTML id attribute
-  @param disabled [Boolean] Whether inputs are disabled
-  @param classes [String] Additional CSS classes
-  @param attributes [Hash] Additional HTML attributes
+  @param pattern [String] Regex for one valid character (default: "\d")
+  @param name [String] Form field name; the whole code is submitted under it
+  @param id [String] Id of the input (for <label for>)
+  @param value [String] Initial value
+  @param disabled [Boolean] Whether the input is disabled
+  @param autofocus [Boolean] Focus the input on page load (default: false)
+  @param required [Boolean] Whether the input is required
+  @param invalid [Boolean] Mark the input aria-invalid and the slots as errored
+  @param inputmode [String] Override the inputmode ("numeric" for digits, else "text")
+  @param input_attributes [Hash] Extra attributes for the input
+  @param classes [String] Additional CSS classes for the container
+  @param attributes [Hash] Additional HTML attributes for the container
+    (aria-label / aria-labelledby / aria-describedby go to the input)
 %>
 <%
+  input_aria_keys = [:"aria-label", :"aria-labelledby", :"aria-describedby", :"aria-invalid", :"aria-required"]
+  container_attributes = local_assigns.fetch(:attributes, {})
+
   @length = local_assigns.fetch(:length, 6)
   @pattern = local_assigns.fetch(:pattern, "\\d")
   @name = local_assigns.fetch(:name, nil)
   @id = local_assigns.fetch(:id, nil)
+  @value = local_assigns.fetch(:value, nil)
   @disabled = local_assigns.fetch(:disabled, false)
+  @autofocus = local_assigns.fetch(:autofocus, false)
+  @required = local_assigns.fetch(:required, false)
+  @invalid = local_assigns.fetch(:invalid, false)
+  @inputmode = local_assigns.fetch(:inputmode, nil)
+  @input_attributes = local_assigns.fetch(:input_attributes, {}).merge(container_attributes.slice(*input_aria_keys))
   @classes = local_assigns.fetch(:classes, "")
-  @attributes = local_assigns.fetch(:attributes, {})
+  @attributes = container_attributes.except(*input_aria_keys)
 
   # Extend behavior for shared logic
   extend UI::InputOtpBehavior
 
-  # Get HTML attributes from behavior
+  # Computed now: the slot partials reuse @value, @disabled, @classes and @attributes.
   input_otp_attrs = input_otp_html_attributes.deep_merge(@attributes)
+  otp_state = {length: @length, pattern: @pattern, name: @name, id: @id, value: @value, disabled: @disabled,
+               autofocus: @autofocus, required: @required, invalid: @invalid, inputmode: @inputmode,
+               input_attributes: @input_attributes}
+  restore_otp_state = -> { otp_state.each { |key, val| instance_variable_set(:"@#{key}", val) } }
+
+  slots_html, otp_context = with_input_otp_context do
+    # A partial always has a block (the layout's), so check what it renders.
+    composed = block_given? ? capture { yield } : nil
+    if composed.present?
+      composed
+    else
+      render("ui/input_otp/group") do
+        safe_join(@length.times.map { |i| render("ui/input_otp/slot", index: i) })
+      end
+    end
+  end
+  restore_otp_state.call
+  input_html = tag.input(**input_otp_input_attributes(otp_context))
 -%>
 <%= content_tag :div, **input_otp_attrs do %>
-  <% if block_given? %>
-    <%= yield %>
-  <% else %>
-    <%# Auto-generate inputs wrapped in group %>
-    <%= render "ui/input_otp/group" do %>
-      <% @length.times do |i| %>
-        <%= render "ui/input_otp/slot",
-          index: i,
-          name: @name ? "#{@name}[#{i}]" : nil,
-          id: @id ? "#{@id}_#{i}" : nil,
-          disabled: @disabled %>
-      <% end %>
-    <% end %>
-  <% end %>
+  <%= slots_html %>
+  <%= input_html %>
 <% end %>

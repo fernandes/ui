@@ -10,7 +10,8 @@ module UI::InputOtpGroupBehavior
   # Returns HTML attributes for the input OTP group element
   def input_otp_group_html_attributes
     {
-      class: input_otp_group_classes
+      class: input_otp_group_classes,
+      data: {slot: "input-otp-group"}
     }
   end
 

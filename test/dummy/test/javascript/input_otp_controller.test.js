@@ -1,424 +1,182 @@
-import { describe, test, expect, beforeEach, afterEach } from "bun:test"
-import { Application } from "@hotwired/stimulus"
-import InputOTPController from "../../../../app/javascript/ui/controllers/input_otp_controller.js"
+import { describe, test, expect, afterAll } from "bun:test"
+import { screen } from "@testing-library/dom"
+import { render, settle, cleanup } from "./support/render.js"
 
-describe("InputOTPController", () => {
-  let application
-  let container
+// Markup as UI::InputOtpBehavior / InputOtpSlotBehavior render it (classes
+// dropped): decorative slots and one real input.
+function otp({ length = 6, pattern = "\\d", value = "", name = "code", id = "otp", autofocus = false, groups = [3, 3], inputmode = "numeric" } = {}) {
+  let index = 0
+  const group = (size) => `<div data-slot="input-otp-group">${
+    Array.from({ length: size }, () => {
+      const i = index++
+      return `<div aria-hidden="true" data-slot="input-otp-slot" data-ui--input-otp-target="slot" data-index="${i}" data-active="false">${value[i] || ""}<div><div></div></div></div>`
+    }).join("")
+  }</div>`
+  const separator = `<div role="separator" aria-hidden="true" data-slot="input-otp-separator"></div>`
+  return `
+    <label for="${id}">Verification code</label>
+    <div data-controller="ui--input-otp" data-slot="input-otp"
+         data-ui--input-otp-length-value="${length}" data-ui--input-otp-pattern-value="${pattern}"
+         ${autofocus ? 'data-ui--input-otp-autofocus-value="true"' : ""}>
+      ${groups.map(group).join(separator)}
+      <input type="text" id="${id}" name="${name}" ${value ? `value="${value}"` : ""} maxlength="${length}"
+             inputmode="${inputmode}" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false"
+             data-slot="input-otp-input" data-ui--input-otp-target="input"
+             data-action="input->ui--input-otp#input keydown->ui--input-otp#keydown paste->ui--input-otp#paste focus->ui--input-otp#focus blur->ui--input-otp#blur click->ui--input-otp#focus">
+    </div>
+  `
+}
 
-  beforeEach(() => {
-    application = Application.start()
-    application.register("ui--input-otp", InputOTPController)
-    container = document.createElement("div")
-    document.body.appendChild(container)
+const field = () => screen.getByRole("textbox", { name: "Verification code" })
+const slots = () => Array.from(document.querySelectorAll("[data-slot='input-otp-slot']"))
+const shown = () => slots().map(slot => slot.firstChild?.nodeType === 3 ? slot.firstChild.textContent : "").join("")
+const activeIndex = () => slots().findIndex(slot => slot.dataset.active === "true")
+
+describe("Input OTP is one labelled field", () => {
+  test("there is exactly one textbox, named by its label, with one-time-code autofill", async () => {
+    await render(otp())
+
+    expect(screen.getAllByRole("textbox")).toHaveLength(1)
+    expect(field()).toHaveAttribute("autocomplete", "one-time-code")
+    expect(field()).toHaveAttribute("maxlength", "6")
   })
 
-  afterEach(() => {
-    application.stop()
-    document.body.innerHTML = ""
+  test("it does not steal focus on connect", async () => {
+    await render(`<button>Elsewhere</button>${otp()}`)
+    expect(field()).not.toHaveFocus()
   })
 
-  function createInputOTP(options = {}) {
-    const { length = 6, pattern = "\\d" } = options
-
-    let inputsHtml = ""
-    for (let i = 0; i < length; i++) {
-      inputsHtml += `
-        <input type="text"
-               maxlength="1"
-               data-ui--input-otp-target="input"
-               data-action="input->ui--input-otp#input keydown->ui--input-otp#keydown paste->ui--input-otp#paste"
-               data-testid="input-${i}" />
-      `
-    }
-
-    return `
-      <div data-controller="ui--input-otp"
-           data-ui--input-otp-length-value="${length}"
-           data-ui--input-otp-pattern-value="${pattern}"
-           data-testid="otp-container">
-        ${inputsHtml}
-      </div>
-    `
-  }
-
-  describe("Initialization", () => {
-    test("connects with default values", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      expect(controller).not.toBeNull()
-      expect(controller.lengthValue).toBe(6)
-      expect(controller.patternValue).toBe("\\d")
-    })
-
-    test("has input targets", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      expect(controller.inputTargets.length).toBe(4)
-    })
-
-    test("starts with completeValue false", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      expect(controller.completeValue).toBe(false)
-    })
-  })
-
-  describe("Input Handling", () => {
-    test("moves to next input after entering value", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const input0 = container.querySelector('[data-testid="input-0"]')
-      const input1 = container.querySelector('[data-testid="input-1"]')
-
-      input0.value = "5"
-      input0.dispatchEvent(new Event("input", { bubbles: true }))
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      // input1 should be focused (can't truly test focus in happy-dom, but logic should work)
-      expect(input0.value).toBe("5")
-    })
-
-    test("clears invalid input based on pattern", async () => {
-      container.innerHTML = createInputOTP({ pattern: "\\d" })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      input0.value = "a"
-      input0.dispatchEvent(new Event("input", { bubbles: true }))
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(input0.value).toBe("")
-    })
-
-    test("accepts valid input based on pattern", async () => {
-      container.innerHTML = createInputOTP({ pattern: "\\d" })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      input0.value = "7"
-      input0.dispatchEvent(new Event("input", { bubbles: true }))
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(input0.value).toBe("7")
-    })
-  })
-
-  describe("Keyboard Navigation", () => {
-    test("backspace on empty input clears previous", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input0 = container.querySelector('[data-testid="input-0"]')
-      const input1 = container.querySelector('[data-testid="input-1"]')
-
-      input0.value = "1"
-      input1.value = ""
-
-      const mockEvent = {
-        key: "Backspace",
-        target: input1,
-        preventDefault: () => {}
-      }
-      controller.keydown(mockEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(input0.value).toBe("")
-    })
-
-    test("ArrowLeft moves to previous input", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input1 = container.querySelector('[data-testid="input-1"]')
-
-      // Create custom event object instead of modifying readonly property
-      const mockEvent = {
-        key: "ArrowLeft",
-        target: input1,
-        preventDefault: () => {}
-      }
-      controller.keydown(mockEvent)
-
-      // Logic test - should not throw
-    })
-
-    test("ArrowRight moves to next input", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      const mockEvent = {
-        key: "ArrowRight",
-        target: input0,
-        preventDefault: () => {}
-      }
-      controller.keydown(mockEvent)
-
-      // Logic test - should not throw
-    })
-
-    test("Home moves to first input", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input3 = container.querySelector('[data-testid="input-3"]')
-
-      const mockEvent = {
-        key: "Home",
-        target: input3,
-        preventDefault: () => {}
-      }
-      controller.keydown(mockEvent)
-
-      // Logic test - should not throw
-    })
-
-    test("End moves to last input", async () => {
-      container.innerHTML = createInputOTP()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      const mockEvent = {
-        key: "End",
-        target: input0,
-        preventDefault: () => {}
-      }
-      controller.keydown(mockEvent)
-
-      // Logic test - should not throw
-    })
-  })
-
-  describe("Paste Handling", () => {
-    test("distributes pasted content across inputs", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      const clipboardData = {
-        getData: () => "1234"
-      }
-      const pasteEvent = {
-        preventDefault: () => {},
-        clipboardData,
-        target: input0
-      }
-
-      controller.paste(pasteEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(container.querySelector('[data-testid="input-0"]').value).toBe("1")
-      expect(container.querySelector('[data-testid="input-1"]').value).toBe("2")
-      expect(container.querySelector('[data-testid="input-2"]').value).toBe("3")
-      expect(container.querySelector('[data-testid="input-3"]').value).toBe("4")
-    })
-
-    test("rejects paste with invalid characters", async () => {
-      container.innerHTML = createInputOTP({ pattern: "\\d" })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      const clipboardData = {
-        getData: () => "abc123"
-      }
-      const pasteEvent = {
-        preventDefault: () => {},
-        clipboardData,
-        target: input0
-      }
-
-      controller.paste(pasteEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      // Should not update because it contains invalid chars
-      expect(container.querySelector('[data-testid="input-0"]').value).toBe("")
-    })
-
-    test("accepts paste with all valid characters", async () => {
-      container.innerHTML = createInputOTP({ pattern: "\\d", length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-      const input0 = container.querySelector('[data-testid="input-0"]')
-
-      const clipboardData = {
-        getData: () => "9876"
-      }
-      const pasteEvent = {
-        preventDefault: () => {},
-        clipboardData,
-        target: input0
-      }
-
-      controller.paste(pasteEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(container.querySelector('[data-testid="input-0"]').value).toBe("9")
-      expect(container.querySelector('[data-testid="input-3"]').value).toBe("6")
-    })
-  })
-
-  describe("Completion", () => {
-    test("sets completeValue true when all inputs filled", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      // Fill all inputs
-      for (let i = 0; i < 4; i++) {
-        const input = container.querySelector(`[data-testid="input-${i}"]`)
-        input.value = String(i + 1)
-      }
-
-      controller.checkComplete()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(controller.completeValue).toBe(true)
-    })
-
-    test("dispatches inputotp:complete event when complete", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      let eventFired = false
-      let eventValue = null
-      element.addEventListener("inputotp:complete", (e) => {
-        eventFired = true
-        eventValue = e.detail.value
-      })
-
-      // Fill all inputs
-      for (let i = 0; i < 4; i++) {
-        const input = container.querySelector(`[data-testid="input-${i}"]`)
-        input.value = String(i + 1)
-      }
-
-      controller.checkComplete()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(eventFired).toBe(true)
-      expect(eventValue).toBe("1234")
-    })
-
-    test("does not fire complete event if already complete", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      // Set already complete
-      controller.completeValue = true
-
-      let eventCount = 0
-      element.addEventListener("inputotp:complete", () => {
-        eventCount++
-      })
-
-      // Fill all inputs
-      for (let i = 0; i < 4; i++) {
-        const input = container.querySelector(`[data-testid="input-${i}"]`)
-        input.value = String(i + 1)
-      }
-
-      controller.checkComplete()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(eventCount).toBe(0) // Should not fire again
-    })
-  })
-
-  describe("getValue", () => {
-    test("returns combined value of all inputs", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      // Fill inputs
-      container.querySelector('[data-testid="input-0"]').value = "1"
-      container.querySelector('[data-testid="input-1"]').value = "2"
-      container.querySelector('[data-testid="input-2"]').value = "3"
-      container.querySelector('[data-testid="input-3"]').value = "4"
-
-      expect(controller.getValue()).toBe("1234")
-    })
-
-    test("returns partial value if not all filled", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      container.querySelector('[data-testid="input-0"]').value = "1"
-      container.querySelector('[data-testid="input-1"]').value = "2"
-      // input 2 and 3 empty
-
-      expect(controller.getValue()).toBe("12")
-    })
-  })
-
-  describe("clear", () => {
-    test("clears all inputs", async () => {
-      container.innerHTML = createInputOTP({ length: 4 })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-testid="otp-container"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--input-otp")
-
-      // Fill inputs
-      for (let i = 0; i < 4; i++) {
-        container.querySelector(`[data-testid="input-${i}"]`).value = String(i + 1)
-      }
-      controller.completeValue = true
-
-      controller.clear()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      expect(controller.getValue()).toBe("")
-      expect(controller.completeValue).toBe(false)
-    })
+  test("autofocus is opt-in", async () => {
+    await render(otp({ autofocus: true }))
+    await settle()
+    expect(field()).toHaveFocus()
   })
 })
+
+describe("Typing", () => {
+  test("typed characters are drawn in the slots and the active slot follows", async () => {
+    const { user } = await render(otp())
+
+    await user.click(field())
+    expect(activeIndex()).toBe(0)
+    await user.keyboard("123")
+
+    expect(field()).toHaveValue("123")
+    expect(shown()).toBe("123")
+    expect(activeIndex()).toBe(3)
+  })
+
+  test("characters that don't match the pattern are dropped", async () => {
+    const { user } = await render(otp())
+
+    await user.click(field())
+    await user.keyboard("1a2-3")
+    expect(field()).toHaveValue("123")
+  })
+
+  test("a custom pattern accepts letters and uses a text keyboard", async () => {
+    const { user } = await render(otp({ pattern: "[A-Za-z0-9]", inputmode: "text" }))
+
+    await user.click(field())
+    await user.keyboard("A1b2")
+    expect(field()).toHaveValue("A1b2")
+  })
+
+  test("Backspace deletes the last character", async () => {
+    const { user } = await render(otp({ value: "123" }))
+
+    await user.click(field())
+    await user.keyboard("{Backspace}")
+    expect(field()).toHaveValue("12")
+    expect(shown()).toBe("12")
+  })
+
+  test("ArrowLeft then typing overwrites a filled slot", async () => {
+    const { user } = await render(otp({ value: "123456" }))
+
+    await user.click(field())
+    expect(activeIndex()).toBe(5)
+    await user.keyboard("{ArrowLeft}{ArrowLeft}")
+    expect(activeIndex()).toBe(3)
+    await user.keyboard("9")
+
+    expect(field()).toHaveValue("123956")
+    expect(activeIndex()).toBe(4)
+  })
+
+  test("Home and End move between the first and last filled slot", async () => {
+    const { user } = await render(otp({ value: "12" }))
+
+    await user.click(field())
+    await user.keyboard("{Home}")
+    expect(activeIndex()).toBe(0)
+    await user.keyboard("{End}")
+    expect(activeIndex()).toBe(2)
+  })
+
+  test("leaving the field clears the active slot", async () => {
+    const { user } = await render(`${otp()}<button>Next</button>`)
+
+    await user.click(field())
+    await user.tab()
+    expect(activeIndex()).toBe(-1)
+  })
+})
+
+describe("Paste", () => {
+  test("a pasted code with spaces or dashes is cleaned up", async () => {
+    const { user } = await render(otp())
+
+    await user.click(field())
+    await user.paste("123 - 456")
+    expect(field()).toHaveValue("123456")
+    expect(shown()).toBe("123456")
+  })
+
+  test("a pasted code longer than the field is truncated", async () => {
+    const { user } = await render(otp({ length: 4, groups: [4] }))
+
+    await user.click(field())
+    await user.paste("987654")
+    expect(field()).toHaveValue("9876")
+  })
+})
+
+describe("Forms and events", () => {
+  test("the whole code is submitted under name", async () => {
+    const { user } = await render(`<form>${otp({ name: "user[otp]" })}</form>`)
+
+    await user.click(field())
+    await user.keyboard("123456")
+
+    const data = new FormData(document.querySelector("form"))
+    expect(Array.from(data.keys())).toEqual(["user[otp]"])
+    expect(data.get("user[otp]")).toBe("123456")
+  })
+
+  test("inputotp:complete fires once with the value when the last slot is filled", async () => {
+    const { user } = await render(otp({ length: 4, groups: [4] }))
+    const values = []
+    document.addEventListener("inputotp:complete", (event) => values.push(event.detail.value))
+
+    await user.click(field())
+    await user.keyboard("1234")
+    expect(values).toEqual(["1234"])
+  })
+
+  test("form reset redraws the slots", async () => {
+    const { user } = await render(`<form>${otp({ value: "12" })}<button type="reset">Reset</button></form>`)
+
+    await user.click(field())
+    await user.keyboard("34")
+    expect(shown()).toBe("1234")
+
+    await user.click(screen.getByRole("button", { name: "Reset" }))
+    await settle(5)
+    expect(field()).toHaveValue("12")
+    expect(shown()).toBe("12")
+  })
+})
+
+// Stop the Stimulus app after the last test so it doesn't leak into other files.
+afterAll(() => cleanup())

@@ -155,40 +155,25 @@ class InputOtpTest < UI::SystemTestCase
 
   # === Backspace Behavior Tests ===
 
-  test "backspace clears current slot if filled" do
+  test "backspace clears the selected slot" do
     otp = default_otp
 
-    # Enter a digit in slot 1 (not first)
-    slot = otp.input_slot(1)
-    slot.fill_in(with: "5")
-    assert_equal "5", otp.slot_value(1)
-
-    # Click to select and then use backspace
-    # The input has maxlength=1, so clicking selects all
-    slot.click
-    sleep 0.05
-    slot.send_keys([:backspace])
-
-    # Check that slot becomes empty after backspace
-    sleep 0.1
-    value = otp.slot_value(1).to_s
-    assert_equal "", value, "Expected slot to be empty after backspace, but got '#{value}'"
-  end
-
-  test "backspace moves to previous slot if current is empty" do
-    otp = default_otp
-
-    otp.enter_digit(0, "1")
-    otp.enter_digit(1, "2")
-
-    # Focus slot 1 and clear it
+    otp.enter_otp("15")
     otp.focus_slot(1)
-    otp.input_slot(1).fill_in(with: "")
-
-    # Press backspace - should move to slot 0 and clear it
     otp.press_backspace
 
-    assert otp.slot_empty?(0)
+    assert otp.slot_empty?(1)
+    assert_equal "1", otp.value
+  end
+
+  test "backspace on an empty slot deletes the previous character" do
+    otp = default_otp
+
+    otp.enter_otp("12")
+    otp.press_backspace
+
+    assert otp.slot_empty?(1)
+    assert_equal "1", otp.value
   end
 
   # === Paste Functionality Tests ===
@@ -229,45 +214,47 @@ class InputOtpTest < UI::SystemTestCase
   test "arrow right navigates to next slot" do
     otp = default_otp
 
+    otp.enter_otp("123")
     otp.focus_slot(0)
     otp.navigate_right
+    assert_equal 1, otp.focused_slot_index
 
-    # Verify navigation by entering a digit - it should go to slot 1
-    otp.enter_digit(1, "5")
-    assert_equal "5", otp.slot_value(1)
+    otp.input.send_keys("5")
+    assert_equal "153", otp.value
   end
 
   test "arrow left navigates to previous slot" do
     otp = default_otp
 
-    otp.focus_slot(2)
+    otp.enter_otp("123")
     otp.navigate_left
+    assert_equal 2, otp.focused_slot_index
 
-    # Verify navigation by entering a digit - it should go to slot 1
-    otp.enter_digit(1, "7")
-    assert_equal "7", otp.slot_value(1)
+    otp.input.send_keys("7")
+    assert_equal "127", otp.value
   end
 
   test "Home key navigates to first slot" do
     otp = default_otp
 
-    otp.focus_slot(3)
+    otp.enter_otp("1234")
     otp.navigate_to_first
+    assert_equal 0, otp.focused_slot_index
 
-    # Verify by entering digit - should go to first slot
-    otp.enter_digit(0, "9")
-    assert_equal "9", otp.slot_value(0)
+    otp.input.send_keys("9")
+    assert_equal "9234", otp.value
   end
 
-  test "End key navigates to last slot" do
+  test "End key navigates to the first empty slot" do
     otp = default_otp
 
+    otp.enter_otp("12")
     otp.focus_slot(0)
     otp.navigate_to_last
+    assert_equal 2, otp.focused_slot_index
 
-    # Verify by entering digit - should go to last slot
-    otp.enter_digit(5, "8")
-    assert_equal "8", otp.slot_value(5)
+    otp.input.send_keys("8")
+    assert_equal "128", otp.value
   end
 
   # === Different Lengths Tests ===
@@ -345,7 +332,7 @@ class InputOtpTest < UI::SystemTestCase
 
     # Try entering a letter - should be rejected
     otp.focus_slot(0)
-    otp.input_slot(0).fill_in(with: "A")
+    otp.input.send_keys("A")
 
     # Value should be empty (rejected by pattern validation)
     assert otp.slot_empty?(0)
@@ -356,24 +343,17 @@ class InputOtpTest < UI::SystemTestCase
 
     assert otp.alphanumeric?
 
-    # Enter letters
-    otp.enter_digit(0, "A")
-    assert_equal "A", otp.slot_value(0)
-
-    # Enter numbers
-    otp.enter_digit(1, "1")
-    assert_equal "1", otp.slot_value(1)
-
-    # Enter mixed
     otp.enter_otp("A1B2C3")
     assert_equal "A1B2C3", otp.value
+    assert_equal "A", otp.slot_value(0)
+    assert_equal "1", otp.slot_value(1)
   end
 
   test "pattern validation prevents invalid characters" do
     otp = default_otp # Numeric only
 
     otp.focus_slot(0)
-    otp.input_slot(0).fill_in(with: "!")
+    otp.input.send_keys("!")
 
     # Special character should be rejected
     assert otp.slot_empty?(0)
@@ -561,12 +541,11 @@ class InputOtpTest < UI::SystemTestCase
 
   # === Focus Management Tests ===
 
-  test "focuses first slot on mount" do
+  test "does not steal focus on page load" do
     otp = default_otp
 
-    # First slot should be focusable immediately
-    otp.enter_digit(0, "1")
-    assert_equal "1", otp.slot_value(0)
+    assert_not otp.focused?
+    assert_nil otp.focused_slot_index
   end
 
   test "focus_first_slot focuses the first slot" do
@@ -580,14 +559,14 @@ class InputOtpTest < UI::SystemTestCase
     assert_equal "7", otp.slot_value(0)
   end
 
-  test "focus_slot can focus any slot" do
+  test "focus_slot can focus any filled slot" do
     otp = default_otp
 
-    otp.focus_slot(4)
-
-    # Verify by entering digit
+    otp.enter_otp("123456")
     otp.enter_digit(4, "6")
+
     assert_equal "6", otp.slot_value(4)
+    assert_equal "123466", otp.value
   end
 
   # === Complex Scenarios ===
@@ -616,17 +595,13 @@ class InputOtpTest < UI::SystemTestCase
   test "keyboard navigation through all slots" do
     otp = default_otp
 
-    # Start at first slot
+    otp.enter_otp("123456")
     otp.focus_slot(0)
+    5.times { otp.navigate_right }
+    assert_equal 5, otp.focused_slot_index
 
-    # Navigate through all slots with arrow right
-    5.times do
-      otp.navigate_right
-    end
-
-    # Should be at last slot now
-    otp.enter_digit(5, "9")
-    assert_equal "9", otp.slot_value(5)
+    otp.input.send_keys("9")
+    assert_equal "123459", otp.value
   end
 
   test "mixed input methods: manual and paste" do
@@ -641,6 +616,35 @@ class InputOtpTest < UI::SystemTestCase
     # Should have valid OTP
     assert otp.complete?
     assert_equal 6, otp.filled_count
+  end
+
+  # === Accessibility and forms ===
+
+  test "the OTP is one field named by its label" do
+    otp = find_element(UI::Testing::InputOtpElement, "#form-otp")
+
+    assert_equal 1, otp.node.all("input", visible: :all).size
+    assert_equal "one-time-code", otp.input["autocomplete"]
+
+    find("label", text: "One-time code").click
+    assert otp.focused?
+  end
+
+  test "the whole code is submitted under name" do
+    otp = find_element(UI::Testing::InputOtpElement, "#form-otp")
+
+    otp.enter_otp("246810")
+
+    assert_equal [["user[otp]", "246810"]],
+      page.evaluate_script("Array.from(new FormData(document.getElementById('otp-form')).entries())")
+  end
+
+  test "a pasted code with spaces is cleaned up" do
+    otp = find_element(UI::Testing::InputOtpElement, "#form-otp")
+
+    otp.paste("135 791")
+
+    assert_equal "135791", otp.value
   end
 
   # === Length Tests ===

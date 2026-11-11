@@ -4,283 +4,202 @@ module UI
   module Testing
     # Element class for interacting with the Input OTP component.
     #
-    # @example Basic usage
-    #   otp = InputOtpElement.new(find('#otp-input'))
+    # The OTP is one real <input> laid over decorative slots that draw its
+    # value. This element drives that input with the keyboard, like a user,
+    # and reads the slots for what is shown.
+    #
+    # It can wrap the container (`[data-controller="ui--input-otp"]`) or the
+    # input itself (an `id:` passed to the component lands on the input).
+    #
+    # @example
+    #   otp = InputOtpElement.new(find("#otp"))
     #   otp.enter_otp("123456")
     #   assert otp.complete?
     #   assert_equal "123456", otp.value
     #
-    # @example Digit by digit entry
-    #   otp = InputOtpElement.new(find('#otp-input'))
-    #   otp.enter_digit(0, "1")
-    #   otp.enter_digit(1, "2")
-    #   otp.enter_digit(2, "3")
-    #
     class InputOtpElement < BaseElement
       DEFAULT_SELECTOR = '[data-controller="ui--input-otp"]'
+      INPUT_SELECTOR = 'input[data-ui--input-otp-target="input"]'
+      SLOT_SELECTOR = '[data-slot="input-otp-slot"]'
+
+      def initialize(node)
+        node = node.find(:xpath, 'ancestor::*[@data-controller="ui--input-otp"][1]') if node.tag_name == "input"
+        super
+      end
 
       # === Actions ===
 
-      # Enter a complete OTP value by filling all slots
-      #
-      # @param otp [String] The OTP value to enter
-      #
+      # Type a code from the current caret position (focuses the input first).
       def enter_otp(otp)
-        chars = otp.chars
-        chars.each_with_index do |char, index|
-          break if index >= input_slots.length
-
-          slot = input_slots[index]
-          slot.fill_in(with: char)
-        end
+        focus_input
+        input.send_keys(otp)
       end
 
-      # Enter a single digit in a specific slot
-      #
-      # @param index [Integer] The slot index (0-based)
-      # @param value [String] The value to enter
-      #
-      def enter_digit(index, value)
-        slot = input_slots[index]
-        slot.fill_in(with: value)
+      # Type one character on the given slot. Slots fill left to right, so the
+      # caret can only go as far as the first empty slot.
+      def enter_digit(index, char)
+        focus_slot(index)
+        input.send_keys(char)
       end
 
-      # Paste a value into the OTP input (simulates paste)
-      #
-      # @param value [String] The value to paste
-      #
-      def paste(value)
-        # Focus first input
-        input_slots.first.click
-
-        # Simulate paste using clipboard
-        page.evaluate_script(<<~JAVASCRIPT)
-          (function() {
-            var input = document.querySelector('##{node[:id]} input[data-ui--input-otp-target="input"]');
-            if (input) {
-              var event = new ClipboardEvent('paste', {
-                clipboardData: new DataTransfer(),
-                bubbles: true,
-                cancelable: true
-              });
-              event.clipboardData.setData('text/plain', '#{value}');
-              input.dispatchEvent(event);
-            }
-          })();
-        JAVASCRIPT
+      # Paste text into the input (a real ClipboardEvent).
+      def paste(text)
+        focus_input
+        page.execute_script(<<~JS, input, text)
+          const [input, text] = arguments
+          const data = new DataTransfer()
+          data.setData("text/plain", text)
+          input.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }))
+        JS
       end
 
-      # Clear all OTP slots
+      # Delete every character with the keyboard.
       def clear
-        input_slots.each do |slot|
-          slot.fill_in(with: "")
-        end
+        focus_input
+        input.send_keys(:end)
+        (value.length + 1).times { input.send_keys(:backspace) }
       end
 
-      # Focus a specific slot
-      #
-      # @param index [Integer] The slot index (0-based)
-      #
+      def focus_input
+        page.execute_script("arguments[0].focus()", input) unless focused?
+      end
+
+      # Put the caret on a slot (Home, then ArrowRight).
       def focus_slot(index)
-        input_slots[index].click
+        focus_input
+        input.send_keys(:home)
+        index.times { input.send_keys(:right) }
       end
 
-      # Focus the first slot
       def focus_first_slot
         focus_slot(0)
       end
 
-      # Backspace in current focused slot
       def press_backspace
-        send_keys(:backspace)
+        input.send_keys(:backspace)
       end
 
       # === State Queries ===
 
-      # Get the current OTP value (all digits combined)
-      #
-      # @return [String] The current OTP value
-      #
+      # The input's value: the code that is submitted.
       def value
-        input_slots.map { |slot| slot.value }.join("")
+        input.value
       end
 
-      # Check if all slots are filled (OTP is complete)
-      #
-      # @return [Boolean]
-      #
       def complete?
-        input_slots.all? { |slot| slot.value.present? }
+        value.length >= length
       end
 
-      # Get the value of a specific slot
-      #
-      # @param index [Integer] The slot index (0-based)
-      # @return [String] The slot value
-      #
+      # The character a slot shows.
       def slot_value(index)
-        input_slots[index].value
+        evaluate_script_on(slots[index], "arguments[0].firstChild && arguments[0].firstChild.nodeType === 3 ? arguments[0].firstChild.textContent : ''")
       end
 
-      # Check if a slot is empty
-      #
-      # @param index [Integer] The slot index (0-based)
-      # @return [Boolean]
-      #
       def slot_empty?(index)
         slot_value(index).blank?
       end
 
-      # Check if a slot is filled
-      #
-      # @param index [Integer] The slot index (0-based)
-      # @return [Boolean]
-      #
       def slot_filled?(index)
         slot_value(index).present?
       end
 
-      # Get the number of filled slots
-      #
-      # @return [Integer]
-      #
       def filled_count
-        input_slots.count { |slot| slot.value.present? }
+        length.times.count { |i| slot_filled?(i) }
       end
 
-      # Get the number of empty slots
-      #
-      # @return [Integer]
-      #
       def empty_count
-        input_slots.count { |slot| slot.value.blank? }
+        length - filled_count
       end
 
-      # Check if any slot is disabled
-      #
-      # @return [Boolean]
-      #
       def disabled?
-        input_slots.any?(&:disabled?)
+        input.disabled?
       end
 
-      # Check if a specific slot is disabled
-      #
-      # @param index [Integer] The slot index (0-based)
-      # @return [Boolean]
-      #
-      def slot_disabled?(index)
-        input_slots[index].disabled?
+      # Slots aren't controls: they're disabled when the input is.
+      def slot_disabled?(_index)
+        disabled?
       end
 
-      # Get the currently focused slot index
-      #
-      # @return [Integer, nil] The index of the focused slot or nil
-      #
+      def focused?
+        page.evaluate_script("document.activeElement === arguments[0]", input)
+      end
+
+      # The slot marked active (the caret's), or nil when not focused.
       def focused_slot_index
-        input_slots.each_with_index do |slot, index|
-          return index if slot == page.driver.browser.active_element
-        end
-        nil
+        slots.index { |slot| slot["data-active"] == "true" }
       end
 
       # === Sub-elements ===
 
-      # Get all input slot elements
-      #
-      # @return [Array<Capybara::Node::Element>]
-      #
+      def input
+        node.find(INPUT_SELECTOR, visible: :all)
+      end
+
+      def slots
+        node.all(SLOT_SELECTOR, visible: :all)
+      end
+
+      # Kept for older tests: the slots.
       def input_slots
-        all_within('[data-ui--input-otp-target="input"]')
+        slots
       end
 
-      # Get a specific input slot
-      #
-      # @param index [Integer] The slot index (0-based)
-      # @return [Capybara::Node::Element]
-      #
       def input_slot(index)
-        input_slots[index]
+        slots[index]
       end
 
-      # Get the number of slots
-      #
-      # @return [Integer]
-      #
       def length
-        input_slots.length
+        slots.length
       end
 
-      # Check if separator is present
-      #
-      # @return [Boolean]
-      #
       def has_separator?
-        has_css?('[role="separator"]')
+        node.has_css?('[role="separator"]', visible: :all)
       end
 
-      # Get all separator elements
-      #
-      # @return [Array<Capybara::Node::Element>]
-      #
       def separators
-        all_within('[role="separator"]')
+        node.all('[role="separator"]', visible: :all)
       end
 
-      # Get the number of separators
-      #
-      # @return [Integer]
-      #
       def separator_count
         separators.length
       end
 
       # === Keyboard Navigation ===
 
-      # Navigate to next slot using arrow right
       def navigate_right
-        press_arrow_right
+        input.send_keys(:right)
       end
 
-      # Navigate to previous slot using arrow left
       def navigate_left
-        press_arrow_left
+        input.send_keys(:left)
       end
 
-      # Navigate to first slot using Home key
       def navigate_to_first
-        press_home
+        input.send_keys(:home)
       end
 
-      # Navigate to last slot using End key
       def navigate_to_last
-        press_end
+        input.send_keys(:end)
       end
 
       # === Validation Queries ===
 
-      # Get the pattern used for validation
-      #
-      # @return [String] The regex pattern
-      #
       def pattern
         node["data-ui--input-otp-pattern-value"]
       end
 
-      # Check if the pattern is numeric only
-      #
-      # @return [Boolean]
-      #
       def numeric_only?
         pattern == "\\d"
       end
 
-      # Check if the pattern is alphanumeric
-      #
-      # @return [Boolean]
-      #
       def alphanumeric?
         pattern == "[A-Za-z0-9]"
+      end
+
+      private
+
+      def evaluate_script_on(element, script)
+        page.evaluate_script(script, element)
       end
     end
   end
