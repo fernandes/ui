@@ -9946,7 +9946,7 @@
       }
     };
     connect() {
-      this.currentMonth = this.monthValue ? new Date(this.monthValue) : new Date;
+      this.currentMonth = this.monthValue ? parseISO(this.monthValue) : new Date;
       this.hoveredDate = null;
       this.animationDirection = null;
       this.initializeLocale();
@@ -12514,10 +12514,6 @@
     }
     parseInputDate(value) {
       const formats = [ "yyyy-MM-dd", "MM/dd/yyyy", "dd/MM/yyyy", "MMMM dd, yyyy", "MMM dd, yyyy", "dd MMMM yyyy", "dd MMM yyyy" ];
-      const nativeDate = new Date(value);
-      if (isValid(nativeDate) && !isNaN(nativeDate.getTime())) {
-        return nativeDate;
-      }
       for (const fmt of formats) {
         try {
           const parsed = parse(value, fmt, new Date);
@@ -12525,6 +12521,10 @@
             return parsed;
           }
         } catch {}
+      }
+      const nativeDate = new Date(value);
+      if (isValid(nativeDate) && !isNaN(nativeDate.getTime())) {
+        return nativeDate;
       }
       return null;
     }

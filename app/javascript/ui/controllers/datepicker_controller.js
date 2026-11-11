@@ -130,13 +130,8 @@ export default class extends Controller {
       "dd MMM yyyy"
     ]
 
-    // First try native Date parsing
-    const nativeDate = new Date(value)
-    if (isValid(nativeDate) && !isNaN(nativeDate.getTime())) {
-      return nativeDate
-    }
-
-    // Try each format
+    // Explicit formats first: they parse as local time. Native parsing reads
+    // "yyyy-MM-dd" as UTC, which west of Greenwich becomes the previous day.
     for (const fmt of formats) {
       try {
         const parsed = parse(value, fmt, new Date())
@@ -146,6 +141,12 @@ export default class extends Controller {
       } catch {
         // Continue to next format
       }
+    }
+
+    // Fall back to native Date parsing for anything else
+    const nativeDate = new Date(value)
+    if (isValid(nativeDate) && !isNaN(nativeDate.getTime())) {
+      return nativeDate
     }
 
     return null

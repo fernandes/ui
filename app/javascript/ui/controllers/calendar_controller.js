@@ -30,7 +30,9 @@ export default class extends Controller {
   }
 
   connect() {
-    this.currentMonth = this.monthValue ? new Date(this.monthValue) : new Date()
+    // parseISO reads a bare "yyyy-MM-dd" as local time; `new Date()` reads it
+    // as UTC, which west of Greenwich lands on the previous day (and month).
+    this.currentMonth = this.monthValue ? parseISO(this.monthValue) : new Date()
     this.hoveredDate = null // For range preview
     this.animationDirection = null // For month transition animation
     this.initializeLocale()
