@@ -17,10 +17,12 @@ module UI::AccordionItemBehavior
 
   # Data attributes for Stimulus target
   def item_data_attributes
-    {
+    data = {
       ui__accordion_target: "item",
       value: @value || ""
     }
+    data[:disabled] = "" if @disabled
+    data
   end
 
   # Merge user-provided data attributes

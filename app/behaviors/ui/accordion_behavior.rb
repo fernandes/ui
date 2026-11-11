@@ -32,7 +32,10 @@ module UI::AccordionBehavior
     {
       controller: "ui--accordion",
       ui__accordion_type_value: @type || "single",
-      ui__accordion_collapsible_value: @collapsible || false
+      # Single type: whether the open item can be closed. Defaults to true
+      # (pass collapsible: false for Radix' default, where one stays open).
+      # Rendered as a string: Phlex drops false boolean attributes.
+      ui__accordion_collapsible_value: (@collapsible.nil? || @collapsible).to_s
     }
   end
 

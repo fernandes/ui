@@ -16,20 +16,6 @@ module UI::AccordionContentBehavior
     UI::ClassMerger.merge([content_base_classes, @classes].compact.join(" "))
   end
 
-  # Generate unique IDs for ARIA relationships (matching trigger)
-  def trigger_id
-    @trigger_id ||= "accordion-trigger-#{item_value}"
-  end
-
-  def content_id
-    @content_id ||= "accordion-content-#{item_value}"
-  end
-
-  # Get item value from context (set by parent AccordionItem)
-  def item_value
-    @item_value || SecureRandom.hex(4)
-  end
-
   # Determine initial state from context
   def content_state
     @initial_open ? "open" : "closed"
@@ -37,9 +23,9 @@ module UI::AccordionContentBehavior
 
   # Data attributes for Stimulus
   def content_data_attributes
-    {
-      ui__accordion_target: "content"
-    }
+    data = {ui__accordion_target: "content"}
+    data[:disabled] = "" if @disabled
+    data
   end
 
   # Merge user-provided data attributes
@@ -48,14 +34,13 @@ module UI::AccordionContentBehavior
     user_data.merge(content_data_attributes)
   end
 
-  # Build complete HTML attributes hash for content container
+  # Build complete HTML attributes hash for content container.
+  # Id and aria-labelledby are wired by the accordion controller on connect.
   def content_html_attributes
     base_attrs = @attributes&.except(:data) || {}
     attrs = base_attrs.merge(
       class: content_classes,
-      id: content_id,
       role: "region",
-      "aria-labelledby": trigger_id,
       "data-state": content_state,
       "data-orientation": @orientation || "vertical",
       data: merged_content_data_attributes

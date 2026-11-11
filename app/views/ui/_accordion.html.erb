@@ -2,7 +2,7 @@
 <%
   content ||= local_assigns.fetch(:content, nil)
   @type = local_assigns.fetch(:type, "single")
-  @collapsible = local_assigns.fetch(:collapsible, false)
+  @collapsible = local_assigns.fetch(:collapsible, true)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 

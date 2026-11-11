@@ -12,11 +12,13 @@ class UI::AccordionTrigger < Phlex::HTML
 
   # @param item_value [String] value from parent Item
   # @param initial_open [Boolean] initial state from parent Item
+  # @param disabled [Boolean] disabled state from parent Item (the controller also copies it from the item)
   # @param classes [String] additional CSS classes
   # @param attributes [Hash] additional HTML attributes
-  def initialize(item_value: nil, initial_open: false, classes: "", attributes: {}, **)
+  def initialize(item_value: nil, initial_open: false, disabled: false, classes: "", attributes: {}, **)
     @item_value = item_value
     @initial_open = initial_open
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

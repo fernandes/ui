@@ -21,11 +21,13 @@ class UI::AccordionItemComponent < ViewComponent::Base
 
   # @param value [String] unique identifier for this item
   # @param initial_open [Boolean] whether this item starts open
+  # @param disabled [Boolean] disables the item: its trigger is disabled and skipped by arrow keys
   # @param classes [String] additional CSS classes
   # @param attributes [Hash] additional HTML attributes
-  def initialize(value: "", initial_open: false, classes: "", attributes: {})
+  def initialize(value: "", initial_open: false, disabled: false, classes: "", attributes: {})
     @value = value
     @initial_open = initial_open
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

@@ -22,7 +22,7 @@ class UI::AccordionComponent < ViewComponent::Base
   # @param collapsible [Boolean] whether the open item can be collapsed in "single" mode
   # @param classes [String] additional CSS classes
   # @param attributes [Hash] additional HTML attributes
-  def initialize(type: "single", collapsible: false, classes: "", attributes: {})
+  def initialize(type: "single", collapsible: true, classes: "", attributes: {})
     @type = type
     @collapsible = collapsible
     @classes = classes

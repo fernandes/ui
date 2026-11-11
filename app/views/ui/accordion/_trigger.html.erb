@@ -5,8 +5,8 @@
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Get context from parent item
-  @item_value = @_accordion_item_value || SecureRandom.hex(4)
   @initial_open = @_accordion_item_initial_open || false
+  @disabled = local_assigns.fetch(:disabled, @_accordion_item_disabled || false)
 
   # Extend behavior for shared logic
   extend UI::AccordionTriggerBehavior

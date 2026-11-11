@@ -30,7 +30,7 @@ The accordion consists of 4 nested components:
 
 **Parameters**:
 - `type:` - `"single"` (default) or `"multiple"` - Controls if multiple items can be open
-- `collapsible:` - Boolean - If single item can be collapsed
+- `collapsible:` - Boolean, default `true` - In `"single"` mode, whether the open item can be closed again. `false` keeps one item open (Radix default) and marks its trigger `aria-disabled`
 - `orientation:` - `"vertical"` (default) or `"horizontal"`
 - `classes:` - Additional CSS classes
 - `**attributes` - Additional HTML attributes
@@ -42,6 +42,7 @@ The accordion consists of 4 nested components:
 **Parameters**:
 - `value:` - **Required** - Unique identifier for this item
 - `initial_open:` - Boolean - Whether item starts open
+- `disabled:` - Boolean - Disables the item: its trigger is disabled and arrow keys skip it
 - `orientation:` - `"vertical"` (default) or `"horizontal"`
 - `classes:` - Additional CSS classes
 - `**attributes` - Additional HTML attributes
@@ -186,3 +187,8 @@ Accordion uses Tailwind CSS transitions for smooth animations:
 ```ruby
 <%= render UI::Accordion::Trigger.new(item_value: "item-1") { "Title" } %>
 ```
+
+## Accessibility
+
+- Ids, `aria-controls` (trigger → region) and `aria-labelledby` (region → trigger) are generated per instance by the Stimulus controller on connect. Don't build ids from the item value; an `id` you pass in `attributes:` is kept.
+- Arrow Up/Down, Home and End move between enabled triggers; Enter/Space toggle.

@@ -3,12 +3,14 @@
   content ||= local_assigns.fetch(:content, nil)
   @value = local_assigns.fetch(:value, "")
   @initial_open = local_assigns.fetch(:initial_open, false)
+  @disabled = local_assigns.fetch(:disabled, false)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
   # Store context for child components
   @_accordion_item_value = @value
   @_accordion_item_initial_open = @initial_open
+  @_accordion_item_disabled = @disabled
 
   # Extend behavior for shared logic
   extend UI::AccordionItemBehavior

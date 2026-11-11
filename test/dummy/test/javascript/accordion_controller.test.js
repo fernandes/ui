@@ -22,7 +22,7 @@ describe("AccordionController", () => {
   function createAccordion(options = {}) {
     const {
       type = "single",
-      collapsible = false,
+      collapsible = true,
       items = [
         { value: "item-1", title: "Item 1", content: "Content 1", open: false },
         { value: "item-2", title: "Item 2", content: "Content 2", open: false },
@@ -75,7 +75,7 @@ describe("AccordionController", () => {
 
       expect(controller).not.toBeNull()
       expect(controller.typeValue).toBe("single")
-      expect(controller.collapsibleValue).toBe(false)
+      expect(controller.collapsibleValue).toBe(true)
     })
 
     test("starts with all items closed by default", async () => {

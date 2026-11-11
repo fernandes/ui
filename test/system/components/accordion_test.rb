@@ -437,6 +437,38 @@ class AccordionTest < UI::SystemTestCase
     assert_equal trigger_id, labelledby
   end
 
+  test "every trigger and region on the page reference each other by unique ids" do
+    result = page.evaluate_script(<<~JS)
+      (() => {
+        const triggers = Array.from(document.querySelectorAll("[data-ui--accordion-target='trigger']"))
+        const ids = Array.from(document.querySelectorAll("[id]")).map(el => el.id)
+        return {
+          count: triggers.length,
+          dangling: triggers.filter(t => {
+            const region = document.getElementById(t.getAttribute("aria-controls"))
+            return !region || region.getAttribute("aria-labelledby") !== t.id
+          }).length,
+          duplicates: ids.length - new Set(ids).size
+        }
+      })()
+    JS
+
+    assert_operator result["count"], :>, 6
+    assert_equal 0, result["dangling"], "aria-controls / aria-labelledby must resolve"
+    assert_equal 0, result["duplicates"], "ids must be unique"
+  end
+
+  test "collapsed content is hidden even when no transition runs" do
+    page.execute_script("const s = document.createElement('style'); s.textContent = '* { transition: none !important }'; document.head.appendChild(s)")
+    accordion = basic_accordion
+
+    accordion.expand("erb-1")
+    accordion.collapse("erb-1")
+    sleep 0.5
+
+    assert accordion.content("erb-1")[:hidden].present?, "collapsed content must get the hidden attribute"
+  end
+
   # === Data State Management Tests ===
 
   test "item has correct data-state attribute when closed" do

@@ -3,7 +3,8 @@
 require "tailwind_merge"
 
 # Shared behavior for Accordion Trigger (button) component
-# Handles classes, ARIA attributes, and unique IDs
+# Handles classes and ARIA attributes. Ids and aria-controls are wired by the
+# accordion controller on connect (an id passed in attributes is kept).
 module UI::AccordionTriggerBehavior
   # Base CSS classes for trigger button
   def trigger_base_classes
@@ -12,21 +13,7 @@ module UI::AccordionTriggerBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def trigger_classes
-    UI::ClassMerger.merge([trigger_base_classes, @classes].compact.join(" "))
-  end
-
-  # Generate unique IDs for ARIA relationships
-  def trigger_id
-    @trigger_id ||= "accordion-trigger-#{item_value}"
-  end
-
-  def content_id
-    @content_id ||= "accordion-content-#{item_value}"
-  end
-
-  # Get item value from context (set by parent AccordionItem)
-  def item_value
-    @item_value || SecureRandom.hex(4)
+    UI::ClassMerger.merge([trigger_base_classes, "disabled:pointer-events-none disabled:opacity-50", @classes].compact.join(" "))
   end
 
   # Determine initial state from context
@@ -41,10 +28,12 @@ module UI::AccordionTriggerBehavior
 
   # Data attributes for Stimulus
   def trigger_data_attributes
-    {
+    data = {
       ui__accordion_target: "trigger",
       action: "click->ui--accordion#toggle"
     }
+    data[:disabled] = "" if @disabled
+    data
   end
 
   # Merge user-provided data attributes
@@ -59,9 +48,8 @@ module UI::AccordionTriggerBehavior
     base_attrs.merge(
       class: trigger_classes,
       type: "button",
-      id: trigger_id,
       "aria-expanded": aria_expanded,
-      "aria-controls": content_id,
+      disabled: @disabled || false,
       "data-state": trigger_state,
       "data-orientation": @orientation || "vertical",
       data: merged_trigger_data_attributes
