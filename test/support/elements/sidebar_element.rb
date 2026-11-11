@@ -149,7 +149,7 @@ module UI
 
         # Check if mobile sheet/drawer is visible
         if has_mobile_sheet?
-          mobile_sheet["data-state"] == "open"
+          mobile_sheet.find("[role='dialog']", visible: :all)["data-state"] == "open"
         elsif has_mobile_drawer?
           mobile_drawer["data-state"] == "open"
         else

@@ -5,8 +5,10 @@
 # Main sidebar container with support for variants and collapsible modes.
 # Must be used within a SidebarProvider.
 #
-# Automatically renders a mobile Sheet version (hidden on md+) alongside
-# the desktop sidebar (hidden below md), eliminating content duplication.
+# Renders the desktop sidebar (hidden below md) and an empty mobile Sheet
+# (hidden on md+). The block is rendered once, inside the desktop <aside>;
+# on phones the ui--sidebar controller moves that same content into the
+# sheet (and back), so ids stay unique and nested controllers run once.
 #
 # @example Basic usage
 #   render UI::Sidebar.new do
@@ -42,8 +44,9 @@ class UI::Sidebar < Phlex::HTML
   end
 
   def view_template(&block)
-    # Render mobile Sheet version (visible only below md breakpoint)
-    render_mobile_sheet(&block)
+    # Render mobile Sheet (visible only below md breakpoint); the controller
+    # moves the content into it on phones
+    render_mobile_sheet
 
     # Render desktop sidebar (visible only at md+ breakpoint)
     render_desktop_sidebar(&block)
@@ -51,7 +54,7 @@ class UI::Sidebar < Phlex::HTML
 
   private
 
-  def render_mobile_sheet(&block)
+  def render_mobile_sheet
     # Mobile Sheet - slides in from left/right based on side
     sheet_side = (@side.to_s == "right") ? "right" : "left"
 
@@ -59,20 +62,21 @@ class UI::Sidebar < Phlex::HTML
       classes: "md:hidden",
       data: {ui__sidebar_target: "mobileSheet"}
     ) do
-      render UI::SheetOverlay.new
-      render UI::SheetContent.new(
-        side: sheet_side,
-        show_close: false,
-        classes: "bg-sidebar text-sidebar-foreground w-[var(--sidebar-width-mobile)] p-0"
-      ) do
-        # Screen reader only header for accessibility
-        render UI::SheetHeader.new(classes: "sr-only") do
-          render UI::SheetTitle.new { "Sidebar" }
-          render UI::SheetDescription.new { "Navigation sidebar" }
+      # The content goes inside the overlay's container: the modal session
+      # keeps that container interactive and makes everything else inert
+      render UI::SheetOverlay.new do
+        render UI::SheetContent.new(
+          side: sheet_side,
+          show_close: false,
+          classes: "bg-sidebar text-sidebar-foreground w-[var(--sidebar-width-mobile)] p-0",
+          data: {ui__sidebar_target: "mobileContent"}
+        ) do
+          # Screen reader only header for accessibility
+          render UI::SheetHeader.new(classes: "sr-only") do
+            render UI::SheetTitle.new { "Sidebar" }
+            render UI::SheetDescription.new { "Navigation sidebar" }
+          end
         end
-
-        # Same content as desktop sidebar
-        div(class: "flex h-full w-full flex-col", &block)
       end
     end
   end
@@ -94,7 +98,7 @@ class UI::Sidebar < Phlex::HTML
 
     aside(**all_attributes) do
       # Inner container with flex layout
-      div(class: "flex h-full w-full flex-col", &block)
+      div(class: "flex h-full w-full flex-col", data: {ui__sidebar_target: "content"}, &block)
     end
   end
 end

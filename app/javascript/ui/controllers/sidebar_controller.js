@@ -1,16 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
+import { setIdRefs } from "../utils/id-manager.js"
 
 // Sidebar controller for collapsible navigation sidebars
 // Based on shadcn/ui Sidebar component
 //
 // Features:
 // - Desktop: collapsible sidebar (offcanvas, icon, or none modes)
-// - Mobile: drawer overlay with drag-to-close (via Drawer component)
+// - Mobile: modal sheet (ui--dialog). The content is rendered once, in the
+//   desktop <aside>, and moved into the sheet below the breakpoint
+// - Trigger exposes aria-expanded / aria-controls; a collapsed offcanvas
+//   sidebar is inert so its links leave the Tab order
 // - Cookie persistence for state
 // - Keyboard shortcut (Cmd/Ctrl + B)
 // - Responsive detection (< 768px = mobile)
 export default class extends Controller {
-  static targets = ["sidebar", "trigger", "mobileSheet", "mobileDrawer"]
+  static targets = ["sidebar", "trigger", "mobileSheet", "mobileDrawer", "content", "mobileContent"]
   static values = {
     open: { type: Boolean, default: true },
     openMobile: { type: Boolean, default: false },
@@ -39,7 +43,8 @@ export default class extends Controller {
     this.boundHandleSheetClose = this.handleSheetClose.bind(this)
     this.element.addEventListener("dialog:close", this.boundHandleSheetClose)
 
-    // Initial state update
+    // Put the content where it is shown, then sync state
+    this.placeContent()
     this.updateState()
   }
 
@@ -131,14 +136,18 @@ export default class extends Controller {
     this.updateMobileDrawer()
   }
 
+  // Called directly and again from openMobileValueChanged, so it only acts
+  // when the sheet isn't already in the wanted state
   updateMobileDrawer() {
+    this.syncTriggers()
+
     // If we have a mobile sheet target (uses ui--dialog controller like shadcn)
     if (this.hasMobileSheetTarget) {
       const sheetController = this.application.getControllerForElementAndIdentifier(
         this.mobileSheetTarget,
         "ui--dialog"
       )
-      if (sheetController) {
+      if (sheetController && sheetController.openValue !== this.openMobileValue) {
         if (this.openMobileValue) {
           sheetController.open()
         } else {
@@ -198,10 +207,44 @@ export default class extends Controller {
       this.sidebarTarget.dataset.side = this.sideValue
     }
 
+    // A collapsed offcanvas sidebar is off screen: keep its links out of
+    // the Tab order and the accessibility tree
+    if (this.hasSidebarTarget) {
+      this.sidebarTarget.inert = !this.isMobile() && state === "collapsed" && this.collapsibleValue === "offcanvas"
+    }
+
     // Update trigger targets
     this.triggerTargets.forEach(trigger => {
       trigger.dataset.state = state
     })
+    this.syncTriggers()
+  }
+
+  // aria-expanded / aria-controls follow what the trigger toggles right now:
+  // the mobile sheet on phones, the sidebar otherwise
+  syncTriggers() {
+    const mobile = this.isMobile() && this.hasMobileContentTarget
+    const controlled = mobile ? this.mobileContentTarget : (this.hasSidebarTarget ? this.sidebarTarget : null)
+    const expanded = mobile ? this.openMobileValue : this.getState() === "expanded"
+
+    this.triggerTargets.forEach(trigger => {
+      trigger.setAttribute("aria-expanded", String(expanded))
+      if (controlled) setIdRefs(trigger, "aria-controls", controlled, { prefix: "sidebar" })
+    })
+  }
+
+  // The content is rendered once, in the <aside>. Below the breakpoint it
+  // moves into the mobile sheet, and back above it.
+  placeContent() {
+    if (!this.hasContentTarget) return
+
+    const mobile = this.isMobile() && this.hasMobileContentTarget
+    const host = mobile ? this.mobileContentTarget : (this.hasSidebarTarget ? this.sidebarTarget : null)
+    if (!host || this.contentTarget.parentElement === host) return
+
+    // Leaving the phone layout with the sheet open: close it first
+    if (!mobile && this.openMobileValue) this.closeMobile()
+    host.append(this.contentTarget)
   }
 
   // ============================================================================
@@ -239,6 +282,7 @@ export default class extends Controller {
 
   handleResize() {
     // Update state on resize (e.g., when crossing mobile breakpoint)
+    this.placeContent()
     this.updateState()
   }
 
@@ -247,6 +291,14 @@ export default class extends Controller {
     // Check if the event came from our mobile sheet target
     if (this.hasMobileSheetTarget && this.mobileSheetTarget.contains(event.target)) {
       this.openMobileValue = false
+      this.syncTriggers()
+
+      // The sheet restores focus to what opened it; when that was <body>
+      // (Safari doesn't focus buttons on click) fall back to the trigger
+      const active = document.activeElement
+      if (!active || active === document.body) {
+        this.triggerTargets.find(trigger => !this.mobileSheetTarget.contains(trigger))?.focus()
+      }
     }
   }
 

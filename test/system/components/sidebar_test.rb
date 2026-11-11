@@ -393,17 +393,40 @@ class SidebarTest < UI::SystemTestCase
     refute sidebar.is_mobile?
   end
 
-  # Note: Mobile tests would require resizing the viewport to < 768px
-  # and interacting with the mobile sheet/drawer. These tests are skipped
-  # for now as they require viewport manipulation which may not be
-  # consistent across test environments.
-  #
-  # Example mobile test (commented out):
-  # test "opens mobile drawer in mobile viewport" do
-  #   page.current_window.resize_to(375, 667)
-  #   assert sidebar.is_mobile?
-  #
-  #   sidebar.open_mobile
-  #   assert sidebar.mobile_open?
-  # end
+  # === Mobile sheet and keyboard access ===
+
+  def active_element_inside?(selector)
+    page.evaluate_script("!!document.activeElement.closest(#{selector.to_json})")
+  end
+
+  test "on phones the sheet is a modal: focus moves in, Tab is trapped, Escape returns to the trigger" do
+    page.current_window.resize_to(375, 800)
+    assert sidebar.is_mobile?
+
+    sidebar.trigger.click
+    assert page.has_css?("[data-ui--sidebar-target='mobileContent'][data-state='open']")
+    assert active_element_inside?("[role='dialog']"), "focus should move into the sheet"
+    assert_equal 1, page.all("[data-slot='sidebar-content']", visible: :all).size, "content rendered once"
+
+    20.times { page.send_keys(:tab) }
+    assert active_element_inside?("[role='dialog']"), "Tab should stay inside the sheet"
+
+    page.send_keys(:escape)
+    assert page.has_css?("[data-ui--sidebar-target='mobileContent'][data-state='closed']", visible: :all)
+    assert_equal "false", sidebar.trigger["aria-expanded"]
+    assert page.evaluate_script("document.activeElement.matches(\"[data-ui--sidebar-target='trigger']\")"),
+      "focus should return to the trigger"
+  ensure
+    page.current_window.resize_to(1400, 900)
+  end
+
+  test "a collapsed offcanvas sidebar is out of the Tab order" do
+    page.execute_script("document.querySelector('[data-controller~=\"ui--sidebar\"]').setAttribute('data-ui--sidebar-collapsible-value', 'offcanvas')")
+    sidebar.collapse
+    assert sidebar.collapsed?
+
+    sidebar.trigger.native.focus
+    page.send_keys([:shift, :tab])
+    refute active_element_inside?("aside[data-slot='sidebar']"), "Shift+Tab from the trigger must not land in the hidden sidebar"
+  end
 end
