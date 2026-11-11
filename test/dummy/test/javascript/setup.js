@@ -7,12 +7,16 @@ import { resetScrollLockState } from "../../../../app/javascript/ui/utils/scroll
 import { resetEscapeLayers } from "../../../../app/javascript/ui/utils/escape-key-manager.js"
 import { resetFocusTraps } from "../../../../app/javascript/ui/utils/focus-trap-manager.js"
 import { resetInert } from "../../../../app/javascript/ui/utils/inert-manager.js"
+import { cleanup } from "./support/render.js"
 
 // jest-dom matchers (toBeVisible, toHaveAccessibleName, toHaveFocus, ...)
 expect.extend(matchers)
 
 // Reset shared utility state between tests
 afterEach(() => {
+  // Stop the Stimulus app a render() started, so it can't connect the next
+  // file's controllers a second time
+  cleanup()
   resetScrollLockState()
   // Escape layers, focus traps and inert sets are module-level stacks; a test
   // that leaves an overlay open must not leak it into the next test
