@@ -1,21 +1,45 @@
 import { Controller } from "@hotwired/stimulus"
 import { computePosition, flip, offset, shift, autoUpdate } from "@floating-ui/dom"
 import {
-  getFocusableItems,
-  findCurrentItemIndex,
+  MENU_ITEM_SELECTOR,
+  getMenuItems,
   focusItem as focusItemUtil,
   focusNextItem as focusNextItemUtil,
   focusPreviousItem as focusPreviousItemUtil,
   hasSubmenu,
+  getSubmenu,
+  getSubmenuTrigger,
+  isSubmenu,
+  initSubmenuTriggers,
   openSubmenu,
   closeSubmenu,
   closeAllSubmenus,
-  positionSubmenu,
+  closeSiblingSubmenus,
   clearAllTabindexes,
-  getKeyboardFocusedItem
+  updateRovingTabindex,
+  getKeyboardFocusedItem,
+  isItemDisabled,
+  isEditableTarget,
+  createTypeahead,
+  toggleCheckbox as toggleCheckboxUtil,
+  selectRadio as selectRadioUtil
 } from "../utils/menu_utils.js"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
+import { createEscapeLayer } from "../utils/escape-key-manager.js"
 
-// Dropdown Menu controller with keyboard navigation support
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+const NATIVE_ACTIVATOR = 'button, a[href], input[type="button"], input[type="submit"], input[type="reset"], summary'
+
+// Dropdown Menu controller (WAI-ARIA menu button + menu).
+//
+// - Trigger: aria-haspopup="menu", aria-expanded, aria-controls → menu; the
+//   menu is labelled by the trigger. Enter/Space/ArrowDown open on the first
+//   item, ArrowUp on the last.
+// - Menu: roving focus, Home/End, typeahead, disabled items skipped,
+//   submenus with ArrowRight/ArrowLeft (Enter/Space also open them).
+// - Escape goes through the shared layer stack: it closes the innermost open
+//   submenu, then the menu, and focus returns to the trigger. Selecting an
+//   item (keyboard or pointer) and Tab also return focus to the trigger.
 export default class extends Controller {
   static targets = ["trigger", "menu", "content", "item"]
   static values = {
@@ -31,261 +55,306 @@ export default class extends Controller {
     this.cleanup = null
     this.closeSubmenuTimeouts = new Map() // Track timeouts for closing submenus
     this.lastHoveredItem = null // Track last item with mouse hover
-    this.shouldReturnFocusToTrigger = false // Flag to return focus after closing
   }
 
   connect() {
-    // Close dropdown when clicking outside
+    this.typeahead = createTypeahead()
     this.boundHandleClickOutside = this.handleClickOutside.bind(this)
     this.boundHandleKeydown = this.handleKeydown.bind(this)
     this.boundHandleFocusOut = this.handleFocusOut.bind(this)
-    document.addEventListener('click', this.boundHandleClickOutside)
 
-    // Listen for focus leaving the dropdown
+    document.addEventListener('click', this.boundHandleClickOutside)
     this.element.addEventListener('focusout', this.boundHandleFocusOut)
+    // Menu keys are handled on the component, never page-wide: keys typed
+    // outside the menu (or in a text field inside it) are left alone.
+    this.element.addEventListener('keydown', this.boundHandleKeydown)
+
+    this.escapeLayer = createEscapeLayer(() => this.handleEscape(), { element: this.element })
+
+    this.setupAria()
+    this.resetToClosed()
   }
 
   disconnect() {
-    // Cleanup Floating UI auto-update
     if (this.cleanup) {
       this.cleanup()
       this.cleanup = null
     }
 
-    // Clear all pending submenu close timeouts
-    this.closeSubmenuTimeouts.forEach((timeoutId) => clearTimeout(timeoutId))
-    this.closeSubmenuTimeouts.clear()
+    this.clearSubmenuTimeouts()
+    this.escapeLayer?.deactivate()
+    this.typeahead?.reset()
 
     document.removeEventListener('click', this.boundHandleClickOutside)
-    document.removeEventListener('keydown', this.boundHandleKeydown)
+    this.element.removeEventListener('keydown', this.boundHandleKeydown)
     this.element.removeEventListener('focusout', this.boundHandleFocusOut)
   }
 
-  handleFocusOut(event) {
-    // Don't do anything if dropdown is not open
+  // ===========================================================================
+  // ARIA / STATE
+  // ===========================================================================
+
+  get menuElement() {
+    return this.hasMenuTarget ? this.menuTarget : (this.hasContentTarget ? this.contentTarget : null)
+  }
+
+  // The element that carries the menu-button semantics: the trigger target
+  // itself, or the button/link it wraps.
+  get triggerElement() {
+    if (!this.hasTriggerTarget) return null
+    const trigger = this.triggerTarget
+    if (trigger.matches(`${NATIVE_ACTIVATOR}, [role="button"]`)) return trigger
+    return trigger.querySelector(FOCUSABLE) || trigger
+  }
+
+  setupAria() {
+    const menu = this.menuElement
+    const trigger = this.triggerElement
+    if (!menu) return
+
+    ensureId(menu, 'dropdown-menu-content')
+    if (trigger) {
+      trigger.setAttribute('aria-haspopup', 'menu')
+      trigger.setAttribute('aria-expanded', String(this.openValue))
+      setIdRefs(trigger, 'aria-controls', menu, { prefix: 'dropdown-menu-trigger' })
+      setIdRefs(menu, 'aria-labelledby', trigger, { prefix: 'dropdown-menu-trigger' })
+    }
+    initSubmenuTriggers(this.element, 'dropdown-menu')
+  }
+
+  // A Turbo snapshot taken while the menu was open restores it with
+  // data-state="open" (and open-value="true") but no live state behind it.
+  // Start every connect closed.
+  resetToClosed() {
+    const menu = this.menuElement
+    if (!menu) return
+    if (this.openValue || menu.getAttribute('data-state') === 'open') {
+      this.openValue = false
+      closeAllSubmenus(this.element)
+      clearAllTabindexes(this.element)
+      menu.classList.add('hidden')
+      menu.setAttribute('data-state', 'closed')
+      this.triggerElement?.setAttribute('aria-expanded', 'false')
+    }
+  }
+
+  // ===========================================================================
+  // OPEN / CLOSE
+  // ===========================================================================
+
+  toggle(event) {
+    // Legacy markup bound `keydown.enter/space->toggle` on the trigger. On a
+    // native button or link the browser fires a click as well: let the click
+    // do it, or the menu opens and closes again.
+    if (event && event.type === 'keydown') {
+      if (this.isNativeActivation(event)) return
+      event.preventDefault()
+    }
+
+    if (this.openValue) {
+      this.close()
+    } else {
+      this.open()
+    }
+  }
+
+  handleTriggerKeydown(event) {
+    switch (event.key) {
+      case 'Enter':
+      case ' ':
+        if (this.isNativeActivation(event)) return // the native click toggles
+        event.preventDefault()
+        this.toggle()
+        break
+      case 'ArrowDown':
+        event.preventDefault()
+        if (this.openValue) this.focusItem(0)
+        else this.open({ focus: 'first' })
+        break
+      case 'ArrowUp':
+        event.preventDefault()
+        if (this.openValue) this.focusItem(this.getFocusableItems().length - 1)
+        else this.open({ focus: 'last' })
+        break
+    }
+  }
+
+  isNativeActivation(event) {
+    const activator = event.target.closest?.(NATIVE_ACTIVATOR)
+    return !!(activator && this.hasTriggerTarget && this.triggerTarget.contains(activator))
+  }
+
+  open({ focus = 'first' } = {}) {
+    const menu = this.menuElement
+    if (!menu) return
+
+    this.openValue = true
+    this.typeahead.reset()
+    menu.classList.remove('hidden')
+    menu.setAttribute('data-state', 'open')
+    this.triggerElement?.setAttribute('aria-expanded', 'true')
+    this.positionDropdown()
+    this.escapeLayer.activate()
+
+    const items = this.getMenuItems(menu)
+    if (focus === 'last') this.focusItem(items.length - 1)
+    else if (focus) this.focusItem(0)
+  }
+
+  close(options = {}) {
+    const { returnFocus = false } = options
+    const wasOpen = this.openValue
+    const menu = this.menuElement
+
+    this.openValue = false
+    this.escapeLayer?.deactivate()
+    this.typeahead?.reset()
+
+    // Move focus back before hiding the menu, so it never drops to <body>.
+    if (returnFocus && wasOpen) this.focusTrigger()
+
+    this.clearSubmenuTimeouts()
+    closeAllSubmenus(this.element)
+    clearAllTabindexes(this.element)
+    this.lastHoveredItem = null
+
+    if (menu) {
+      menu.classList.add('hidden')
+      menu.setAttribute('data-state', 'closed')
+    }
+    this.triggerElement?.setAttribute('aria-expanded', 'false')
+
+    if (this.cleanup) {
+      this.cleanup()
+      this.cleanup = null
+    }
+  }
+
+  focusTrigger() {
+    this.triggerElement?.focus()
+  }
+
+  handleEscape() {
+    const focusedCommandOption = this.focusedCommandOption()
+    if (focusedCommandOption) {
+      this.closeCommandSubmenu(focusedCommandOption.closest('[data-controller~="command"]'))
+    } else if (!this.closeCurrentSubmenuWithKeyboard()) {
+      this.close({ returnFocus: true })
+    }
+  }
+
+  handleFocusOut() {
     if (!this.openValue) return
 
-    // Check if focus is moving outside the dropdown element
-    // Use setTimeout to allow the new focus target to be set
+    // Let the new focus target settle, then close if focus left the component
     setTimeout(() => {
-      const newFocusedElement = document.activeElement
-
-      // If the new focused element is outside our dropdown, close without returning focus
-      if (!this.element.contains(newFocusedElement)) {
+      if (this.openValue && !this.element.contains(document.activeElement)) {
         this.close({ returnFocus: false })
       }
     }, 0)
   }
 
-  // Submenu hover handlers
+  handleClickOutside(event) {
+    if (!this.openValue) return
+    if (!this.element.contains(event.target)) {
+      this.close({ returnFocus: false })
+    }
+  }
+
+  // ===========================================================================
+  // ITEM ACTIONS
+  // ===========================================================================
+
+  // click on a menuitem: activate and close, focus back to the trigger
+  select(event) {
+    const item = event.currentTarget
+    if (isItemDisabled(item)) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return
+    }
+    if (hasSubmenu(item)) return
+    this.close({ returnFocus: true })
+  }
+
+  toggleCheckbox(event) {
+    const item = event.currentTarget
+    if (item.getAttribute('role') !== 'menuitemcheckbox') return
+    event.stopPropagation()
+    toggleCheckboxUtil(item)
+  }
+
+  selectRadio(event) {
+    const item = event.currentTarget
+    if (item.getAttribute('role') !== 'menuitemradio') return
+    event.stopPropagation()
+    selectRadioUtil(item)
+  }
+
+  // ===========================================================================
+  // POINTER
+  // ===========================================================================
+
+  trackHoveredItem(event) {
+    const item = event.currentTarget
+    if (isItemDisabled(item)) return
+
+    // Focusing the hovered item (instead of blurring the old one) keeps focus
+    // inside the dropdown, so handleFocusOut doesn't close the menu.
+    updateRovingTabindex(this.element, item)
+    item.focus()
+    this.lastHoveredItem = item
+  }
+
   openSubmenuHandler(event) {
     const trigger = event.currentTarget
-    const submenu = trigger.nextElementSibling
+    const submenu = getSubmenu(trigger)
+    if (isItemDisabled(trigger)) return
 
-    // Remove keyboard focus from all items, except this one
-    clearAllTabindexes(this.element)
-
-    // Set tabindex="0" on the hovered trigger and focus it
-    // Focusing the new item instead of blurring the old one keeps focus inside
-    // the dropdown, preventing handleFocusOut from closing the menu
-    trigger.setAttribute('tabindex', '0')
+    updateRovingTabindex(this.element, trigger)
     trigger.focus()
-
-    // Track the hovered item for keyboard navigation continuity
     this.lastHoveredItem = trigger
 
-    // Cancel any pending close timeout for this submenu
     if (this.closeSubmenuTimeouts.has(trigger)) {
       clearTimeout(this.closeSubmenuTimeouts.get(trigger))
       this.closeSubmenuTimeouts.delete(trigger)
     }
 
-    if (submenu && submenu.hasAttribute('role') && submenu.getAttribute('role') === 'menu') {
-      // Close sibling submenus (not parent or child submenus)
+    if (submenu) {
       this.closeSiblingSubmenus(trigger)
-
-      // Open this submenu using utility
       openSubmenu(trigger, submenu)
-
-      // If submenu contains a command controller, focus first item
       this.focusFirstCommandItem(submenu)
     }
   }
 
-  // Backwards compatibility alias
+  // Backwards compatibility alias (used in markup: mouseenter->ui--dropdown#openSubmenu)
   openSubmenu(event) {
     return this.openSubmenuHandler(event)
   }
 
-  // Focus first item in command menu if present in submenu
-  focusFirstCommandItem(submenu) {
-    const commandElement = submenu.querySelector('[data-controller~="command"]')
-    if (!commandElement) return
-
-    // Wait a tick for command controller to initialize
-    setTimeout(() => {
-      const firstOption = commandElement.querySelector('[role="option"]:not([data-hidden])')
-      if (firstOption) {
-        // Remove any existing focus
-        const allOptions = commandElement.querySelectorAll('[role="option"]')
-        allOptions.forEach(option => {
-          option.removeAttribute('data-focused')
-          option.classList.remove('bg-accent', 'text-accent-foreground')
-        })
-
-        // Focus first item
-        firstOption.setAttribute('data-focused', 'true')
-        firstOption.classList.add('bg-accent', 'text-accent-foreground')
-      }
-    }, 50)
-  }
-
-  // Track hovered item (for items without submenu)
-  trackHoveredItem(event) {
-    const item = event.currentTarget
-
-    // Remove keyboard focus from all items, except this one
-    clearAllTabindexes(this.element)
-
-    // Set tabindex="0" on the hovered item and focus it
-    // Focusing the new item instead of blurring the old one keeps focus inside
-    // the dropdown, preventing handleFocusOut from closing the menu
-    item.setAttribute('tabindex', '0')
-    item.focus()
-
-    // Track the hovered item for keyboard navigation continuity
-    this.lastHoveredItem = item
-  }
-
-  // Toggle checkbox state
-  toggleCheckbox(event) {
-    const item = event.currentTarget
-
-    // Only handle checkbox items
-    if (item.getAttribute('role') !== 'menuitemcheckbox') return
-
-    // Don't close dropdown when clicking checkbox
-    event.stopPropagation()
-
-    // Toggle checked state
-    const currentState = item.getAttribute('data-state')
-    const newState = currentState === 'checked' ? 'unchecked' : 'checked'
-    const isChecked = newState === 'checked'
-
-    item.setAttribute('data-state', newState)
-    item.setAttribute('aria-checked', isChecked)
-
-    // Toggle check icon visibility
-    const checkIcon = item.querySelector('[data-state="checked"]')
-    if (checkIcon) {
-      checkIcon.parentElement.innerHTML = isChecked ? `
-        <span data-state="checked">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4">
-            <path d="M20 6 9 17l-5-5"></path>
-          </svg>
-        </span>
-      ` : ''
-    } else if (isChecked) {
-      // Add check icon if it doesn't exist
-      const iconContainer = item.querySelector('.absolute.left-2')
-      if (iconContainer) {
-        iconContainer.innerHTML = `
-          <span data-state="checked">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4">
-              <path d="M20 6 9 17l-5-5"></path>
-            </svg>
-          </span>
-        `
-      }
-    }
-  }
-
-  // Select radio item (only one can be selected in a group)
-  selectRadio(event) {
-    const item = event.currentTarget
-
-    // Only handle radio items
-    if (item.getAttribute('role') !== 'menuitemradio') return
-
-    // Don't close dropdown when clicking radio
-    event.stopPropagation()
-
-    // Find the radio group (parent menu or radio group container)
-    const radioGroup = item.closest('[role="group"]') || item.closest('[role="menu"]')
-    if (!radioGroup) return
-
-    // Uncheck all radio items in the same group
-    const allRadios = radioGroup.querySelectorAll('[role="menuitemradio"]')
-    allRadios.forEach(radio => {
-      radio.setAttribute('data-state', 'unchecked')
-      radio.setAttribute('aria-checked', 'false')
-      const iconContainer = radio.querySelector('.absolute.left-2')
-      if (iconContainer) {
-        iconContainer.innerHTML = ''
-      }
-    })
-
-    // Check the clicked item
-    item.setAttribute('data-state', 'checked')
-    item.setAttribute('aria-checked', 'true')
-
-    // Add radio indicator
-    const iconContainer = item.querySelector('.absolute.left-2')
-    if (iconContainer) {
-      iconContainer.innerHTML = `
-        <span data-state="checked">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle size-2 fill-current">
-            <circle cx="12" cy="12" r="10"></circle>
-          </svg>
-        </span>
-      `
-    }
-  }
-
   closeSubmenuHandler(event) {
     const trigger = event.currentTarget
-    const submenu = trigger.nextElementSibling
+    const submenu = getSubmenu(trigger)
     const relatedTarget = event.relatedTarget
 
-    // Cancel if we're moving to the submenu itself or a child element
-    if (relatedTarget && submenu && submenu.contains(relatedTarget)) {
-      return
-    }
+    if (relatedTarget && submenu && submenu.contains(relatedTarget)) return
 
-    // Add delay before closing to allow navigation to nested submenus
+    // Delay so the pointer can travel into the submenu
     const timeoutId = setTimeout(() => {
-      if (submenu && submenu.hasAttribute('role') && submenu.getAttribute('role') === 'menu') {
-        // Close this submenu and all its children using utility
-        closeSubmenu(submenu, trigger)
-      }
+      if (submenu) closeSubmenu(submenu, trigger)
       this.closeSubmenuTimeouts.delete(trigger)
-    }, 300) // 300ms delay allows smooth navigation
+    }, 300)
 
     this.closeSubmenuTimeouts.set(trigger, timeoutId)
   }
 
-  // Backwards compatibility alias - closeSubmenu is used in HTML with data-action
+  // Backwards compatibility alias (used in markup: mouseleave->ui--dropdown#closeSubmenu)
   closeSubmenu(event) {
     return this.closeSubmenuHandler(event)
   }
 
   closeSiblingSubmenus(currentTrigger) {
-    // Find the parent menu
-    const parentMenu = currentTrigger.closest('[role="menu"]')
-    if (!parentMenu) return
-
-    // Close all submenus that are siblings (same level)
-    // Note: We filter by data-dropdown-target for backwards compatibility with existing HTML
-    const siblingTriggers = Array.from(parentMenu.children).filter(child => {
-      return child !== currentTrigger && child.hasAttribute('data-dropdown-target') && child.getAttribute('data-dropdown-target').includes('item')
-    })
-
-    siblingTriggers.forEach(sibling => {
-      const siblingSubmenu = sibling.nextElementSibling
-      if (siblingSubmenu && siblingSubmenu.hasAttribute('role') && siblingSubmenu.getAttribute('role') === 'menu') {
-        closeSubmenu(siblingSubmenu, sibling)
-      }
-    })
+    closeSiblingSubmenus(currentTrigger)
   }
 
   closeAllSubmenusHandler() {
@@ -297,405 +366,224 @@ export default class extends Controller {
     return this.closeAllSubmenusHandler()
   }
 
-  toggle(event) {
-    // Don't stopPropagation - allow click to reach document for handleClickOutside
-    // event.stopPropagation()
-    this.openValue = !this.openValue
-
-    const target = this.hasMenuTarget ? this.menuTarget : this.contentTarget
-    target.classList.toggle('hidden')
-
-    if (!target.classList.contains('hidden')) {
-      // Menu is opening
-      target.setAttribute('data-state', 'open')
-      this.positionDropdown()
-      this.setupKeyboardNavigation()
-
-      // Focus first item after a short delay
-      setTimeout(() => {
-        this.focusItem(0)
-      }, 100)
-    } else {
-      // Menu is closing
-      target.setAttribute('data-state', 'closed')
-      this.teardownKeyboardNavigation()
-    }
+  clearSubmenuTimeouts() {
+    this.closeSubmenuTimeouts.forEach((timeoutId) => clearTimeout(timeoutId))
+    this.closeSubmenuTimeouts.clear()
   }
 
-  close(options = {}) {
-    const { returnFocus = this.shouldReturnFocusToTrigger } = options
-
-    this.openValue = false
-    const target = this.hasMenuTarget ? this.menuTarget : this.contentTarget
-
-    // Close all submenus before closing main menu
-    closeAllSubmenus(this.element)
-
-    // Clear keyboard/hover focus from all items (including checkboxes and radios)
-    clearAllTabindexes(this.element)
-
-    // Clear last hovered item
-    this.lastHoveredItem = null
-
-    if (target) {
-      target.classList.add('hidden')
-      target.setAttribute('data-state', 'closed')
-    }
-
-    // Cleanup Floating UI auto-update when closing
-    if (this.cleanup) {
-      this.cleanup()
-      this.cleanup = null
-    }
-
-    this.teardownKeyboardNavigation()
-
-    // Return focus to trigger button (ARIA best practice)
-    if (returnFocus && this.hasTriggerTarget) {
-      setTimeout(() => {
-        this.focusTrigger()
-      }, 0)
-    }
-
-    // Reset the flag
-    this.shouldReturnFocusToTrigger = false
-  }
-
-  // Focus the trigger element, or first focusable child if trigger is not focusable
-  focusTrigger() {
-    if (!this.triggerTarget) return
-
-    // Check if trigger itself is focusable
-    const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-
-    if (isFocusable) {
-      this.triggerTarget.focus()
-    } else {
-      // Find first focusable element inside the trigger
-      const focusableChild = this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-      if (focusableChild) {
-        focusableChild.focus()
-      }
-    }
-  }
-
-  handleClickOutside(event) {
-    // Check if click is outside this dropdown
-    if (!this.element.contains(event.target)) {
-      this.close({ returnFocus: false })
-    } else if (this.hasTriggerTarget && this.triggerTarget.contains(event.target)) {
-      // Click is on our own trigger - toggle() will handle it, don't close here
-      return
-    }
-  }
-
-  setupKeyboardNavigation() {
-    document.addEventListener('keydown', this.boundHandleKeydown)
-  }
-
-  teardownKeyboardNavigation() {
-    document.removeEventListener('keydown', this.boundHandleKeydown)
-  }
+  // ===========================================================================
+  // KEYBOARD
+  // ===========================================================================
 
   handleKeydown(event) {
-    if (!this.openValue) return
+    if (!this.openValue || event.defaultPrevented) return
 
-    // Get the currently focused element
-    const focusedElement = document.activeElement
+    const menu = this.menuElement
+    const target = event.target
+    if (!menu || !menu.contains(target)) return // trigger keys: handleTriggerKeydown
 
-    // Check if we're in a command controller by looking for a focused command option
-    const focusedCommandOption = this.element.querySelector('[data-controller~="command"] [role="option"][data-focused="true"]')
+    // A Command inside a submenu: its options are navigated with the arrows
+    const focusedCommandOption = this.focusedCommandOption()
     if (focusedCommandOption && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-      // Let command controller handle ArrowDown/Up
-      const commandElement = focusedCommandOption.closest('[data-controller~="command"]')
-      this.handleCommandNavigation(event, commandElement)
+      this.handleCommandNavigation(event, focusedCommandOption.closest('[data-controller~="command"]'))
       return
     }
 
-    const items = this.getFocusableItems()
+    if (event.key === 'Tab') {
+      // Close and put focus on the trigger; the browser's Tab then moves on
+      // from there, to the element after (or before) the menu button.
+      this.close({ returnFocus: true })
+      return
+    }
+
+    // Text fields own Space, Home/End, ←/→ and printable keys
+    if (isEditableTarget(target)) return
+
+    const current = this.currentItem()
+
+    if (this.typeahead.isTypeaheadKey(event)) {
+      const match = this.typeahead.handleKey(event, this.getFocusableItems(), current)
+      if (match) this.focusItemElement(match)
+      return
+    }
 
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault()
-        this.focusNextItem(items)
+        this.focusNextItem()
         break
 
       case 'ArrowUp':
         event.preventDefault()
-        this.focusPreviousItem(items)
+        this.focusPreviousItem()
         break
 
       case 'ArrowRight':
         event.preventDefault()
-        // If focused item has a submenu, open it
-        if (focusedElement && hasSubmenu(focusedElement)) {
-          this.openSubmenuWithKeyboard(focusedElement)
-        }
+        if (current && hasSubmenu(current)) this.openSubmenuWithKeyboard(current)
         break
 
       case 'ArrowLeft':
         event.preventDefault()
-        // If we're in a command, close it and return to parent menu
         if (focusedCommandOption) {
-          const commandElement = focusedCommandOption.closest('[data-controller~="command"]')
-          this.closeCommandSubmenu(commandElement)
+          this.closeCommandSubmenu(focusedCommandOption.closest('[data-controller~="command"]'))
         } else {
-          // Close current submenu and return focus to parent
-          this.closeCurrentSubmenuWithKeyboard(focusedElement)
+          this.closeCurrentSubmenuWithKeyboard()
         }
         break
 
       case 'Home':
         event.preventDefault()
-        this.focusItem(0, items)
+        this.focusItem(0)
         break
 
       case 'End':
         event.preventDefault()
-        this.focusItem(items.length - 1, items)
-        break
-
-      case 'Escape':
-        event.preventDefault()
-        // Close only the current submenu level, or entire menu if at top level
-        if (focusedCommandOption) {
-          const commandElement = focusedCommandOption.closest('[data-controller~="command"]')
-          this.closeCommandSubmenu(commandElement)
-        } else if (!this.closeCurrentSubmenuWithKeyboard(focusedElement)) {
-          // Return focus to trigger when closing with Escape (ARIA best practice)
-          this.close({ returnFocus: true })
-        }
+        this.focusItem(this.getFocusableItems().length - 1)
         break
 
       case 'Enter':
-        event.preventDefault()
-        // Find the item with keyboard focus (tabindex="0") or DOM focus
-        const enterTarget = getKeyboardFocusedItem(this.element) || focusedElement
-        if (enterTarget && enterTarget.hasAttribute('role')) {
-          const role = enterTarget.getAttribute('role')
-
-          if (role === 'menuitem') {
-            // Regular menu item: open submenu or activate and close
-            if (hasSubmenu(enterTarget)) {
-              this.openSubmenuWithKeyboard(enterTarget)
-            } else {
-              enterTarget.click()
-              this.close()
-            }
-          } else if (role === 'menuitemcheckbox' || role === 'menuitemradio') {
-            // Checkbox/Radio: toggle/select and close menu (ARIA spec)
-            enterTarget.click()
-            // Set flag to return focus after close completes
-            this.shouldReturnFocusToTrigger = true
-            this.close()
-          }
-        }
-        break
-
       case ' ':
         event.preventDefault()
-        // Find the item with keyboard focus (tabindex="0") or DOM focus
-        const spaceTarget = getKeyboardFocusedItem(this.element) || focusedElement
-        if (spaceTarget && spaceTarget.hasAttribute('role')) {
-          const role = spaceTarget.getAttribute('role')
-
-          if (role === 'menuitem') {
-            // Regular menu item: open submenu or activate and close
-            if (hasSubmenu(spaceTarget)) {
-              this.openSubmenuWithKeyboard(spaceTarget)
-            } else {
-              spaceTarget.click()
-              this.close()
-            }
-          } else if (role === 'menuitemcheckbox' || role === 'menuitemradio') {
-            // Checkbox/Radio: toggle/select but keep menu open (ARIA spec)
-            spaceTarget.click()
-            // Don't close the menu - this is the key difference from Enter
-          }
-        }
+        this.activateItem(current, { closeOnCheck: event.key === 'Enter' })
         break
     }
+  }
+
+  // Enter/Space on an item. Checkbox/radio: Enter toggles and closes, Space
+  // toggles and keeps the menu open (React Aria).
+  activateItem(item, { closeOnCheck }) {
+    if (!item || isItemDisabled(item)) return
+    const role = item.getAttribute('role')
+
+    if (role === 'menuitem') {
+      if (hasSubmenu(item)) {
+        this.openSubmenuWithKeyboard(item)
+      } else {
+        item.click()
+        this.close({ returnFocus: true })
+      }
+    } else if (role === 'menuitemcheckbox' || role === 'menuitemradio') {
+      item.click()
+      if (closeOnCheck) this.close({ returnFocus: true })
+    }
+  }
+
+  currentItem() {
+    const active = document.activeElement
+    if (active && active.matches?.(MENU_ITEM_SELECTOR) && this.element.contains(active)) return active
+    return getKeyboardFocusedItem(this.element)
+  }
+
+  focusedCommandOption() {
+    return this.element.querySelector('[data-controller~="command"] [role="option"][data-focused="true"]')
+  }
+
+  getMenuItems(menu) {
+    return getMenuItems(menu)
   }
 
   getFocusableItems() {
-    // Determine the current menu based on the item with tabindex="0"
-    const currentMenu = this.getCurrentMenu()
-    return getFocusableItems(this.element, currentMenu)
+    return getMenuItems(this.getCurrentMenu())
   }
 
   getCurrentMenu() {
-    const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    const currentItem = Array.from(allItems).find(item => item.getAttribute('tabindex') === '0')
-
-    if (currentItem) {
-      return currentItem.closest('[role="menu"]')
-    }
-
-    // Default to the main menu if no item has tabindex="0"
-    return this.hasMenuTarget ? this.menuTarget : this.contentTarget
+    const current = this.currentItem()
+    if (current) return current.closest('[role="menu"]')
+    return this.menuElement
   }
 
-  focusNextItem(items = null) {
-    items = items || this.getFocusableItems()
-    if (items.length === 0) return
-
-    const result = focusNextItemUtil(items, this.element, true)
-    if (result) {
-      this.lastHoveredItem = result
-    }
+  focusNextItem() {
+    const result = focusNextItemUtil(this.getFocusableItems(), this.element, true)
+    if (result) this.afterKeyboardFocus(result)
   }
 
-  focusPreviousItem(items = null) {
-    items = items || this.getFocusableItems()
-    if (items.length === 0) return
-
-    const result = focusPreviousItemUtil(items, this.element, true)
-    if (result) {
-      this.lastHoveredItem = result
-    }
+  focusPreviousItem() {
+    const result = focusPreviousItemUtil(this.getFocusableItems(), this.element, true)
+    if (result) this.afterKeyboardFocus(result)
   }
 
-  focusItem(index, items = null) {
-    // Always recalculate items to ensure we have the current menu items after any DOM changes
-    items = this.getFocusableItems()
-    if (items.length === 0 || index < 0 || index >= items.length) {
+  focusItem(index) {
+    const items = this.getFocusableItems()
+    if (items.length === 0 || index < 0 || index >= items.length) return
+
+    const targetItem = focusItemUtil(items, index, this.element)
+    if (targetItem) this.afterKeyboardFocus(targetItem)
+  }
+
+  focusItemElement(item) {
+    updateRovingTabindex(this.element, item)
+    item.focus()
+    this.afterKeyboardFocus(item)
+  }
+
+  // Moving through a menu with the keyboard closes the submenus of the other
+  // items at that level.
+  afterKeyboardFocus(item) {
+    this.lastHoveredItem = item
+    closeSiblingSubmenus(item)
+  }
+
+  openSubmenuWithKeyboard(trigger) {
+    const submenu = getSubmenu(trigger)
+    if (!submenu || isItemDisabled(trigger)) return
+
+    this.closeSiblingSubmenus(trigger)
+    openSubmenu(trigger, submenu)
+
+    if (submenu.querySelector('[data-controller~="command"]')) {
+      this.focusFirstCommandItem(submenu)
       return
     }
 
-    // Close all submenus in the current menu level when navigating with keyboard
-    const currentMenu = items[0] ? items[0].closest('[role="menu"]') : null
-    if (currentMenu) {
-      const siblingsWithSubmenus = Array.from(currentMenu.children).filter(child => {
-        if (child.classList && child.classList.contains('relative')) {
-          const trigger = child.querySelector(':scope > [role="menuitem"]')
-          const submenu = trigger?.nextElementSibling
-          return submenu && submenu.hasAttribute('role') && submenu.getAttribute('role') === 'menu'
-        }
-        return false
-      })
-
-      siblingsWithSubmenus.forEach(container => {
-        const trigger = container.querySelector(':scope > [role="menuitem"]')
-        const submenu = trigger?.nextElementSibling
-        if (submenu && submenu.getAttribute('data-state') === 'open') {
-          closeSubmenu(submenu, trigger)
-        }
-      })
-    }
-
-    // Focus the target item using utility
-    const targetItem = focusItemUtil(items, index, this.element)
-    if (targetItem) {
-      this.lastHoveredItem = targetItem
+    const first = getMenuItems(submenu)[0]
+    if (first) {
+      updateRovingTabindex(this.element, first)
+      first.focus()
+      this.lastHoveredItem = first
     }
   }
 
-  // Open submenu with keyboard and focus first item
-  openSubmenuWithKeyboard(trigger) {
-    const submenu = trigger.nextElementSibling
+  // Close the submenu holding the current item and focus its trigger.
+  // Returns false at the top level.
+  closeCurrentSubmenuWithKeyboard() {
+    const current = this.currentItem()
+    if (!current) return false
 
-    if (submenu && submenu.hasAttribute('role') && submenu.getAttribute('role') === 'menu') {
-      // Close sibling submenus
-      this.closeSiblingSubmenus(trigger)
+    const menu = current.closest('[role="menu"]')
+    const trigger = getSubmenuTrigger(menu)
+    if (!trigger) return false
 
-      // Open this submenu using utility
-      openSubmenu(trigger, submenu)
+    closeSubmenu(menu, trigger)
+    updateRovingTabindex(this.element, trigger)
+    trigger.focus()
+    this.lastHoveredItem = trigger
+    return true
+  }
 
-      // Check if submenu contains a command controller
-      const commandElement = submenu.querySelector('[data-controller~="command"]')
-      if (commandElement) {
-        // Focus first command item
-        this.focusFirstCommandItem(submenu)
-        return
-      }
+  // ===========================================================================
+  // COMMAND INSIDE A SUBMENU
+  // ===========================================================================
 
-      // Get all menuitems in the submenu
-      const submenuItems = []
-      Array.from(submenu.children).forEach(child => {
-        if (child.hasAttribute('role') && child.getAttribute('role') === 'menuitem') {
-          if (!child.hasAttribute('data-disabled')) {
-            submenuItems.push(child)
-          }
-        } else if (child.classList && child.classList.contains('relative')) {
-          const itemTrigger = child.querySelector(':scope > [role="menuitem"]')
-          if (itemTrigger && !itemTrigger.hasAttribute('data-disabled')) {
-            submenuItems.push(itemTrigger)
-          }
-        }
+  focusFirstCommandItem(submenu) {
+    const commandElement = submenu.querySelector('[data-controller~="command"]')
+    if (!commandElement) return
+
+    // Wait a tick for the command controller to initialize
+    setTimeout(() => {
+      const firstOption = commandElement.querySelector('[role="option"]:not([data-hidden])')
+      if (!firstOption) return
+
+      commandElement.querySelectorAll('[role="option"]').forEach(option => {
+        option.removeAttribute('data-focused')
+        option.classList.remove('bg-accent', 'text-accent-foreground')
       })
 
-      // Remove tabindex from ALL menuitems in the dropdown to ensure clean state
-      clearAllTabindexes(this.element)
-
-      // Focus first item in submenu
-      if (submenuItems.length > 0) {
-        const firstItem = submenuItems[0]
-        firstItem.setAttribute('tabindex', '0')
-        firstItem.focus()
-        this.lastHoveredItem = firstItem
-      }
-    }
+      firstOption.setAttribute('data-focused', 'true')
+      firstOption.classList.add('bg-accent', 'text-accent-foreground')
+    }, 50)
   }
 
-  // Close current submenu and return focus to parent trigger
-  // Returns true if a submenu was closed, false if we're at top level
-  closeCurrentSubmenuWithKeyboard(focusedElement) {
-    // Find the item with tabindex="0" (current item) instead of using focusedElement
-    const allItems = this.element.querySelectorAll('[role="menuitem"]')
-    const currentItem = Array.from(allItems).find(item => item.getAttribute('tabindex') === '0')
-
-    if (!currentItem) return false
-
-    // Find the closest parent menu (the menu containing the current item)
-    const parentMenu = currentItem.closest('[role="menu"]')
-    if (!parentMenu) return false
-
-    // Check if this menu is a submenu (has data-side="right" or "right-start")
-    const dataSide = parentMenu.getAttribute('data-side')
-    if (dataSide === 'right' || dataSide === 'right-start') {
-      // Find the trigger that opened this submenu
-      const trigger = parentMenu.previousElementSibling
-
-      // Close this submenu and all its children using utility
-      closeSubmenu(parentMenu, trigger)
-
-      // Return focus to the trigger
-      if (trigger) {
-        // Find the parent menu of the trigger to get all items in that level
-        const triggerParentMenu = trigger.closest('[role="menu"]')
-        if (triggerParentMenu) {
-          // Get all items in the trigger's menu level
-          const parentMenuItems = []
-          Array.from(triggerParentMenu.children).forEach(child => {
-            if (child.hasAttribute('role') && child.getAttribute('role') === 'menuitem') {
-              parentMenuItems.push(child)
-            } else if (child.classList && child.classList.contains('relative')) {
-              const itemTrigger = child.querySelector(':scope > [role="menuitem"]')
-              if (itemTrigger) {
-                parentMenuItems.push(itemTrigger)
-              }
-            }
-          })
-
-          // Set tabindex on all items in parent menu
-          parentMenuItems.forEach(item => {
-            item.setAttribute('tabindex', '-1')
-          })
-        }
-
-        // Set focus on the trigger
-        trigger.setAttribute('tabindex', '0')
-        trigger.focus()
-        this.lastHoveredItem = trigger
-      }
-
-      return true
-    }
-
-    return false
-  }
-
-  // Handle navigation within command items
   handleCommandNavigation(event, commandElement) {
     event.preventDefault()
 
@@ -709,106 +597,62 @@ export default class extends Controller {
       currentIndex = currentIndex > 0 ? currentIndex - 1 : allOptions.length - 1
     }
 
-    // Remove focus from all options
     allOptions.forEach(opt => {
       opt.removeAttribute('data-focused')
       opt.classList.remove('bg-accent', 'text-accent-foreground')
     })
 
-    // Add focus to new option
     if (allOptions[currentIndex]) {
       allOptions[currentIndex].setAttribute('data-focused', 'true')
       allOptions[currentIndex].classList.add('bg-accent', 'text-accent-foreground')
-      allOptions[currentIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      allOptions[currentIndex].scrollIntoView?.({ block: 'nearest', behavior: 'smooth' })
     }
   }
 
-  // Close command submenu and return to parent menu
   closeCommandSubmenu(commandElement) {
-    const submenu = commandElement.closest('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]')
-    if (!submenu) return false
+    const submenu = commandElement.closest('[role="menu"]')
+    if (!isSubmenu(submenu)) return false
 
-    const trigger = submenu.previousElementSibling
-    if (!trigger || trigger.getAttribute('role') !== 'menuitem') return false
+    const trigger = getSubmenuTrigger(submenu)
+    if (!trigger) return false
 
-    // Clear data-focused from all command options to prevent them from interfering with main menu navigation
-    const allCommandOptions = commandElement.querySelectorAll('[role="option"]')
-    allCommandOptions.forEach(option => {
+    commandElement.querySelectorAll('[role="option"]').forEach(option => {
       option.removeAttribute('data-focused')
       option.classList.remove('bg-accent', 'text-accent-foreground')
     })
 
-    // Close the submenu using utility
     closeSubmenu(submenu, trigger)
-
-    // Find parent menu and its items
-    const parentMenu = trigger.closest('[role="menu"]')
-    if (parentMenu) {
-      const parentItems = []
-      Array.from(parentMenu.children).forEach(child => {
-        if (child.hasAttribute('role') && child.getAttribute('role') === 'menuitem') {
-          parentItems.push(child)
-        } else if (child.classList && child.classList.contains('relative')) {
-          const itemTrigger = child.querySelector(':scope > [role="menuitem"]')
-          if (itemTrigger) {
-            parentItems.push(itemTrigger)
-          }
-        }
-      })
-
-      // Set tabindex on all parent items
-      parentItems.forEach(item => {
-        item.setAttribute('tabindex', '-1')
-      })
-    }
-
-    // Return focus to trigger
-    trigger.setAttribute('tabindex', '0')
+    updateRovingTabindex(this.element, trigger)
     trigger.focus()
     this.lastHoveredItem = trigger
-
     return true
   }
 
+  // ===========================================================================
+  // POSITIONING
+  // ===========================================================================
+
   positionDropdown() {
-    // Get trigger and content elements
     const trigger = this.hasTriggerTarget ? this.triggerTarget : this.element
-    const content = this.hasContentTarget ? this.contentTarget : this.menuTarget
+    const content = this.menuElement
 
     if (!trigger || !content) return
 
-    // Cleanup previous auto-update if exists
-    if (this.cleanup) {
-      this.cleanup()
-    }
+    if (this.cleanup) this.cleanup()
 
-    // Setup middleware for Floating UI
     const middleware = []
-
-    // Always add offset if specified
-    if (this.offsetValue > 0) {
-      middleware.push(offset(this.offsetValue))
-    }
-
-    // Add flip to automatically adjust placement when overflowing (if enabled)
-    if (this.flipValue) {
-      middleware.push(flip())
-    }
-
-    // Add shift to keep dropdown in viewport
+    if (this.offsetValue > 0) middleware.push(offset(this.offsetValue))
+    if (this.flipValue) middleware.push(flip())
     middleware.push(shift({ padding: 8 }))
 
-    // Set trigger width CSS variable for dropdown content sizing
     content.style.setProperty('--ui-dropdown-menu-trigger-width', `${trigger.offsetWidth}px`)
 
-    // Define update function
     const update = () => {
       computePosition(trigger, content, {
         placement: this.placementValue,
         middleware: middleware,
         strategy: this.strategyValue
-      }).then(({ x, y, placement, middlewareData }) => {
-        // Update trigger width in case it changed
+      }).then(({ x, y, placement }) => {
         content.style.setProperty('--ui-dropdown-menu-trigger-width', `${trigger.offsetWidth}px`)
 
         Object.assign(content.style, {
@@ -817,28 +661,18 @@ export default class extends Controller {
           top: `${y}px`,
         })
 
-        // Update data-side attribute for CSS styling
-        const side = placement.split('-')[0]
+        const [side, align] = placement.split('-')
         content.setAttribute('data-side', side)
-
-        // Update data-align attribute for CSS styling
-        const align = placement.split('-')[1] || 'center'
-        content.setAttribute('data-align', align)
+        content.setAttribute('data-align', align || 'center')
       })
     }
 
-    // Use autoUpdate to keep position synchronized
-    this.cleanup = autoUpdate(
-      trigger,
-      content,
-      update,
-      {
-        ancestorScroll: true,
-        ancestorResize: true,
-        elementResize: true,
-        layoutShift: true,
-        animationFrame: true
-      }
-    )
+    this.cleanup = autoUpdate(trigger, content, update, {
+      ancestorScroll: true,
+      ancestorResize: true,
+      elementResize: true,
+      layoutShift: true,
+      animationFrame: true
+    })
   }
 }

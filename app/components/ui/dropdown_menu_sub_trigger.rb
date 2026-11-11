@@ -11,10 +11,12 @@ class UI::DropdownMenuSubTrigger < Phlex::HTML
   include UI::DropdownMenuSubTriggerBehavior
 
   # @param inset [Boolean] Whether to add left padding for alignment
+  # @param disabled [Boolean] Whether the sub trigger is disabled
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(inset: false, classes: "", **attributes)
+  def initialize(inset: false, disabled: false, classes: "", **attributes)
     @inset = inset
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

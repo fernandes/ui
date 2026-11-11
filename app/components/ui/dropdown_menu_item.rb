@@ -16,12 +16,14 @@ class UI::DropdownMenuItem < Phlex::HTML
   # @param href [String] Optional URL to make item a link
   # @param inset [Boolean] Whether to add left padding for alignment
   # @param variant [String] Variant style (default, destructive)
+  # @param disabled [Boolean] Whether the item is disabled (skipped by the keyboard, not activatable)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(href: nil, inset: false, variant: "default", classes: "", **attributes)
+  def initialize(href: nil, inset: false, variant: "default", disabled: false, classes: "", **attributes)
     @href = href
     @inset = inset
     @variant = variant
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

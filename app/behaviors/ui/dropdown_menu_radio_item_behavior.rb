@@ -10,9 +10,11 @@ module UI::DropdownMenuRadioItemBehavior
       class: dropdown_menu_radio_item_classes,
       data: dropdown_menu_radio_item_data_attributes,
       role: "menuitemradio",
-      "aria-checked": @checked,
+      "aria-checked": @checked.to_s,
       tabindex: "-1"
-    }
+    }.tap do |attrs|
+      attrs[:"aria-disabled"] = "true" if @disabled
+    end
   end
 
   # Returns combined CSS classes for the radio item

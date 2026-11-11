@@ -35,10 +35,12 @@ class UI::DropdownMenuTrigger < Phlex::HTML
       # The child component handles its own styling (following shadcn pattern)
       yield(trigger_attrs.except(:class)) if block_given?
     else
-      # Default: render wrapper div with trigger behavior
-      div(**trigger_attrs) do
-        yield if block_given?
-      end
+      # Default: a <button>, or a plain wrapper when the content is itself
+      # interactive (see dropdown_menu_trigger_default_attributes)
+      body = block_given? ? capture(&block) : ""
+      attrs = dropdown_menu_trigger_default_attributes(body).deep_merge(@attributes)
+      tag = (dropdown_menu_trigger_tag(body) == :button) ? :button : :div
+      send(tag, **attrs) { raw(safe(body)) }
     end
   end
 end

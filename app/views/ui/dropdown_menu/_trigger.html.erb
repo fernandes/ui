@@ -16,7 +16,8 @@
       The child component handles its own styling (following shadcn pattern) %>
   <%= yield(all_attributes.except(:class)) %>
 <% else %>
-  <%= content_tag :div, all_attributes do %>
-    <%= content || yield %>
+  <% body = content || yield %>
+  <%= content_tag dropdown_menu_trigger_tag(body), dropdown_menu_trigger_default_attributes(body).deep_merge(@attributes) do %>
+    <%= body %>
   <% end %>
 <% end %>

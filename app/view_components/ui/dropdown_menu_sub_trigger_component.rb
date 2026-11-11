@@ -4,8 +4,9 @@
 class UI::DropdownMenuSubTriggerComponent < ViewComponent::Base
   include UI::DropdownMenuSubTriggerBehavior
 
-  def initialize(inset: false, classes: "", **attributes)
+  def initialize(inset: false, disabled: false, classes: "", **attributes)
     @inset = inset
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

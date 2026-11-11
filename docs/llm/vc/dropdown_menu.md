@@ -103,6 +103,25 @@ See full feature list in `docs/llm/phlex/dropdown_menu.md`.
 <% end %>
 ```
 
+## Accessibility
+
+- **Trigger**: with text/icon content the trigger renders a `<button type="button">`. When you
+  pass your own button or link as content, the trigger renders a plain wrapper (no role, no
+  tabindex) and the controller puts `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`
+  on your element: one tab stop, no nested interactive elements. `as_child` hands the same
+  attributes to your child.
+- **Ids**: the menu gets a unique id on connect and is labelled by the trigger; sub triggers get
+  `aria-haspopup="menu"`, `aria-expanded` and `aria-controls` → their submenu. An `id` you pass is kept.
+- **Disabled**: `disabled: true` on `UI::DropdownMenuItemComponent`, `UI::DropdownMenuSubTriggerComponent`, `UI::DropdownMenuCheckboxItemComponent` and `UI::DropdownMenuRadioItemComponent` renders `aria-disabled="true"` + `data-disabled`; disabled items are
+  skipped by the arrow keys and typeahead and can't be activated.
+- **Keyboard**: Enter/Space/ArrowDown on the trigger open on the first item, ArrowUp on the last.
+  In the menu: arrows (looping), Home/End, typeahead (type the start of an item's label; set
+  `data-text-value` to override), ArrowRight/Enter/Space open a submenu, ArrowLeft/Escape close it.
+  Enter on a checkbox/radio item toggles and closes, Space toggles and keeps the menu open.
+- **Focus**: Escape (outermost level), selecting an item (keyboard or pointer) and Tab return focus
+  to the trigger. Escape is layered: inside a Dialog it closes only the menu.
+- Text fields inside a submenu (e.g. a Command search) keep Space, Home/End and ←/→.
+
 ## See Also
 
 - ViewComponent guide: `docs/llm/vc.md`

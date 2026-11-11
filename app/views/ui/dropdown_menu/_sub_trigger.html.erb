@@ -4,6 +4,7 @@
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
   @inset = local_assigns.fetch(:inset, false)
+  @disabled = local_assigns.fetch(:disabled, false)
 
   # Extend behavior for shared logic
   extend UI::DropdownMenuSubTriggerBehavior

@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test"
 import { Application } from "@hotwired/stimulus"
+import userEvent from "@testing-library/user-event"
 import DropdownController from "../../../../app/javascript/ui/controllers/dropdown_controller.js"
 
 describe("DropdownController", () => {
@@ -223,7 +224,7 @@ describe("DropdownController", () => {
 
       // Press ArrowDown
       const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      element.dispatchEvent(event)
+      document.activeElement.dispatchEvent(event)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Second item should now be focused
@@ -246,12 +247,12 @@ describe("DropdownController", () => {
 
       // Move to second item first
       const downEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      element.dispatchEvent(downEvent)
+      document.activeElement.dispatchEvent(downEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Press ArrowUp
       const upEvent = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true })
-      element.dispatchEvent(upEvent)
+      document.activeElement.dispatchEvent(upEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // First item should be focused again
@@ -272,12 +273,12 @@ describe("DropdownController", () => {
 
       // Move to last item
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      element.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Press Home
       const homeEvent = new KeyboardEvent("keydown", { key: "Home", bubbles: true })
-      element.dispatchEvent(homeEvent)
+      document.activeElement.dispatchEvent(homeEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // First item should be focused
@@ -298,7 +299,7 @@ describe("DropdownController", () => {
 
       // Press End
       const event = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      element.dispatchEvent(event)
+      document.activeElement.dispatchEvent(event)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Last item should be focused
@@ -320,7 +321,7 @@ describe("DropdownController", () => {
 
       // Press Escape
       const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
-      element.dispatchEvent(event)
+      document.activeElement.dispatchEvent(event)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       expect(content.classList.contains("hidden")).toBe(true)
@@ -362,11 +363,11 @@ describe("DropdownController", () => {
 
       // Navigate down twice
       const event1 = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      element.dispatchEvent(event1)
+      document.activeElement.dispatchEvent(event1)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       const event2 = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      element.dispatchEvent(event2)
+      document.activeElement.dispatchEvent(event2)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Only third item should have tabindex 0
@@ -592,12 +593,12 @@ describe("DropdownController", () => {
 
       // Navigate to submenu trigger using End key
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      element.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Press ArrowRight to open submenu
       const rightEvent = new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
-      element.dispatchEvent(rightEvent)
+      document.activeElement.dispatchEvent(rightEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       expect(submenu.classList.contains("hidden")).toBe(false)
@@ -636,7 +637,7 @@ describe("DropdownController", () => {
 
       // Press ArrowLeft to close submenu
       const leftEvent = new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true })
-      element.dispatchEvent(leftEvent)
+      document.activeElement.dispatchEvent(leftEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       expect(submenu.classList.contains("hidden")).toBe(true)
@@ -662,7 +663,7 @@ describe("DropdownController", () => {
 
       // Press Enter on first item
       const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      element.dispatchEvent(event)
+      document.activeElement.dispatchEvent(event)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       expect(clicked).toBe(true)
@@ -684,12 +685,12 @@ describe("DropdownController", () => {
 
       // Navigate to checkbox (it's after the regular items)
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      element.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Press Space
       const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true })
-      element.dispatchEvent(spaceEvent)
+      document.activeElement.dispatchEvent(spaceEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Checkbox should be checked
@@ -713,12 +714,12 @@ describe("DropdownController", () => {
 
       // Navigate to checkbox
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      element.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Press Enter
       const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      element.dispatchEvent(enterEvent)
+      document.activeElement.dispatchEvent(enterEvent)
       await new Promise(resolve => setTimeout(resolve, 200))
 
       // Checkbox should be checked
@@ -953,9 +954,8 @@ describe("DropdownController", () => {
       trigger.focus()
       await new Promise(resolve => setTimeout(resolve, 10))
 
-      // Press Enter
-      const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      trigger.dispatchEvent(enterEvent)
+      // Press Enter (a real key press: keydown, then the native click)
+      await userEvent.setup().keyboard("{Enter}")
       await new Promise(resolve => setTimeout(resolve, 150))
 
       expect(content.classList.contains("hidden")).toBe(false)
@@ -973,9 +973,8 @@ describe("DropdownController", () => {
       trigger.focus()
       await new Promise(resolve => setTimeout(resolve, 10))
 
-      // Press Space
-      const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true })
-      trigger.dispatchEvent(spaceEvent)
+      // Press Space (a real key press: keydown, keyup, then the native click)
+      await userEvent.setup().keyboard(" ")
       await new Promise(resolve => setTimeout(resolve, 150))
 
       expect(content.classList.contains("hidden")).toBe(false)
@@ -997,12 +996,12 @@ describe("DropdownController", () => {
 
       // Navigate into menu items with ArrowDown
       const downEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      element.dispatchEvent(downEvent)
+      document.activeElement.dispatchEvent(downEvent)
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Press Escape - should close menu AND return focus to trigger
       const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
-      element.dispatchEvent(escapeEvent)
+      document.activeElement.dispatchEvent(escapeEvent)
       await new Promise(resolve => setTimeout(resolve, 200))
 
       expect(content.classList.contains("hidden")).toBe(true)
@@ -1039,7 +1038,7 @@ describe("DropdownController", () => {
 
       // Close with Escape
       const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
-      element.dispatchEvent(escapeEvent)
+      document.activeElement.dispatchEvent(escapeEvent)
       await new Promise(resolve => setTimeout(resolve, 200)) // Wait for focus return (150ms delay in close())
       expect(content.classList.contains("hidden")).toBe(true)
 

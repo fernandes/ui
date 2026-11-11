@@ -10,8 +10,12 @@ module UI::DropdownMenuSubTriggerBehavior
       class: dropdown_menu_sub_trigger_classes,
       data: dropdown_menu_sub_trigger_data_attributes,
       role: "menuitem",
+      "aria-haspopup": "menu",
+      "aria-expanded": "false",
       tabindex: "-1"
-    }
+    }.tap do |attrs|
+      attrs[:"aria-disabled"] = "true" if @disabled
+    end
   end
 
   # Returns combined CSS classes for the submenu trigger
@@ -25,11 +29,13 @@ module UI::DropdownMenuSubTriggerBehavior
   # Returns data attributes for Stimulus
   def dropdown_menu_sub_trigger_data_attributes
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
-    (attributes_value&.fetch(:data, {}) || {}).merge({
+    data_attrs = (attributes_value&.fetch(:data, {}) || {}).merge({
       "ui--dropdown-target": "item",
       action: "mouseenter->ui--dropdown#openSubmenu mouseleave->ui--dropdown#closeSubmenu",
       inset: @inset,
       state: "closed"
     })
+    data_attrs[:disabled] = true if @disabled
+    data_attrs
   end
 end

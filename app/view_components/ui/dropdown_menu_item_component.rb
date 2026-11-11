@@ -4,10 +4,11 @@
 class UI::DropdownMenuItemComponent < ViewComponent::Base
   include UI::DropdownMenuItemBehavior
 
-  def initialize(href: nil, inset: false, variant: "default", classes: "", **attributes)
+  def initialize(href: nil, inset: false, variant: "default", disabled: false, classes: "", **attributes)
     @href = href
     @inset = inset
     @variant = variant
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

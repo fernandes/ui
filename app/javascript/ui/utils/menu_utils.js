@@ -1,16 +1,69 @@
 /**
  * Menu Utilities
  *
- * Shared utilities for dropdown and menubar controllers.
- * Provides common functionality for menu navigation, checkbox/radio management,
- * and submenu handling.
+ * Shared by the Dropdown Menu, Context Menu and Menubar controllers: item
+ * queries, roving focus, disabled items, typeahead, checkbox/radio state and
+ * submenus (with their ARIA: aria-haspopup / aria-expanded / aria-controls).
+ *
+ * Structure the helpers rely on (what the Ruby components render):
+ *
+ *   [role=menu]                       ← a menu (content or sub content)
+ *     [role=menuitem]                 ← item
+ *     [role=group] > [role=menuitemradio]
+ *     div (Sub wrapper)
+ *       [role=menuitem]               ← sub trigger
+ *       [role=menu]                   ← its submenu (next sibling)
+ *
+ * A submenu is any [role=menu] nested inside another [role=menu]; nothing
+ * depends on `data-side`, which Floating UI rewrites when the submenu flips.
  */
 
 import { computePosition, flip, offset, shift } from "@floating-ui/dom"
+import { ensureId, setIdRefs } from "./id-manager.js"
+
+export const MENU_ITEM_SELECTOR = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'
+
+// =============================================================================
+// ITEM STATE
+// =============================================================================
+
+/**
+ * Whether a menu item is disabled (`data-disabled` or `aria-disabled="true"`).
+ * @param {HTMLElement} item
+ * @returns {boolean}
+ */
+export function isItemDisabled(item) {
+  if (!item) return true
+  return item.hasAttribute('data-disabled') || item.getAttribute('aria-disabled') === 'true'
+}
+
+/**
+ * Whether keyboard events from this element belong to a text field (an input
+ * inside a menu, e.g. a Command search in a submenu), so the menu must leave
+ * Space, Home/End, ←/→ and printable keys alone.
+ * @param {EventTarget} element
+ * @returns {boolean}
+ */
+export function isEditableTarget(element) {
+  if (!element || element.nodeType !== 1) return false
+  if (element.isContentEditable) return true
+  const tag = element.tagName
+  if (tag === 'TEXTAREA' || tag === 'SELECT') return true
+  if (tag !== 'INPUT') return false
+  const type = (element.getAttribute('type') || 'text').toLowerCase()
+  return !['button', 'checkbox', 'radio', 'submit', 'reset', 'image', 'range', 'color', 'file'].includes(type)
+}
 
 // =============================================================================
 // CHECKBOX / RADIO MANAGEMENT
 // =============================================================================
+
+const CHECK_ICON = `<span data-state="checked"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>`
+const RADIO_ICON = `<span data-state="checked"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle size-2 fill-current" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle></svg></span>`
+
+function indicatorContainer(item) {
+  return item.querySelector('.absolute.left-2') || item.querySelector('span.absolute')
+}
 
 /**
  * Toggle checkbox state on a menuitemcheckbox element
@@ -18,25 +71,16 @@ import { computePosition, flip, offset, shift } from "@floating-ui/dom"
  * @returns {boolean} The new checked state
  */
 export function toggleCheckbox(item) {
-  if (item.getAttribute('role') !== 'menuitemcheckbox') return false
+  if (!item || item.getAttribute('role') !== 'menuitemcheckbox') return false
+  if (isItemDisabled(item)) return item.getAttribute('aria-checked') === 'true'
 
-  const currentState = item.getAttribute('data-state')
-  const newState = currentState === 'checked' ? 'unchecked' : 'checked'
-  const isChecked = newState === 'checked'
+  const isChecked = item.getAttribute('aria-checked') !== 'true' && item.getAttribute('data-state') !== 'checked'
 
-  item.setAttribute('data-state', newState)
-  item.setAttribute('aria-checked', isChecked)
+  item.setAttribute('data-state', isChecked ? 'checked' : 'unchecked')
+  item.setAttribute('aria-checked', String(isChecked))
 
-  // Update check icon visibility
-  const iconContainer = item.querySelector('.absolute.left-2') ||
-                        item.querySelector('span.absolute')
-  if (iconContainer) {
-    iconContainer.innerHTML = isChecked ? `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" data-state="checked">
-        <path d="M20 6 9 17l-5-5"></path>
-      </svg>
-    ` : ''
-  }
+  const iconContainer = indicatorContainer(item)
+  if (iconContainer) iconContainer.innerHTML = isChecked ? CHECK_ICON : ''
 
   return isChecked
 }
@@ -47,43 +91,44 @@ export function toggleCheckbox(item) {
  * @returns {void}
  */
 export function selectRadio(item) {
-  if (item.getAttribute('role') !== 'menuitemradio') return
+  if (!item || item.getAttribute('role') !== 'menuitemradio') return
+  if (isItemDisabled(item)) return
 
-  // Find the radio group (parent with role="group" or closest menu)
   const radioGroup = item.closest('[role="group"]') || item.closest('[role="menu"]')
   if (!radioGroup) return
 
-  // Uncheck all radio items in the group
-  const allRadios = radioGroup.querySelectorAll('[role="menuitemradio"]')
-  allRadios.forEach(radio => {
+  radioGroup.querySelectorAll('[role="menuitemradio"]').forEach(radio => {
     radio.setAttribute('data-state', 'unchecked')
     radio.setAttribute('aria-checked', 'false')
-    const iconContainer = radio.querySelector('.absolute.left-2') ||
-                          radio.querySelector('span.absolute')
-    if (iconContainer) {
-      iconContainer.innerHTML = ''
-    }
+    const iconContainer = indicatorContainer(radio)
+    if (iconContainer) iconContainer.innerHTML = ''
   })
 
-  // Check the selected item
   item.setAttribute('data-state', 'checked')
   item.setAttribute('aria-checked', 'true')
 
-  // Add radio indicator
-  const iconContainer = item.querySelector('.absolute.left-2') ||
-                        item.querySelector('span.absolute')
-  if (iconContainer) {
-    iconContainer.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-2" data-state="checked">
-        <circle cx="12" cy="12" r="10"></circle>
-      </svg>
-    `
-  }
+  const iconContainer = indicatorContainer(item)
+  if (iconContainer) iconContainer.innerHTML = RADIO_ICON
 }
 
 // =============================================================================
 // ITEM NAVIGATION
 // =============================================================================
+
+/**
+ * The items that belong to `menu` itself (not to its submenus), in DOM order:
+ * direct items, radio items in groups and sub triggers, wherever they are
+ * nested, skipping disabled ones.
+ * @param {HTMLElement} menu - a [role=menu]
+ * @param {{includeDisabled?: boolean}} options
+ * @returns {HTMLElement[]}
+ */
+export function getMenuItems(menu, { includeDisabled = false } = {}) {
+  if (!menu) return []
+  return Array.from(menu.querySelectorAll(MENU_ITEM_SELECTOR)).filter(item =>
+    item.closest('[role="menu"]') === menu && (includeDisabled || !isItemDisabled(item))
+  )
+}
 
 /**
  * Get all focusable items in a menu container
@@ -92,46 +137,12 @@ export function selectRadio(item) {
  * @returns {HTMLElement[]} Array of focusable items
  */
 export function getFocusableItems(container, currentMenu = null) {
-  // If no specific menu, try to find the current menu from focused item
   if (!currentMenu) {
-    const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    const currentItem = Array.from(allItems).find(item => item.getAttribute('tabindex') === '0')
-
-    if (currentItem) {
-      currentMenu = currentItem.closest('[role="menu"]')
-    }
+    const currentItem = getKeyboardFocusedItem(container)
+    if (currentItem) currentMenu = currentItem.closest('[role="menu"]')
   }
 
-  if (!currentMenu) return []
-
-  // Get menuitems - they can be direct children OR children of submenu containers
-  const items = []
-  Array.from(currentMenu.children).forEach(child => {
-    const role = child.getAttribute('role')
-
-    // Check for menuitem, menuitemcheckbox, or menuitemradio
-    if (role === 'menuitem' || role === 'menuitemcheckbox' || role === 'menuitemradio') {
-      if (!child.hasAttribute('data-disabled')) {
-        items.push(child)
-      }
-    } else if (role === 'group') {
-      // Radio group container - get all radio items inside
-      const radioItems = child.querySelectorAll('[role="menuitemradio"]')
-      radioItems.forEach(radioItem => {
-        if (!radioItem.hasAttribute('data-disabled')) {
-          items.push(radioItem)
-        }
-      })
-    } else if (child.classList && child.classList.contains('relative')) {
-      // Submenu container - get the trigger (first child with role="menuitem")
-      const trigger = child.querySelector(':scope > [role="menuitem"]')
-      if (trigger && !trigger.hasAttribute('data-disabled')) {
-        items.push(trigger)
-      }
-    }
-  })
-
-  return items
+  return getMenuItems(currentMenu)
 }
 
 /**
@@ -153,15 +164,8 @@ export function findCurrentItemIndex(items) {
 export function focusItem(items, index, container) {
   if (items.length === 0 || index < 0 || index >= items.length) return
 
-  // Remove tabindex from ALL menuitems in the container
-  const allMenuItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-  allMenuItems.forEach(item => {
-    item.setAttribute('tabindex', '-1')
-  })
-
-  // Focus the target item
   const targetItem = items[index]
-  targetItem.setAttribute('tabindex', '0')
+  updateRovingTabindex(container, targetItem)
   targetItem.focus()
 
   return targetItem
@@ -177,12 +181,10 @@ export function focusItem(items, index, container) {
 export function focusNextItem(items, container, loop = true) {
   if (items.length === 0) return null
 
-  let currentIndex = findCurrentItemIndex(items)
+  const currentIndex = findCurrentItemIndex(items)
 
   if (currentIndex === -1 || currentIndex >= items.length - 1) {
-    if (loop) {
-      return focusItem(items, 0, container)
-    }
+    if (loop || currentIndex === -1) return focusItem(items, 0, container)
     return null
   }
 
@@ -199,12 +201,10 @@ export function focusNextItem(items, container, loop = true) {
 export function focusPreviousItem(items, container, loop = true) {
   if (items.length === 0) return null
 
-  let currentIndex = findCurrentItemIndex(items)
+  const currentIndex = findCurrentItemIndex(items)
 
   if (currentIndex === -1 || currentIndex === 0) {
-    if (loop) {
-      return focusItem(items, items.length - 1, container)
-    }
+    if (loop || currentIndex === -1) return focusItem(items, items.length - 1, container)
     return null
   }
 
@@ -212,8 +212,124 @@ export function focusPreviousItem(items, container, loop = true) {
 }
 
 // =============================================================================
+// TYPEAHEAD (X7)
+// =============================================================================
+
+/**
+ * The text typeahead matches against: `data-text-value` when the author set
+ * one, else the item's text without its shortcut hint.
+ * @param {HTMLElement} item
+ * @returns {string}
+ */
+export function getItemTextValue(item) {
+  if (item.dataset.textValue) return item.dataset.textValue
+  let text = ''
+  item.childNodes.forEach(node => {
+    if (node.nodeType === 3) text += node.textContent
+    else if (node.nodeType === 1 && !node.matches('[data-slot="shortcut"], .ml-auto, svg, [aria-hidden="true"]')) text += node.textContent
+  })
+  return text.replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * First-letter typeahead for menus (Radix `menu.tsx` handleTypeaheadSearch).
+ *
+ *   this.typeahead = createTypeahead()
+ *   // in keydown, before handling other keys:
+ *   const match = this.typeahead.handleKey(event, items, document.activeElement)
+ *   if (match) focus(match)
+ *
+ * - Printable keys without Ctrl/Meta/Alt build a search string that resets
+ *   after `timeout` ms of no typing.
+ * - Space is only part of the search while one is in progress (otherwise it
+ *   activates the item).
+ * - Repeating one letter cycles through the items starting with it; the
+ *   search always looks forward from the current item and wraps.
+ *
+ * @param {{timeout?: number}} options
+ */
+export function createTypeahead({ timeout = 1000 } = {}) {
+  let search = ''
+  let timer = null
+
+  const reset = () => {
+    search = ''
+    clearTimeout(timer)
+    timer = null
+  }
+
+  return {
+    /** Whether this keydown is a typeahead keystroke. */
+    isTypeaheadKey(event) {
+      if (event.ctrlKey || event.metaKey || event.altKey) return false
+      if (!event.key || event.key.length !== 1) return false
+      if (event.key === ' ' && search === '') return false
+      return true
+    },
+
+    /**
+     * Feed a keydown. Returns the item to focus, or null. Calls
+     * preventDefault() when the key was consumed as typeahead.
+     * @param {KeyboardEvent} event
+     * @param {HTMLElement[]} items - enabled items of the current menu
+     * @param {HTMLElement|null} current - the item that has focus now
+     */
+    handleKey(event, items, current = null) {
+      if (!this.isTypeaheadKey(event)) return null
+      event.preventDefault()
+
+      search += event.key
+      clearTimeout(timer)
+      timer = setTimeout(reset, timeout)
+
+      return findTypeaheadMatch(items, search, current)
+    },
+
+    /** Whether a search is in progress (Space then belongs to it). */
+    isSearching() {
+      return search !== ''
+    },
+
+    reset
+  }
+}
+
+/**
+ * Next item whose text starts with `search`, looking forward from `current`.
+ * @param {HTMLElement[]} items
+ * @param {string} search
+ * @param {HTMLElement|null} current
+ * @returns {HTMLElement|null}
+ */
+export function findTypeaheadMatch(items, search, current = null) {
+  if (!items.length || !search) return null
+
+  const isRepeated = search.length > 1 && Array.from(search).every(char => char === search[0])
+  const normalized = (isRepeated ? search[0] : search).toLowerCase()
+  const currentIndex = current ? items.indexOf(current) : -1
+
+  // Look forward from the current item, wrapping around. A one-letter search
+  // skips the current item so repeated presses move on; a longer one may stay.
+  const ordered = items.map((_, i) => items[(Math.max(currentIndex, 0) + i) % items.length])
+  const candidates = normalized.length === 1 ? ordered.filter(item => item !== current) : ordered
+  const match = candidates.find(item => getItemTextValue(item).toLowerCase().startsWith(normalized))
+
+  return match && match !== current ? match : null
+}
+
+// =============================================================================
 // SUBMENU MANAGEMENT
 // =============================================================================
+
+/**
+ * The submenu a sub trigger opens (its next sibling [role=menu]), or null.
+ * @param {HTMLElement} trigger
+ * @returns {HTMLElement|null}
+ */
+export function getSubmenu(trigger) {
+  const next = trigger?.nextElementSibling
+  return next && next.getAttribute('role') === 'menu' ? next : null
+}
 
 /**
  * Check if a menu item has a submenu
@@ -221,90 +337,119 @@ export function focusPreviousItem(items, container, loop = true) {
  * @returns {boolean}
  */
 export function hasSubmenu(menuItem) {
-  if (!menuItem) return false
-  const nextSibling = menuItem.nextElementSibling
-  return nextSibling && nextSibling.getAttribute('role') === 'menu'
+  return !!getSubmenu(menuItem)
+}
+
+/**
+ * Whether `menu` is a submenu (a [role=menu] nested in another one).
+ * @param {HTMLElement} menu
+ * @returns {boolean}
+ */
+export function isSubmenu(menu) {
+  return !!(menu && menu.getAttribute('role') === 'menu' && menu.parentElement?.closest('[role="menu"]'))
+}
+
+/**
+ * The sub trigger that opens `submenu`, or null when it is a top-level menu.
+ * @param {HTMLElement} submenu
+ * @returns {HTMLElement|null}
+ */
+export function getSubmenuTrigger(submenu) {
+  if (!isSubmenu(submenu)) return null
+  const trigger = submenu.previousElementSibling
+  return trigger && trigger.matches(MENU_ITEM_SELECTOR) ? trigger : null
+}
+
+/**
+ * Wire every sub trigger inside `container`: aria-haspopup="menu",
+ * aria-expanded and aria-controls → its submenu (which gets an id and is
+ * labelled by the trigger). Idempotent.
+ * @param {HTMLElement} container
+ * @param {string} prefix - id prefix, e.g. "dropdown-menu"
+ */
+export function initSubmenuTriggers(container, prefix = "menu") {
+  container.querySelectorAll('[role="menu"] [role="menu"]').forEach(submenu => {
+    const trigger = getSubmenuTrigger(submenu)
+    if (!trigger) return
+    ensureId(submenu, `${prefix}-sub-content`)
+    trigger.setAttribute('aria-haspopup', 'menu')
+    trigger.setAttribute('aria-expanded', String(submenu.getAttribute('data-state') === 'open'))
+    setIdRefs(trigger, 'aria-controls', submenu, { prefix: `${prefix}-sub-trigger` })
+    setIdRefs(submenu, 'aria-labelledby', trigger, { prefix: `${prefix}-sub-trigger` })
+  })
 }
 
 /**
  * Open a submenu
  * @param {HTMLElement} trigger - The submenu trigger element
  * @param {HTMLElement} submenu - The submenu element
+ * @param {{position?: boolean}} options - position with Floating UI (default true)
  */
-export function openSubmenu(trigger, submenu) {
+export function openSubmenu(trigger, submenu, { position = true } = {}) {
   if (!submenu || submenu.getAttribute('role') !== 'menu') return
+  if (isItemDisabled(trigger)) return
 
   submenu.classList.remove('hidden')
   submenu.setAttribute('data-state', 'open')
   trigger.setAttribute('data-state', 'open')
+  trigger.setAttribute('aria-expanded', 'true')
 
-  positionSubmenu(trigger, submenu)
+  if (position) positionSubmenu(trigger, submenu)
+}
+
+function markClosed(submenu, trigger) {
+  submenu.classList.add('hidden')
+  submenu.setAttribute('data-state', 'closed')
+  if (trigger) {
+    trigger.setAttribute('data-state', 'closed')
+    if (trigger.hasAttribute('aria-expanded')) trigger.setAttribute('aria-expanded', 'false')
+  }
 }
 
 /**
  * Close a submenu and all its children
  * @param {HTMLElement} submenu - The submenu element
  * @param {HTMLElement} trigger - The submenu trigger element
+ * @param {Function} onClose - optional callback per closed submenu (cleanup)
  */
-export function closeSubmenu(submenu, trigger) {
+export function closeSubmenu(submenu, trigger, onClose = null) {
   if (!submenu) return
 
-  // Close all nested submenus first
-  const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]')
-  nestedSubmenus.forEach(nested => {
-    nested.classList.add('hidden')
-    nested.setAttribute('data-state', 'closed')
-    const nestedTrigger = nested.previousElementSibling
-    if (nestedTrigger) {
-      nestedTrigger.setAttribute('data-state', 'closed')
-    }
+  submenu.querySelectorAll('[role="menu"]').forEach(nested => {
+    markClosed(nested, getSubmenuTrigger(nested))
+    if (onClose) onClose(nested)
   })
 
-  // Close the submenu itself
-  submenu.classList.add('hidden')
-  submenu.setAttribute('data-state', 'closed')
-  if (trigger) {
-    trigger.setAttribute('data-state', 'closed')
-  }
+  markClosed(submenu, trigger || getSubmenuTrigger(submenu))
+  if (onClose) onClose(submenu)
 }
 
 /**
  * Close all submenus in a container
  * @param {HTMLElement} container - The root container
+ * @param {Function} onClose - optional callback per closed submenu (cleanup)
  */
-export function closeAllSubmenus(container) {
-  const submenus = container.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]')
-  submenus.forEach(submenu => {
-    submenu.classList.add('hidden')
-    submenu.setAttribute('data-state', 'closed')
-
-    const trigger = submenu.previousElementSibling
-    if (trigger) {
-      trigger.setAttribute('data-state', 'closed')
-    }
+export function closeAllSubmenus(container, onClose = null) {
+  container.querySelectorAll('[role="menu"] [role="menu"]').forEach(submenu => {
+    markClosed(submenu, getSubmenuTrigger(submenu))
+    if (onClose) onClose(submenu)
   })
 }
 
 /**
- * Close sibling submenus (not parent or child submenus)
- * @param {HTMLElement} currentTrigger - The current trigger
+ * Close the open submenus of `menu` other than the one `currentItem` opens.
+ * @param {HTMLElement} currentItem - item in `menu` that keeps its submenu
+ * @param {HTMLElement} menu - defaults to currentItem's menu
+ * @param {Function} onClose - optional callback per closed submenu
  */
-export function closeSiblingSubmenus(currentTrigger) {
-  const parentMenu = currentTrigger.closest('[role="menu"]')
+export function closeSiblingSubmenus(currentItem, menu = null, onClose = null) {
+  const parentMenu = menu || currentItem.closest('[role="menu"]')
   if (!parentMenu) return
 
-  const siblingTriggers = Array.from(parentMenu.children).filter(child => {
-    return child !== currentTrigger &&
-           child.classList &&
-           child.classList.contains('relative')
-  })
-
-  siblingTriggers.forEach(container => {
-    const trigger = container.querySelector(':scope > [role="menuitem"]')
-    const submenu = trigger?.nextElementSibling
-    if (submenu && submenu.getAttribute('role') === 'menu') {
-      closeSubmenu(submenu, trigger)
-    }
+  getMenuItems(parentMenu, { includeDisabled: true }).forEach(item => {
+    if (item === currentItem) return
+    const submenu = getSubmenu(item)
+    if (submenu && submenu.getAttribute('data-state') === 'open') closeSubmenu(submenu, item, onClose)
   })
 }
 
@@ -317,7 +462,7 @@ export function closeSiblingSubmenus(currentTrigger) {
  * @param {HTMLElement} trigger - The trigger element
  * @param {HTMLElement} content - The content element
  * @param {Object} options - Positioning options
- * @returns {Function} Cleanup function
+ * @returns {Promise}
  */
 export function positionDropdown(trigger, content, options = {}) {
   const {
@@ -327,15 +472,8 @@ export function positionDropdown(trigger, content, options = {}) {
   } = options
 
   const middleware = []
-
-  if (offsetValue > 0) {
-    middleware.push(offset(offsetValue))
-  }
-
-  if (flipEnabled) {
-    middleware.push(flip())
-  }
-
+  if (offsetValue > 0) middleware.push(offset(offsetValue))
+  if (flipEnabled) middleware.push(flip())
   middleware.push(shift({ padding: 8 }))
 
   return computePosition(trigger, content, {
@@ -348,7 +486,6 @@ export function positionDropdown(trigger, content, options = {}) {
       top: `${y}px`,
     })
 
-    // Update data-side and data-align attributes
     const [side, align] = finalPlacement.split('-')
     content.setAttribute('data-side', side)
     content.setAttribute('data-align', align || 'center')
@@ -356,12 +493,15 @@ export function positionDropdown(trigger, content, options = {}) {
 }
 
 /**
- * Position a submenu relative to its trigger
+ * Position a submenu relative to its trigger. The requested side comes from
+ * `data-preferred-side` (set on first open from the rendered `data-side`), so
+ * a submenu that flipped once still asks for its original side next time.
  * @param {HTMLElement} trigger - The submenu trigger
  * @param {HTMLElement} submenu - The submenu content
  */
 export function positionSubmenu(trigger, submenu) {
-  const side = submenu.getAttribute('data-side') || 'right'
+  if (!submenu.dataset.preferredSide) submenu.dataset.preferredSide = submenu.getAttribute('data-side') || 'right'
+  const side = submenu.dataset.preferredSide
   const align = submenu.getAttribute('data-align') || 'start'
   const placement = `${side}-${align}`
 
@@ -395,8 +535,7 @@ export function positionSubmenu(trigger, submenu) {
  * @param {HTMLElement} focusedItem - The item that should have tabindex=0
  */
 export function updateRovingTabindex(container, focusedItem) {
-  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-  allItems.forEach(item => {
+  container.querySelectorAll(MENU_ITEM_SELECTOR).forEach(item => {
     item.setAttribute('tabindex', item === focusedItem ? '0' : '-1')
   })
 }
@@ -406,8 +545,7 @@ export function updateRovingTabindex(container, focusedItem) {
  * @param {HTMLElement} container - The container with all items
  */
 export function clearAllTabindexes(container) {
-  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-  allItems.forEach(item => {
+  container.querySelectorAll(MENU_ITEM_SELECTOR).forEach(item => {
     item.setAttribute('tabindex', '-1')
   })
 }
@@ -418,6 +556,6 @@ export function clearAllTabindexes(container) {
  * @returns {HTMLElement|null}
  */
 export function getKeyboardFocusedItem(container) {
-  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-  return Array.from(allItems).find(item => item.getAttribute('tabindex') === '0') || null
+  if (!container) return null
+  return Array.from(container.querySelectorAll(MENU_ITEM_SELECTOR)).find(item => item.getAttribute('tabindex') === '0') || null
 }

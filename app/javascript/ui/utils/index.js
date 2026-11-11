@@ -108,5 +108,16 @@ export {
   positionSubmenu,
   updateRovingTabindex,
   clearAllTabindexes,
-  getKeyboardFocusedItem
+  getKeyboardFocusedItem,
+  MENU_ITEM_SELECTOR,
+  isItemDisabled,
+  isEditableTarget,
+  getMenuItems,
+  getItemTextValue,
+  createTypeahead,
+  findTypeaheadMatch,
+  getSubmenu,
+  isSubmenu,
+  getSubmenuTrigger,
+  initSubmenuTriggers
 } from './menu_utils.js'

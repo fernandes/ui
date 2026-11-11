@@ -11,7 +11,8 @@ module UI::DropdownMenuTriggerBehavior
       data: dropdown_menu_trigger_data_attributes,
       tabindex: "0",
       role: "button",
-      "aria-haspopup": "menu"
+      "aria-haspopup": "menu",
+      "aria-expanded": "false"
     }
 
     # Only include class if it's not empty (to avoid overriding child component's classes)
@@ -19,6 +20,33 @@ module UI::DropdownMenuTriggerBehavior
     attrs[:class] = trigger_classes unless trigger_classes.blank?
 
     attrs
+  end
+
+  # Attributes for the default (non as_child) trigger, given its rendered content.
+  #
+  # - Text/icon content: the trigger is a native <button type="button">, so it
+  #   is one tab stop with button semantics and no role/tabindex needed.
+  # - Content that is itself interactive (a <button>, a link, ...): the
+  #   wrapper is a plain <div> with no role, tabindex or ARIA, so there is no
+  #   nested interactive element and no second tab stop. The controller moves
+  #   aria-haspopup / aria-expanded / aria-controls onto that inner element.
+  def dropdown_menu_trigger_default_attributes(content_html)
+    attrs = dropdown_menu_trigger_html_attributes.except(:role, :tabindex)
+    if dropdown_menu_trigger_interactive_content?(content_html)
+      attrs.except(:"aria-haspopup", :"aria-expanded")
+    else
+      attrs.merge(type: "button")
+    end
+  end
+
+  # Whether the trigger's content contains its own interactive element.
+  def dropdown_menu_trigger_interactive_content?(content_html)
+    content_html.to_s.match?(/<(button|a|input|select|textarea)[\s>]|role=["']button["']/i)
+  end
+
+  # Tag for the default trigger, given its rendered content.
+  def dropdown_menu_trigger_tag(content_html)
+    dropdown_menu_trigger_interactive_content?(content_html) ? :div : :button
   end
 
   # Returns combined CSS classes for the trigger
@@ -40,7 +68,7 @@ module UI::DropdownMenuTriggerBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     (attributes_value&.fetch(:data, {}) || {}).merge({
       "ui--dropdown-target": "trigger",
-      action: "click->ui--dropdown#toggle keydown.enter->ui--dropdown#toggle keydown.space->ui--dropdown#toggle"
+      action: "click->ui--dropdown#toggle keydown->ui--dropdown#handleTriggerKeydown"
     })
   end
 end

@@ -21,16 +21,15 @@ class UI::DropdownMenuTriggerComponent < ViewComponent::Base
   end
 
   def call
-    all_attrs = dropdown_menu_trigger_html_attributes.deep_merge(@attributes)
-
     if @as_child
       # asChild mode: yield attributes to block, child handles rendering
       content
     else
-      # Default mode: render as div
-      content_tag :div, **all_attrs do
-        content
-      end
+      # Default mode: a <button>, or a plain wrapper when the content is
+      # itself interactive (see dropdown_menu_trigger_default_attributes)
+      body = content
+      attrs = dropdown_menu_trigger_default_attributes(body).deep_merge(@attributes)
+      content_tag dropdown_menu_trigger_tag(body), body, **attrs
     end
   end
 end

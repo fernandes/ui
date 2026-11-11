@@ -13,6 +13,7 @@ module UI::DropdownMenuItemBehavior
       tabindex: "-1"
     }.tap do |attrs|
       attrs[:href] = @href if @href
+      attrs[:"aria-disabled"] = "true" if @disabled
     end
   end
 
@@ -28,13 +29,15 @@ module UI::DropdownMenuItemBehavior
   def dropdown_menu_item_data_attributes
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     existing_action = (attributes_value&.fetch(:data, {}) || {}).fetch(:action, "")
-    combined_action = [existing_action, "mouseenter->ui--dropdown#trackHoveredItem"].reject(&:empty?).join(" ")
+    combined_action = [existing_action, "click->ui--dropdown#select mouseenter->ui--dropdown#trackHoveredItem"].reject(&:empty?).join(" ")
 
-    (attributes_value&.fetch(:data, {}) || {}).merge({
+    data_attrs = (attributes_value&.fetch(:data, {}) || {}).merge({
       "ui--dropdown-target": "item",
       action: combined_action,
       inset: @inset,
       variant: @variant
     })
+    data_attrs[:disabled] = true if @disabled
+    data_attrs
   end
 end

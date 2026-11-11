@@ -10,9 +10,11 @@ module UI::DropdownMenuCheckboxItemBehavior
       class: dropdown_menu_checkbox_item_classes,
       data: dropdown_menu_checkbox_item_data_attributes,
       role: "menuitemcheckbox",
-      "aria-checked": @checked,
+      "aria-checked": @checked.to_s,
       tabindex: "-1"
-    }
+    }.tap do |attrs|
+      attrs[:"aria-disabled"] = "true" if @disabled
+    end
   end
 
   # Returns combined CSS classes for the checkbox item
