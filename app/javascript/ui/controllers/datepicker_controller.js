@@ -91,7 +91,13 @@ export default class extends Controller {
     const days = Array.from(calendar.querySelectorAll("[data-date]")).filter((day) =>
       !day.disabled && day.getAttribute("aria-disabled") !== "true"
     )
-    const byDate = (date) => date && days.find((day) => day.dataset.date === date)
+    // Multi-month calendars repeat a date as an outside day of the next or
+    // previous month; prefer the copy inside its own month
+    const byDate = (date) => {
+      if (!date) return null
+      const matches = days.filter((day) => day.dataset.date === date)
+      return matches.find((day) => !day.hasAttribute("data-outside")) || matches[0]
+    }
 
     return byDate(this.selectedValue[0]) ||
       byDate(format(new Date(), "yyyy-MM-dd")) ||

@@ -9,26 +9,28 @@ import { render, cleanup, settle } from "./support/render.js"
 const pad = (n) => String(n).padStart(2, "0")
 const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 
-const datePickerMarkup = ({ mode = "single", selected = [], month = iso(new Date()) } = {}) => `
+const datePickerMarkup = ({ mode = "single", selected = [], month = iso(new Date()), months = 1 } = {}) => `
   <div data-controller="ui--datepicker" data-ui--datepicker-mode-value="${mode}" data-ui--datepicker-selected-value='${JSON.stringify(selected)}' data-ui--datepicker-locale-value="en-US" data-ui--datepicker-format-value="long" data-ui--datepicker-placeholder-value="Select date" data-ui--datepicker-close-on-select-value="true">
     <div data-controller="ui--popover" data-ui--popover-placement-value="bottom-start" data-ui--popover-offset-value="4" data-ui--popover-trigger-value="click" data-ui--popover-hover-delay-value="0">
       <button type="button" data-ui--datepicker-target="trigger" data-ui--popover-target="trigger">
         <span data-ui--datepicker-target="label">Pick a date</span>
       </button>
       <div data-ui--popover-target="content" data-state="closed">
-        <div role="application" aria-label="Date picker" data-controller="ui--calendar" data-ui--calendar-mode-value="${mode}" data-ui--calendar-selected-value='${JSON.stringify(selected)}' data-ui--calendar-month-value="${month}" data-ui--calendar-number-of-months-value="1" data-ui--calendar-week-starts-on-value="0" data-ui--calendar-locale-value="en-US" data-ui--calendar-disabled-value="[]" data-ui--calendar-show-outside-days-value="true" data-ui--calendar-fixed-weeks-value="false" data-action="keydown->ui--calendar#handleKeydown ui--calendar:select->ui--datepicker#handleSelect">
+        <div role="application" aria-label="Date picker" data-controller="ui--calendar" data-ui--calendar-mode-value="${mode}" data-ui--calendar-selected-value='${JSON.stringify(selected)}' data-ui--calendar-month-value="${month}" data-ui--calendar-number-of-months-value="${months}" data-ui--calendar-week-starts-on-value="0" data-ui--calendar-locale-value="en-US" data-ui--calendar-disabled-value="[]" data-ui--calendar-show-outside-days-value="true" data-ui--calendar-fixed-weeks-value="false" data-action="keydown->ui--calendar#handleKeydown ui--calendar:select->ui--datepicker#handleSelect">
           <div aria-live="polite" aria-atomic="true" data-ui--calendar-target="liveRegion"></div>
           <div data-ui--calendar-target="monthLabel"></div>
-          <table role="grid">
+          ${Array.from({ length: months }, () => `<table role="grid">
             <thead><tr data-ui--calendar-target="weekdaysHeader"><th scope="col">Su</th></tr></thead>
             <tbody data-ui--calendar-target="grid" role="rowgroup"></tbody>
-          </table>
+          </table>`).join("")}
         </div>
       </div>
     </div>
   </div>`
 
-const trigger = () => screen.getByRole("button", { name: /Pick a date|2025|dates selected/ })
+// Anchored so it doesn't also match the day buttons, which the calendar names
+// by their full date ("Friday, June 13, 2025")
+const trigger = () => screen.getByRole("button", { name: /^(Pick a date|[A-Z][a-z]+ \d{1,2}, \d{4}|\d+ dates selected)$/ })
 const day = (date) => document.querySelector(`[data-date="${date}"]`)
 const content = () => document.querySelector('[data-ui--popover-target="content"]')
 
@@ -43,6 +45,18 @@ describe("Date Picker accessibility", () => {
       await settle(20)
 
       expect(day("2025-06-12")).toHaveFocus()
+    })
+
+    test("with two months, focus goes to the selected day in its own month, not its outside-day copy", async () => {
+      const { user } = await render(datePickerMarkup({ selected: ["2025-07-01"], month: "2025-06-12", months: 2 }))
+
+      await user.click(trigger())
+      await settle(20)
+
+      const copies = document.querySelectorAll('[data-date="2025-07-01"]')
+      expect(copies.length).toBe(2)
+      expect(document.activeElement).toHaveAttribute("data-date", "2025-07-01")
+      expect(document.activeElement).not.toHaveAttribute("data-outside")
     })
 
     test("without a selection, focus moves to today", async () => {
