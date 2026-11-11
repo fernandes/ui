@@ -50,7 +50,12 @@ jobs:
           RAILS_ENV: test
         run: bundle exec rails test
 
+      # Runs west of UTC on purpose: a bare "yyyy-MM-dd" parsed with `new Date()`
+      # is read as UTC midnight and slips to the previous day here, while a UTC
+      # runner would never notice.
       - name: Run bun tests
+        env:
+          TZ: America/Sao_Paulo
         run: bun test
 
   system-test:
