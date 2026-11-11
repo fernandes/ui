@@ -53,10 +53,9 @@
 
   extend UI::CalendarBehavior
 
+  # calendar_html_attributes already merges @attributes[:data], concatenating
+  # data-action with the calendar's own keydown action (don't override it)
   all_attributes = calendar_html_attributes.deep_merge(@attributes.except(:data))
-  if @attributes[:data]
-    all_attributes[:data] = all_attributes[:data].merge(@attributes[:data])
-  end
 
   nav_button_classes = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
 -%>

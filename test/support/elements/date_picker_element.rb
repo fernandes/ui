@@ -50,6 +50,28 @@ module UI
         wait_for_closed
       end
 
+      # Open from the keyboard: focus the trigger and press Enter
+      def open_with_keyboard
+        trigger.native.focus
+        press_enter
+        wait_for_open
+      end
+
+      # data-date of the focused day button ("" when focus is elsewhere)
+      #
+      # @return [String]
+      #
+      def focused_date
+        page.evaluate_script("document.activeElement?.dataset?.date || ''")
+      end
+
+      # Whether this picker's trigger has DOM focus
+      def trigger_focused?
+        page.evaluate_script(<<~JS)
+          document.activeElement === document.querySelector('##{node[:id]} [data-ui--datepicker-target="trigger"]')
+        JS
+      end
+
       # Select a date in the calendar
       #
       # @param date [Date] The date to select

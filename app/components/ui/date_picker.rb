@@ -84,9 +84,12 @@ class UI::DatePicker < Phlex::HTML
         yield(self) if block_given?
 
         render UI::PopoverContent.new(classes: "w-auto overflow-hidden p-0") do
+          # Phlex Calendar takes data: as an HTML attribute (an `attributes:`
+          # keyword would be ignored and the select event never wired)
           render UI::Calendar.new(
             mode: @mode,
             selected: @selected,
+            month: date_picker_calendar_month,
             locale: @locale,
             show_dropdowns: @show_dropdowns,
             min_date: @min_date,
@@ -94,11 +97,7 @@ class UI::DatePicker < Phlex::HTML
             disabled_dates: @disabled_dates,
             number_of_months: @number_of_months,
             week_starts_on: @week_starts_on,
-            attributes: {
-              data: {
-                action: "ui--calendar:select->ui--datepicker#handleSelect"
-              }
-            }
+            data: date_picker_calendar_data
           )
         end
       end

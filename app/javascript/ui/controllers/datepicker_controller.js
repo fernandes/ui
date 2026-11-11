@@ -56,6 +56,54 @@ export default class extends Controller {
     if (this.selectedValue.length > 0) {
       this.updateDisplay()
     }
+
+    // Move focus into the calendar when its popover opens (React Aria
+    // useDatePicker: the calendar takes focus). popover:show bubbles from the
+    // popover root inside this element.
+    this.boundHandlePopoverShow = this.handlePopoverShow.bind(this)
+    this.element.addEventListener("popover:show", this.boundHandlePopoverShow)
+  }
+
+  disconnect() {
+    this.element.removeEventListener("popover:show", this.boundHandlePopoverShow)
+    if (this.focusFrame) cancelAnimationFrame(this.focusFrame)
+  }
+
+  handlePopoverShow(event) {
+    const calendar = this.findCalendarElement()
+    if (!calendar || !event.target.contains(calendar)) return
+    this.focusCalendar(calendar)
+  }
+
+  // Focus the selected day, else today, else the calendar's own tab stop,
+  // else the first enabled day. The popover may still be visibility:hidden
+  // on the frame it opens, so retry on the next frames.
+  focusCalendar(calendar, attempts = 5) {
+    const target = this.dayToFocus(calendar)
+    if (!target) return
+
+    target.focus({ preventScroll: true })
+    if (document.activeElement === target || attempts <= 0) return
+    this.focusFrame = requestAnimationFrame(() => this.focusCalendar(calendar, attempts - 1))
+  }
+
+  dayToFocus(calendar) {
+    const days = Array.from(calendar.querySelectorAll("[data-date]")).filter((day) =>
+      !day.disabled && day.getAttribute("aria-disabled") !== "true"
+    )
+    const byDate = (date) => date && days.find((day) => day.dataset.date === date)
+
+    return byDate(this.selectedValue[0]) ||
+      byDate(format(new Date(), "yyyy-MM-dd")) ||
+      days.find((day) => day.tabIndex === 0) ||
+      days.find((day) => day.dataset.date.endsWith("-01")) ||
+      days[0] ||
+      null
+  }
+
+  findCalendarElement() {
+    if (this.hasUiCalendarOutlet) return this.uiCalendarOutlet.element
+    return this.element.querySelector("[data-controller*='ui--calendar']")
   }
 
   // Handle date selection from calendar
@@ -287,11 +335,12 @@ export default class extends Controller {
     }
   }
 
-  // Close the popover
+  // Close the popover and give focus back to its trigger: the day button
+  // that had focus is about to become inert
   closePopover() {
     // Try outlet first
     if (this.hasUiPopoverOutlet) {
-      this.uiPopoverOutlet.hide()
+      this.uiPopoverOutlet.hide({ returnFocus: true })
       return
     }
 
@@ -303,7 +352,7 @@ export default class extends Controller {
         "ui--popover"
       )
       if (popoverController) {
-        popoverController.hide()
+        popoverController.hide({ returnFocus: true })
       }
     }
   }

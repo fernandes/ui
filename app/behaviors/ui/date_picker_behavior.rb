@@ -54,6 +54,23 @@ module UI::DatePickerBehavior
   end
 
   # Convert selected dates to JSON array
+  # The calendar opens on the month of the (first) selected date, so the
+  # selected day is there to receive focus
+  def date_picker_calendar_month
+    first = case @selected
+    when Date then @selected
+    when Range then @selected.begin
+    when Array then @selected.first
+    end
+    first.respond_to?(:to_date) ? first.to_date : Date.today
+  end
+
+  # Wires the calendar's select event to the date picker. The calendar
+  # concatenates it with its own keydown action.
+  def date_picker_calendar_data
+    {action: "ui--calendar:select->ui--datepicker#handleSelect"}
+  end
+
   def selected_json
     case @selected
     when Date then [@selected.to_s].to_json

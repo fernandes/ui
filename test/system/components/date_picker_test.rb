@@ -443,5 +443,45 @@ module UI
       text = picker.selected_text
       assert text.include?(start_date.strftime("%B %-d, %Y"))
     end
+
+    # === Focus ===
+
+    test "opening moves focus to today's date in the calendar" do
+      visit_component("date_picker")
+
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
+      picker.open_with_keyboard
+
+      assert_equal Date.today.to_s, picker.focused_date
+    end
+
+    test "selecting a date with the keyboard returns focus to the trigger" do
+      visit_component("date_picker")
+
+      picker = find_element(UI::Testing::DatePickerElement, "#basic-date-picker")
+      picker.open_with_keyboard
+      picker.press_enter
+      picker.wait_for_closed
+      sleep 0.2 # focus is returned after the popover closes
+
+      assert picker.closed?
+      assert picker.trigger_focused?, "focus was not returned to the trigger"
+      assert_includes picker.selected_text, Date.today.strftime("%B %-d, %Y")
+    end
+
+    test "multiple mode stays open while picking several days" do
+      visit_component("date_picker")
+
+      picker = find_element(UI::Testing::DatePickerElement, "#multiple-date-picker")
+      picker.open
+      first_day = Date.today.beginning_of_month + 9
+      picker.select_date(first_day)
+      sleep 0.2
+      picker.select_date(first_day + 1)
+      sleep 0.2
+
+      assert picker.open?, "multiple mode closed after a click"
+      assert_includes picker.selected_text, "2 dates selected"
+    end
   end
 end

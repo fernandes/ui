@@ -132,6 +132,17 @@
         <% end %>
       </div>
 
+      <div class="rounded-md border p-4">
+        <%= render "ui/date_picker",
+          mode: :multiple,
+          label: "Available days",
+          attributes: { id: "multiple-date-picker" } do %>
+          <%= render "ui/date_picker/trigger",
+            placeholder: "Pick days",
+            classes: "w-[320px]" %>
+        <% end %>
+      </div>
+
       <div class="rounded-md bg-muted p-4 flex-1 min-w-[300px]">
         <p class="text-sm font-mono whitespace-pre-wrap">&lt;%= render "ui/date_picker",
   mode: :range,

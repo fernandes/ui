@@ -12,7 +12,7 @@ class UI::DatePickerComponent < ViewComponent::Base
   include UI::DatePickerBehavior
 
   renders_one :trigger, ->(placeholder: @placeholder, selected: @selected, icon: :chevron, classes: "", **attributes) do
-    TriggerComponent.new(
+    UI::DatePickerTriggerComponent.new(
       placeholder: placeholder,
       selected: selected,
       icon: icon,
@@ -113,6 +113,7 @@ class UI::DatePickerComponent < ViewComponent::Base
       render UI::CalendarComponent.new(
         mode: @mode,
         selected: @selected,
+        month: date_picker_calendar_month,
         locale: @locale,
         show_dropdowns: @show_dropdowns,
         min_date: @min_date,
@@ -120,11 +121,7 @@ class UI::DatePickerComponent < ViewComponent::Base
         disabled_dates: @disabled_dates,
         number_of_months: @number_of_months,
         week_starts_on: @week_starts_on,
-        attributes: {
-          data: {
-            action: "ui--calendar:select->ui--datepicker#handleSelect"
-          }
-        }
+        attributes: {data: date_picker_calendar_data}
       )
     end
   end

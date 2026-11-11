@@ -7,7 +7,7 @@
 #   render UI::Input.new(placeholder: "June 01, 2025")
 #
 class UI::DatePickerInput < Phlex::HTML
-  include DatePickerInputBehavior
+  include UI::DatePickerInputBehavior
 
   # @param placeholder [String] Placeholder text
   # @param value [String] Initial input value

@@ -58,36 +58,41 @@
   if @attributes[:data]
     all_attributes[:data] = all_attributes[:data].merge(@attributes[:data])
   end
+
+  # Partials share instance variables: the trigger and the calendar rendered
+  # below reassign @selected, @name, @placeholder... Freeze what we need now.
+  calendar_options = {
+    mode: @mode,
+    selected: @selected,
+    month: date_picker_calendar_month,
+    locale: @locale,
+    show_dropdowns: @show_dropdowns,
+    min_date: @min_date,
+    max_date: @max_date,
+    disabled_dates: @disabled_dates,
+    number_of_months: @number_of_months,
+    week_starts_on: @week_starts_on,
+    attributes: {data: date_picker_calendar_data}
+  }
+  label = @label
+  label_for = @label_for
+  name = @name
+  hidden_value = selected_value
 -%>
 <%= content_tag :div, all_attributes do %>
-  <% if @label %>
-    <%= render "ui/label", content: @label, for: @label_for, classes: "px-1" %>
+  <% if label %>
+    <%= render "ui/label", content: label, for: label_for, classes: "px-1" %>
   <% end %>
 
   <%= render "ui/popover", trigger: "click", placement: "bottom-start", offset: 4 do %>
     <%= yield %>
 
     <%= render "ui/popover/content", classes: "w-auto overflow-hidden p-0" do %>
-      <%= render "ui/calendar",
-        mode: @mode,
-        selected: @selected,
-        locale: @locale,
-        show_dropdowns: @show_dropdowns,
-        min_date: @min_date,
-        max_date: @max_date,
-        disabled_dates: @disabled_dates,
-        number_of_months: @number_of_months,
-        week_starts_on: @week_starts_on,
-        attributes: {
-          data: {
-            action: "ui--calendar:select->ui--datepicker#handleSelect"
-          }
-        }
-      %>
+      <%= render "ui/calendar", **calendar_options %>
     <% end %>
   <% end %>
 
-  <% if @name %>
-    <%= hidden_field_tag @name, selected_value, data: { ui__datepicker_target: "hiddenInput" } %>
+  <% if name %>
+    <%= hidden_field_tag name, hidden_value, data: { ui__datepicker_target: "hiddenInput" } %>
   <% end %>
 <% end %>
