@@ -4,17 +4,17 @@
 # Container for toast notifications - render once in your layout
 #
 # @example Basic usage
-#   <%= render UI::ToasterComponent.new %>
+#   <%= render UI::SonnerToasterComponent.new %>
 #
 # @example With options
-#   <%= render UI::ToasterComponent.new(
+#   <%= render UI::SonnerToasterComponent.new(
 #     position: "top-center",
 #     theme: "dark",
 #     rich_colors: true,
 #     close_button: true
 #   ) %>
 class UI::SonnerToasterComponent < ViewComponent::Base
-  include UI::ToasterBehavior
+  include UI::SonnerToasterBehavior
 
   # @param position [String] Toast position (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right)
   # @param theme [String] Theme (light, dark, system)
@@ -23,6 +23,7 @@ class UI::SonnerToasterComponent < ViewComponent::Base
   # @param duration [Integer] Default toast duration in milliseconds
   # @param close_button [Boolean] Show close button on toasts
   # @param visible_toasts [Integer] Maximum number of visible toasts
+  # @param label [String] Name of the notifications region; " (F8)" is appended (default: "Notifications")
   # @param classes [String] Additional CSS classes
   # @param attributes [Hash] Additional HTML attributes
   def initialize(
@@ -33,6 +34,7 @@ class UI::SonnerToasterComponent < ViewComponent::Base
     duration: 4000,
     close_button: false,
     visible_toasts: 3,
+    label: "Notifications",
     classes: "",
     **attributes
   )
@@ -43,11 +45,17 @@ class UI::SonnerToasterComponent < ViewComponent::Base
     @duration = duration
     @close_button = close_button
     @visible_toasts = visible_toasts
+    @label = label
     @classes = classes
     @attributes = attributes
   end
 
   def call
-    content_tag :ol, "", **toaster_html_attributes
+    content_tag :section, **toaster_region_attributes do
+      safe_join([
+        content_tag(:ol, "", **toaster_html_attributes),
+        content_tag(:div, "", **toaster_alerts_attributes)
+      ])
+    end
   end
 end

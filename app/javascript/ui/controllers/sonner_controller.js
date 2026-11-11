@@ -1,4 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { getTabbableElements } from "../utils/focus-trap-manager.js"
+
+const HOTKEY = "F8"
+const REGION_LABEL = `Notifications (${HOTKEY})`
 
 export default class extends Controller {
   static values = {
@@ -17,11 +21,179 @@ export default class extends Controller {
     this.toasts = []
     this.toastId = 0
     this.isHovered = false
+    this.isFocused = false
+    this.windowBlurred = false
+    this.returnFocusTo = null
     this.lastCloseTimestamp = 0
     this.setupContainer()
+    this.setupRegion()
     this.setupEventListeners()
     this.setupHoverListeners()
+    this.setupFocusListeners()
     this.detectTheme()
+  }
+
+  // The region around the list is the polite live region and the F8 landmark
+  // (Radix / Base UI ToastViewport). Ruby renders it so it exists before the
+  // first toast; a hand-written bare <ol> gets the live attributes here.
+  setupRegion() {
+    this.region = this.element.closest("[data-sonner-region]")
+    if (!this.region) {
+      this.region = this.element
+      const defaults = {
+        "aria-live": "polite",
+        "aria-relevant": "additions text",
+        "aria-atomic": "false",
+        "aria-label": REGION_LABEL,
+        tabindex: "-1"
+      }
+      Object.entries(defaults).forEach(([name, value]) => {
+        if (!this.element.hasAttribute(name)) this.element.setAttribute(name, value)
+      })
+    }
+
+    this.alertsContainer = this.region.querySelector("[data-sonner-alerts]")
+    if (!this.alertsContainer) {
+      this.alertsContainer = document.createElement("div")
+      this.alertsContainer.className = "sr-only"
+      this.alertsContainer.setAttribute("data-sonner-alerts", "")
+      if (this.region === this.element) {
+        this.element.after(this.alertsContainer)
+      } else {
+        this.region.append(this.alertsContainer)
+      }
+      this.createdAlertsContainer = true
+    }
+  }
+
+  setupFocusListeners() {
+    this.listeners = new AbortController()
+    const { signal } = this.listeners
+
+    this.region.addEventListener("focusin", this.handleFocusIn, { signal })
+    this.region.addEventListener("focusout", this.handleFocusOut, { signal })
+    this.region.addEventListener("keydown", this.handleRegionKeydown, { signal })
+    document.addEventListener("keydown", this.handleHotkey, { signal })
+    window.addEventListener("blur", this.handleWindowBlur, { signal })
+    window.addEventListener("focus", this.handleWindowFocus, { signal })
+  }
+
+  // F8 jumps to the notifications so keyboard users can reach toast actions
+  handleHotkey = (event) => {
+    if (event.key !== HOTKEY || event.defaultPrevented || !this.element.isConnected) return
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+
+    event.preventDefault()
+    const active = document.activeElement
+    if (active && active !== document.body && !this.region.contains(active)) {
+      this.returnFocusTo = active
+    }
+    this.region.focus()
+  }
+
+  handleFocusIn = (event) => {
+    const from = event.relatedTarget
+    if (!this.isFocused && from && !this.region.contains(from)) this.returnFocusTo = from
+
+    this.isFocused = true
+    this.expandToasts()
+    this.syncTimers()
+    // Toasts are now read from the region itself; drop the assertive copies
+    this.alertsContainer?.replaceChildren()
+    this.syncAccessibility()
+  }
+
+  handleFocusOut = (event) => {
+    if (event.relatedTarget && this.region.contains(event.relatedTarget)) return
+
+    this.isFocused = false
+    if (!this.isHovered) this.collapseToasts()
+    this.syncTimers()
+    this.syncAccessibility()
+  }
+
+  // Escape dismisses the focused toast (Radix Toast)
+  handleRegionKeydown = (event) => {
+    if (event.key !== "Escape" || event.defaultPrevented) return
+    const toastElement = event.target.closest?.("[data-sonner-toast]")
+    const toast = this.toasts.find(t => t.element === toastElement)
+    if (!toast) return
+
+    event.preventDefault()
+    this.dismiss(toast.id)
+  }
+
+  handleWindowBlur = () => {
+    this.windowBlurred = true
+    this.syncTimers()
+  }
+
+  handleWindowFocus = () => {
+    this.windowBlurred = false
+    this.syncTimers()
+  }
+
+  // Timers stop while the pointer or keyboard focus is on the toasts, or the
+  // window is in the background (Radix Toast)
+  isPaused() {
+    return this.isHovered || this.isFocused || this.windowBlurred
+  }
+
+  syncTimers() {
+    if (this.isPaused()) {
+      this.pauseAllTimers()
+    } else {
+      this.resumeAllTimers()
+    }
+  }
+
+  // Error toasts are announced assertively through a role="alert" copy; the
+  // visible toast is hidden from the polite region meanwhile so it isn't read
+  // twice. Once focus is inside, the toasts are read from the region.
+  syncAccessibility() {
+    this.toasts.forEach(t => {
+      if (t.important && !this.isFocused) {
+        t.element.setAttribute("aria-hidden", "true")
+      } else {
+        t.element.removeAttribute("aria-hidden")
+      }
+    })
+  }
+
+  announceAssertively(toastData, message, description) {
+    if (this.isFocused || !this.alertsContainer) return
+
+    const alert = document.createElement("div")
+    alert.setAttribute("role", "alert")
+    alert.setAttribute("aria-atomic", "true")
+    alert.textContent = description ? `${message}. ${description}` : message
+    this.alertsContainer.append(alert)
+    toastData.alert = alert
+  }
+
+  // Keep focus in the notifications when the focused toast goes away: the
+  // next toast, else where focus was before entering, else the region
+  moveFocusFrom(toast) {
+    const others = this.toasts.filter(t => t !== toast && !t.removed)
+    const index = this.toasts.indexOf(toast)
+    const ordered = [
+      ...others.filter(t => this.toasts.indexOf(t) < index).reverse(),
+      ...others.filter(t => this.toasts.indexOf(t) > index)
+    ]
+
+    for (const candidate of ordered) {
+      const [first] = getTabbableElements(candidate.element)
+      if (first) {
+        first.focus()
+        return
+      }
+    }
+
+    if (this.returnFocusTo?.isConnected && !this.region.contains(this.returnFocusTo)) {
+      this.returnFocusTo.focus()
+    } else {
+      this.region.focus()
+    }
   }
 
   setupContainer() {
@@ -66,8 +238,12 @@ export default class extends Controller {
 
   handleMouseLeave() {
     this.isHovered = false
-    this.collapseToasts()
-    this.resumeAllTimers()
+    if (!this.isFocused) this.collapseToasts()
+    this.syncTimers()
+  }
+
+  isExpanded() {
+    return this.isHovered || this.isFocused || this.expandValue
   }
 
   expandToasts() {
@@ -99,9 +275,10 @@ export default class extends Controller {
   resumeAllTimers() {
     const now = Date.now()
     this.toasts.forEach(t => {
-      if (t.remainingTime !== undefined && t.remainingTime > 0) {
+      if (!t.timerId && !t.removed && t.remainingTime > 0) {
         t.dismissAt = now + t.remainingTime
         t.timerId = setTimeout(() => this.dismiss(t.id), t.remainingTime)
+        t.remainingTime = null
       }
     })
   }
@@ -114,8 +291,10 @@ export default class extends Controller {
     this.element.appendChild(toast)
 
     // Store height as null initially, will be set after first render
-    const toastData = { id, element: toast, options, timerId: null, dismissAt: null, remainingTime: null, height: null }
+    const toastData = { id, element: toast, options, timerId: null, dismissAt: null, remainingTime: null, height: null, important: options.type === "error" }
     this.toasts.push(toastData)
+    if (toastData.important) this.announceAssertively(toastData, message, options.description)
+    this.syncAccessibility()
     this.updateToastPositions()
 
     // Trigger mount animation after a frame and capture height
@@ -128,10 +307,10 @@ export default class extends Controller {
       toast.setAttribute("data-mounted", "true")
     })
 
-    // Auto-dismiss (only if not hovered)
+    // Auto-dismiss (only while not paused by hover, focus or window blur)
     const duration = options.duration ?? this.durationValue
     if (duration !== Infinity) {
-      if (!this.isHovered) {
+      if (!this.isPaused()) {
         toastData.dismissAt = Date.now() + duration
         toastData.timerId = setTimeout(() => this.dismiss(id), duration)
       } else {
@@ -153,8 +332,8 @@ export default class extends Controller {
     toast.setAttribute("data-front", "true")
     toast.setAttribute("data-visible", "true")
     toast.setAttribute("data-swipe-out", "false")
-    // Start expanded if hovered, otherwise collapsed
-    toast.setAttribute("data-expanded", this.isHovered || this.expandValue ? "true" : "false")
+    // Start expanded if hovered or focused, otherwise collapsed
+    toast.setAttribute("data-expanded", this.isExpanded() ? "true" : "false")
     if (options.type) toast.setAttribute("data-type", options.type)
     if (this.richColorsValue) toast.setAttribute("data-rich-colors", "true")
 
@@ -238,7 +417,7 @@ export default class extends Controller {
   updateToastPositions() {
     const visible = this.toasts.slice(-this.visibleToastsValue)
     const totalToasts = this.toasts.length
-    const isExpanded = this.isHovered || this.expandValue
+    const isExpanded = this.isExpanded()
 
     // Use stored heights (or fallback to getBoundingClientRect for toasts not yet measured)
     const heights = this.toasts.map(t => t.height || t.element.getBoundingClientRect().height || 50)
@@ -304,11 +483,17 @@ export default class extends Controller {
     if (index === -1) return
 
     const toast = this.toasts[index]
+    if (toast.removed) return
+    toast.removed = true
 
     // Clear any pending timer
     if (toast.timerId) {
       clearTimeout(toast.timerId)
+      toast.timerId = null
     }
+
+    toast.alert?.remove()
+    if (toast.element.contains(document.activeElement)) this.moveFocusFrom(toast)
 
     toast.element.setAttribute("data-removed", "true")
     toast.element.setAttribute("data-front", "true")
@@ -381,6 +566,8 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.listeners?.abort()
+    if (this.createdAlertsContainer) this.alertsContainer?.remove()
     document.removeEventListener("ui:toast", this.boundHandleToast)
     this.element.removeEventListener("mouseenter", this.boundHandleMouseEnter)
     this.element.removeEventListener("mouseleave", this.boundHandleMouseLeave)

@@ -4,10 +4,10 @@
 # Container for toast notifications - render once in your layout
 #
 # @example Basic usage
-#   <%= render UI::Toaster.new %>
+#   <%= render UI::SonnerToaster.new %>
 #
 # @example With options
-#   <%= render UI::Toaster.new(
+#   <%= render UI::SonnerToaster.new(
 #     position: "top-center",
 #     theme: "dark",
 #     rich_colors: true,
@@ -23,6 +23,7 @@ class UI::SonnerToaster < Phlex::HTML
   # @param duration [Integer] Default toast duration in milliseconds
   # @param close_button [Boolean] Show close button on toasts
   # @param visible_toasts [Integer] Maximum number of visible toasts
+  # @param label [String] Name of the notifications region; " (F8)" is appended (default: "Notifications")
   # @param classes [String] Additional CSS classes
   # @param attributes [Hash] Additional HTML attributes
   def initialize(
@@ -33,6 +34,7 @@ class UI::SonnerToaster < Phlex::HTML
     duration: 4000,
     close_button: false,
     visible_toasts: 3,
+    label: "Notifications",
     classes: "",
     **attributes
   )
@@ -43,11 +45,15 @@ class UI::SonnerToaster < Phlex::HTML
     @duration = duration
     @close_button = close_button
     @visible_toasts = visible_toasts
+    @label = label
     @classes = classes
     @attributes = attributes
   end
 
   def view_template
-    ol(**toaster_html_attributes)
+    section(**toaster_region_attributes) do
+      ol(**toaster_html_attributes)
+      div(**toaster_alerts_attributes)
+    end
   end
 end

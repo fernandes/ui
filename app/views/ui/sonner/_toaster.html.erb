@@ -23,6 +23,7 @@
   @param duration [Integer] Default toast duration in milliseconds
   @param close_button [Boolean] Show close button on toasts
   @param visible_toasts [Integer] Maximum number of visible toasts
+  @param label [String] Name of the notifications region; " (F8)" is appended (default: "Notifications")
   @param classes [String] Additional CSS classes
   @param attributes [Hash] Additional HTML attributes
 -%>
@@ -34,8 +35,12 @@
   @duration = local_assigns.fetch(:duration, 4000)
   @close_button = local_assigns.fetch(:close_button, false)
   @visible_toasts = local_assigns.fetch(:visible_toasts, 3)
+  @label = local_assigns.fetch(:label, "Notifications")
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
   extend UI::SonnerToasterBehavior
 -%>
-<%= content_tag :ol, "", **toaster_html_attributes %>
+<%= content_tag :section, **toaster_region_attributes do %>
+  <%= content_tag :ol, "", **toaster_html_attributes %>
+  <%= content_tag :div, "", **toaster_alerts_attributes %>
+<% end %>

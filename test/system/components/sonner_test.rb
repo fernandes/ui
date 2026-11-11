@@ -424,4 +424,23 @@ class SonnerTest < UI::SystemTestCase
     assert_equal "356px", width.strip
     assert_equal "14px", gap.strip
   end
+
+  # === Keyboard and screen reader access ===
+
+  test "F8 reaches the notifications and Tab reaches the toast action" do
+    sonner.trigger("#action-toast-btn")
+    sonner.wait_for_toast_to_appear
+
+    page.send_keys(:f8)
+    assert_equal "Notifications (F8)", page.evaluate_script("document.activeElement.getAttribute('aria-label')")
+
+    page.send_keys(:tab)
+    assert_equal "Undo", page.evaluate_script("document.activeElement.textContent.trim()")
+  end
+
+  test "error toasts are announced through an alert" do
+    sonner.trigger("#error-toast-btn")
+
+    assert page.has_css?("[data-sonner-alerts] [role='alert']", text: "Error occurred", visible: :all)
+  end
 end
