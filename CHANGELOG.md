@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.1.10
+
+### Added
+
+- [Button] Support `as_child: true` to hand the button styling to a child element (e.g. a link); `type` is withheld and `disabled` becomes `aria-disabled`
+
+### Changed
+
+- [Performance] Reuse one TailwindMerge merger per thread (`UI::ClassMerger`) instead of building a new one per component. Building a merger costs ~4ms; rendering 200 buttons went from ~1160ms to ~4ms
+
+### Fixed
+
+- [CommandDialog] Merging custom classes no longer raises `NameError` (it referenced a `UI::TailwindMerge` module that did not exist)
+- [Popover] Clear `inert` when opening, so open content accepts clicks and focus again
+- [Sidebar] Anchor the rail to the sidebar instead of the viewport, removing horizontal overflow on pages with a sidebar
+- [Sidebar] Position the menu badge over the menu button instead of below it
+- [Sonner] Toaster partial no longer recurses forever because of an ERB output tag inside its doc comment
+- [Button, Checkbox] Add `ring-offset-background` and `focus-visible:ring-offset-2` to the focus ring
+
 ## 0.1.7
 
 ## 0.1.6
