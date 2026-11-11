@@ -251,10 +251,13 @@ module UI
       #
       def dropdown_trigger_aria
         trigger = dropdown_trigger
+        native_button = trigger.tag_name == "button"
         {
-          role: trigger["role"],
+          # A native <button> has the button role and is tabbable without
+          # role/tabindex attributes
+          role: trigger["role"] || (native_button ? "button" : nil),
           haspopup: trigger["aria-haspopup"],
-          tabindex: trigger["tabindex"]
+          tabindex: trigger["tabindex"] || (native_button ? "0" : nil)
         }
       end
 
