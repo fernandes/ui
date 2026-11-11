@@ -320,5 +320,82 @@ module UI
       nav_menu.open_menu("Simple")
       assert nav_menu.menu_open?("Simple")
     end
+
+    # === Keyboard and focus (accessibility audit) ===
+
+    test "every trigger is a tab stop" do
+      nav_menu = find_element(NavigationMenuElement, "#erb-nav")
+
+      nav_menu.focus_trigger("Home")
+      nav_menu.keyboard(:tab)
+
+      assert_equal "Components", nav_menu.focused_label
+    end
+
+    test "Tab out of the last link of a menu moves to the next item and closes the menu" do
+      nav_menu = find_element(NavigationMenuElement, "#erb-nav")
+
+      nav_menu.focus_trigger("Simple")
+      nav_menu.keyboard(:enter)
+      nav_menu.wait_for_menu_open("Simple")
+      4.times { nav_menu.keyboard(:tab) }
+
+      assert_equal "With Icon", nav_menu.focused_label
+      nav_menu.wait_for_menu_closed("Simple")
+    end
+
+    test "Escape in the content returns focus to its own trigger" do
+      nav_menu = find_element(NavigationMenuElement, "#erb-nav")
+
+      nav_menu.focus_trigger("Simple")
+      nav_menu.keyboard(:enter)
+      nav_menu.wait_for_menu_open("Simple")
+      nav_menu.keyboard(:tab)
+      nav_menu.keyboard(:escape)
+
+      nav_menu.wait_for_menu_closed("Simple")
+      assert_equal "Simple", nav_menu.focused_label
+    end
+
+    test "viewport mode: closed panels are hidden and not tabbable" do
+      nav_menu = find_element(NavigationMenuElement, "#erb-viewport-nav")
+
+      nav_menu.focus_trigger("Learn")
+      nav_menu.keyboard(:tab)
+
+      assert_equal "Build", nav_menu.focused_label
+      assert_no_selector "#erb-viewport-nav a", text: "Guides", visible: true
+    end
+
+    test "viewport mode: open content is the real node, not a copy" do
+      nav_menu = find_element(NavigationMenuElement, "#erb-viewport-nav")
+
+      nav_menu.focus_trigger("Learn")
+      nav_menu.keyboard(:enter)
+      nav_menu.wait_for_menu_open("Learn")
+
+      assert_equal 1, nav_menu.link_count("Guides")
+      assert_empty nav_menu.duplicate_ids
+      assert nav_menu.viewport_open?
+    end
+
+    test "viewport mode: Tab from an open trigger enters its content, then leaves to the next trigger" do
+      nav_menu = find_element(NavigationMenuElement, "#erb-viewport-nav")
+
+      nav_menu.focus_trigger("Learn")
+      nav_menu.keyboard(:enter)
+      nav_menu.wait_for_menu_open("Learn")
+
+      nav_menu.keyboard(:tab)
+      assert_equal "Guides", nav_menu.focused_label
+      assert nav_menu.focused_visible?, "focus went to a hidden copy of the link"
+
+      nav_menu.keyboard(:tab)
+      assert_equal "Tutorials", nav_menu.focused_label
+
+      nav_menu.keyboard(:tab)
+      assert_equal "Build", nav_menu.focused_label
+      nav_menu.wait_for_menu_closed("Learn")
+    end
   end
 end

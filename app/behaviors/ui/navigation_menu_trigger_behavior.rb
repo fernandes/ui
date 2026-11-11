@@ -5,15 +5,17 @@
 # Shared behavior for NavigationMenu Trigger component.
 module UI::NavigationMenuTriggerBehavior
   # Returns HTML attributes for the trigger
+  #
+  # Every trigger is a Tab stop: a navigation menu is a list of links, not a
+  # composite widget (Base UI NavigationMenuTrigger). The legacy `first:`
+  # option is still accepted and ignored. aria-controls is wired by the
+  # controller (per-instance ids).
   def navigation_menu_trigger_html_attributes
-    first_value = defined?(@first) && @first
-
     {
       class: navigation_menu_trigger_classes,
       data: navigation_menu_trigger_data_attributes,
       type: "button",
-      "aria-expanded": "false",
-      tabindex: first_value ? "0" : "-1"
+      "aria-expanded": "false"
     }
   end
 

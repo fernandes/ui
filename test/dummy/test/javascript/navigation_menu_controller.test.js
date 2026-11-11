@@ -117,15 +117,15 @@ describe("NavigationMenuController", () => {
       expect(controller.delayDurationValue).toBe(300)
     })
 
-    test("initializes triggers with tabindex", async () => {
-      container.innerHTML = createNavigationMenu()
+    test("every trigger is a tab stop (no roving tabindex)", async () => {
+      container.innerHTML = createNavigationMenu().replace('data-testid="trigger-1"', 'data-testid="trigger-1" tabindex="-1"')
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const trigger0 = container.querySelector('[data-testid="trigger-0"]')
       const trigger1 = container.querySelector('[data-testid="trigger-1"]')
 
-      expect(trigger0.getAttribute("tabindex")).toBe("0")
-      expect(trigger1.getAttribute("tabindex")).toBe("-1")
+      expect(trigger0).not.toHaveAttribute("tabindex")
+      expect(trigger1).not.toHaveAttribute("tabindex")
     })
 
     test("starts with activeIndex -1", async () => {
@@ -303,7 +303,7 @@ describe("NavigationMenuController", () => {
   })
 
   describe("Trigger Navigation", () => {
-    test("focusTrigger focuses and sets tabindex", async () => {
+    test("focusTrigger focuses the trigger", async () => {
       container.innerHTML = createNavigationMenu()
       await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -315,8 +315,8 @@ describe("NavigationMenuController", () => {
       controller.focusTrigger(1)
       await new Promise(resolve => setTimeout(resolve, 10))
 
-      expect(trigger0.getAttribute("tabindex")).toBe("-1")
-      expect(trigger1.getAttribute("tabindex")).toBe("0")
+      expect(trigger1).toHaveFocus()
+      expect(trigger0).not.toHaveAttribute("tabindex")
     })
 
     test("focusNextTrigger wraps around", async () => {
@@ -330,7 +330,7 @@ describe("NavigationMenuController", () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const trigger0 = container.querySelector('[data-testid="trigger-0"]')
-      expect(trigger0.getAttribute("tabindex")).toBe("0")
+      expect(trigger0).toHaveFocus()
     })
 
     test("focusPreviousTrigger wraps around", async () => {
@@ -344,7 +344,7 @@ describe("NavigationMenuController", () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const trigger1 = container.querySelector('[data-testid="trigger-1"]')
-      expect(trigger1.getAttribute("tabindex")).toBe("0")
+      expect(trigger1).toHaveFocus()
     })
   })
 

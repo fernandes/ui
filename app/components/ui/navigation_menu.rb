@@ -43,7 +43,7 @@ class UI::NavigationMenu < Phlex::HTML
 
       # Render viewport if enabled
       if @viewport
-        render UI::Viewport.new
+        render UI::NavigationMenuViewport.new
       end
     end
   end

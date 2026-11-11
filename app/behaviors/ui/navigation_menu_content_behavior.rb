@@ -18,11 +18,15 @@ module UI::NavigationMenuContentBehavior
     viewport_mode = defined?(@viewport) ? @viewport : true
 
     base_classes = if viewport_mode
-      # Viewport mode - content appears inside viewport
+      # Viewport mode - the controller moves the open content into the
+      # viewport and back into its item once closed. Closed content is
+      # hidden in place (it used to stay visible and tabbable).
       [
         "absolute left-0 top-0 w-full p-2 md:w-auto",
+        "data-[state=closed]:invisible data-[state=open]:visible",
+        "data-[state=closed]:pointer-events-none data-[state=open]:pointer-events-auto",
         # Animation classes
-        "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out",
+        "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out fill-mode-forwards",
         "data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out",
         "data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52",
         "data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52"

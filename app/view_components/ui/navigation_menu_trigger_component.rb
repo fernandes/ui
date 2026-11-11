@@ -7,7 +7,7 @@
 class UI::NavigationMenuTriggerComponent < ViewComponent::Base
   include UI::NavigationMenuTriggerBehavior
 
-  # @param first [Boolean] Whether this is the first trigger (gets tabindex=0)
+  # @param first [Boolean] Whether this is the first trigger (deprecated, ignored: every trigger is a Tab stop)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
   def initialize(first: false, classes: "", **attributes)

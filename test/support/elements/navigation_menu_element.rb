@@ -249,6 +249,43 @@ module UI
         page.execute_script("arguments[0].focus()", trigger)
       end
 
+      # Press keys on whatever has focus (unlike press_* which target the root)
+      def keyboard(*keys)
+        page.send_keys(*keys)
+      end
+
+      # Trimmed text of the focused element, anywhere on the page
+      def focused_label
+        page.evaluate_script("document.activeElement && document.activeElement.textContent.trim()")
+      end
+
+      # Whether the focused element is visible (not visibility:hidden / display:none)
+      def focused_visible?
+        page.evaluate_script(<<~JS)
+          (() => {
+            const el = document.activeElement
+            return !!el && el !== document.body && el.checkVisibility({ visibilityProperty: true })
+          })()
+        JS
+      end
+
+      # How many links with this exact text exist inside the nav (visible or not)
+      def link_count(text)
+        page.evaluate_script(<<~JS)
+          Array.from(document.querySelectorAll('##{node[:id]} a')).filter(a => a.textContent.trim() === #{text.to_json}).length
+        JS
+      end
+
+      # Ids that appear more than once inside the nav
+      def duplicate_ids
+        page.evaluate_script(<<~JS)
+          (() => {
+            const ids = Array.from(document.querySelectorAll('##{node[:id]} [id]')).map(el => el.id)
+            return ids.filter((id, i) => ids.indexOf(id) !== i)
+          })()
+        JS
+      end
+
       # === Sub-elements ===
 
       # Get all trigger elements
@@ -362,6 +399,12 @@ module UI
 
       def find_content(trigger_text)
         trigger = find_trigger(trigger_text)
+        # The trigger controls its content (works in viewport mode, where the
+        # open content is moved into the viewport)
+        if trigger["aria-controls"].present?
+          return find_in_page("##{trigger["aria-controls"]}", visible: :all)
+        end
+
         trigger_index = triggers.index(trigger)
         # Find all content elements including hidden ones
         all_contents = contents

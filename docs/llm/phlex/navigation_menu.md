@@ -61,7 +61,7 @@ Individual menu item container.
 Button that opens the dropdown content.
 
 **Parameters:**
-- `first:` Boolean - Mark as first trigger for proper tabindex (default: false)
+- `first:` Boolean - Deprecated, ignored (every trigger is a Tab stop)
 - `classes:` String - Additional CSS classes
 - `**attributes` Hash - Additional HTML attributes
 
@@ -234,14 +234,27 @@ The NavigationMenu includes intelligent directional animations:
 
 | Key | Action |
 |-----|--------|
-| ArrowRight | Focus next trigger |
-| ArrowLeft | Focus previous trigger |
-| ArrowDown | Open menu / Focus first link |
-| Enter/Space | Toggle menu |
-| Escape | Close menu |
-| Home | Focus first trigger |
-| End | Focus last trigger |
-| Tab | Navigate through content links |
+| Tab / Shift+Tab | Every trigger and top-level link is a Tab stop; Tab from an open trigger enters its content, Tab from the last link moves on and closes it |
+| ArrowRight / ArrowLeft | Focus next / previous trigger or top-level link (wraps) |
+| ArrowDown | Open menu / focus first link; inside content, next link |
+| ArrowUp | Inside content, previous link |
+| Enter/Space | Toggle menu (native button click) |
+| Escape | Close menu and return focus to its trigger |
+| Home / End | Focus first / last top-level item (first / last link inside content) |
+
+## Accessibility
+
+- It's navigation, not a composite widget: there is no roving tabindex. `first:` is still
+  accepted on triggers but no longer needed (ignored).
+- Each trigger gets `aria-controls` → its content and `aria-expanded`; the content is labelled by
+  its trigger. Ids are generated per instance by the controller.
+- The `<nav>` is named `aria-label="Main"` unless you pass `aria-label` / `aria-labelledby`
+  (give each navigation menu on a page its own name).
+- Viewport mode (default) moves the real content node into the viewport while it's open and back
+  into its item when closed, so links and ids are never duplicated. Closed panels are hidden in
+  both modes, even when no exit animation runs.
+- The menu closes on Escape, on an outside click, when focus leaves the open item, and when a link
+  inside a panel is followed.
 
 ## Common Mistakes
 
@@ -281,18 +294,6 @@ render UI::NavigationMenu::Link.new(as_child: true, classes: "flex-row items-cen
     # Classes are properly merged
   end
 end
-```
-
-### ❌ Wrong - Missing `first: true` on first trigger
-
-```ruby
-render UI::NavigationMenu::Trigger.new { "First Item" }  # No tabindex="0"
-```
-
-### ✅ Correct - Mark first trigger
-
-```ruby
-render UI::NavigationMenu::Trigger.new(first: true) { "First Item" }  # Gets tabindex="0"
 ```
 
 ## See Also

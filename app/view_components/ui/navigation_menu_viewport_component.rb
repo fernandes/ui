@@ -4,7 +4,7 @@
 #
 # Container for navigation menu content when viewport mode is enabled.
 class UI::NavigationMenuViewportComponent < ViewComponent::Base
-  include UI::ViewportBehavior
+  include UI::NavigationMenuViewportBehavior
 
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes

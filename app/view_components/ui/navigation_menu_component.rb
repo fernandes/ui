@@ -35,7 +35,7 @@ class UI::NavigationMenuComponent < ViewComponent::Base
     content_tag :nav, **navigation_menu_html_attributes.deep_merge(@attributes) do
       safe_join([
         content,
-        (@viewport ? render(UI::ViewportComponent.new) : nil)
+        (@viewport ? render(UI::NavigationMenuViewportComponent.new) : nil)
       ].compact)
     end
   end

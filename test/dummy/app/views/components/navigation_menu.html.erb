@@ -404,6 +404,40 @@
     </div>
   </section>
 
+  <!-- Viewport mode (the default) -->
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold">Viewport (default)</h2>
+    <p class="text-sm text-muted-foreground">Open content is shown in a shared viewport below the list.</p>
+
+    <%= render "ui/navigation_menu", id: "erb-viewport-nav", attributes: { "aria-label": "Viewport demo" } do %>
+      <%= render "ui/navigation_menu/list" do %>
+        <%= render "ui/navigation_menu/item" do %>
+          <%= render "ui/navigation_menu/trigger" do %>Learn<% end %>
+          <%= render "ui/navigation_menu/content" do %>
+            <ul class="grid w-[300px] gap-2">
+              <li><%= render "ui/navigation_menu/link", href: "#learn-guides" do %>Guides<% end %></li>
+              <li><%= render "ui/navigation_menu/link", href: "#learn-tutorials" do %>Tutorials<% end %></li>
+            </ul>
+          <% end %>
+        <% end %>
+
+        <%= render "ui/navigation_menu/item" do %>
+          <%= render "ui/navigation_menu/trigger" do %>Build<% end %>
+          <%= render "ui/navigation_menu/content" do %>
+            <ul class="grid w-[300px] gap-2">
+              <li><%= render "ui/navigation_menu/link", href: "#build-starters" do %>Starters<% end %></li>
+              <li><%= render "ui/navigation_menu/link", href: "#build-examples" do %>Examples<% end %></li>
+            </ul>
+          <% end %>
+        <% end %>
+
+        <%= render "ui/navigation_menu/item" do %>
+          <%= render "ui/navigation_menu/link", href: "#viewport-pricing", trigger_style: true do %>Pricing<% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </section>
+
   <!-- ViewComponent Example -->
   <section class="space-y-4">
     <h2 class="text-2xl font-semibold">ViewComponent</h2>

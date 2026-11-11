@@ -8,7 +8,7 @@
 # @example Usage (automatically included in NavigationMenu when viewport: true)
 #   render UI::Viewport.new
 class UI::NavigationMenuViewport < Phlex::HTML
-  include UI::ViewportBehavior
+  include UI::NavigationMenuViewportBehavior
 
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes

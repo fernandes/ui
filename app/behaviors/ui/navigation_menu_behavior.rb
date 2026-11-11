@@ -36,11 +36,25 @@
 #
 module UI::NavigationMenuBehavior
   # Returns HTML attributes for the navigation menu container
+  #
+  # The <nav> landmark gets aria-label="Main" (Radix's default) unless the
+  # caller names it with aria-label / aria-labelledby; a page with several
+  # navigation menus should give each its own name.
   def navigation_menu_html_attributes
-    {
+    attrs = {
       class: navigation_menu_classes,
       data: navigation_menu_data_attributes
     }
+    attrs[:"aria-label"] = "Main" unless navigation_menu_named?
+    attrs
+  end
+
+  # Whether the caller already named the landmark
+  def navigation_menu_named?
+    attributes_value = (respond_to?(:attributes, true) ? attributes : @attributes) || {}
+    aria = attributes_value[:aria] || attributes_value["aria"] || {}
+    keys = attributes_value.keys.map(&:to_s) + aria.keys.map { |key| "aria-#{key}" }
+    keys.map { |key| key.tr("_", "-") }.intersect?(%w[aria-label aria-labelledby])
   end
 
   # Returns combined CSS classes for the navigation menu
