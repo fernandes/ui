@@ -28,17 +28,17 @@ export default class extends Controller {
     this._boundHandleHide = (event) => {
       if (event.target.contains(this.element)) this.handleHide()
     }
-    document.addEventListener("popover:show", this._boundHandleShow)
-    document.addEventListener("drawer:show",  this._boundHandleShow)
-    document.addEventListener("popover:hide", this._boundHandleHide)
-    document.addEventListener("drawer:hide",  this._boundHandleHide)
+    // The Drawer dispatches drawer:open / drawer:close; drawer:show /
+    // drawer:hide are kept for anything that dispatched those.
+    this.showEvents = ["popover:show", "drawer:open", "drawer:show"]
+    this.hideEvents = ["popover:hide", "drawer:close", "drawer:hide"]
+    this.showEvents.forEach((name) => document.addEventListener(name, this._boundHandleShow))
+    this.hideEvents.forEach((name) => document.addEventListener(name, this._boundHandleHide))
   }
 
   disconnect() {
-    document.removeEventListener("popover:show", this._boundHandleShow)
-    document.removeEventListener("drawer:show",  this._boundHandleShow)
-    document.removeEventListener("popover:hide", this._boundHandleHide)
-    document.removeEventListener("drawer:hide",  this._boundHandleHide)
+    this.showEvents.forEach((name) => document.removeEventListener(name, this._boundHandleShow))
+    this.hideEvents.forEach((name) => document.removeEventListener(name, this._boundHandleHide))
   }
 
   // Ids and relationships, wired client-side so all three renderers share

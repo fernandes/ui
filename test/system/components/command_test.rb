@@ -281,12 +281,7 @@ class CommandTest < UI::SystemTestCase
     command.navigate_down
     assert_equal "Dashboard", command.selected_item_text
 
-    # Navigate down - the controller filters out disabled items in visibleItems
-    # However, disabled items with data-disabled="" are not properly filtered
-    # due to JavaScript's falsy evaluation of empty strings
-    # For now, we'll skip this test and document the issue
-    skip "Disabled item filtering needs fix in controller (empty string check)"
-
+    # Analytics (data-disabled="") is skipped
     command.navigate_down
     assert_equal "Reports", command.selected_item_text
   end

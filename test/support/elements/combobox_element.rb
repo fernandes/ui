@@ -197,6 +197,16 @@ module UI
         empty&.text&.strip
       end
 
+      # Whether this combobox's trigger has DOM focus
+      def trigger_focused?
+        page.evaluate_script(<<~JS)
+          (() => {
+            const root = document.getElementById(#{node[:id].to_json})
+            return !!root && document.activeElement === root.querySelector('[role="combobox"]:not(input)')
+          })()
+        JS
+      end
+
       # === Sub-elements ===
 
       # Get the trigger button element

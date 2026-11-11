@@ -164,6 +164,22 @@ describe("Command accessibility", () => {
     })
   })
 
+  describe("inside a drawer", () => {
+    // The Drawer announces itself with drawer:open / drawer:close on its root
+    test("opening the drawer highlights the first option, closing resets the search", async () => {
+      const { user } = await render(`<div data-testid="drawer">${commandMarkup()}</div>`)
+      const drawer = screen.getByTestId("drawer")
+      const input = screen.getByRole("combobox")
+
+      drawer.dispatchEvent(new CustomEvent("drawer:open", { bubbles: true }))
+      expect(screen.getByRole("option", { name: "Calendar" })).toHaveAttribute("aria-selected", "true")
+
+      await user.type(input, "calc")
+      drawer.dispatchEvent(new CustomEvent("drawer:close", { bubbles: true }))
+      expect(input).toHaveValue("")
+    })
+  })
+
   describe("pointer", () => {
     test("hovering an option highlights it", async () => {
       const { user } = await render(commandMarkup())

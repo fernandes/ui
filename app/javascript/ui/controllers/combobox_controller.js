@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { setIdRefs } from "../utils/id-manager.js"
 
 // Combobox controller for managing selection state
 // Works with Command component to provide combobox functionality:
@@ -35,6 +36,34 @@ export default class extends Controller {
     if (this.valueValue) {
       this.updateCheckIcons()
     }
+
+    this.wireTrigger()
+  }
+
+  // The button that opens the list is the combobox (shadcn's Popover +
+  // Command combobox: role="combobox" + aria-expanded on the trigger); it
+  // controls the list inside the popover
+  wireTrigger() {
+    const trigger = this.findTrigger()
+    if (!trigger) return
+
+    if (!trigger.hasAttribute("role")) trigger.setAttribute("role", "combobox")
+    trigger.setAttribute("aria-expanded", "false")
+    const list = this.element.querySelector('[data-slot="command-list"]')
+    if (list) setIdRefs(trigger, "aria-controls", list, { prefix: "command-list" })
+  }
+
+  findTrigger() {
+    const target = this.element.querySelector(
+      '[data-ui--popover-target="trigger"], [data-ui--drawer-target="trigger"], [data-ui--dropdown-target="trigger"]'
+    )
+    if (!target) return null
+    const focusable = 'button, [href], input, [tabindex]:not([tabindex="-1"])'
+    return target.matches(focusable) ? target : target.querySelector(focusable)
+  }
+
+  setExpanded(expanded) {
+    this.findTrigger()?.setAttribute("aria-expanded", String(expanded))
   }
 
   disconnect() {
@@ -47,6 +76,8 @@ export default class extends Controller {
 
   // Focus the search input when the combobox opens
   handleOpen() {
+    this.setExpanded(true)
+
     // Use requestAnimationFrame to ensure the content is visible
     requestAnimationFrame(() => {
       const input = this.element.querySelector('[data-slot="command-input"]')
@@ -58,6 +89,8 @@ export default class extends Controller {
 
   // Clear the search input when the combobox closes
   handleClose() {
+    this.setExpanded(false)
+
     const input = this.element.querySelector('[data-slot="command-input"]')
     if (input && input.value) {
       input.value = ''
@@ -113,7 +146,9 @@ export default class extends Controller {
       'ui--popover'
     )
     if (popoverController) {
-      popoverController.hide()
+      // Focus is in the search input, which is about to become inert: give
+      // it back to the trigger (Radix/Base UI return focus on close)
+      popoverController.hide({ returnFocus: true })
       return
     }
 

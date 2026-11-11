@@ -329,4 +329,34 @@ class ComboboxTest < UI::SystemTestCase
     # Should still have original selection
     assert_equal original_text, combobox.selected_text
   end
+
+  # === Focus ===
+
+  test "focus returns to the trigger after selecting with the keyboard" do
+    combobox = framework_combobox
+
+    combobox.select_with_keyboard("Remix")
+    sleep 0.2 # focus is returned after the popover closes
+
+    assert combobox.trigger_focused?, "focus was not returned to the trigger"
+  end
+
+  test "focus returns to the trigger after clicking an option" do
+    combobox = framework_combobox
+
+    combobox.select_option("Next.js")
+    sleep 0.2
+
+    assert combobox.trigger_focused?, "focus was not returned to the trigger"
+  end
+
+  test "the trigger exposes combobox state" do
+    combobox = framework_combobox
+
+    assert_equal "combobox", combobox.trigger["role"]
+    assert_equal "false", combobox.trigger["aria-expanded"]
+
+    combobox.open
+    assert_equal "true", combobox.trigger["aria-expanded"]
+  end
 end
