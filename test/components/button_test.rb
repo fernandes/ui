@@ -40,7 +40,7 @@ class ButtonTest < ActiveSupport::TestCase
   end
 
   test "custom attributes reach the element" do
-    html = render(UI::Button.new(data: { action: "click->thing#go" }, id: "go") { "x" })
+    html = render(UI::Button.new(data: {action: "click->thing#go"}, id: "go") { "x" })
 
     assert_match(/data-action="click->thing#go"/, html)
     assert_match(/id="go"/, html)
@@ -50,7 +50,10 @@ class ButtonTest < ActiveSupport::TestCase
 
   test "as_child yields the attributes instead of rendering a button" do
     captured = nil
-    html = render(UI::Button.new(as_child: true) { |attrs| captured = attrs; "" })
+    html = render(UI::Button.new(as_child: true) { |attrs|
+      captured = attrs
+      ""
+    })
 
     assert_not_includes html, "<button"
     assert captured.present?
@@ -59,7 +62,10 @@ class ButtonTest < ActiveSupport::TestCase
 
   test "as_child hands over the variant and size styling" do
     captured = nil
-    render(UI::Button.new(variant: "outline", size: "sm", as_child: true) { |attrs| captured = attrs; "" })
+    render(UI::Button.new(variant: "outline", size: "sm", as_child: true) { |attrs|
+      captured = attrs
+      ""
+    })
 
     assert_match(/border/, captured[:class])
     assert_match(/h-8/, captured[:class])
@@ -68,7 +74,10 @@ class ButtonTest < ActiveSupport::TestCase
   # `type` belongs to <button>; an <a> receiving it would be invalid HTML.
   test "as_child does not hand over the type attribute" do
     captured = nil
-    render(UI::Button.new(as_child: true) { |attrs| captured = attrs; "" })
+    render(UI::Button.new(as_child: true) { |attrs|
+      captured = attrs
+      ""
+    })
 
     assert_not_includes captured.keys, :type
   end
@@ -76,7 +85,10 @@ class ButtonTest < ActiveSupport::TestCase
   # An anchor cannot be `disabled`, so the intent is carried as aria-disabled.
   test "as_child converts disabled into aria-disabled" do
     captured = nil
-    render(UI::Button.new(disabled: true, as_child: true) { |attrs| captured = attrs; "" })
+    render(UI::Button.new(disabled: true, as_child: true) { |attrs|
+      captured = attrs
+      ""
+    })
 
     assert_not_includes captured.keys, :disabled
     assert_equal "true", captured.dig(:aria, :disabled)
@@ -84,14 +96,20 @@ class ButtonTest < ActiveSupport::TestCase
 
   test "as_child keeps custom attributes" do
     captured = nil
-    render(UI::Button.new(as_child: true, data: { turbo_method: :delete }) { |attrs| captured = attrs; "" })
+    render(UI::Button.new(as_child: true, data: {turbo_method: :delete}) { |attrs|
+      captured = attrs
+      ""
+    })
 
     assert_equal :delete, captured.dig(:data, :turbo_method)
   end
 
   test "as_child merges caller classes with the button styling" do
     captured = nil
-    render(UI::Button.new(as_child: true, class: "w-full") { |attrs| captured = attrs; "" })
+    render(UI::Button.new(as_child: true, class: "w-full") { |attrs|
+      captured = attrs
+      ""
+    })
 
     assert_match(/w-full/, captured[:class])
     assert_match(/inline-flex/, captured[:class])

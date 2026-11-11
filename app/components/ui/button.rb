@@ -30,7 +30,7 @@ class UI::Button < Phlex::HTML
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
   def initialize(variant: "default", size: "default", type: "button", disabled: false,
-                 as_child: false, classes: "", **attributes)
+    as_child: false, classes: "", **attributes)
     @variant = variant
     @size = size
     @type = type
@@ -57,7 +57,7 @@ class UI::Button < Phlex::HTML
 
     if @attributes.key?(:class)
       merged = TailwindMerge::Merger.new.merge(
-        [ attributes[:class], @attributes[:class] ].compact.join(" ")
+        [attributes[:class], @attributes[:class]].compact.join(" ")
       )
       attributes = attributes.merge(class: merged)
     end
@@ -73,6 +73,6 @@ class UI::Button < Phlex::HTML
     attributes = resolved_attributes.except(:type, :disabled)
     return attributes unless @disabled
 
-    attributes.deep_merge(aria: { disabled: "true" })
+    attributes.deep_merge(aria: {disabled: "true"})
   end
 end

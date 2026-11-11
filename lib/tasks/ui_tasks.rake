@@ -4,10 +4,10 @@ namespace :ui do
   desc "Bump version (sync version.rb + package.json), rebuild JS bundle, refresh lockfiles, " \
        "stage everything for commit. Pass VERSION=x.y.z or you'll be prompted."
   task :release do
-    root      = File.expand_path("../..", __dir__)
-    ver_file  = File.join(root, "lib/ui/version.rb")
-    pkg_file  = File.join(root, "package.json")
-    current   = File.read(ver_file)[/VERSION\s*=\s*"([^"]+)"/, 1]
+    root = File.expand_path("../..", __dir__)
+    ver_file = File.join(root, "lib/ui/version.rb")
+    pkg_file = File.join(root, "package.json")
+    current = File.read(ver_file)[/VERSION\s*=\s*"([^"]+)"/, 1]
 
     target = ENV["VERSION"]
     if target.to_s.empty?
