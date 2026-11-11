@@ -261,7 +261,7 @@ describe("ContextMenuController", () => {
       await new Promise(resolve => setTimeout(resolve, 150))
 
       const downEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      document.dispatchEvent(downEvent)
+      document.activeElement.dispatchEvent(downEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(items[1].getAttribute("tabindex")).toBe("0")
@@ -286,12 +286,12 @@ describe("ContextMenuController", () => {
 
       // Go to second item first
       const downEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      document.dispatchEvent(downEvent)
+      document.activeElement.dispatchEvent(downEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Then go back up
       const upEvent = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true })
-      document.dispatchEvent(upEvent)
+      document.activeElement.dispatchEvent(upEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(items[0].getAttribute("tabindex")).toBe("0")
@@ -316,12 +316,12 @@ describe("ContextMenuController", () => {
 
       // Go to last item
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      document.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Press Home
       const homeEvent = new KeyboardEvent("keydown", { key: "Home", bubbles: true })
-      document.dispatchEvent(homeEvent)
+      document.activeElement.dispatchEvent(homeEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(items[0].getAttribute("tabindex")).toBe("0")
@@ -345,7 +345,7 @@ describe("ContextMenuController", () => {
       await new Promise(resolve => setTimeout(resolve, 150))
 
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      document.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(items[items.length - 1].getAttribute("tabindex")).toBe("0")
@@ -369,7 +369,7 @@ describe("ContextMenuController", () => {
       await new Promise(resolve => setTimeout(resolve, 150))
 
       const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
-      document.dispatchEvent(escEvent)
+      document.activeElement.dispatchEvent(escEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(content.classList.contains("hidden")).toBe(true)
@@ -397,7 +397,7 @@ describe("ContextMenuController", () => {
       await new Promise(resolve => setTimeout(resolve, 150))
 
       const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      document.dispatchEvent(enterEvent)
+      document.activeElement.dispatchEvent(enterEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(itemClicked).toBe(true)

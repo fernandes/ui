@@ -4,8 +4,9 @@
 class UI::ContextMenuRadioItemComponent < ViewComponent::Base
   include UI::ContextMenuRadioItemBehavior
 
-  def initialize(checked: false, classes: "", **attributes)
+  def initialize(checked: false, disabled: false, classes: "", **attributes)
     @checked = checked
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

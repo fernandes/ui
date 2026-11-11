@@ -4,9 +4,10 @@
 class UI::ContextMenuItemComponent < ViewComponent::Base
   include UI::ContextMenuItemBehavior
 
-  def initialize(href: nil, inset: false, variant: "default", classes: "", **attributes)
+  def initialize(href: nil, inset: false, variant: "default", disabled: false, classes: "", **attributes)
     @href = href
     @inset = inset
+    @disabled = disabled
     @variant = variant
     @classes = classes
     @attributes = attributes

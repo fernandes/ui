@@ -13,8 +13,9 @@ class UI::ContextMenuCheckboxItem < Phlex::HTML
   # @param checked [Boolean] Whether the checkbox is checked
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(checked: false, classes: "", **attributes)
+  def initialize(checked: false, disabled: false, classes: "", **attributes)
     @checked = checked
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

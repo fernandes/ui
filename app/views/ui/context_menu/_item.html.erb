@@ -3,6 +3,7 @@
   content ||= local_assigns.fetch(:content, nil)
   @href = local_assigns.fetch(:href, nil)
   @inset = local_assigns.fetch(:inset, false)
+  @disabled = local_assigns.fetch(:disabled, false)
   @variant = local_assigns.fetch(:variant, "default")
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})

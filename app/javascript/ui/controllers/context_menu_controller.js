@@ -1,8 +1,33 @@
 import { Controller } from "@hotwired/stimulus"
-import { computePosition, flip, offset, shift } from "@floating-ui/dom"
+import {
+  MENU_ITEM_SELECTOR,
+  getMenuItems,
+  focusItem as focusItemUtil,
+  focusNextItem as focusNextItemUtil,
+  focusPreviousItem as focusPreviousItemUtil,
+  clearAllTabindexes,
+  updateRovingTabindex,
+  getKeyboardFocusedItem,
+  isItemDisabled,
+  isEditableTarget,
+  createTypeahead,
+  toggleCheckbox,
+  selectRadio
+} from "../utils/menu_utils.js"
+import { ensureId } from "../utils/id-manager.js"
+import { createEscapeLayer } from "../utils/escape-key-manager.js"
 
-// Context Menu controller - triggered by right-click with keyboard navigation support
-// Based on dropdown_controller but with contextmenu trigger instead of click
+// Only one context menu is open at a time; opening another closes this one.
+let activeMenu = null
+
+// Context Menu controller - opened by right-click (or the keyboard's context
+// menu key / Shift+F10), with menu keyboard support.
+//
+// - Keys are handled on the menu itself, never page-wide.
+// - Closes on Escape (shared layer stack), on selecting an item, on Tab, when
+//   focus leaves the menu, and on a click or right-click outside it.
+// - Escape, selection and Tab return focus to the element that had it when
+//   the menu opened.
 export default class extends Controller {
   static targets = ["trigger", "content", "item"]
   static values = {
@@ -12,245 +37,294 @@ export default class extends Controller {
   constructor() {
     super(...arguments)
     this.lastHoveredItem = null
+    this.returnFocusTo = null
   }
 
   connect() {
+    this.typeahead = createTypeahead()
     this.boundHandleClickOutside = this.handleClickOutside.bind(this)
     this.boundHandleKeydown = this.handleKeydown.bind(this)
-    document.addEventListener('click', this.boundHandleClickOutside)
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this)
+
+    this.escapeLayer = createEscapeLayer(() => this.close({ returnFocus: true }), { element: this.element })
+
+    if (this.hasContentTarget) {
+      ensureId(this.contentTarget, 'context-menu-content')
+      this.contentTarget.addEventListener('keydown', this.boundHandleKeydown)
+      this.contentTarget.addEventListener('focusout', this.boundHandleFocusOut)
+    }
+
+    this.resetToClosed()
   }
 
   disconnect() {
-    document.removeEventListener('click', this.boundHandleClickOutside)
-    document.removeEventListener('keydown', this.boundHandleKeydown)
+    this.escapeLayer?.deactivate()
+    this.typeahead?.reset()
+    this.removeDocumentListeners()
+    if (activeMenu === this) activeMenu = null
+
+    if (this.hasContentTarget) {
+      this.contentTarget.removeEventListener('keydown', this.boundHandleKeydown)
+      this.contentTarget.removeEventListener('focusout', this.boundHandleFocusOut)
+    }
   }
 
-  // Handle right-click to open context menu
-  open(event) {
-    event.preventDefault() // Prevent default browser context menu
-    event.stopPropagation()
+  // A Turbo snapshot taken while open restores data-state="open" with no live
+  // state behind it: start every connect closed.
+  resetToClosed() {
+    if (!this.hasContentTarget) return
+    if (this.openValue || this.contentTarget.getAttribute('data-state') === 'open') {
+      this.openValue = false
+      this.contentTarget.classList.add('hidden')
+      this.contentTarget.setAttribute('data-state', 'closed')
+      clearAllTabindexes(this.element)
+    }
+  }
 
-    // Close any other open context menus first
-    this.closeAllContextMenus()
+  // ===========================================================================
+  // OPEN / CLOSE
+  // ===========================================================================
+
+  // contextmenu on the trigger
+  open(event) {
+    event.preventDefault() // no browser context menu
+    event.stopPropagation() // an outer context menu (or our document listener) must not react
+
+    if (activeMenu && activeMenu !== this) activeMenu.close({ returnFocus: false })
+    activeMenu = this
+
+    const content = this.contentTarget
+    if (!this.openValue) {
+      const active = document.activeElement
+      this.returnFocusTo = active && !content.contains(active) ? active : null
+    }
 
     this.openValue = true
-    const content = this.contentTarget
-
-    // Show the menu
+    this.typeahead.reset()
     content.classList.remove('hidden')
     content.setAttribute('data-state', 'open')
 
-    // Position menu at cursor location
-    this.positionContextMenu(event.clientX, event.clientY)
+    const { x, y } = this.pointFor(event)
+    this.positionContextMenu(x, y)
 
-    // Setup keyboard navigation
-    this.setupKeyboardNavigation()
-
-    // Focus first item after a short delay
-    setTimeout(() => {
-      this.focusItem(0)
-    }, 100)
+    this.escapeLayer.activate()
+    this.addDocumentListeners()
+    this.focusItem(0)
   }
 
-  close() {
+  close(options = {}) {
+    const { returnFocus = false } = options
+    const wasOpen = this.openValue
+
     this.openValue = false
-    const content = this.contentTarget
+    this.escapeLayer?.deactivate()
+    this.typeahead?.reset()
+    this.removeDocumentListeners()
+    if (activeMenu === this) activeMenu = null
 
-    if (content) {
-      content.classList.add('hidden')
-      content.setAttribute('data-state', 'closed')
+    if (returnFocus && wasOpen) this.restoreFocus()
+
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.add('hidden')
+      this.contentTarget.setAttribute('data-state', 'closed')
     }
 
-    // Clear keyboard focus from all items
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    allMenuItems.forEach(item => {
-      item.setAttribute('tabindex', '-1')
-    })
-
+    clearAllTabindexes(this.element)
     this.lastHoveredItem = null
-    this.teardownKeyboardNavigation()
   }
 
-  closeAllContextMenus() {
-    // Close any other open context menus on the page
-    document.querySelectorAll('[data-ui--context-menu-target="content"][data-state="open"]').forEach(menu => {
-      menu.classList.add('hidden')
-      menu.setAttribute('data-state', 'closed')
-    })
-  }
-
-  handleClickOutside(event) {
-    if (!this.element.contains(event.target)) {
-      this.close()
+  restoreFocus() {
+    const target = this.returnFocusTo
+    this.returnFocusTo = null
+    if (target && target.isConnected && target !== document.body && typeof target.focus === 'function') {
+      target.focus()
+    } else if (this.hasContentTarget && this.contentTarget.contains(document.activeElement)) {
+      document.activeElement.blur()
     }
   }
 
-  setupKeyboardNavigation() {
-    document.addEventListener('keydown', this.boundHandleKeydown)
+  // Backwards compatible: close whichever context menu is open
+  closeAllContextMenus() {
+    if (activeMenu && activeMenu !== this) activeMenu.close({ returnFocus: false })
   }
 
-  teardownKeyboardNavigation() {
-    document.removeEventListener('keydown', this.boundHandleKeydown)
+  addDocumentListeners() {
+    if (this.listening) return
+    document.addEventListener('click', this.boundHandleClickOutside)
+    document.addEventListener('contextmenu', this.boundHandleClickOutside)
+    this.listening = true
   }
+
+  removeDocumentListeners() {
+    if (!this.listening) return
+    document.removeEventListener('click', this.boundHandleClickOutside)
+    document.removeEventListener('contextmenu', this.boundHandleClickOutside)
+    this.listening = false
+  }
+
+  // A click or right-click anywhere outside the menu closes it
+  handleClickOutside(event) {
+    if (!this.openValue) return
+    if (!this.contentTarget.contains(event.target)) this.close({ returnFocus: false })
+  }
+
+  handleFocusOut() {
+    if (!this.openValue) return
+    setTimeout(() => {
+      if (this.openValue && !this.contentTarget.contains(document.activeElement)) {
+        this.close({ returnFocus: false })
+      }
+    }, 0)
+  }
+
+  // ===========================================================================
+  // ITEMS
+  // ===========================================================================
+
+  // click on any item: checkbox/radio toggle and stay open, plain items close
+  select(event) {
+    const item = event.currentTarget
+    if (isItemDisabled(item)) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return
+    }
+
+    const role = item.getAttribute('role')
+    if (role === 'menuitemcheckbox') {
+      toggleCheckbox(item)
+    } else if (role === 'menuitemradio') {
+      selectRadio(item)
+    } else {
+      this.close({ returnFocus: true })
+    }
+  }
+
+  trackHoveredItem(event) {
+    const item = event.currentTarget
+    if (isItemDisabled(item)) return
+
+    // Focus the hovered item: focus stays in the menu and keyboard navigation
+    // continues from here.
+    updateRovingTabindex(this.element, item)
+    item.focus()
+    this.lastHoveredItem = item
+  }
+
+  // ===========================================================================
+  // KEYBOARD
+  // ===========================================================================
 
   handleKeydown(event) {
-    if (!this.openValue) return
+    if (!this.openValue || event.defaultPrevented) return
 
-    const items = this.getFocusableItems()
+    if (event.key === 'Tab') {
+      this.close({ returnFocus: true })
+      return
+    }
+
+    if (isEditableTarget(event.target)) return
+
+    const current = this.currentItem()
+
+    if (this.typeahead.isTypeaheadKey(event)) {
+      const match = this.typeahead.handleKey(event, this.getFocusableItems(), current)
+      if (match) this.focusItemElement(match)
+      return
+    }
 
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault()
-        this.focusNextItem(items)
+        this.focusNextItem()
         break
 
       case 'ArrowUp':
         event.preventDefault()
-        this.focusPreviousItem(items)
+        this.focusPreviousItem()
         break
 
       case 'Home':
         event.preventDefault()
-        this.focusItem(0, items)
+        this.focusItem(0)
         break
 
       case 'End':
         event.preventDefault()
-        this.focusItem(items.length - 1, items)
-        break
-
-      case 'Escape':
-        event.preventDefault()
-        this.close()
+        this.focusItem(this.getFocusableItems().length - 1)
         break
 
       case 'Enter':
-      case ' ':
+      case ' ': {
         event.preventDefault()
-        const target = this.getKeyboardFocusedItem()
-        if (target) {
-          target.click()
-          this.close()
-        }
+        if (!current || isItemDisabled(current)) break
+        const isCheckable = current.getAttribute('role') !== 'menuitem'
+        current.click()
+        // Enter closes after toggling a checkbox/radio, Space keeps the menu open
+        if (this.openValue && (!isCheckable || event.key === 'Enter')) this.close({ returnFocus: true })
         break
+      }
     }
+  }
+
+  currentItem() {
+    const active = document.activeElement
+    if (active && active.matches?.(MENU_ITEM_SELECTOR) && this.contentTarget.contains(active)) return active
+    return getKeyboardFocusedItem(this.element)
   }
 
   getFocusableItems() {
     if (!this.hasContentTarget) return []
-
-    const content = this.contentTarget
-    const items = []
-
-    // Get direct children that are menu items (not disabled)
-    Array.from(content.children).forEach(child => {
-      const role = child.getAttribute('role')
-      if (role === 'menuitem' || role === 'menuitemcheckbox' || role === 'menuitemradio') {
-        if (!child.hasAttribute('data-disabled')) {
-          items.push(child)
-        }
-      } else if (role === 'group') {
-        // Radio group container
-        const radioItems = child.querySelectorAll('[role="menuitemradio"]')
-        radioItems.forEach(radioItem => {
-          if (!radioItem.hasAttribute('data-disabled')) {
-            items.push(radioItem)
-          }
-        })
-      }
-    })
-
-    return items
+    return getMenuItems(this.contentTarget)
   }
 
   getKeyboardFocusedItem() {
-    const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    return Array.from(allItems).find(item => item.getAttribute('tabindex') === '0')
+    return getKeyboardFocusedItem(this.element)
   }
 
-  focusNextItem(items = null) {
-    items = items || this.getFocusableItems()
-    if (items.length === 0) return
-
-    let currentIndex = this.findCurrentItemIndex(items)
-
-    if (currentIndex === -1 || currentIndex >= items.length - 1) {
-      this.focusItem(0, items)
-    } else {
-      this.focusItem(currentIndex + 1, items)
-    }
+  focusNextItem() {
+    const item = focusNextItemUtil(this.getFocusableItems(), this.element, true)
+    if (item) this.lastHoveredItem = item
   }
 
-  focusPreviousItem(items = null) {
-    items = items || this.getFocusableItems()
-    if (items.length === 0) return
-
-    let currentIndex = this.findCurrentItemIndex(items)
-
-    if (currentIndex === -1 || currentIndex === 0) {
-      this.focusItem(items.length - 1, items)
-    } else {
-      this.focusItem(currentIndex - 1, items)
-    }
+  focusPreviousItem() {
+    const item = focusPreviousItemUtil(this.getFocusableItems(), this.element, true)
+    if (item) this.lastHoveredItem = item
   }
 
-  findCurrentItemIndex(items) {
-    const currentItem = items.find(item => item.getAttribute('tabindex') === '0')
-    return currentItem ? items.indexOf(currentItem) : -1
+  focusItem(index) {
+    const item = focusItemUtil(this.getFocusableItems(), index, this.element)
+    if (item) this.lastHoveredItem = item
   }
 
-  focusItem(index, items = null) {
-    items = items || this.getFocusableItems()
-    if (items.length === 0 || index < 0 || index >= items.length) return
-
-    // Remove tabindex from all items
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    allMenuItems.forEach(item => {
-      item.setAttribute('tabindex', '-1')
-    })
-
-    // Focus the target item
-    const targetItem = items[index]
-    targetItem.setAttribute('tabindex', '0')
-    targetItem.focus()
-    this.lastHoveredItem = targetItem
-  }
-
-  // Track hovered item
-  trackHoveredItem(event) {
-    const item = event.currentTarget
-
-    // Remove DOM focus from currently focused element
-    if (document.activeElement && document.activeElement.hasAttribute('role') &&
-        (document.activeElement.getAttribute('role') === 'menuitem' ||
-         document.activeElement.getAttribute('role') === 'menuitemcheckbox' ||
-         document.activeElement.getAttribute('role') === 'menuitemradio')) {
-      document.activeElement.blur()
-    }
-
-    // Remove keyboard focus from all items
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')
-    allMenuItems.forEach(menuItem => {
-      menuItem.setAttribute('tabindex', '-1')
-    })
-
-    // Set tabindex="0" on the hovered item
-    item.setAttribute('tabindex', '0')
+  focusItemElement(item) {
+    updateRovingTabindex(this.element, item)
+    item.focus()
     this.lastHoveredItem = item
+  }
+
+  // ===========================================================================
+  // POSITIONING
+  // ===========================================================================
+
+  // Pointer: the cursor. Keyboard (context menu key / Shift+F10 report 0,0):
+  // the bottom-left corner of the focused element.
+  pointFor(event) {
+    if (event.clientX || event.clientY) return { x: event.clientX, y: event.clientY }
+    const rect = event.target?.getBoundingClientRect?.()
+    return rect ? { x: rect.left, y: rect.bottom } : { x: 0, y: 0 }
   }
 
   positionContextMenu(x, y) {
     const content = this.contentTarget
     if (!content) return
 
-    // Set initial position at cursor - position directly, no Floating UI computation
     Object.assign(content.style, {
       position: 'fixed',
       left: `${x}px`,
       top: `${y}px`,
     })
 
-    // Check if menu would overflow viewport and adjust if needed
     requestAnimationFrame(() => {
       const rect = content.getBoundingClientRect()
       const viewportWidth = window.innerWidth
@@ -259,24 +333,15 @@ export default class extends Controller {
       let adjustedX = x
       let adjustedY = y
 
-      // Adjust horizontal position if overflowing right
-      if (rect.right > viewportWidth) {
-        adjustedX = viewportWidth - rect.width - 8
-      }
+      if (rect.right > viewportWidth) adjustedX = viewportWidth - rect.width - 8
+      if (rect.bottom > viewportHeight) adjustedY = viewportHeight - rect.height - 8
 
-      // Adjust vertical position if overflowing bottom
-      if (rect.bottom > viewportHeight) {
-        adjustedY = viewportHeight - rect.height - 8
-      }
-
-      // Ensure menu doesn't go off screen on left or top
       adjustedX = Math.max(8, adjustedX)
       adjustedY = Math.max(8, adjustedY)
 
       content.style.left = `${adjustedX}px`
       content.style.top = `${adjustedY}px`
 
-      // Set data-side attribute for animations based on final position
       if (adjustedY < y) {
         content.setAttribute('data-side', 'top')
       } else if (adjustedX < x) {

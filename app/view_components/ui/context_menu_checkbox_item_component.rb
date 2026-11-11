@@ -4,8 +4,9 @@
 class UI::ContextMenuCheckboxItemComponent < ViewComponent::Base
   include UI::ContextMenuCheckboxItemBehavior
 
-  def initialize(checked: false, classes: "", **attributes)
+  def initialize(checked: false, disabled: false, classes: "", **attributes)
     @checked = checked
+    @disabled = disabled
     @classes = classes
     @attributes = attributes
   end

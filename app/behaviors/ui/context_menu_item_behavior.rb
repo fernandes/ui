@@ -13,6 +13,7 @@ module UI::ContextMenuItemBehavior
       tabindex: "-1"
     }.tap do |attrs|
       attrs[:href] = @href if @href
+      attrs[:"aria-disabled"] = "true" if @disabled
     end
   end
 
@@ -28,13 +29,15 @@ module UI::ContextMenuItemBehavior
   def context_menu_item_data_attributes
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     existing_action = (attributes_value&.fetch(:data, {}) || {}).fetch(:action, "")
-    combined_action = [existing_action, "mouseenter->ui--context-menu#trackHoveredItem"].reject(&:empty?).join(" ")
+    combined_action = [existing_action, "click->ui--context-menu#select mouseenter->ui--context-menu#trackHoveredItem"].reject(&:empty?).join(" ")
 
-    (attributes_value&.fetch(:data, {}) || {}).merge({
+    data_attrs = (attributes_value&.fetch(:data, {}) || {}).merge({
       "ui--context-menu-target": "item",
       action: combined_action,
       inset: @inset,
       variant: @variant
     })
+    data_attrs[:disabled] = true if @disabled
+    data_attrs
   end
 end

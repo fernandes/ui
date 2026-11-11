@@ -18,9 +18,10 @@ class UI::ContextMenuItem < Phlex::HTML
   # @param variant [String] Variant style (default, destructive)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(href: nil, inset: false, variant: "default", classes: "", **attributes)
+  def initialize(href: nil, inset: false, variant: "default", disabled: false, classes: "", **attributes)
     @href = href
     @inset = inset
+    @disabled = disabled
     @variant = variant
     @classes = classes
     @attributes = attributes

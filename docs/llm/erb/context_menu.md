@@ -190,6 +190,20 @@ Radio selection item.
 <% end %>
 ```
 
+## Accessibility
+
+- **Name**: give the menu an accessible name with `aria-label` on the content
+  (`render "ui/context_menu/content", attributes: { "aria-label": "Page actions" }`).
+- **Checkbox / radio items** toggle on click, Space (menu stays open) and Enter (menu closes).
+- **Disabled**: `disabled: true` on `item`, `checkbox_item` and `radio_item` renders `aria-disabled="true"` + `data-disabled`; disabled items are
+  skipped by the arrow keys and typeahead and can't be activated.
+- **Keyboard**: the keyboard's context-menu key / Shift+F10 opens the menu at the focused element.
+  Arrows (looping), Home/End, typeahead (type the start of an item's label; `data-text-value`
+  overrides it), Enter/Space activate.
+- **Closing**: Escape (layered: inside a Dialog it closes only the menu), selecting an item and Tab
+  return focus to the element that had it when the menu opened. Focus leaving the menu, a click or a
+  right-click outside it, or opening another context menu close it too.
+
 ## See Also
 
 - ERB guide: `docs/llm/erb.md`
