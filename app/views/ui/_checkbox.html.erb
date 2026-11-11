@@ -5,6 +5,7 @@
   # @param id [String] The id attribute (auto-generated if not provided)
   # @param value [String] The value attribute
   # @param checked [Boolean] Whether the checkbox is checked
+  # @param indeterminate [Boolean] Whether the checkbox starts in the "mixed" state
   # @param disabled [Boolean] Whether the checkbox is disabled
   # @param required [Boolean] Whether the checkbox is required
   # @param classes [String] Additional CSS classes to merge
@@ -15,6 +16,7 @@
   @disabled = local_assigns.fetch(:disabled, false)
   @value = local_assigns.fetch(:value, nil)
   @checked = local_assigns.fetch(:checked, false)
+  @indeterminate = local_assigns.fetch(:indeterminate, false)
   @name = local_assigns.fetch(:name, nil)
   @id = local_assigns.fetch(:id, nil)
   @required = local_assigns.fetch(:required, false)
@@ -28,5 +30,7 @@
 <div class="relative inline-flex items-center justify-center">
   <%= tag :input, input_attributes %>
   <%# Checkmark icon - shown when checked %>
-  <%= lucide_icon("check", class: "size-3.5 pointer-events-none absolute text-primary-foreground opacity-0 peer-checked:opacity-100 transition-opacity") %>
+  <%= lucide_icon("check", class: checkbox_check_icon_classes, "aria-hidden": "true") %>
+  <%# Minus icon - shown when indeterminate %>
+  <%= lucide_icon("minus", class: checkbox_indeterminate_icon_classes, "aria-hidden": "true") %>
 </div>

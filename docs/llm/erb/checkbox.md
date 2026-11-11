@@ -22,6 +22,7 @@ Checkbox input with custom styling and animated checkmark indicator.
 | `id` | String | auto-generated | HTML id attribute (auto-generated if not provided) |
 | `value` | String | `nil` | Checkbox value |
 | `checked` | Boolean | `false` | Whether checkbox is checked |
+| `indeterminate` | Boolean | `false` | Starts in the "mixed" state (e.g. a "select all" whose children are partly checked). Shows a minus icon; a click clears it, a form reset restores it. |
 | `disabled` | Boolean | `false` | Whether checkbox is disabled |
 | `required` | Boolean | `false` | Whether checkbox is required |
 | `classes` | String | `""` | Additional CSS classes |

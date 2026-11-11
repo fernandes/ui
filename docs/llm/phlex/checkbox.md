@@ -23,6 +23,7 @@ Checkbox input with custom styling and animated checkmark indicator.
 | `id` | String | auto-generated | HTML id attribute (auto-generated if not provided) |
 | `value` | String | `nil` | Checkbox value |
 | `checked` | Boolean | `false` | Whether checkbox is checked |
+| `indeterminate` | Boolean | `false` | Starts in the "mixed" state (e.g. a "select all" whose children are partly checked). Shows a minus icon; a click clears it, a form reset restores it. |
 | `disabled` | Boolean | `false` | Whether checkbox is disabled |
 | `required` | Boolean | `false` | Whether checkbox is required |
 | `classes` | String | `""` | Additional CSS classes |
@@ -145,13 +146,14 @@ The checkbox uses a Stimulus controller (`ui--checkbox`) to sync the checked sta
 
 - **data-state="checked"**: When checkbox is checked
 - **data-state="unchecked"**: When checkbox is unchecked
+- **data-state="indeterminate"**: When checkbox is in the mixed state
 
 This allows CSS animations to respond to state changes.
 
 ## Accessibility
 
 - **Keyboard**: Space to toggle
-- **ARIA**: `aria-checked` attribute automatically synced with checked state
+- **Native checkbox**: the browser exposes checked / unchecked / mixed; no `aria-checked` is rendered (it would go stale after a form reset)
 - **Focus**: Visible focus ring with `focus-visible:ring-[3px]`
 
 ## Integration with Other Components

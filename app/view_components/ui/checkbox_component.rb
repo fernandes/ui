@@ -8,6 +8,7 @@ class UI::CheckboxComponent < ViewComponent::Base
     id: nil,
     value: nil,
     checked: false,
+    indeterminate: false,
     disabled: false,
     required: false,
     classes: "",
@@ -17,6 +18,7 @@ class UI::CheckboxComponent < ViewComponent::Base
     @id = id
     @value = value
     @checked = checked
+    @indeterminate = indeterminate
     @disabled = disabled
     @required = required
     @classes = classes
@@ -27,7 +29,8 @@ class UI::CheckboxComponent < ViewComponent::Base
     content_tag :div, class: "relative inline-flex items-center justify-center" do
       safe_join([
         content_tag(:input, nil, checkbox_html_attributes),
-        checkmark_icon
+        checkmark_icon,
+        indeterminate_icon
       ])
     end
   end
@@ -37,9 +40,17 @@ class UI::CheckboxComponent < ViewComponent::Base
   attr_reader :classes, :attributes
 
   def checkmark_icon
+    icon("M20 6 9 17l-5-5", checkbox_check_icon_classes)
+  end
+
+  def indeterminate_icon
+    icon("M5 12h14", checkbox_indeterminate_icon_classes)
+  end
+
+  def icon(path, icon_classes)
     content_tag(
       :svg,
-      content_tag(:path, nil, d: "M20 6 9 17l-5-5"),
+      content_tag(:path, nil, d: path),
       xmlns: "http://www.w3.org/2000/svg",
       width: "24",
       height: "24",
@@ -49,7 +60,8 @@ class UI::CheckboxComponent < ViewComponent::Base
       "stroke-width": "2",
       "stroke-linecap": "round",
       "stroke-linejoin": "round",
-      class: "size-3.5 pointer-events-none absolute text-primary-foreground opacity-0 peer-checked:opacity-100 transition-opacity"
+      "aria-hidden": "true",
+      class: icon_classes
     )
   end
 end

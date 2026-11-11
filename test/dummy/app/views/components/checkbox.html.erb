@@ -66,6 +66,10 @@
           <%= render "ui/checkbox", id: "disabled-checkbox", name: "disabled", value: "yes", disabled: true %>
           <%= render "ui/label", for: "disabled-checkbox" do %>Disabled checkbox<% end %>
         </div>
+        <div class="flex items-center space-x-2">
+          <%= render "ui/checkbox", id: "indeterminate-checkbox", name: "all", value: "yes", indeterminate: true %>
+          <%= render "ui/label", for: "indeterminate-checkbox" do %>Select all (indeterminate)<% end %>
+        </div>
       </div>
     </section>
 

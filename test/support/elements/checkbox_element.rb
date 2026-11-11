@@ -47,7 +47,7 @@ module UI
       # @return [Boolean]
       #
       def checked?
-        node.checked? || data_state == "checked" || aria_checked?
+        node.checked?
       end
 
       # Check if the checkbox is unchecked
@@ -63,7 +63,7 @@ module UI
       # @return [Boolean]
       #
       def indeterminate?
-        aria("checked") == "mixed"
+        evaluate_script("document.getElementById(#{node[:id].to_json}).indeterminate") == true
       end
 
       # Check if the checkbox is disabled
@@ -123,10 +123,29 @@ module UI
       # @return [Boolean]
       #
       def indicator_visible?
-        return false unless indicator
+        icon_settled_opacity(0) > 0
+      end
 
-        # Check opacity class to determine visibility
-        indicator[:class].include?("peer-checked:opacity-100") && checked?
+      # Check if the indeterminate (minus) indicator is visible
+      #
+      # @return [Boolean]
+      #
+      def indeterminate_indicator_visible?
+        icon_settled_opacity(1) > 0
+      end
+
+      # Computed opacity of the n-th icon next to the input, once the opacity
+      # transition has settled (same value twice, 200ms apart).
+      def icon_settled_opacity(index)
+        script = "parseFloat(getComputedStyle(document.getElementById(#{node[:id].to_json}).parentElement.querySelectorAll('svg')[#{index}]).opacity)"
+        previous = evaluate_script(script)
+        10.times do
+          sleep 0.2
+          current = evaluate_script(script)
+          return current if current == previous && [0.0, 1.0].include?(current)
+          previous = current
+        end
+        previous
       end
 
       # Get the associated label element (if any)
@@ -149,12 +168,16 @@ module UI
 
       # === ARIA Queries ===
 
-      # Get the aria-checked attribute value
+      # The checked state the browser exposes to assistive technology.
+      # It's a native checkbox, so this comes from the element's properties,
+      # not from an aria-checked attribute.
       #
-      # @return [String, nil] "true", "false", or "mixed"
+      # @return [String] "true", "false", or "mixed"
       #
       def aria_checked_value
-        aria("checked")
+        return "mixed" if indeterminate?
+
+        checked? ? "true" : "false"
       end
 
       # Check if checkbox has correct ARIA attributes

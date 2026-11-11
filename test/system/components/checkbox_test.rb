@@ -157,6 +157,21 @@ class CheckboxTest < UI::SystemTestCase
     assert_equal "true", checkbox.aria_checked_value
   end
 
+  test "indeterminate checkbox is exposed as mixed until clicked" do
+    checkbox = find_element(UI::Testing::CheckboxElement, "#indeterminate-checkbox")
+
+    assert checkbox.indeterminate?
+    assert_equal "mixed", checkbox.aria_checked_value
+    assert_equal "indeterminate", checkbox.data_state
+    assert_nil checkbox.aria("checked"), "native checkbox must not carry aria-checked"
+
+    checkbox.click
+
+    assert_not checkbox.indeterminate?
+    assert_equal "true", checkbox.aria_checked_value
+    assert_equal "checked", checkbox.data_state
+  end
+
   test "syncs data-state with checked state" do
     checkbox = basic_checkbox
 
@@ -254,17 +269,21 @@ class CheckboxTest < UI::SystemTestCase
   test "indicator visibility changes with checked state" do
     checkbox = basic_checkbox
 
-    # Unchecked - indicator should have opacity-0
     assert checkbox.unchecked?
-    assert checkbox.indicator[:class].include?("opacity-0")
+    assert_not checkbox.indicator_visible?
 
-    # Check it
     checkbox.check
 
-    # Indicator should become visible (peer-checked:opacity-100 applies)
     assert checkbox.checked?
-    # The class list includes peer-checked:opacity-100
-    assert checkbox.indicator[:class].include?("peer-checked:opacity-100")
+    assert checkbox.indicator_visible?
+    assert_not checkbox.indeterminate_indicator_visible?
+  end
+
+  test "indeterminate checkbox shows the minus indicator, not the check" do
+    checkbox = find_element(UI::Testing::CheckboxElement, "#indeterminate-checkbox")
+
+    assert checkbox.indeterminate_indicator_visible?
+    assert_not checkbox.indicator_visible?
   end
 
   # === Multiple Checkboxes Tests ===
