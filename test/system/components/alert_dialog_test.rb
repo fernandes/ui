@@ -22,6 +22,10 @@ class AlertDialogTest < UI::SystemTestCase
     find_element(UI::Testing::AlertDialogElement, "#save-changes-alert-dialog")
   end
 
+  def as_child_alert_dialog
+    find_element(UI::Testing::AlertDialogElement, "#as-child-alert-dialog")
+  end
+
   # === Basic Interaction Tests ===
 
   test "opens alert dialog when trigger is clicked" do
@@ -168,47 +172,100 @@ class AlertDialogTest < UI::SystemTestCase
     assert_equal "true", alert_dialog.content_aria_modal
   end
 
-  # ARIA labeling tests - Currently skipped as alert dialog component
-  # doesn't yet implement aria-labelledby/describedby with IDs
-  #
-  # test "content is properly labeled by title" do
-  #   alert_dialog = default_alert_dialog
-  #   alert_dialog.open
-  #   assert alert_dialog.aria_labeled_correctly?
-  # end
+  test "content is labelled by its title and described by its description" do
+    alert_dialog = default_alert_dialog
+
+    alert_dialog.open
+
+    assert alert_dialog.aria_labeled_correctly?
+  end
+
+  test "the button inside the trigger wrapper exposes the dialog state" do
+    alert_dialog = default_alert_dialog
+    button = alert_dialog.trigger_button
+
+    assert_equal "dialog", button["aria-haspopup"]
+    assert_equal alert_dialog.content["id"], button["aria-controls"]
+    assert_equal "false", button["aria-expanded"]
+
+    alert_dialog.open
+    assert_equal "true", button["aria-expanded"]
+
+    alert_dialog.cancel
+    assert_equal "false", button["aria-expanded"]
+  end
+
+  test "an as_child trigger is the button itself and exposes the dialog state" do
+    alert_dialog = as_child_alert_dialog
+    trigger = alert_dialog.trigger
+
+    assert_equal "BUTTON", trigger.tag_name.upcase
+    assert_equal alert_dialog.content["id"], trigger["aria-controls"]
+
+    alert_dialog.open
+    assert_equal "true", trigger["aria-expanded"]
+  end
 
   # === Focus Management Tests ===
 
-  test "focuses first focusable element when opened" do
+  # --- Modal focus (X3/X4/X5): only a real browser knows Tab order and inert ---
+
+  test "focus starts on Cancel" do
     alert_dialog = default_alert_dialog
 
-    alert_dialog.open
+    alert_dialog.trigger_button.click
+    alert_dialog.wait_for_focus_inside
 
-    # Wait a moment for focus to settle
-    sleep 0.2
-
-    # Check that something inside the alert dialog has focus
-    # The alert dialog controller should focus the first focusable element
-    page.evaluate_script("document.activeElement")
-    focused_tag = page.evaluate_script("document.activeElement.tagName")
-
-    # Should be a button (cancel or action button)
-    assert_equal "BUTTON", focused_tag,
-      "Expected a button to be focused, got #{focused_tag}"
+    assert_equal "Cancel", alert_dialog.focused_label
   end
 
-  test "traps focus within alert dialog when open" do
+  test "focus starts on Cancel even when it comes after the action and a form's hidden token" do
+    alert_dialog = as_child_alert_dialog
+
+    alert_dialog.trigger.click
+    alert_dialog.wait_for_focus_inside
+
+    assert_equal "Keep access", alert_dialog.focused_label
+  end
+
+  test "Tab and Shift+Tab wrap inside the alert dialog" do
+    alert_dialog = default_alert_dialog
+    alert_dialog.trigger_button.click
+    alert_dialog.wait_for_focus_inside
+
+    alert_dialog.keyboard(:tab)
+    assert_equal "Continue", alert_dialog.focused_label
+    alert_dialog.keyboard(:tab)
+    assert_equal "Cancel", alert_dialog.focused_label
+    alert_dialog.keyboard([:shift, :tab])
+    assert_equal "Continue", alert_dialog.focused_label
+
+    6.times { alert_dialog.keyboard(:tab) }
+    assert alert_dialog.focus_inside?, "focus escaped the alert dialog"
+  end
+
+  test "the page behind an open alert dialog is inert, and comes back on close" do
+    alert_dialog = default_alert_dialog
+    alert_dialog.trigger_button.click
+    alert_dialog.wait_for_focus_inside
+
+    assert alert_dialog.inert?("#destructive-alert-dialog [data-ui--alert-dialog-target='trigger']")
+
+    alert_dialog.keyboard(:escape)
+    alert_dialog.wait_for_closed
+
+    refute alert_dialog.inert?("#destructive-alert-dialog [data-ui--alert-dialog-target='trigger']")
+  end
+
+  test "closing returns focus to the trigger" do
     alert_dialog = default_alert_dialog
 
-    alert_dialog.open
+    alert_dialog.trigger_button.click
+    alert_dialog.wait_for_focus_inside
+    alert_dialog.keyboard(:escape)
+    alert_dialog.wait_for_closed
 
-    # Wait for focus trap to be set up
-    sleep 0.1
-
-    # Tab through elements - focus should stay within alert dialog
-    # This is a basic check - a full implementation would tab through all elements
-    # and verify focus never escapes the alert dialog
-    assert alert_dialog.content_visible?
+    assert alert_dialog.trigger_focused?, "focus went to #{alert_dialog.focused_label}"
   end
 
   # === Overlay Tests ===

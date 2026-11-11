@@ -87,4 +87,31 @@
       <% end %>
     <% end %>
   </div>
+  <%# Example 4: as_child trigger + a form (its hidden token must never get focus) %>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-semibold">As Child Trigger</h2>
+    <p class="text-muted-foreground">The trigger attributes go on your own button; focus starts on Cancel.</p>
+
+    <%= render UI::AlertDialog.new(id: "as-child-alert-dialog") do %>
+      <%= render UI::AlertDialogTrigger.new(as_child: true) do |attrs| %>
+        <%= render UI::Button.new(variant: :outline, **attrs) { "Revoke access" } %>
+      <% end %>
+
+      <%= render UI::AlertDialogOverlay.new do %>
+        <%= render UI::AlertDialogContent.new do %>
+          <%= render UI::AlertDialogHeader.new do %>
+            <%= render UI::AlertDialogTitle.new { "Revoke access?" } %>
+            <%= render UI::AlertDialogDescription.new { "The user is signed out of every device." } %>
+          <% end %>
+
+          <%= form_with url: "#", method: :post do %>
+            <%= render UI::AlertDialogFooter.new do %>
+              <%= render UI::AlertDialogAction.new(variant: :destructive) { "Revoke" } %>
+              <%= render UI::AlertDialogCancel.new { "Keep access" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
 </div>

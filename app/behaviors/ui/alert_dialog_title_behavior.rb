@@ -16,10 +16,14 @@ module UI::AlertDialogTitleBehavior
   end
 
   # Build complete HTML attributes hash for alert dialog title
+  # The `title` target lets the controller give it an id and point the
+  # content's aria-labelledby at it. An `id` passed by the caller is kept.
   def alert_dialog_title_html_attributes
-    base_attrs = @attributes || {}
+    base_attrs = (@attributes || {}).except(:class, :data)
+    user_data = @attributes&.fetch(:data, {}) || {}
     base_attrs.merge(
-      class: alert_dialog_title_classes
+      class: alert_dialog_title_classes,
+      data: user_data.merge(ui__alert_dialog_target: "title")
     )
   end
 end

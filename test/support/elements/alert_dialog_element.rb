@@ -157,9 +157,9 @@ module UI
       # @return [Capybara::Node::Element]
       #
       def cancel_button
-        # Find the first button with close action (typically Cancel with outline variant)
-        buttons = content.all('[data-action*="click->ui--alert-dialog#close"]', visible: :all)
-        buttons.first
+        # The Cancel component is the `cancel` target; fall back to the first close button
+        content.first('[data-ui--alert-dialog-target="cancel"]', visible: :all, minimum: 0) ||
+          content.all('[data-action*="click->ui--alert-dialog#close"]', visible: :all).first
       end
 
       # Get the action/confirm button element
@@ -286,6 +286,59 @@ module UI
         end
       end
 
+      # The element that carries the trigger ARIA: the wrapper's button, or
+      # the as_child element itself
+      def trigger_button
+        trigger.matches_css?("button, a") ? trigger : trigger.find("button, a", match: :first)
+      end
+
+      # Text (or aria-label) of the element that has focus, anywhere on the page
+      def focused_label
+        page.evaluate_script(<<~JS).to_s.strip
+          (() => {
+            const el = document.activeElement
+            return el.getAttribute("aria-label") || el.textContent || el.tagName
+          })()
+        JS
+      end
+
+      # Whether focus is inside this alert dialog's content
+      def focus_inside?
+        page.evaluate_script(<<~JS)
+          document.querySelector(#{content_selector.to_json}).contains(document.activeElement)
+        JS
+      end
+
+      # Whether the trigger button has focus
+      def trigger_focused?
+        page.evaluate_script(<<~JS)
+          (() => {
+            const trigger = document.querySelector(#{(root_selector + " [data-ui--alert-dialog-target='trigger']").to_json})
+            return trigger === document.activeElement || trigger.contains(document.activeElement)
+          })()
+        JS
+      end
+
+      # Whether a page element outside the dialog is inert (unreachable)
+      def inert?(selector)
+        page.evaluate_script("!!document.querySelector(#{selector.to_json})?.closest('[inert]')")
+      end
+
+      # Press keys on whatever has focus
+      def keyboard(*keys)
+        page.send_keys(*keys)
+      end
+
+      def wait_for_focus_inside(timeout: Capybara.default_max_wait_time)
+        start_time = Time.now
+        loop do
+          return true if focus_inside?
+          raise Capybara::ExpectationNotMet, "Focus did not move into the alert dialog after #{timeout}s" if Time.now - start_time > timeout
+
+          sleep 0.05
+        end
+      end
+
       # === Waiters ===
 
       def wait_for_open(timeout: Capybara.default_max_wait_time)
@@ -306,6 +359,19 @@ module UI
 
           sleep 0.05
         end
+      end
+
+      private
+
+      def root_selector
+        id = node[:id]
+        raise ArgumentError, "focus helpers need the alert dialog root to have an id" if id.blank?
+
+        "##{id}"
+      end
+
+      def content_selector
+        "#{root_selector} [data-ui--alert-dialog-target='content']"
       end
     end
   end

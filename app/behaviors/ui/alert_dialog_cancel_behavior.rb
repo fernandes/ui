@@ -8,7 +8,9 @@ module UI::AlertDialogCancelBehavior
   # Data attributes for Stimulus action
   def alert_dialog_cancel_data_attributes
     {
-      action: "click->ui--alert-dialog#close"
+      action: "click->ui--alert-dialog#close",
+      # Initial focus lands here (Radix AlertDialog), the least destructive choice
+      ui__alert_dialog_target: "cancel"
     }
   end
 

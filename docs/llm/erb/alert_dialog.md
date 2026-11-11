@@ -52,11 +52,20 @@ Container that manages the alert dialog state and behavior. Wrap all other compo
 
 ### UI::AlertDialog::Trigger
 
-Wrapper that opens the alert dialog when clicked. Does not directly render a button—it wraps interactive elements.
+Wrapper that opens the alert dialog when clicked. Does not directly render a button—it wraps interactive elements. The controller puts `aria-haspopup`, `aria-controls` and `aria-expanded` on the button inside the wrapper.
 
 **Parameters:**
-- `classes:` String - Additional Tailwind CSS classes to merge
+- `as_child:` Boolean - Yield the trigger attributes to your own button/link instead of rendering a wrapper (default: `false`)
+- `classes:` String - Additional Tailwind CSS classes to merge (wrapper only)
 - Other HTML attributes via `**attributes`
+
+```erb
+<%= render UI::AlertDialogTrigger.new(as_child: true) do |attrs| %>
+  <%= render UI::Button.new(variant: :destructive, **attrs) { "Delete" } %>
+<% end %>
+```
+
+**Accessibility:** the content is named by the Title and described by the Description (ids are wired on connect; an `id` you pass is kept). Opening moves focus to Cancel, traps Tab inside, makes the page behind inert; closing returns focus to the trigger.
 
 ### UI::AlertDialog::Overlay
 

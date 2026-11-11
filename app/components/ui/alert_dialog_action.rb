@@ -26,7 +26,7 @@ class UI::AlertDialogAction < Phlex::HTML
       variant: @variant,
       size: @size,
       classes: @classes,
-      **alert_dialog_action_button_data_attributes.merge(@attributes)
+      **@attributes.merge(alert_dialog_action_button_data_attributes)
     ) do
       yield if block_given?
     end

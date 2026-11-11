@@ -62,14 +62,22 @@ end
 Wrapper that opens the alert dialog when clicked. Does not directly render a button—it wraps interactive elements. By default, yields a block containing content or uses `as_child` composition to pass attributes to a child component.
 
 **Parameters:**
-- `classes:` String - Additional Tailwind CSS classes to merge
+- `as_child:` Boolean - Yield the trigger attributes to your own button/link instead of rendering a wrapper (default: `false`)
+- `classes:` String - Additional Tailwind CSS classes to merge (wrapper only)
 - `**attributes` Hash - Any additional HTML attributes
+
+The controller puts `aria-haspopup`, `aria-controls` and `aria-expanded` on the button inside the wrapper (or on the `as_child` element).
 
 **Example:**
 ```ruby
 # Default: wrap a button directly
 render UI::AlertDialog::Trigger.new do
   render UI::Button::Button.new { "Open Alert" }
+end
+
+# as_child: the button itself is the trigger
+render UI::AlertDialog::Trigger.new(as_child: true) do |attrs|
+  render UI::Button::Button.new(variant: :destructive, **attrs) { "Delete" }
 end
 ```
 
@@ -421,7 +429,8 @@ end
 **Screen Reader Behavior:**
 - Content is announced as an "alert dialog"
 - Title and description are read first
-- Focus is automatically managed within the dialog
+- Opening moves focus to Cancel; Tab is trapped inside and the page behind is inert
+- Closing returns focus to the trigger
 - Dialog closing is announced when triggered
 
 ## Common Mistakes
