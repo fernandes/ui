@@ -109,14 +109,16 @@ class UI::Calendar < Phlex::HTML
 
   def render_header(index)
     div(class: "flex justify-center pt-1 relative items-center") do
-      # Previous button (only on first month or always)
-      button(
-        type: "button",
-        data: {action: "click->ui--calendar#previousMonth"},
-        class: nav_button_classes("left"),
-        aria: {label: "Go to previous month"}
-      ) do
-        render_chevron_left
+      # Previous button (first month only)
+      if show_previous_button?(index)
+        button(
+          type: "button",
+          data: {action: "click->ui--calendar#previousMonth"},
+          class: nav_button_classes("left"),
+          aria: {label: "Go to previous month"}
+        ) do
+          render_chevron_left
+        end
       end
 
       if @show_dropdowns
@@ -125,14 +127,16 @@ class UI::Calendar < Phlex::HTML
         div(class: "text-sm font-medium", data: {ui__calendar_target: "monthLabel"})
       end
 
-      # Next button
-      button(
-        type: "button",
-        data: {action: "click->ui--calendar#nextMonth"},
-        class: nav_button_classes("right"),
-        aria: {label: "Go to next month"}
-      ) do
-        render_chevron_right
+      # Next button (last month only)
+      if show_next_button?(index)
+        button(
+          type: "button",
+          data: {action: "click->ui--calendar#nextMonth"},
+          class: nav_button_classes("right"),
+          aria: {label: "Go to next month"}
+        ) do
+          render_chevron_right
+        end
       end
     end
   end

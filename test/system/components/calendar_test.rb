@@ -556,4 +556,42 @@ class CalendarTest < UI::SystemTestCase
     calendar.wait_for_month(target_month.month, target_month.year, timeout: 1)
     assert_equal target_month.month, calendar.current_month_date.month
   end
+
+  # === Keyboard focus (grid) ===
+
+  def active_date
+    page.evaluate_script("document.activeElement && document.activeElement.dataset.date")
+  end
+
+  test "the day grid is a single tab stop" do
+    calendar = basic_calendar
+    calendar.next_month_button.native.focus
+
+    page.send_keys(:tab)
+    entered = active_date
+    assert entered, "Tab should move into the grid"
+    assert calendar.grid.has_css?("[data-date='#{entered}'][tabindex='0']")
+
+    page.send_keys(:tab)
+    refute page.evaluate_script(
+      "!!document.activeElement.closest('#basic-calendar [data-ui--calendar-target=grid]')"
+    ), "a second Tab should leave the grid"
+  end
+
+  test "arrow keys stop at the minimum date instead of losing focus" do
+    calendar = min_max_calendar
+    calendar.focus_day(Date.today)
+
+    page.send_keys(:left)
+    assert_equal Date.today.to_s, active_date
+
+    page.send_keys(:right)
+    assert_equal (Date.today + 1).to_s, active_date
+  end
+
+  test "day buttons are named by the full date" do
+    calendar = basic_calendar
+
+    assert_equal Date.today.strftime("%A, %B %-d, %Y"), calendar.day_aria_attributes(Date.today)[:label]
+  end
 end

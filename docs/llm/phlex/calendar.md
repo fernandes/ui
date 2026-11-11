@@ -160,6 +160,19 @@ The calendar uses the `ui--calendar` Stimulus controller which:
 - Updates month/year dropdowns
 - Persists selection to hidden input (if `name` provided)
 
+## Accessibility
+
+Follows React Aria's calendar (`useCalendarGrid` / `useCalendarCell`):
+
+- Each month is a `role="grid"` named by its visible month label (or by the month when dropdowns replace the label).
+- Days are `<td role="gridcell">` with `aria-selected`; the button inside is named by the full localized date ("Friday, November 15, 2024"). Today has `aria-current="date"`.
+- Disabled dates (`min_date`, `max_date`, `disabled_dates`) render `aria-disabled="true"` but stay focusable, so arrow keys move across them; they can't be selected.
+- The grid is a single tab stop (roving `tabindex`): the focused day, defaulting to the first visible selected date, then today, then the 1st (or the nearest enabled date). `[data-date][tabindex="0"]` finds it.
+- Keys: arrows (day/week), Home/End (week), PageUp/PageDown (month), Shift+PageUp/PageDown (year), Enter/Space (select). Keys pressed in the month/year selects are left to the selects.
+- Month/year selects are labelled in the calendar's `locale` ("Month"/"mês"); native select month names are localized too.
+- With `number_of_months > 1`, only the first month has a "previous" button and only the last a "next" one.
+- The month-change animation is skipped under `prefers-reduced-motion: reduce`.
+
 ## Important Notes
 
 ### Date Format

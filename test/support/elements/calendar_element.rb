@@ -123,7 +123,7 @@ module UI
       # @return [Boolean]
       #
       def date_selected?(date)
-        day_button(date)["aria-selected"] == "true"
+        day_cell(date)["aria-selected"] == "true"
       end
 
       # Check if a specific day is disabled
@@ -132,7 +132,7 @@ module UI
       # @return [Boolean]
       #
       def day_disabled?(date)
-        day_button(date).disabled?
+        day_button(date)["aria-disabled"] == "true"
       end
 
       # Check if a specific day is today
@@ -212,12 +212,21 @@ module UI
         find_within("[data-date='#{date_str}']")
       end
 
+      # The gridcell (td) holding a day; selection state lives here
+      #
+      # @param date [Date] The date
+      # @return [Capybara::Node::Element]
+      #
+      def day_cell(date)
+        find_within("td:has(> [data-date='#{date.strftime("%Y-%m-%d")}'])")
+      end
+
       # Get all selected day buttons
       #
       # @return [Array<Capybara::Node::Element>]
       #
       def selected_buttons
-        all_within("[aria-selected='true']")
+        all_within("td[aria-selected='true'] button[data-date]")
       end
 
       # Get the previous month navigation button
@@ -272,7 +281,7 @@ module UI
       def day_aria_attributes(date)
         button = day_button(date)
         {
-          selected: button["aria-selected"],
+          selected: day_cell(date)["aria-selected"],
           label: button["aria-label"]
         }
       end

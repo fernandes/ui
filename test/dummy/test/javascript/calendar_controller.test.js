@@ -228,7 +228,7 @@ describe("CalendarController", () => {
       expect(input.value).toBe("2024-11-15")
     })
 
-    test("selected date has aria-selected=true", async () => {
+    test("selected date cell has aria-selected=true", async () => {
       container.innerHTML = `
         <div data-controller="ui--calendar"
              data-ui--calendar-mode-value="single"
@@ -248,7 +248,7 @@ describe("CalendarController", () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const selectedButton = container.querySelector('[data-date="2024-11-15"]')
-      expect(selectedButton.getAttribute("aria-selected")).toBe("true")
+      expect(selectedButton.closest("td")).toHaveAttribute("aria-selected", "true")
     })
   })
 
@@ -704,9 +704,9 @@ describe("CalendarController", () => {
       const nov15 = container.querySelector('[data-date="2024-11-15"]')
       const nov20 = container.querySelector('[data-date="2024-11-20"]')
 
-      expect(nov10.disabled).toBe(true)
-      expect(nov15.disabled).toBe(false)
-      expect(nov20.disabled).toBe(false)
+      expect(nov10).toHaveAttribute("aria-disabled", "true")
+      expect(nov15).not.toHaveAttribute("aria-disabled")
+      expect(nov20).not.toHaveAttribute("aria-disabled")
     })
 
     test("disables dates after maxDate", async () => {
@@ -728,9 +728,9 @@ describe("CalendarController", () => {
       const nov15 = container.querySelector('[data-date="2024-11-15"]')
       const nov20 = container.querySelector('[data-date="2024-11-20"]')
 
-      expect(nov10.disabled).toBe(false)
-      expect(nov15.disabled).toBe(false)
-      expect(nov20.disabled).toBe(true)
+      expect(nov10).not.toHaveAttribute("aria-disabled")
+      expect(nov15).not.toHaveAttribute("aria-disabled")
+      expect(nov20).toHaveAttribute("aria-disabled", "true")
     })
 
     test("disables specific dates in disabled array", async () => {
@@ -752,9 +752,9 @@ describe("CalendarController", () => {
       const nov12 = container.querySelector('[data-date="2024-11-12"]')
       const nov15 = container.querySelector('[data-date="2024-11-15"]')
 
-      expect(nov10.disabled).toBe(true)
-      expect(nov12.disabled).toBe(false)
-      expect(nov15.disabled).toBe(true)
+      expect(nov10).toHaveAttribute("aria-disabled", "true")
+      expect(nov12).not.toHaveAttribute("aria-disabled")
+      expect(nov15).toHaveAttribute("aria-disabled", "true")
     })
 
     test("prevents selection of disabled dates", async () => {
@@ -877,7 +877,7 @@ describe("CalendarController", () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const nov15 = container.querySelector('[data-date="2024-11-15"]')
-      expect(nov15.getAttribute("aria-selected")).toBe("true")
+      expect(nov15.closest("td")).toHaveAttribute("aria-selected", "true")
     })
 
     test("renders with pre-selected date range", async () => {
@@ -898,8 +898,8 @@ describe("CalendarController", () => {
       const nov10 = container.querySelector('[data-date="2024-11-10"]')
       const nov15 = container.querySelector('[data-date="2024-11-15"]')
 
-      expect(nov10.getAttribute("aria-selected")).toBe("true")
-      expect(nov15.getAttribute("aria-selected")).toBe("true")
+      expect(nov10.closest("td")).toHaveAttribute("aria-selected", "true")
+      expect(nov15.closest("td")).toHaveAttribute("aria-selected", "true")
     })
   })
 

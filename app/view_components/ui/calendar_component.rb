@@ -82,13 +82,13 @@ class UI::CalendarComponent < ViewComponent::Base
     end
   end
 
-  def header_html(_index)
+  def header_html(index)
     content_tag(:div, class: "flex justify-center pt-1 relative items-center") do
       safe_join([
-        nav_button(:previous),
+        (nav_button(:previous) if show_previous_button?(index)),
         @show_dropdowns ? dropdowns_html : month_label_html,
-        nav_button(:next)
-      ])
+        (nav_button(:next) if show_next_button?(index))
+      ].compact)
     end
   end
 

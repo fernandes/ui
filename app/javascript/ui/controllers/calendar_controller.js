@@ -4,8 +4,12 @@ import {
   eachDayOfInterval, format, addMonths, subMonths, addYears, subYears,
   isSameMonth, isSameDay, isToday, addDays, differenceInDays,
   setMonth, setYear, getYear, getMonth, isWithinInterval,
-  isBefore, isAfter, parseISO
+  isBefore, isAfter, parseISO, differenceInCalendarMonths
 } from "date-fns"
+import { setIdRefs } from "../utils/id-manager.js"
+
+// How far ensureFocusedDate looks for an enabled date to use as the tab stop
+const MAX_FALLBACK_DAYS = 62
 
 export default class extends Controller {
   static targets = ["grid", "monthLabel", "input", "monthSelect", "yearSelect", "liveRegion", "weekdaysHeader", "monthContainer"]
@@ -142,6 +146,15 @@ export default class extends Controller {
     this.announceMonthChange()
     this.dispatchMonthChange()
     this.restoreFocus()
+  }
+
+  // Localized name of a date field ("Month" / "mês"), for the dropdown labels
+  fieldName(field, fallback) {
+    try {
+      return new Intl.DisplayNames(this.localeValue || "en-US", { type: "dateTimeField" }).of(field) || fallback
+    } catch {
+      return fallback
+    }
   }
 
   // Dispatch month change event
@@ -353,9 +366,86 @@ export default class extends Controller {
 
   // Rendering
   render() {
+    this.ensureFocusedDate()
     this.renderMonthLabels()
     this.renderDropdowns()
     this.renderGrids()
+  }
+
+  // First and last day of the months on screen
+  visibleRange() {
+    return {
+      start: startOfMonth(this.currentMonth),
+      end: endOfMonth(addMonths(this.currentMonth, Math.max(this.numberOfMonthsValue, 1) - 1))
+    }
+  }
+
+  isVisible(date) {
+    if (!date) return false
+    const { start, end } = this.visibleRange()
+    return !isBefore(date, start) && !isAfter(date, end)
+  }
+
+  // The grid has exactly one tab stop: the focused date (React Aria `focusedDate`).
+  // When it isn't on screen it falls back to the first visible selected date,
+  // then today, then the first of the month - skipping to the nearest enabled
+  // date so Tab never lands on a date that can't be picked.
+  ensureFocusedDate() {
+    const current = this.focusedDate ? parseISO(this.focusedDate) : null
+    if (this.isVisible(current)) return
+
+    const selected = this.selectedValue.map(d => parseISO(d)).find(d => this.isVisible(d))
+    const today = new Date()
+    let date = selected || (this.isVisible(today) ? today : this.visibleRange().start)
+    if (this.isDisabled(date)) date = this.nearestEnabledDate(date) || date
+
+    this.focusedDate = format(date, "yyyy-MM-dd")
+  }
+
+  nearestEnabledDate(date) {
+    for (let offset = 1; offset <= MAX_FALLBACK_DAYS; offset++) {
+      for (const candidate of [addDays(date, offset), addDays(date, -offset)]) {
+        if (this.isVisible(candidate) && !this.isDisabled(candidate)) return candidate
+      }
+    }
+    return null
+  }
+
+  // The button for a date, preferring the copy inside its own month over an
+  // outside-day copy shown in a neighbouring month
+  dayButton(dateStr) {
+    return this.element.querySelector(`[data-date="${dateStr}"]:not([data-outside])`) ||
+      this.element.querySelector(`[data-date="${dateStr}"]`)
+  }
+
+  updateTabStop(target = this.dayButton(this.focusedDate)) {
+    this.element.querySelectorAll("[data-date]").forEach(button => {
+      button.setAttribute("tabindex", button === target ? "0" : "-1")
+    })
+  }
+
+  // Move keyboard focus to a date, changing the visible months if needed.
+  // Focus is clamped to min/max dates.
+  focusDate(date) {
+    if (this.minDateValue && isBefore(date, parseISO(this.minDateValue))) date = parseISO(this.minDateValue)
+    if (this.maxDateValue && isAfter(date, parseISO(this.maxDateValue))) date = parseISO(this.maxDateValue)
+
+    this.focusedDate = format(date, "yyyy-MM-dd")
+
+    if (this.isVisible(date)) {
+      this.updateTabStop()
+    } else {
+      const before = isBefore(date, this.visibleRange().start)
+      this.animationDirection = before ? "prev" : "next"
+      this.currentMonth = before
+        ? startOfMonth(date)
+        : startOfMonth(subMonths(date, Math.max(this.numberOfMonthsValue, 1) - 1))
+      this.render()
+      this.announceMonthChange()
+      this.dispatchMonthChange()
+    }
+
+    this.restoreFocus()
   }
 
   renderMonthLabels() {
@@ -420,6 +510,8 @@ export default class extends Controller {
       this.monthSelectTargets.forEach((select, index) => {
         const monthDate = addMonths(this.currentMonth, index)
         const value = getMonth(monthDate).toString()
+        this.localizeMonthOptions(select)
+        this.labelSelect(select, this.fieldName("month", "Month"))
         this.updateSelectValue(select, value)
       })
     }
@@ -427,9 +519,34 @@ export default class extends Controller {
       this.yearSelectTargets.forEach((select, index) => {
         const monthDate = addMonths(this.currentMonth, index)
         const value = getYear(monthDate).toString()
+        this.labelSelect(select, this.fieldName("year", "Year"))
         this.updateSelectValue(select, value)
       })
     }
+  }
+
+  // Name the native select, or the UI Select trigger, unless the author did
+  labelSelect(element, label) {
+    const target = element.tagName === "SELECT"
+      ? element
+      : element.closest("[data-controller~='ui--select']")?.querySelector("[data-ui--select-target='trigger']")
+    if (!target || target.hasAttribute("aria-labelledby")) return
+    if (target.hasAttribute("aria-label") && !target.hasAttribute("data-calendar-label")) return
+
+    target.setAttribute("aria-label", label)
+    target.setAttribute("data-calendar-label", "")
+  }
+
+  // Ruby renders the month names in English; show them in the calendar's locale
+  localizeMonthOptions(select) {
+    if (select.tagName !== "SELECT" || select.dataset.localized === this.localeValue) return
+
+    const names = this.getLocalizedMonthNames()
+    Array.from(select.options).forEach(option => {
+      const month = names[parseInt(option.value)]
+      if (month) option.textContent = month.name
+    })
+    select.dataset.localized = this.localeValue
   }
 
   // Update select value - works with both native selects and UI Select component
@@ -455,14 +572,38 @@ export default class extends Controller {
 
     // Animate month transitions
     if (this.animationDirection) {
-      this.animateMonthTransition()
+      if (this.prefersReducedMotion()) {
+        this.animationDirection = null
+      } else {
+        this.animateMonthTransition()
+      }
     }
 
     // Render each grid with its corresponding month
     this.gridTargets.forEach((grid, index) => {
       const monthDate = addMonths(this.currentMonth, index)
       this.renderGrid(grid, monthDate)
+      this.labelGrid(grid, index, monthDate)
     })
+
+    this.updateTabStop()
+  }
+
+  // Name each grid by its visible month label, or by the month itself when
+  // dropdowns replace the label
+  labelGrid(grid, index, monthDate) {
+    const table = grid.closest("table") || grid
+    const label = this.monthLabelTargets[index]
+    if (label) {
+      setIdRefs(table, "aria-labelledby", label, { prefix: "calendar-month" })
+    } else if (!table.hasAttribute("aria-labelledby")) {
+      table.setAttribute("aria-label", this.monthFormatter.format(monthDate))
+    }
+  }
+
+  prefersReducedMotion() {
+    return typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
   }
 
   // Animate month transition with fade and slide effect
@@ -548,16 +689,24 @@ export default class extends Controller {
       actions += " mouseenter->ui--calendar#handleDayHover mouseleave->ui--calendar#handleDayLeave"
     }
 
+    // React Aria useCalendarCell: selection state on the gridcell, the full
+    // date as the button's name, and disabled dates stay focusable
+    // (aria-disabled) so arrow keys can move across them. The tab stop is
+    // set by updateTabStop().
+    const disabledAttr = isDisabledDate ? 'aria-disabled="true"' : ""
+
     return `
-      <td class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20 ${this.getTdClasses(isSelected, isCurrentMonth, isRangeMiddle)}">
+      <td role="gridcell" aria-selected="${isSelected}" ${disabledAttr} class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20 ${this.getTdClasses(isSelected, isCurrentMonth, isRangeMiddle)}">
         <button
           type="button"
           data-date="${dateStr}"
           data-action="${actions}"
-          ${isDisabledDate ? "disabled" : ""}
-          aria-selected="${isSelected}"
+          aria-label="${this.dayFormatter.format(date)}"
+          ${isTodayDate ? 'aria-current="date"' : ""}
+          ${disabledAttr}
+          ${isCurrentMonth ? "" : "data-outside"}
           class="${classes}"
-          tabindex="${isSelected || isTodayDate ? 0 : -1}"
+          tabindex="-1"
         >${date.getDate()}</button>
       </td>
     `
@@ -567,6 +716,10 @@ export default class extends Controller {
   handleDayFocus(event) {
     const dateStr = event.currentTarget.dataset.date
     if (!dateStr) return
+
+    // Roving tabindex: the focused day is the grid's tab stop
+    this.focusedDate = dateStr
+    this.updateTabStop(event.currentTarget)
 
     this.dispatch("dayFocus", {
       detail: { date: dateStr, element: event.currentTarget }
@@ -669,15 +822,10 @@ export default class extends Controller {
   // - Home/End: start/end of week
   // - Enter/Space: select focused date
   handleKeydown(event) {
-    // Check if focus is on a day button - if not, don't handle Enter/Space
-    // This allows other components like Select to handle their own keyboard events
-    const focusedElement = document.activeElement
-    const isFocusOnDayButton = focusedElement?.hasAttribute("data-date")
-
-    // For Enter and Space, only handle if focus is on a day button
-    if ((event.key === "Enter" || event.key === " ") && !isFocusOnDayButton) {
-      return // Let the event bubble up to other handlers
-    }
+    // Only keys pressed on a day belong to the grid: the month/year selects,
+    // the nav buttons and anything else inside the calendar keep their keys
+    const day = document.activeElement?.closest?.("[data-date]")
+    if (!day || !this.element.contains(day)) return
 
     // Handle Shift+Arrow combinations for month/year navigation
     if (event.shiftKey) {
@@ -716,42 +864,19 @@ export default class extends Controller {
     }
   }
 
-  moveFocus(days) {
+  // The date keyboard navigation starts from
+  currentFocusDate() {
     const focused = this.element.querySelector("[data-date]:focus")
-    let currentDateStr = focused?.dataset.date || this.focusedDate
+    const dateStr = focused?.dataset.date || this.focusedDate
+    if (dateStr) return parseISO(dateStr)
 
-    // If no focused element and no tracked date, find the first selectable date
-    if (!currentDateStr) {
-      const firstButton = this.element.querySelector("[data-date]")
-      if (!firstButton) return
-      currentDateStr = firstButton.dataset.date
-    }
+    const firstButton = this.element.querySelector("[data-date]")
+    return firstButton ? parseISO(firstButton.dataset.date) : null
+  }
 
-    const currentDate = parseISO(currentDateStr)
-    const newDate = addDays(currentDate, days)
-    const newDateStr = format(newDate, "yyyy-MM-dd")
-
-    // Track the new focused date
-    this.focusedDate = newDateStr
-
-    // Check if the new date is in the current view
-    let target = this.element.querySelector(`[data-date="${newDateStr}"]`)
-
-    if (!target) {
-      // Navigate to the new month if needed
-      if (days > 0) {
-        this.nextMonth()
-      } else {
-        this.previousMonth()
-      }
-      // Try to find the target after rendering
-      requestAnimationFrame(() => {
-        target = this.element.querySelector(`[data-date="${newDateStr}"]`)
-        target?.focus()
-      })
-    } else {
-      target.focus()
-    }
+  moveFocus(days) {
+    const current = this.currentFocusDate()
+    if (current) this.focusDate(addDays(current, days))
   }
 
   selectFocusedDate() {
@@ -760,18 +885,14 @@ export default class extends Controller {
   }
 
   restoreFocus() {
-    if (this.focusedDate) {
-      requestAnimationFrame(() => {
-        const target = this.element.querySelector(`[data-date="${this.focusedDate}"]`)
-        target?.focus()
-      })
-    }
+    if (this.focusedDate) this.dayButton(this.focusedDate)?.focus()
   }
 
-  // Navigate by month/year while maintaining focus on same day-of-month when possible
+  // Navigate by month/year while keeping focus on the same day-of-month
+  // when possible
   navigateAndFocus(direction) {
     const focused = this.element.querySelector("[data-date]:focus")
-    let currentDateStr = focused?.dataset.date || this.focusedDate
+    const currentDateStr = focused?.dataset.date || this.focusedDate
 
     if (!currentDateStr) {
       // No focus, just navigate
@@ -780,90 +901,34 @@ export default class extends Controller {
     }
 
     const currentDate = parseISO(currentDateStr)
-    let newDate
-
-    switch (direction) {
-      case "previousMonth":
-        newDate = subMonths(currentDate, 1)
-        break
-      case "nextMonth":
-        newDate = addMonths(currentDate, 1)
-        break
-      case "previousYear":
-        newDate = subYears(currentDate, 1)
-        break
-      case "nextYear":
-        newDate = addYears(currentDate, 1)
-        break
+    const shifts = {
+      previousMonth: () => subMonths(currentDate, 1),
+      nextMonth: () => addMonths(currentDate, 1),
+      previousYear: () => subYears(currentDate, 1),
+      nextYear: () => addYears(currentDate, 1)
     }
+    const newDate = shifts[direction]()
 
-    const newDateStr = format(newDate, "yyyy-MM-dd")
-    this.focusedDate = newDateStr
-    this.currentMonth = startOfMonth(newDate)
+    // Page the view by the same number of months, like the nav buttons
+    const months = differenceInCalendarMonths(newDate, currentDate)
+    this.animationDirection = months > 0 ? "next" : "prev"
+    this.currentMonth = addMonths(this.currentMonth, months)
+    this.focusedDate = format(newDate, "yyyy-MM-dd")
     this.render()
     this.announceMonthChange()
-
-    requestAnimationFrame(() => {
-      const target = this.element.querySelector(`[data-date="${newDateStr}"]`)
-      target?.focus()
-    })
+    this.dispatchMonthChange()
+    this.restoreFocus()
   }
 
   // Move focus to start of current week
   moveToStartOfWeek() {
-    const focused = this.element.querySelector("[data-date]:focus")
-    let currentDateStr = focused?.dataset.date || this.focusedDate
-
-    if (!currentDateStr) {
-      const firstButton = this.element.querySelector("[data-date]")
-      if (!firstButton) return
-      currentDateStr = firstButton.dataset.date
-    }
-
-    const currentDate = parseISO(currentDateStr)
-    const weekStart = startOfWeek(currentDate, { weekStartsOn: this.weekStartsOnValue })
-    const weekStartStr = format(weekStart, "yyyy-MM-dd")
-
-    this.focusedDate = weekStartStr
-
-    let target = this.element.querySelector(`[data-date="${weekStartStr}"]`)
-    if (!target) {
-      this.previousMonth()
-      requestAnimationFrame(() => {
-        target = this.element.querySelector(`[data-date="${weekStartStr}"]`)
-        target?.focus()
-      })
-    } else {
-      target.focus()
-    }
+    const current = this.currentFocusDate()
+    if (current) this.focusDate(startOfWeek(current, { weekStartsOn: this.weekStartsOnValue }))
   }
 
   // Move focus to end of current week
   moveToEndOfWeek() {
-    const focused = this.element.querySelector("[data-date]:focus")
-    let currentDateStr = focused?.dataset.date || this.focusedDate
-
-    if (!currentDateStr) {
-      const firstButton = this.element.querySelector("[data-date]")
-      if (!firstButton) return
-      currentDateStr = firstButton.dataset.date
-    }
-
-    const currentDate = parseISO(currentDateStr)
-    const weekEnd = endOfWeek(currentDate, { weekStartsOn: this.weekStartsOnValue })
-    const weekEndStr = format(weekEnd, "yyyy-MM-dd")
-
-    this.focusedDate = weekEndStr
-
-    let target = this.element.querySelector(`[data-date="${weekEndStr}"]`)
-    if (!target) {
-      this.nextMonth()
-      requestAnimationFrame(() => {
-        target = this.element.querySelector(`[data-date="${weekEndStr}"]`)
-        target?.focus()
-      })
-    } else {
-      target.focus()
-    }
+    const current = this.currentFocusDate()
+    if (current) this.focusDate(endOfWeek(current, { weekStartsOn: this.weekStartsOnValue }))
   }
 }

@@ -139,6 +139,16 @@ module UI::CalendarBehavior
     (@disabled_dates || []).map(&:to_s).to_json
   end
 
+  # With several months side by side, only the first month gets a "previous"
+  # button and only the last a "next" one: one control per action, not N.
+  def show_previous_button?(month_index)
+    month_index.zero?
+  end
+
+  def show_next_button?(month_index)
+    month_index == (@number_of_months || 1) - 1
+  end
+
   # Get weekdays ordered by week_starts_on
   def ordered_weekdays
     WEEKDAYS.rotate(@week_starts_on || 0)

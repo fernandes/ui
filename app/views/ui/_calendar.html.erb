@@ -70,6 +70,7 @@
   <% @number_of_months.times do |month_index| %>
     <div class="space-y-4">
       <div class="flex justify-center pt-1 relative items-center">
+        <% if show_previous_button?(month_index) %>
         <button
           type="button"
           data-action="click->ui--calendar#previousMonth"
@@ -80,6 +81,7 @@
             <path d="m15 18-6-6 6-6"/>
           </svg>
         </button>
+        <% end %>
 
         <% if @show_dropdowns %>
           <% if use_native_select? %>
@@ -142,6 +144,7 @@
           <div class="text-sm font-medium" data-ui--calendar-target="monthLabel"></div>
         <% end %>
 
+        <% if show_next_button?(month_index) %>
         <button
           type="button"
           data-action="click->ui--calendar#nextMonth"
@@ -152,6 +155,7 @@
             <path d="m9 18 6-6-6-6"/>
           </svg>
         </button>
+        <% end %>
       </div>
 
       <table class="w-full border-collapse space-y-1" role="grid">
