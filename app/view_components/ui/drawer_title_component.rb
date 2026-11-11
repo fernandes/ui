@@ -16,6 +16,6 @@ class UI::DrawerTitleComponent < ViewComponent::Base
   end
 
   def call
-    content_tag :div, content, **drawer_title_html_attributes.merge(@attributes)
+    content_tag :h2, content, **drawer_title_html_attributes
   end
 end

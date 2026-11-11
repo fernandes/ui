@@ -22,10 +22,7 @@ class UI::DrawerContentComponent < ViewComponent::Base
   end
 
   def call
-    attrs = drawer_content_html_attributes
-    attrs[:data] = attrs[:data].merge(@attributes.fetch(:data, {}))
-
-    content_tag :div, class: "group/drawer-content", **attrs.merge(@attributes.except(:data)) do
+    content_tag :div, **drawer_content_html_attributes do
       content
     end
   end

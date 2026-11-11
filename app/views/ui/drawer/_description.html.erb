@@ -7,9 +7,7 @@
   # Extend behavior for shared logic
   extend UI::DrawerDescriptionBehavior
 
-  # Get HTML attributes from behavior
-  all_attributes = drawer_description_html_attributes.deep_merge(@attributes)
 -%>
-<%= content_tag :p, all_attributes do %>
+<%= content_tag :p, **drawer_description_html_attributes do %>
   <%= content || yield %>
 <% end %>

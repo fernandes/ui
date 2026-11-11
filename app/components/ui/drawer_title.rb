@@ -9,7 +9,7 @@ class UI::DrawerTitle < Phlex::HTML
   end
 
   def view_template(&block)
-    div(**drawer_title_html_attributes) do
+    h2(**drawer_title_html_attributes) do
       yield if block_given?
     end
   end

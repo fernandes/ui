@@ -416,6 +416,10 @@ The `Trigger` component supports the `as_child` pattern for composition:
 ## Accessibility
 
 - ARIA attributes automatically applied (`role="dialog"`, `aria-modal`)
+- Title renders as `<h2>`; the content gets `aria-labelledby`/`aria-describedby` pointing at Title/Description (ids wired on connect; an `id` you pass is kept)
+- Trigger carries `aria-haspopup="dialog"`, `aria-expanded` and `aria-controls`
+- Opening moves focus inside; a modal drawer traps Tab, makes the page behind inert and locks scroll. Escape closes only the topmost layer; closing returns focus to the trigger
+- Content passes through every attribute you give it (`id`, `aria-label`, `data-*`)
 - Focus trap in modal mode
 - Escape key closes drawer (when `dismissible: true`)
 - Keyboard navigation support

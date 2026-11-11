@@ -353,4 +353,59 @@ class DrawerComponentTest < UI::SystemTestCase
     drawer.close
     assert_equal "closed", drawer.container["data-state"]
   end
+
+  # ============================================================================
+  # MODAL FOCUS (X3/X4/X5): only a real browser knows Tab order and inert
+  # ============================================================================
+
+  test "drawer is labelled by its title and described by its description" do
+    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-erb")
+
+    title = drawer.title_element
+    assert_equal "H2", title.tag_name.upcase
+    assert_equal title["id"], drawer.content_aria_labelledby
+    assert_equal drawer.description_element["id"], drawer.content_aria_describedby
+    assert_equal drawer.content["id"], drawer.trigger["aria-controls"]
+    assert_equal "dialog", drawer.trigger["aria-haspopup"]
+  end
+
+  test "Tab stays inside an open modal drawer and the page behind is inert" do
+    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-erb")
+
+    drawer.trigger.click
+    drawer.wait_for_focus_inside
+    assert_equal "goal-erb", drawer.focused_label
+
+    drawer.keyboard(:tab)
+    assert_equal "Submit", drawer.focused_label
+    drawer.keyboard(:tab)
+    assert_equal "Cancel", drawer.focused_label
+    drawer.keyboard(:tab)
+    assert_equal "goal-erb", drawer.focused_label
+    drawer.keyboard([:shift, :tab])
+    assert_equal "Cancel", drawer.focused_label
+
+    assert drawer.inert?("#drawer-default-phlex [data-action*='click->ui--drawer#open']")
+  end
+
+  test "closing a modal drawer returns focus to its trigger and releases the page" do
+    drawer = find_element(UI::Testing::DrawerElement, "#drawer-default-erb")
+
+    drawer.trigger.click
+    drawer.wait_for_focus_inside
+    drawer.keyboard(:escape)
+    drawer.wait_for_closed
+
+    assert drawer.trigger_focused?, "focus went to #{drawer.focused_label}"
+    refute drawer.inert?("#drawer-default-phlex [data-action*='click->ui--drawer#open']")
+    assert_equal "", page.evaluate_script("document.body.style.overflow")
+  end
+
+  test "a non-modal drawer leaves the page interactive" do
+    drawer = find_element(UI::Testing::DrawerElement, "#drawer-non-modal-erb")
+
+    drawer.open
+
+    refute drawer.inert?("#drawer-default-phlex [data-action*='click->ui--drawer#open']")
+  end
 end

@@ -401,6 +401,63 @@ module UI
           sleep 0.05
         end
       end
+
+      # === Modal focus helpers ===
+
+      # Text (or aria-label / id) of the element that has focus, anywhere on the page
+      def focused_label
+        page.evaluate_script(<<~JS).to_s.strip
+          (() => {
+            const el = document.activeElement
+            return el.getAttribute("aria-label") || el.id || el.textContent || el.tagName
+          })()
+        JS
+      end
+
+      def focus_inside?
+        page.evaluate_script("document.querySelector(#{content_selector.to_json}).contains(document.activeElement)")
+      end
+
+      def trigger_focused?
+        page.evaluate_script("document.activeElement === document.querySelector(#{trigger_selector.to_json})")
+      end
+
+      # Whether a page element outside the drawer is inert (unreachable)
+      def inert?(selector)
+        page.evaluate_script("!!document.querySelector(#{selector.to_json})?.closest('[inert]')")
+      end
+
+      # Press keys on whatever has focus
+      def keyboard(*keys)
+        page.send_keys(*keys)
+      end
+
+      def wait_for_focus_inside(timeout: Capybara.default_max_wait_time)
+        start_time = Time.now
+        loop do
+          return true if focus_inside?
+          raise Capybara::ExpectationNotMet, "Focus did not move into the drawer after #{timeout}s" if Time.now - start_time > timeout
+
+          sleep 0.05
+        end
+      end
+
+      private
+
+      def root_selector
+        id = node[:id]
+        raise ArgumentError, "focus helpers need the drawer root to have an id" if id.blank?
+
+        "##{id}"
+      end
+
+      def content_selector
+        "#{root_selector} [data-vaul-drawer]"
+      end
+
+      def trigger_selector
+        "#{root_selector} [data-action*='click->ui--drawer#open']"
+      end
     end
   end
 end

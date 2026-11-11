@@ -16,6 +16,6 @@ class UI::DrawerDescriptionComponent < ViewComponent::Base
   end
 
   def call
-    content_tag :p, content, **drawer_description_html_attributes.merge(@attributes)
+    content_tag :p, content, **drawer_description_html_attributes
   end
 end

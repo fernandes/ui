@@ -1,8 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { setState } from "../utils/state-manager.js"
-import { lockScroll, unlockScroll } from "../utils/scroll-lock-manager.js"
-import { onEscapeKey } from "../utils/escape-key-manager.js"
-import { focusFirstElement } from "../utils/focus-trap-manager.js"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
+import { createModalSession } from "../utils/modal-session.js"
 
 // Drawer controller for gesture-based mobile-first drawers
 // Based on Vaul (https://vaul.emilkowal.ski)
@@ -14,8 +13,15 @@ import { focusFirstElement } from "../utils/focus-trap-manager.js"
 // - Modal and non-modal modes
 // - Handle-only dragging
 // - Input repositioning for mobile keyboards
+//
+// Accessibility (Vaul = Radix Dialog underneath):
+// - content is named/described by its title/description; triggers carry
+//   aria-haspopup, aria-controls and aria-expanded
+// - while open, focus moves in; a modal drawer also traps Tab, makes the page
+//   inert and locks scroll (each drawer releases only its own lock)
+// - Escape closes only the topmost layer; closing returns focus to the trigger
 export default class extends Controller {
-  static targets = ["container", "overlay", "content", "handle"]
+  static targets = ["container", "overlay", "content", "handle", "trigger", "title", "description"]
   static values = {
     open: { type: Boolean, default: false },
     direction: { type: String, default: "bottom" },
@@ -40,6 +46,10 @@ export default class extends Controller {
   DRAG_CLASS = "vaul-dragging"
   SCROLL_LOCK_TIMEOUT = 500 // ms
 
+  constructor() {
+    super(...arguments)
+  }
+
   connect() {
     this.isPointerDown = false
     this.pointerStart = null
@@ -58,6 +68,25 @@ export default class extends Controller {
       this.resizeObserver.observe(this.contentTarget)
     }
 
+    this.wireAria()
+
+    if (this.hasContentTarget) {
+      const modal = this.modalValue
+      this.session = createModalSession({
+        content: this.contentTarget,
+        // Overlay and content are siblings under the root: keep both live
+        isolate: this.element,
+        returnFocus: () => this.triggers[0],
+        trapFocus: modal,
+        inertBackground: modal,
+        // The session owns this drawer's scroll lock, so a non-modal drawer
+        // or a disconnect never releases another modal's lock
+        lockScroll: modal,
+        // A non-dismissible drawer still claims Escape, so a layer below stays open
+        onEscape: () => { if (this.dismissibleValue) this.animateToClosedPosition() }
+      })
+    }
+
     if (this.openValue) {
       this.show()
     } else {
@@ -73,8 +102,8 @@ export default class extends Controller {
   }
 
   disconnect() {
-    unlockScroll()
-    this.cleanupEscapeHandler()
+    this.clearCloseTimer()
+    this.session?.deactivate({ restoreFocus: false })
     if (this.preventScrollHandler) {
       document.removeEventListener("touchmove", this.preventScrollHandler)
     }
@@ -84,6 +113,34 @@ export default class extends Controller {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
     }
+  }
+
+  // Ids are wired on the client so ERB, Phlex and ViewComponent share one
+  // implementation; an id the author rendered is kept.
+  wireAria() {
+    if (!this.hasContentTarget) return
+    const content = this.contentTarget
+
+    ensureId(content, "drawer-content")
+    if (this.hasTitleTarget) setIdRefs(content, "aria-labelledby", this.titleTarget, { prefix: "drawer-title" })
+    if (this.hasDescriptionTarget) setIdRefs(content, "aria-describedby", this.descriptionTarget, { prefix: "drawer-description" })
+
+    this.triggers.forEach(trigger => {
+      if (!trigger.hasAttribute("aria-haspopup")) trigger.setAttribute("aria-haspopup", "dialog")
+      setIdRefs(trigger, "aria-controls", content)
+    })
+    this.syncTriggers(this.openValue)
+  }
+
+  // Trigger targets, plus hand-written triggers that only carry the action
+  get triggers() {
+    const own = el => el.closest("[data-controller~='ui--drawer']") === this.element
+    const byAction = Array.from(this.element.querySelectorAll("[data-action*='ui--drawer#open']")).filter(own)
+    return Array.from(new Set([...this.triggerTargets, ...byAction]))
+  }
+
+  syncTriggers(open) {
+    this.triggers.forEach(trigger => trigger.setAttribute("aria-expanded", open ? "true" : "false"))
   }
 
   // ============================================================================
@@ -681,8 +738,13 @@ export default class extends Controller {
   // ============================================================================
 
   show() {
+    // A close still animating must not mark this reopened drawer closed
+    this.clearCloseTimer()
+    this.closing = false
+
     // Set data-state to open for animations
     this.setAllTargetsState("open")
+    this.syncTriggers(true)
 
     // If using snap points, position drawer at FIRST snap point (Vaul behavior)
     if (this.hasSnapPoints()) {
@@ -707,20 +769,15 @@ export default class extends Controller {
       this.hasBeenOpened = true
     }
 
-    // Lock body scroll in modal mode
-    if (this.modalValue) {
-      lockScroll()
+    // Block touch scrolling of the page in modal mode
+    if (this.modalValue && !this.preventScrollHandler) {
       this.preventScrollHandler = this.handlePreventScroll.bind(this)
       document.addEventListener("touchmove", this.preventScrollHandler, { passive: false })
     }
 
-    // Setup focus trap
-    this.setupFocusTrap()
-
-    // Setup escape key handler
-    if (this.dismissibleValue) {
-      this.setupEscapeHandler()
-    }
+    // Content is open: move focus in, and for a modal drawer trap Tab, inert
+    // the page and lock scroll; push an Escape layer
+    this.session?.activate()
 
     // Dispatch open event
     this.dispatchEvent("drawer:open", { open: true })
@@ -732,6 +789,12 @@ export default class extends Controller {
   }
 
   animateToClosedPosition() {
+    // Release the page and give focus back as soon as closing starts (before
+    // the content goes inert), like Dialog
+    this.session?.deactivate()
+    this.syncTriggers(false)
+    this.closing = true
+
     // Animate from current position to closed position, then close
     if (this.hasContentTarget) {
       const closedPosition = this.getClosedPosition()
@@ -746,13 +809,21 @@ export default class extends Controller {
         this.overlayTarget.style.opacity = "0"
       }
 
-      // After animation completes, clean up
-      setTimeout(() => {
+      // After animation completes, clean up (cancelled by a reopen)
+      this.clearCloseTimer()
+      this.closeTimer = setTimeout(() => {
+        this.closeTimer = null
         this.cleanupAfterClose()
       }, this.TRANSITIONS.DURATION * 1000)
     } else {
-      // Fallback if no content target
-      this.close()
+      this.cleanupAfterClose()
+    }
+  }
+
+  clearCloseTimer() {
+    if (this.closeTimer) {
+      clearTimeout(this.closeTimer)
+      this.closeTimer = null
     }
   }
 
@@ -767,20 +838,17 @@ export default class extends Controller {
       this.overlayTarget.style.opacity = ""
     }
 
+    this.closing = false
+    this.session?.deactivate()
+    this.syncTriggers(false)
     this.setAllTargetsState("closed")
     this.openValue = false
-
-    // Unlock body scroll
-    unlockScroll()
 
     // Remove touch scroll prevention
     if (this.preventScrollHandler) {
       document.removeEventListener("touchmove", this.preventScrollHandler)
       this.preventScrollHandler = null
     }
-
-    // Remove escape handler
-    this.cleanupEscapeHandler()
 
     // Dispatch close event
     this.dispatchEvent("drawer:close", { open: false })
@@ -789,16 +857,6 @@ export default class extends Controller {
   isMobile() {
     // Detect mobile devices to prevent keyboard popup on focus
     return /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  }
-
-  setupFocusTrap() {
-    if (!this.hasContentTarget) return
-
-    // On mobile, avoid focusing inputs/textareas to prevent keyboard popup
-    focusFirstElement(this.contentTarget, {
-      excludeInputsOnMobile: true,
-      preventScroll: true
-    })
   }
 
   // ============================================================================
@@ -895,20 +953,6 @@ export default class extends Controller {
 
   getTransitionStyle() {
     return `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(',')})`
-  }
-
-  setupEscapeHandler() {
-    this.cleanupEscapeHandler()
-    this.escapeCleanup = onEscapeKey(() => {
-      this.animateToClosedPosition()
-    })
-  }
-
-  cleanupEscapeHandler() {
-    if (this.escapeCleanup) {
-      this.escapeCleanup()
-      this.escapeCleanup = null
-    }
   }
 
   applyTransform(transform, animated = false, clearAfter = false) {
