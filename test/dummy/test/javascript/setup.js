@@ -4,6 +4,9 @@
 import { afterEach, expect } from "bun:test"
 import * as matchers from "@testing-library/jest-dom/matchers"
 import { resetScrollLockState } from "../../../../app/javascript/ui/utils/scroll-lock-manager.js"
+import { resetEscapeLayers } from "../../../../app/javascript/ui/utils/escape-key-manager.js"
+import { resetFocusTraps } from "../../../../app/javascript/ui/utils/focus-trap-manager.js"
+import { resetInert } from "../../../../app/javascript/ui/utils/inert-manager.js"
 
 // jest-dom matchers (toBeVisible, toHaveAccessibleName, toHaveFocus, ...)
 expect.extend(matchers)
@@ -11,6 +14,11 @@ expect.extend(matchers)
 // Reset shared utility state between tests
 afterEach(() => {
   resetScrollLockState()
+  // Escape layers, focus traps and inert sets are module-level stacks; a test
+  // that leaves an overlay open must not leak it into the next test
+  resetEscapeLayers()
+  resetFocusTraps()
+  resetInert()
 })
 
 // Mock Element.setPointerCapture and releasePointerCapture for happy-dom

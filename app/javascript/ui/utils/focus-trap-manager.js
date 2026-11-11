@@ -1,222 +1,259 @@
 /**
- * Focus Trap Manager Utility
+ * Focus Trap Manager
  *
- * Handles focus trapping within modal components.
- * Used by dialog, alert_dialog, drawer, responsive_dialog, etc.
+ * Tabbable detection, initial focus and a stackable Tab trap for modal
+ * components (dialog, alert dialog, drawer, command dialog, sheet).
+ * Most controllers should use `createModalSession` (modal-session.js), which
+ * combines this with focus restore, the inert background and the Escape stack.
+ *
+ *   getTabbableElements(content)          // what Tab would visit, in order
+ *   focusInitial(content, { preferredElement: this.cancelTarget })
+ *   const trap = createFocusTrap(content)
+ *   trap.activate() ... trap.deactivate()
  */
 
-// Focusable elements selector
-const FOCUSABLE_SELECTOR = [
-  'button:not([disabled])',
-  '[href]',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])'
-].join(', ')
+// Candidates; the filter in isTabbable() does the real work.
+const CANDIDATE_SELECTOR = [
+  "a[href]",
+  "area[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "iframe",
+  "summary",
+  "audio[controls]",
+  "video[controls]",
+  "[contenteditable]:not([contenteditable='false'])",
+  "[tabindex]"
+].join(", ")
 
-// Input elements that trigger mobile keyboard
-const INPUT_SELECTOR = 'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]), textarea'
+// Input elements that trigger the mobile keyboard
+const INPUT_SELECTOR = "input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']), textarea"
 
 /**
- * Get all focusable elements within a container
- * @param {HTMLElement} container - Container to search within
- * @returns {HTMLElement[]} Array of focusable elements
+ * Whether Tab can reach the element: not disabled, not a hidden input, not
+ * tabindex < 0, not inside `[hidden]` / `[inert]`, and actually rendered
+ * (not display:none / visibility:hidden).
+ *
+ * @param {Element} element
+ * @returns {boolean}
  */
-export function getFocusableElements(container) {
-  if (!container) return []
-  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR))
+export function isTabbable(element) {
+  if (!element || !element.matches(CANDIDATE_SELECTOR)) return false
+
+  const tabindex = element.getAttribute("tabindex")
+  if (tabindex !== null && parseInt(tabindex, 10) < 0) return false
+  if (element.matches(":disabled")) return false
+  if (element.localName === "input" && element.type === "hidden") return false
+  if (element.closest("[hidden], [inert]")) return false
+  if (element.closest("fieldset[disabled]") && !element.closest("legend")) return false
+
+  return isRendered(element)
 }
 
 /**
- * Get the first focusable element in a container
- * @param {HTMLElement} container - Container to search within
- * @param {Object} options - Options
- * @param {boolean} options.skipInputs - Skip text inputs (useful for mobile to avoid keyboard popup)
- * @returns {HTMLElement|null}
+ * Whether the element is focusable at all, including tabindex="-1"
+ * (used to check a focus-restore target).
+ */
+export function isFocusable(element) {
+  if (!element || typeof element.focus !== "function" || !element.isConnected) return false
+  if (element === document.body) return false
+  if (element.closest("[inert], [hidden]")) return false
+  if (element.matches(":disabled")) return false
+  return isRendered(element)
+}
+
+function isRendered(element) {
+  if (typeof element.checkVisibility === "function") {
+    return element.checkVisibility({ visibilityProperty: true })
+  }
+  return element.getClientRects().length > 0
+}
+
+/**
+ * All tabbable elements inside a container, in DOM order.
+ * @param {Element} container
+ * @returns {HTMLElement[]}
+ */
+export function getTabbableElements(container) {
+  if (!container) return []
+  return Array.from(container.querySelectorAll(CANDIDATE_SELECTOR)).filter(isTabbable)
+}
+
+/** @deprecated alias of getTabbableElements */
+export function getFocusableElements(container) {
+  return getTabbableElements(container)
+}
+
+/**
+ * First tabbable element in a container.
+ * @param {Element} container
+ * @param {Object} options
+ * @param {boolean} options.skipInputs - prefer a non-text-input (mobile)
  */
 export function getFirstFocusable(container, options = {}) {
-  const elements = getFocusableElements(container)
+  const elements = getTabbableElements(container)
 
   if (options.skipInputs) {
-    const nonInput = elements.find(el => !el.matches(INPUT_SELECTOR))
-    return nonInput || elements[0] || null
+    return elements.find(el => !el.matches(INPUT_SELECTOR)) || elements[0] || null
   }
 
   return elements[0] || null
 }
 
-/**
- * Get the last focusable element in a container
- * @param {HTMLElement} container - Container to search within
- * @returns {HTMLElement|null}
- */
+/** Last tabbable element in a container. */
 export function getLastFocusable(container) {
-  const elements = getFocusableElements(container)
+  const elements = getTabbableElements(container)
   return elements[elements.length - 1] || null
 }
 
-/**
- * Check if the current device is mobile
- * @returns {boolean}
- */
+/** Whether the current device is a phone/tablet. */
 export function isMobileDevice() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 }
 
 /**
- * Focus the first appropriate element in a container
- * @param {HTMLElement} container - Container to focus within
- * @param {Object} options - Options
- * @param {boolean} options.mobileAware - Skip inputs on mobile to avoid keyboard popup
- * @param {boolean} options.excludeInputsOnMobile - Alias for mobileAware (for compatibility)
- * @param {boolean} options.preventScroll - Pass preventScroll option to focus()
- * @param {HTMLElement} options.preferredElement - Specific element to focus if available
+ * Move focus into a container on open. Order:
+ * 1. `preferredElement` (element or function returning one), when focusable
+ * 2. an `[autofocus]` element inside the container
+ * 3. the first tabbable element (on mobile, skipping text inputs so the
+ *    keyboard doesn't pop up — when `mobileAware`)
+ * 4. the container itself, given tabindex="-1" if it has no tabindex
+ *
+ * @param {HTMLElement} container
+ * @param {Object} options
+ * @param {HTMLElement|Function} options.preferredElement
+ * @param {boolean} options.mobileAware - default true
+ * @param {boolean} options.preventScroll
+ * @returns {HTMLElement|null} the element that received focus
  */
-export function focusFirstElement(container, options = {}) {
-  const {
-    mobileAware = true,
-    excludeInputsOnMobile = mobileAware,
-    preventScroll = false,
-    preferredElement = null
-  } = options
-
+export function focusInitial(container, options = {}) {
+  if (!container) return null
+  const { mobileAware = true, preventScroll = false } = options
   const focusOptions = preventScroll ? { preventScroll: true } : undefined
 
-  // Try preferred element first
-  if (preferredElement && container.contains(preferredElement)) {
-    preferredElement.focus(focusOptions)
-    return preferredElement
+  const preferred = resolve(options.preferredElement)
+  const autofocus = container.querySelector("[autofocus]")
+  const skipInputs = mobileAware && isMobileDevice()
+
+  const candidates = [
+    preferred && container.contains(preferred) ? preferred : null,
+    autofocus,
+    getFirstFocusable(container, { skipInputs })
+  ]
+
+  for (const candidate of candidates) {
+    if (candidate && isFocusable(candidate)) {
+      candidate.focus(focusOptions)
+      if (document.activeElement === candidate) return candidate
+    }
   }
 
-  // On mobile, skip text inputs to avoid keyboard popup
-  const skipInputs = excludeInputsOnMobile && isMobileDevice()
-  const element = getFirstFocusable(container, { skipInputs })
-
-  if (element) {
-    element.focus(focusOptions)
-    return element
-  }
-
-  return null
+  if (!container.hasAttribute("tabindex")) container.setAttribute("tabindex", "-1")
+  container.focus(focusOptions)
+  return document.activeElement === container ? container : null
 }
 
 /**
- * Create a focus trap for a container
- * @param {HTMLElement} container - Container to trap focus within
- * @param {Object} options - Options
- * @param {boolean} options.mobileAware - Handle mobile devices specially
- * @param {HTMLElement} options.returnFocus - Element to return focus to on deactivate
- * @param {boolean} options.autoFocus - Whether to auto-focus first element on activate
- * @returns {Object} Focus trap controller
+ * @deprecated Use focusInitial. Kept for existing callers; same order, and
+ * `excludeInputsOnMobile` is still accepted as an alias of `mobileAware`.
  */
-export function createFocusTrap(container, options = {}) {
-  const {
-    mobileAware = true,
-    returnFocus = null,
-    autoFocus = true
-  } = options
+export function focusFirstElement(container, options = {}) {
+  const { mobileAware = true, excludeInputsOnMobile = mobileAware } = options
+  return focusInitial(container, { ...options, mobileAware: excludeInputsOnMobile })
+}
 
-  let isActive = false
-  let previouslyFocused = null
-  let tabHandler = null
+// --- Trap stack -------------------------------------------------------------
+// Only the most recently activated trap handles Tab, so a modal opened from
+// inside another modal traps focus in itself and hands back when it closes.
 
-  const handleTab = (event) => {
-    if (event.key !== 'Tab') return
+const traps = []
+let listening = false
 
-    const focusableElements = getFocusableElements(container)
-    if (focusableElements.length === 0) return
+function handleTabKey(event) {
+  if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return
+  // Drop traps whose container left the DOM without deactivate()
+  for (let i = traps.length - 1; i >= 0; i--) {
+    if (!traps[i].container.isConnected) traps.splice(i, 1)
+  }
+  const top = traps[traps.length - 1]
+  if (top) top.handleTab(event)
+}
 
-    const firstFocusable = focusableElements[0]
-    const lastFocusable = focusableElements[focusableElements.length - 1]
+function updateListener() {
+  if (traps.length && !listening) {
+    document.addEventListener("keydown", handleTabKey)
+    listening = true
+  } else if (!traps.length && listening) {
+    document.removeEventListener("keydown", handleTabKey)
+    listening = false
+  }
+}
 
-    if (event.shiftKey) {
-      // Shift+Tab: if on first element, go to last
-      if (document.activeElement === firstFocusable) {
+/**
+ * Trap Tab / Shift+Tab inside a container: from the last tabbable Tab wraps
+ * to the first, from the first (or the container) Shift+Tab wraps to the
+ * last; with nothing tabbable, focus stays on the container. Focus outside
+ * the container (e.g. a popover portaled to <body>) is left alone.
+ *
+ * The trap only handles keys. Initial focus and restoring focus are
+ * separate (`focusInitial`, or `createModalSession` for everything).
+ *
+ * @param {HTMLElement} container
+ * @returns {{activate: Function, deactivate: Function, isActive: Function}}
+ */
+export function createFocusTrap(container, _options = {}) {
+  const trap = {
+    container,
+    handleTab(event) {
+      const active = document.activeElement
+      if (!container.contains(active)) return
+
+      const tabbables = getTabbableElements(container)
+      if (tabbables.length === 0) {
         event.preventDefault()
-        lastFocusable.focus()
+        container.focus()
+        return
       }
-    } else {
-      // Tab: if on last element, go to first
-      if (document.activeElement === lastFocusable) {
+
+      const first = tabbables[0]
+      const last = tabbables[tabbables.length - 1]
+
+      if (event.shiftKey && (active === first || active === container)) {
         event.preventDefault()
-        firstFocusable.focus()
+        last.focus()
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault()
+        first.focus()
       }
     }
   }
 
   return {
-    /**
-     * Activate the focus trap
-     */
     activate() {
-      if (isActive) return
-
-      // Store currently focused element
-      previouslyFocused = returnFocus || document.activeElement
-
-      // Add tab key handler
-      tabHandler = handleTab
-      document.addEventListener('keydown', tabHandler)
-
-      // Focus first element
-      if (autoFocus) {
-        // Delay to allow DOM to settle
-        requestAnimationFrame(() => {
-          focusFirstElement(container, { mobileAware })
-        })
-      }
-
-      isActive = true
+      const index = traps.indexOf(trap)
+      if (index !== -1) traps.splice(index, 1)
+      traps.push(trap)
+      updateListener()
     },
 
-    /**
-     * Deactivate the focus trap and optionally return focus
-     */
     deactivate() {
-      if (!isActive) return
-
-      // Remove tab handler
-      if (tabHandler) {
-        document.removeEventListener('keydown', tabHandler)
-        tabHandler = null
-      }
-
-      // Return focus to previously focused element
-      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-        previouslyFocused.focus()
-      }
-
-      previouslyFocused = null
-      isActive = false
+      const index = traps.indexOf(trap)
+      if (index !== -1) traps.splice(index, 1)
+      updateListener()
     },
 
-    /**
-     * Check if trap is active
-     * @returns {boolean}
-     */
     isActive() {
-      return isActive
+      return traps.includes(trap)
     },
 
-    /**
-     * Update the return focus element
-     * @param {HTMLElement} element
-     */
-    setReturnFocus(element) {
-      previouslyFocused = element
-    },
-
-    /**
-     * Manually focus first element
-     */
+    /** Focus the first tabbable element (or the container). */
     focusFirst() {
-      focusFirstElement(container, { mobileAware })
+      focusInitial(container, { mobileAware: false })
     },
 
-    /**
-     * Manually focus last element
-     */
+    /** Focus the last tabbable element. */
     focusLast() {
       const element = getLastFocusable(container)
       if (element) element.focus()
@@ -225,14 +262,22 @@ export function createFocusTrap(container, options = {}) {
 }
 
 /**
- * Simple one-liner to setup focus trap
- * Returns cleanup function
- * @param {HTMLElement} container - Container to trap focus within
- * @param {Object} options - Options for createFocusTrap
- * @returns {Function} Cleanup function to deactivate trap
+ * Drop every trap (test helper, like resetScrollLockState).
+ */
+export function resetFocusTraps() {
+  traps.length = 0
+  updateListener()
+}
+
+/**
+ * @deprecated Returns a cleanup function that deactivates a trap.
  */
 export function trapFocus(container, options = {}) {
   const trap = createFocusTrap(container, options)
   trap.activate()
   return () => trap.deactivate()
+}
+
+function resolve(value) {
+  return typeof value === "function" ? value() : value
 }

@@ -29,19 +29,45 @@ export {
 
 // Escape Key Handling
 export {
+  createEscapeLayer,
+  getEscapeLayerCount,
+  resetEscapeLayers,
   createEscapeKeyHandler,
   onEscapeKey,
   onEscapeKeyWhen
 } from './escape-key-manager.js'
 
+// Per-instance ids and aria id references
+export {
+  ensureId,
+  setIdRefs,
+  addIdRef,
+  removeIdRef
+} from './id-manager.js'
+
+// Inert background
+export {
+  inertOthers,
+  getInertLayerCount,
+  resetInert
+} from './inert-manager.js'
+
+// Modal session (trap + restore + inert + scroll lock + Escape)
+export { createModalSession } from './modal-session.js'
+
 // Focus Trap
 export {
+  isTabbable,
+  isFocusable,
+  getTabbableElements,
+  focusInitial,
   getFocusableElements,
   getFirstFocusable,
   getLastFocusable,
   isMobileDevice,
   focusFirstElement,
   createFocusTrap,
+  resetFocusTraps,
   trapFocus
 } from './focus-trap-manager.js'
 
