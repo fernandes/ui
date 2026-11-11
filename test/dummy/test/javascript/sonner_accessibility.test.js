@@ -1,6 +1,6 @@
-import { describe, test, expect } from "bun:test"
+import { describe, test, expect, afterEach } from "bun:test"
 import { screen, within } from "@testing-library/dom"
-import { render, settle } from "./support/render.js"
+import { render, settle, cleanup } from "./support/render.js"
 
 // Markup as UI::SonnerToasterBehavior renders it (classes dropped)
 function toaster({ duration = 4000, closeButton = false } = {}) {
@@ -23,6 +23,8 @@ function toast(detail) {
 
 const region = () => screen.getByRole("region", { name: "Notifications (F8)" })
 const toastItems = () => document.querySelectorAll("[data-sonner-toast]:not([data-removed='true'])")
+
+afterEach(() => cleanup())
 
 describe("Sonner: announcements", () => {
   test("a toast is inserted inside the polite live region", async () => {

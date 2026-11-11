@@ -1,7 +1,7 @@
 import { describe, test, expect, afterEach } from "bun:test"
 import { screen, within } from "@testing-library/dom"
 import { format } from "date-fns"
-import { render, settle } from "./support/render.js"
+import { render, settle, cleanup } from "./support/render.js"
 
 // Markup as UI::CalendarBehavior + _calendar.html.erb render it (classes dropped).
 function header({ prev = true, next = true, dropdowns = false } = {}) {
@@ -52,6 +52,7 @@ const day = name => screen.getByRole("button", { name })
 const tabStops = () => document.querySelectorAll('[data-date][tabindex="0"]')
 
 afterEach(() => {
+  cleanup()
   delete window.matchMedia
 })
 

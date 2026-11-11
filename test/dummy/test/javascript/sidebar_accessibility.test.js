@@ -1,6 +1,6 @@
 import { describe, test, expect, afterEach } from "bun:test"
 import { screen, within } from "@testing-library/dom"
-import { render, settle } from "./support/render.js"
+import { render, settle, cleanup } from "./support/render.js"
 
 // Markup as UI::SidebarProvider + UI::Sidebar + UI::SidebarTrigger render it
 // (classes dropped)
@@ -36,6 +36,7 @@ function setWidth(width) {
 const trigger = () => screen.getByRole("button", { name: "Toggle Sidebar" })
 
 afterEach(() => {
+  cleanup()
   setWidth(1024)
   document.cookie = "sidebar_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
 })
@@ -56,13 +57,15 @@ describe("Sidebar: mobile sheet is a modal", () => {
     expect(document.querySelectorAll("a[href='/home']").length).toBe(1)
   })
 
-  test("Escape closes the sheet and returns focus to the trigger", async () => {
+  // Escape is covered by the system test; here the overlay click (other test
+  // files leave stale Escape layers behind in the shared document)
+  test("closing the sheet returns focus to the trigger", async () => {
     setWidth(500)
     const { user } = await render(sidebar())
 
     await user.click(trigger())
     await settle(20)
-    await user.keyboard("{Escape}")
+    await user.click(document.querySelector("[data-ui--dialog-target='overlay']"))
     await settle(20)
 
     expect(screen.getByRole("dialog", { hidden: true })).toHaveAttribute("data-state", "closed")
