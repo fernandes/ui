@@ -39,7 +39,7 @@
 #     end
 #   end
 class UI::ComboboxWrapper < Phlex::HTML
-  include ComboboxBehavior
+  include UI::ComboboxBehavior
 
   # @param value [String] Initial selected value (empty string for no selection)
   # @param attributes [Hash] Additional HTML attributes to merge

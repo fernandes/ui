@@ -13,8 +13,8 @@
 # - Container closing after selection
 #
 # @example With Popover
-#   <%= render UI::WrapperComponent.new(value: "") do |combobox_attrs| %>
-#     <%= render UI::PopoverComponent.new(**combobox_attrs, placement: "bottom-start") do %>
+#   <%= render UI::ComboboxWrapperComponent.new(value: "") do |wrapper| %>
+#     <%= render UI::PopoverComponent.new(**wrapper.combobox_attrs, placement: "bottom-start") do %>
 #       <%= render UI::PopoverTriggerComponent.new(as_child: true) do %>
 #         <%= render UI::ButtonComponent.new do %>
 #           <span data-ui--combobox-target="text">Select framework...</span>
@@ -38,13 +38,13 @@
 #   <% end %>
 #
 # @example With Drawer (responsive)
-#   <%= render UI::WrapperComponent.new(value: "done") do |combobox_attrs| %>
-#     <%= render UI::DrawerComponent.new(**combobox_attrs) do %>
+#   <%= render UI::ComboboxWrapperComponent.new(value: "done") do |wrapper| %>
+#     <%= render UI::DrawerComponent.new(**wrapper.combobox_attrs) do %>
 #       ...
 #     <% end %>
 #   <% end %>
 class UI::ComboboxWrapperComponent < ViewComponent::Base
-  include ComboboxBehavior
+  include UI::ComboboxBehavior
 
   # @param value [String] Initial selected value (empty string for no selection)
   # @param attributes [Hash] Additional HTML attributes to merge
@@ -52,5 +52,15 @@ class UI::ComboboxWrapperComponent < ViewComponent::Base
     @value = value
     @attributes = attributes
     @combobox_html_attrs = combobox_html_attributes.deep_merge(@attributes)
+  end
+
+  # Attributes to spread into the container. ViewComponent passes the
+  # component itself to the block, so callers read them from it.
+  def combobox_attrs
+    @combobox_html_attrs
+  end
+
+  def call
+    content
   end
 end
