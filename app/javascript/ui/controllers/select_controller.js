@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { computePosition, flip, shift, offset, size } from "@floating-ui/dom"
 import { ensureId, setIdRefs } from "../utils/id-manager.js"
 import { createEscapeLayer } from "../utils/escape-key-manager.js"
-import { createTypeahead, isTypeaheadKey } from "../utils/typeahead.js"
+import { createTypeahead } from "../utils/typeahead.js"
 
 // Keys that open a closed select from its trigger (Radix OPEN_KEYS; Enter
 // and Space already open it through the native button click)
@@ -269,10 +269,9 @@ export default class extends Controller {
       return
     }
 
-    if (isTypeaheadKey(event) && !(event.key === " " && !this.typeahead.isTyping)) {
-      event.preventDefault()
+    if (this.typeahead.isTypeaheadKey(event)) {
       const current = this.itemTargets.find((item) => item.dataset.value === this.valueValue) || null
-      const match = this.typeahead.search(event.key, this.getEnabledItems(), current)
+      const match = this.typeahead.handleKey(event, this.getEnabledItems(), current)
       if (match) this.commitValue(match.dataset.value)
     }
   }
@@ -300,10 +299,9 @@ export default class extends Controller {
       return
     }
 
-    if (isTypeaheadKey(event) && !(event.key === " " && !this.typeahead.isTyping)) {
-      event.preventDefault()
+    if (this.typeahead.isTypeaheadKey(event)) {
       event.stopPropagation()
-      const match = this.typeahead.search(event.key, this.getEnabledItems(), currentItem)
+      const match = this.typeahead.handleKey(event, this.getEnabledItems(), currentItem)
       if (match) this.focusItem(match)
       return
     }
