@@ -174,6 +174,10 @@ export default class extends Controller {
     // Remove hidden class if present
     this.contentTarget.classList.remove('hidden')
 
+    // A11y: libera tab/interação dentro do content enquanto aberto.
+    // Contrapartida do `inert = true` aplicado em connect()/hide().
+    this.contentTarget.inert = false
+
     // Start positioning
     if (this.positioner) {
       this.positioner.start()

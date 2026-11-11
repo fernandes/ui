@@ -265,6 +265,30 @@ describe("PopoverController", () => {
     })
   })
 
+  describe("Inert state", () => {
+    // A closed popover is inert so it stays out of the tab order, but an open
+    // one must be interactive again — otherwise the content is painted and
+    // still swallows every click.
+    test("content is inert while closed and interactive while open", async () => {
+      container.innerHTML = createPopover()
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const element = container.querySelector('[data-controller="ui--popover"]')
+      const controller = application.getControllerForElementAndIdentifier(element, "ui--popover")
+      const content = container.querySelector('[data-testid="content"]')
+
+      expect(content.inert).toBe(true)
+
+      controller.show()
+      await new Promise(resolve => setTimeout(resolve, 10))
+      expect(content.inert).toBe(false)
+
+      controller.hide()
+      await new Promise(resolve => setTimeout(resolve, 10))
+      expect(content.inert).toBe(true)
+    })
+  })
+
   describe("Events", () => {
     test("dispatches popover:show event when opened", async () => {
       container.innerHTML = createPopover()

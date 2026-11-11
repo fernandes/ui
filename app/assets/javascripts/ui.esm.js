@@ -4676,6 +4676,7 @@ class PopoverController extends Controller {
     this.openValue = true;
     setState(this.contentTarget, "open");
     this.contentTarget.classList.remove("hidden");
+    this.contentTarget.inert = false;
     if (this.positioner) {
       this.positioner.start();
     }
