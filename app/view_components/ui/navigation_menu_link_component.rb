@@ -60,7 +60,7 @@ class UI::NavigationMenuLinkComponent < ViewComponent::Base
         # Merge CSS classes with TailwindMerge
         if link_attrs[:class]
           existing_classes = first_element["class"] || ""
-          merged_classes = TailwindMerge::Merger.new.merge([existing_classes, link_attrs[:class]].join(" "))
+          merged_classes = UI::ClassMerger.merge([existing_classes, link_attrs[:class]].join(" "))
           first_element["class"] = merged_classes
         end
 
@@ -90,7 +90,7 @@ class UI::NavigationMenuLinkComponent < ViewComponent::Base
 
     # Override classes if trigger_style is true
     if @trigger_style
-      base_attrs[:class] = TailwindMerge::Merger.new.merge([
+      base_attrs[:class] = UI::ClassMerger.merge([
         navigation_menu_link_trigger_style_classes,
         @classes
       ].compact.join(" "))

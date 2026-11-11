@@ -43,7 +43,7 @@ module UI::ContextMenuBehavior
   # Returns combined CSS classes for the context menu
   def context_menu_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "relative inline-block",
       classes_value
     ].compact.join(" "))

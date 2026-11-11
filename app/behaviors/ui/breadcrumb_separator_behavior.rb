@@ -18,7 +18,7 @@ module UI::BreadcrumbSeparatorBehavior
   # Returns combined CSS classes for the breadcrumb separator
   def breadcrumb_separator_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       breadcrumb_separator_base_classes,
       classes_value
 

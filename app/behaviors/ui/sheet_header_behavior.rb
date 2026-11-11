@@ -13,7 +13,7 @@ module UI::SheetHeaderBehavior
 
   # Returns combined CSS classes for the sheet header
   def sheet_header_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sheet_header_base_classes,
       @classes
     ].compact.join(" "))

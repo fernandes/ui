@@ -4,7 +4,7 @@
   @classes = local_assigns.fetch(:classes, "")
 
   # Build description classes
-  description_classes = TailwindMerge::Merger.new.merge([
+  description_classes = UI::ClassMerger.merge([
     "text-muted-foreground text-sm",
     @classes
   ].compact.join(" "))

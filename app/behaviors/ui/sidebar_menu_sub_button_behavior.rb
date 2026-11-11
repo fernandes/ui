@@ -32,7 +32,7 @@ module UI::SidebarMenuSubButtonBehavior
     is_active = respond_to?(:active, true) ? active : @active
     classes_value = respond_to?(:classes, true) ? classes : @classes
 
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sidebar_menu_sub_button_base_classes,
       SIZES[size_value],
       is_active ? sidebar_menu_sub_button_active_classes : nil,

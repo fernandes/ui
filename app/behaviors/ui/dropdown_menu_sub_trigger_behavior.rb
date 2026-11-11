@@ -19,7 +19,7 @@ module UI::DropdownMenuSubTriggerBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base_classes = "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden data-[state=open]:bg-accent data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset=true]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
 
-    TailwindMerge::Merger.new.merge([base_classes, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base_classes, classes_value].compact.join(" "))
   end
 
   # Returns data attributes for Stimulus

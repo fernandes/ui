@@ -39,9 +39,9 @@ module UI::CollapsibleTriggerBehavior
     # When as_child is true, the parent component provides its own styling
     if as_child_value
       return nil if classes_value.blank?
-      TailwindMerge::Merger.new.merge([classes_value].compact.join(" "))
+      UI::ClassMerger.merge([classes_value].compact.join(" "))
     else
-      TailwindMerge::Merger.new.merge([TRIGGER_BASE_CLASSES, classes_value].compact.join(" "))
+      UI::ClassMerger.merge([TRIGGER_BASE_CLASSES, classes_value].compact.join(" "))
     end
   end
 

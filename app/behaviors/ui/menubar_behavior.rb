@@ -60,7 +60,7 @@ module UI::MenubarBehavior
   # Returns combined CSS classes for the menubar
   def menubar_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "bg-background flex h-9 items-center gap-1 rounded-md border p-1 shadow-xs",
       classes_value
     ].compact.join(" "))

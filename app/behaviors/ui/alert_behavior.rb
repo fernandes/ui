@@ -40,7 +40,7 @@ module UI::AlertBehavior
 
   # Merge base classes with variant and custom classes
   def alert_classes
-    TailwindMerge::Merger.new.merge([alert_base_classes, alert_variant_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([alert_base_classes, alert_variant_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for alert container

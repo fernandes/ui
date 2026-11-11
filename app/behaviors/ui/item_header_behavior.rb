@@ -16,7 +16,7 @@ module UI::ItemHeaderBehavior
   # Returns combined CSS classes
   def item_header_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       item_header_base_classes,
       classes_value
 

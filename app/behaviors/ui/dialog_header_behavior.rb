@@ -13,7 +13,7 @@ module UI::DialogHeaderBehavior
 
   # Returns combined CSS classes for the dialog header
   def dialog_header_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       dialog_header_base_classes,
       @classes
     ].compact.join(" "))

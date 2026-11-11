@@ -16,7 +16,7 @@ module UI::InputGroupTextBehavior
   # Returns combined CSS classes for the text element
   def input_group_text_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_group_text_base_classes,
       classes_value
 

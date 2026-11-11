@@ -17,7 +17,7 @@ module UI::ContextMenuLabelBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base_classes = "text-foreground px-2 py-1.5 text-sm font-medium"
 
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       base_classes,
       @inset ? "pl-8" : nil,
       classes_value

@@ -19,7 +19,7 @@ module UI::PBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def p_classes
-    TailwindMerge::Merger.new.merge([p_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([p_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

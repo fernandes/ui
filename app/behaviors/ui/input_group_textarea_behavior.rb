@@ -40,7 +40,7 @@ module UI::InputGroupTextareaBehavior
   # Returns combined CSS classes for the textarea
   def input_group_textarea_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_group_textarea_base_classes,
       classes_value
 

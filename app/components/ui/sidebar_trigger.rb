@@ -19,7 +19,7 @@ class UI::SidebarTrigger < Phlex::HTML
     all_attributes = sidebar_trigger_html_attributes.merge(type: "button")
 
     if @attributes.key?(:class)
-      merged_class = TailwindMerge::Merger.new.merge([
+      merged_class = UI::ClassMerger.merge([
         all_attributes[:class],
         @attributes[:class]
       ].compact.join(" "))

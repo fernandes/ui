@@ -15,7 +15,7 @@ module UI::SidebarMenuSubBehavior
 
   def sidebar_menu_sub_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sidebar_menu_sub_base_classes,
       classes_value
     ].compact.join(" "))

@@ -30,7 +30,7 @@ module UI::ItemBehavior
   # Returns combined CSS classes for the item
   def item_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       item_base_classes,
       item_variant_classes,
       item_size_classes,

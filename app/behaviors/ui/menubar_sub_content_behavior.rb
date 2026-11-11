@@ -30,7 +30,7 @@ module UI::MenubarSubContentBehavior
       "hidden absolute"
     ].join(" ")
 
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       base_classes,
       classes_value
     ].compact.join(" "))

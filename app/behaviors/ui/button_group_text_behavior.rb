@@ -17,7 +17,7 @@ module UI::ButtonGroupTextBehavior
   # Returns combined CSS classes for the text element
   def text_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       text_base_classes,
       classes_value
     ].compact.join(" "))

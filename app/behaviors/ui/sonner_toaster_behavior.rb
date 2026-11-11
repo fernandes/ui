@@ -37,6 +37,6 @@ module UI::SonnerToasterBehavior
   end
 
   def toaster_classes
-    TailwindMerge::Merger.new.merge(["toaster group", @classes].compact.join(" "))
+    UI::ClassMerger.merge(["toaster group", @classes].compact.join(" "))
   end
 end

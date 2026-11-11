@@ -19,7 +19,7 @@ module UI::ListBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def list_classes
-    TailwindMerge::Merger.new.merge([list_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([list_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

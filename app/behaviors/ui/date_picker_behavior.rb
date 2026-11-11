@@ -47,7 +47,7 @@ module UI::DatePickerBehavior
 
   # Default datepicker classes
   def date_picker_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "flex flex-col gap-3",
       @classes
     ].compact.join(" "))

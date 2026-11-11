@@ -21,7 +21,7 @@ module UI::AvatarImageBehavior
   # Returns combined CSS classes for the avatar image
   def avatar_image_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       avatar_image_base_classes,
       classes_value
     ].compact.join(" "))

@@ -34,7 +34,7 @@ module UI::InputBehavior
   # Returns combined CSS classes for the input
   def input_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_base_classes,
       input_focus_classes,
       input_validation_classes,

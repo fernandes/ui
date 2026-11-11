@@ -30,7 +30,7 @@ module UI::ScrollAreaScrollbarBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     orientation_value = respond_to?(:orientation, true) ? orientation : @orientation
 
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       scroll_area_scrollbar_base_classes,
       scroll_area_scrollbar_orientation_classes(orientation_value),
       classes_value

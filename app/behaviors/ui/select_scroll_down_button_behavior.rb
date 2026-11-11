@@ -33,7 +33,7 @@ module UI::SelectScrollDownButtonBehavior
   # Returns combined CSS classes
   def select_scroll_down_button_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       select_scroll_down_button_base_classes,
       classes_value
     ].compact.join(" "))

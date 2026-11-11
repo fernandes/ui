@@ -16,7 +16,7 @@ module UI::ItemFooterBehavior
   # Returns combined CSS classes
   def item_footer_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       item_footer_base_classes,
       classes_value
 

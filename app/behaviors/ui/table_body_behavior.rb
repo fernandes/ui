@@ -20,7 +20,7 @@ module UI::TableBodyBehavior
   end
 
   def body_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       body_base_classes,
       @classes
     ].compact.join(" "))

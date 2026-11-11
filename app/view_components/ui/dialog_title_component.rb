@@ -18,7 +18,7 @@ class UI::DialogTitleComponent < ViewComponent::Base
   private
 
   def title_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "text-lg font-semibold",
       @classes
     ].compact.join(" "))

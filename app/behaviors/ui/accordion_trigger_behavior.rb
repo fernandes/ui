@@ -12,7 +12,7 @@ module UI::AccordionTriggerBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def trigger_classes
-    TailwindMerge::Merger.new.merge([trigger_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([trigger_base_classes, @classes].compact.join(" "))
   end
 
   # Generate unique IDs for ARIA relationships

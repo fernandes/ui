@@ -57,7 +57,7 @@ module UI::ToggleBehavior
   # Returns combined CSS classes for the toggle
   def toggle_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       toggle_base_classes,
       toggle_variant_classes,
       toggle_size_classes,

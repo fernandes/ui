@@ -25,7 +25,7 @@ module UI::BadgeBehavior
   # Returns combined CSS classes for the badge
   def badge_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       badge_base_classes,
       badge_variant_classes,
       classes_value

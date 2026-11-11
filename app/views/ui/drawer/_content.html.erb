@@ -18,7 +18,7 @@
   end
 
   # Add group class for handle visibility (matching Phlex implementation)
-  all_attributes[:class] = TailwindMerge::Merger.new.merge(["group/drawer-content", all_attributes[:class]].compact.join(" "))
+  all_attributes[:class] = UI::ClassMerger.merge(["group/drawer-content", all_attributes[:class]].compact.join(" "))
 -%>
 <div class="<%= all_attributes[:class] %>"
      role="<%= all_attributes[:role] %>"

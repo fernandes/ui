@@ -45,7 +45,7 @@ class UI::DialogTriggerComponent < ViewComponent::Base
         # Merge CSS classes with TailwindMerge
         if trigger_attrs[:class]
           existing_classes = first_element["class"] || ""
-          merged_classes = TailwindMerge::Merger.new.merge([existing_classes, trigger_attrs[:class]].join(" "))
+          merged_classes = UI::ClassMerger.merge([existing_classes, trigger_attrs[:class]].join(" "))
           first_element["class"] = merged_classes
         end
 

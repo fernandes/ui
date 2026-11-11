@@ -15,7 +15,7 @@ module UI::CommandShortcutBehavior
 
   def command_shortcut_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       command_shortcut_base_classes,
       classes_value
     ].compact.join(" "))

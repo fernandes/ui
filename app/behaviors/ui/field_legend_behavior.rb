@@ -27,6 +27,6 @@ module UI::FieldLegendBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "mb-3 font-medium data-[variant=legend]:text-base data-[variant=label]:text-sm"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 end

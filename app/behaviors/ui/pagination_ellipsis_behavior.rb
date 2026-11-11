@@ -10,7 +10,7 @@ module UI::PaginationEllipsisBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def ellipsis_classes
-    TailwindMerge::Merger.new.merge([ellipsis_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([ellipsis_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for ellipsis

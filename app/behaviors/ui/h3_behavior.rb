@@ -19,7 +19,7 @@ module UI::H3Behavior
 
   # Merge base classes with custom classes using TailwindMerge
   def h3_classes
-    TailwindMerge::Merger.new.merge([h3_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([h3_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

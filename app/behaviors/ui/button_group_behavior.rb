@@ -22,7 +22,7 @@ module UI::ButtonGroupBehavior
   # Returns combined CSS classes for the button group
   def button_group_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       button_group_base_classes,
       button_group_orientation_classes,
       classes_value

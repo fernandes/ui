@@ -11,7 +11,7 @@ module UI::CarouselPreviousBehavior
 
   # Merge base classes with custom classes
   def carousel_previous_classes
-    TailwindMerge::Merger.new.merge([carousel_previous_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([carousel_previous_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus action

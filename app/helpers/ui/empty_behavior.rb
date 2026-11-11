@@ -12,7 +12,7 @@ module UI
 
     def empty_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         "flex min-w-0 flex-1 flex-col items-center justify-center gap-6 rounded-lg border-dashed p-6 text-center text-balance md:p-12",
         classes_value
       ].compact.join(" "))
@@ -30,7 +30,7 @@ module UI
 
     def empty_header_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         "flex max-w-sm flex-col items-center gap-2 text-center",
         classes_value
       ].compact.join(" "))
@@ -50,7 +50,7 @@ module UI
       classes_value = respond_to?(:classes, true) ? classes : @classes
       variant_value = @variant.to_s
 
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         "flex shrink-0 items-center justify-center mb-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         empty_media_variant_classes(variant_value),
         classes_value
@@ -80,7 +80,7 @@ module UI
 
     def empty_title_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         "font-semibold tracking-tight text-base",
         classes_value
       ].compact.join(" "))
@@ -98,7 +98,7 @@ module UI
 
     def empty_description_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         "text-sm text-muted-foreground",
         classes_value
       ].compact.join(" "))
@@ -116,7 +116,7 @@ module UI
 
     def empty_content_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         classes_value
       ].compact.join(" "))
     end

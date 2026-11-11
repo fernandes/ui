@@ -62,6 +62,6 @@ module UI::SheetBehavior
 
   # Generate final classes using TailwindMerge
   def sheet_classes
-    TailwindMerge::Merger.new.merge([sheet_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([sheet_base_classes, @classes].compact.join(" "))
   end
 end

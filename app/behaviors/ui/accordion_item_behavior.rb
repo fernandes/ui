@@ -12,7 +12,7 @@ module UI::AccordionItemBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def item_classes
-    TailwindMerge::Merger.new.merge([item_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([item_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus target

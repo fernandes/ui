@@ -12,7 +12,7 @@ module UI::DrawerTitleBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def drawer_title_classes
-    TailwindMerge::Merger.new.merge([drawer_title_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_title_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for title

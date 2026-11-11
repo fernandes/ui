@@ -19,7 +19,7 @@ module UI::BreadcrumbPageBehavior
   # Returns combined CSS classes for the breadcrumb page
   def breadcrumb_page_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       breadcrumb_page_base_classes,
       classes_value
 

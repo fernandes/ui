@@ -17,7 +17,7 @@ module UI::SidebarMenuActionBehavior
     show_on_hover = respond_to?(:show_on_hover, true) ? show_on_hover : @show_on_hover
     classes_value = respond_to?(:classes, true) ? classes : @classes
 
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sidebar_menu_action_base_classes,
       show_on_hover ? sidebar_menu_action_show_on_hover_classes : nil,
       classes_value

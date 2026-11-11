@@ -12,7 +12,7 @@ module UI::AlertDialogTriggerBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def alert_dialog_trigger_classes
-    TailwindMerge::Merger.new.merge([alert_dialog_trigger_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([alert_dialog_trigger_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus action

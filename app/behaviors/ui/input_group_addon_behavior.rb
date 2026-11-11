@@ -26,7 +26,7 @@ module UI::InputGroupAddonBehavior
   # Returns combined CSS classes for the addon
   def input_group_addon_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_group_addon_base_classes,
       input_group_addon_align_classes,
       classes_value

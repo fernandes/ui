@@ -13,7 +13,7 @@ module UI::DialogContentBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def dialog_content_classes
-    TailwindMerge::Merger.new.merge([dialog_content_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([dialog_content_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus target

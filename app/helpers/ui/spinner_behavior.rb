@@ -19,7 +19,7 @@ module UI
     # Returns combined CSS classes for the spinner
     def spinner_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         spinner_base_classes,
         spinner_size_classes,
         classes_value

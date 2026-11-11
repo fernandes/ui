@@ -18,7 +18,7 @@ module UI::BreadcrumbEllipsisBehavior
   # Returns combined CSS classes for the breadcrumb ellipsis
   def breadcrumb_ellipsis_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       breadcrumb_ellipsis_base_classes,
       classes_value
 

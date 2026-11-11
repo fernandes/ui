@@ -25,7 +25,7 @@ module UI::SelectTriggerBehavior
   # Returns combined CSS classes
   def select_trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       select_trigger_base_classes,
       classes_value
     ].compact.join(" "))

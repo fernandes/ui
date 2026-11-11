@@ -37,7 +37,7 @@ module UI::CarouselBehavior
 
   # Merge base classes with custom classes
   def carousel_classes
-    TailwindMerge::Merger.new.merge([carousel_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([carousel_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus controller

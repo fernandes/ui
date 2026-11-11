@@ -26,7 +26,7 @@ module UI::NavigationMenuLinkBehavior
   # Returns combined CSS classes for the link
   def navigation_menu_link_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       # Base styles
       "flex flex-col gap-1 rounded-sm p-2 text-sm",
       # Interaction states

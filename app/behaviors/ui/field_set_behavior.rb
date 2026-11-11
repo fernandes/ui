@@ -25,6 +25,6 @@ module UI::FieldSetBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "flex flex-col gap-6 has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 end

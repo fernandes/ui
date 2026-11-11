@@ -18,7 +18,7 @@ module UI::DrawerHeaderBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def drawer_header_classes
-    TailwindMerge::Merger.new.merge([drawer_header_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_header_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for header

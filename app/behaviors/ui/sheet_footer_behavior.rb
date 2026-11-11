@@ -13,7 +13,7 @@ module UI::SheetFooterBehavior
 
   # Returns combined CSS classes for the sheet footer
   def sheet_footer_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sheet_footer_base_classes,
       @classes
     ].compact.join(" "))

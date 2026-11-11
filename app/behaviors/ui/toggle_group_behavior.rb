@@ -30,7 +30,7 @@ module UI::ToggleGroupBehavior
   # Returns combined CSS classes for the toggle group container
   def toggle_group_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       toggle_group_base_classes,
       toggle_group_spacing_classes,
       toggle_group_variant_classes,

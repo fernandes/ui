@@ -24,7 +24,7 @@ module UI::InputGroupButtonBehavior
   # Returns combined CSS classes for the button
   def input_group_button_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_group_button_base_classes,
       input_group_button_variant_classes,
       input_group_button_size_classes,

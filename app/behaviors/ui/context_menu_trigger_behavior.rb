@@ -15,7 +15,7 @@ module UI::ContextMenuTriggerBehavior
   # Returns combined CSS classes for the trigger
   def context_menu_trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm",
       classes_value
     ].compact.join(" "))

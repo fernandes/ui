@@ -18,7 +18,7 @@ module UI::CardFooterBehavior
 
   def card_footer_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       card_footer_base_classes,
       classes_value
     ].compact.join(" "))

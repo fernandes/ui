@@ -35,7 +35,7 @@ module UI::PaginationLinkBehavior
 
   # Merge all classes using TailwindMerge
   def link_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       link_base_classes,
       link_variant_classes,
       link_size_classes,

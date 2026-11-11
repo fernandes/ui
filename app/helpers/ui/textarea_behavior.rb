@@ -19,7 +19,7 @@ module UI
     # Returns combined CSS classes for the textarea
     def textarea_classes
       classes_value = respond_to?(:classes, true) ? classes : @classes
-      TailwindMerge::Merger.new.merge([
+      UI::ClassMerger.merge([
         textarea_base_classes,
         classes_value
 

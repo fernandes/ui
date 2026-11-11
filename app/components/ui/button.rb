@@ -56,7 +56,7 @@ class UI::Button < Phlex::HTML
     attributes = button_html_attributes
 
     if @attributes.key?(:class)
-      merged = TailwindMerge::Merger.new.merge(
+      merged = UI::ClassMerger.merge(
         [attributes[:class], @attributes[:class]].compact.join(" ")
       )
       attributes = attributes.merge(class: merged)

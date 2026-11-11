@@ -23,7 +23,7 @@ module UI::CarouselContentBehavior
   # Merge base classes with custom classes for inner flex container
   # User classes can override the -ml-4 default (e.g., -ml-1 for custom spacing)
   def carousel_content_container_classes
-    TailwindMerge::Merger.new.merge([carousel_content_container_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([carousel_content_container_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus target (outer div)

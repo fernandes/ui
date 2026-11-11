@@ -45,7 +45,7 @@ class UI::DialogCloseComponent < ViewComponent::Base
         # Merge CSS classes with TailwindMerge
         if close_attrs[:class]
           existing_classes = first_element["class"] || ""
-          merged_classes = TailwindMerge::Merger.new.merge([existing_classes, close_attrs[:class]].join(" "))
+          merged_classes = UI::ClassMerger.merge([existing_classes, close_attrs[:class]].join(" "))
           first_element["class"] = merged_classes
         end
 

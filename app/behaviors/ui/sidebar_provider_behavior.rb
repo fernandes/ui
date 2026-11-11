@@ -23,7 +23,7 @@ module UI::SidebarProviderBehavior
 
   def sidebar_provider_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sidebar_provider_base_classes,
       classes_value
     ].compact.join(" "))

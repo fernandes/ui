@@ -17,7 +17,7 @@ module UI::MenubarLabelBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     inset_class = inset? ? "pl-8" : ""
 
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "px-2 py-1.5 text-sm font-medium",
       inset_class,
       classes_value

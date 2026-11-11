@@ -15,6 +15,6 @@ module UI::ContextMenuRadioGroupBehavior
   # Returns combined CSS classes for the radio group
   def context_menu_radio_group_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([classes_value].compact.join(" "))
+    UI::ClassMerger.merge([classes_value].compact.join(" "))
   end
 end

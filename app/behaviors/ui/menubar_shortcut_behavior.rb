@@ -15,7 +15,7 @@ module UI::MenubarShortcutBehavior
   # Returns combined CSS classes for the shortcut
   def menubar_shortcut_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "text-muted-foreground ml-auto text-xs tracking-widest",
       classes_value
     ].compact.join(" "))

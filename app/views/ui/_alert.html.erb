@@ -15,7 +15,7 @@
 
   # Merge all classes
   require "tailwind_merge"
-  all_classes = TailwindMerge::Merger.new.merge([base_classes, variant_classes, classes].compact.join(" "))
+  all_classes = UI::ClassMerger.merge([base_classes, variant_classes, classes].compact.join(" "))
 %>
 <div class="<%= all_classes %>" role="alert" data-slot="alert">
   <%= yield %>

@@ -23,7 +23,7 @@ module UI::ButtonGroupSeparatorBehavior
     end
 
     # Merge button group specific classes
-    base_attrs[:class] = TailwindMerge::Merger.new.merge([
+    base_attrs[:class] = UI::ClassMerger.merge([
       base_attrs[:class],
       "bg-input relative !m-0 self-stretch data-[orientation=vertical]:h-auto"
     ].compact.join(" "))

@@ -66,6 +66,6 @@ module UI::DialogBehavior
 
   # Generate final classes using TailwindMerge
   def dialog_classes
-    TailwindMerge::Merger.new.merge([dialog_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([dialog_base_classes, @classes].compact.join(" "))
   end
 end

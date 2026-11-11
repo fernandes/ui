@@ -19,7 +19,7 @@ module UI::SmallBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def small_classes
-    TailwindMerge::Merger.new.merge([small_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([small_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

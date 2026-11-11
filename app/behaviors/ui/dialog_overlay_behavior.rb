@@ -13,7 +13,7 @@ module UI::DialogOverlayBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def dialog_overlay_classes
-    TailwindMerge::Merger.new.merge([dialog_overlay_base_classes].compact.join(" "))
+    UI::ClassMerger.merge([dialog_overlay_base_classes].compact.join(" "))
   end
 
   # Container wrapper classes
@@ -24,7 +24,7 @@ module UI::DialogOverlayBehavior
 
   # Merge container base classes with custom classes
   def dialog_overlay_container_classes
-    TailwindMerge::Merger.new.merge([dialog_overlay_container_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([dialog_overlay_container_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for container

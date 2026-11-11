@@ -16,7 +16,7 @@ module UI::BreadcrumbListBehavior
   # Returns combined CSS classes for the breadcrumb list
   def breadcrumb_list_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       breadcrumb_list_base_classes,
       classes_value
 

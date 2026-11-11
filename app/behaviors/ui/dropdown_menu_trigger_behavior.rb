@@ -24,7 +24,7 @@ module UI::DropdownMenuTriggerBehavior
   # Returns combined CSS classes for the trigger
   def dropdown_menu_trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       dropdown_menu_trigger_base_classes,
       classes_value
     ].compact.join(" "))

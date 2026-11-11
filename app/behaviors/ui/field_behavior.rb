@@ -39,7 +39,7 @@ module UI::FieldBehavior
     base = "group/field flex w-full gap-3 data-[invalid=true]:text-destructive"
     orientation = field_orientation_classes
 
-    TailwindMerge::Merger.new.merge([base, orientation, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, orientation, classes_value].compact.join(" "))
   end
 
   private

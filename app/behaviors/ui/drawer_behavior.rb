@@ -79,6 +79,6 @@ module UI::DrawerBehavior
 
   # Generate final classes using TailwindMerge
   def drawer_classes
-    TailwindMerge::Merger.new.merge([drawer_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_base_classes, @classes].compact.join(" "))
   end
 end

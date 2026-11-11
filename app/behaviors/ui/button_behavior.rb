@@ -32,7 +32,7 @@ module UI::ButtonBehavior
     if @attributes&.key?(:class)
       button_class = all_attributes[:class] || ""
       attr_class = @attributes[:class] || ""
-      merged_class = TailwindMerge::Merger.new.merge([button_class, attr_class].join(" "))
+      merged_class = UI::ClassMerger.merge([button_class, attr_class].join(" "))
       all_attributes = all_attributes.merge(class: merged_class)
     end
 
@@ -54,7 +54,7 @@ module UI::ButtonBehavior
   # Returns combined CSS classes for the button
   def button_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       button_base_classes,
       button_variant_classes,
       button_size_classes,

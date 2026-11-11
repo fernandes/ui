@@ -14,7 +14,7 @@ module UI::TableFooterBehavior
   end
 
   def footer_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       footer_base_classes,
       @classes
     ].compact.join(" "))

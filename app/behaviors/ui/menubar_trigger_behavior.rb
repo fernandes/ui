@@ -19,7 +19,7 @@ module UI::MenubarTriggerBehavior
   # Returns combined CSS classes for the trigger
   def menubar_trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none",
       "focus:bg-accent focus:text-accent-foreground",
       "data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",

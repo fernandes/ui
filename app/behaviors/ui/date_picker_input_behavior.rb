@@ -25,7 +25,7 @@ module UI::DatePickerInputBehavior
 
   # Input classes
   def date_picker_input_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       # Input base styles
       "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
       "ring-offset-background",
@@ -49,7 +49,7 @@ module UI::DatePickerInputBehavior
 
   # Icon button classes (positioned inside input)
   def date_picker_icon_button_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "absolute top-1/2 right-2 -translate-y-1/2",
       "inline-flex items-center justify-center",
       "h-6 w-6 rounded-sm",

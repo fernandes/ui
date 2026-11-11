@@ -41,7 +41,7 @@ module UI::CommandBehavior
 
   def command_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       command_base_classes,
       classes_value
     ].compact.join(" "))

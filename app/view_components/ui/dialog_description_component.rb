@@ -18,7 +18,7 @@ class UI::DialogDescriptionComponent < ViewComponent::Base
   private
 
   def description_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "text-muted-foreground text-sm",
       @classes
     ].compact.join(" "))

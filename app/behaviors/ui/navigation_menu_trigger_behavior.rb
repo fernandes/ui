@@ -20,7 +20,7 @@ module UI::NavigationMenuTriggerBehavior
   # Returns combined CSS classes for the trigger
   def navigation_menu_trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       # Base styles
       "group/navigation-menu-trigger inline-flex h-9 w-max items-center justify-center gap-1",
       "rounded-md bg-background px-4 py-2 text-sm font-medium",

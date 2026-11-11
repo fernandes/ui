@@ -15,7 +15,7 @@ module UI::NavigationMenuItemBehavior
   # Returns combined CSS classes for the item
   def navigation_menu_item_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "group/navigation-menu-item relative",
       classes_value
     ].compact.join(" "))

@@ -16,7 +16,7 @@ module UI::MenubarSeparatorBehavior
   # Returns combined CSS classes for the separator
   def menubar_separator_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "bg-border -mx-1 my-1 h-px",
       classes_value
     ].compact.join(" "))

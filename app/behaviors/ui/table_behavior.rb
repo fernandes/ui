@@ -22,7 +22,7 @@ module UI::TableBehavior
   end
 
   def table_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       table_base_classes,
       @classes
     ].compact.join(" "))

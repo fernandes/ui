@@ -46,6 +46,6 @@ module UI::ResponsiveDialogBehavior
 
   # Generate final classes using TailwindMerge
   def responsive_dialog_classes
-    TailwindMerge::Merger.new.merge([responsive_dialog_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([responsive_dialog_base_classes, @classes].compact.join(" "))
   end
 end

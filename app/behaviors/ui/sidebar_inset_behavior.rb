@@ -22,7 +22,7 @@ module UI::SidebarInsetBehavior
 
   def sidebar_inset_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sidebar_inset_base_classes,
       classes_value
     ].compact.join(" "))

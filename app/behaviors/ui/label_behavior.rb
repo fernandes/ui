@@ -29,7 +29,7 @@ module UI::LabelBehavior
   # Returns combined CSS classes for the label
   def label_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       label_base_classes,
       classes_value
     ].compact.join(" "))

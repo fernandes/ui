@@ -16,6 +16,6 @@ module UI::DropdownMenuSubBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base_classes = "relative"
 
-    TailwindMerge::Merger.new.merge([base_classes, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base_classes, classes_value].compact.join(" "))
   end
 end

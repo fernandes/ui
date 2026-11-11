@@ -18,7 +18,7 @@ module UI::InputGroupBehavior
   # Returns combined CSS classes for the input group
   def input_group_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_group_base_classes,
       input_group_height_classes,
       input_group_alignment_classes,

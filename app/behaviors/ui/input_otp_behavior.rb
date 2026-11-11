@@ -34,7 +34,7 @@ module UI::InputOtpBehavior
   # Returns combined CSS classes for the input OTP container
   def input_otp_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       input_otp_base_classes,
       classes_value
     ].compact.join(" "))

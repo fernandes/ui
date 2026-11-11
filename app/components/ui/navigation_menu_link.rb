@@ -59,7 +59,7 @@ class UI::NavigationMenuLink < Phlex::HTML
 
     # Override classes if trigger_style is true
     if @trigger_style
-      base_attrs[:class] = TailwindMerge::Merger.new.merge([
+      base_attrs[:class] = UI::ClassMerger.merge([
         navigation_menu_link_trigger_style_classes,
         @classes
       ].compact.join(" "))

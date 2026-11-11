@@ -17,7 +17,7 @@ module UI::DropdownMenuLabelBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base_classes = "px-2 py-1.5 text-sm font-medium data-[inset=true]:pl-8"
 
-    TailwindMerge::Merger.new.merge([base_classes, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base_classes, classes_value].compact.join(" "))
   end
 
   # Returns data attributes

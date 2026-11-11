@@ -8,7 +8,7 @@
 
   # Merge classes
   require "tailwind_merge"
-  all_classes = TailwindMerge::Merger.new.merge([classes].compact.join(" "))
+  all_classes = UI::ClassMerger.merge([classes].compact.join(" "))
 %>
 <div class="<%= all_classes %>" data-slot="aspect-ratio" style="position: relative; width: 100%;">
   <div style="padding-bottom: <%= padding_bottom %>;"></div>

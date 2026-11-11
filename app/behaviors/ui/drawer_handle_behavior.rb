@@ -16,7 +16,7 @@ module UI::DrawerHandleBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def drawer_handle_classes
-    TailwindMerge::Merger.new.merge([drawer_handle_container_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_handle_container_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for handle (Stimulus target only)

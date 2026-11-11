@@ -46,7 +46,7 @@ module UI::SharedAsChildBehavior
     # Example: "p-4 text-sm" + "p-2 text-lg" => "p-2 text-lg"
     # (later values override earlier conflicting values)
     if parent_attrs[:class] && child_attrs[:class]
-      merged[:class] = TailwindMerge::Merger.new.merge(
+      merged[:class] = UI::ClassMerger.merge(
         [parent_attrs[:class], child_attrs[:class]].join(" ")
       )
     end

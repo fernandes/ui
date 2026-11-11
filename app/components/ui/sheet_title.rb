@@ -14,7 +14,7 @@ class UI::SheetTitle < Phlex::HTML
   private
 
   def title_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "text-foreground font-semibold",
       @classes
     ].compact.join(" "))

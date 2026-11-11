@@ -33,7 +33,7 @@ class UI::Skeleton < Phlex::HTML
   def merged_attributes
     {
       data: {slot: "skeleton"},
-      class: TailwindMerge::Merger.new.merge([
+      class: UI::ClassMerger.merge([
         "bg-accent animate-pulse rounded-md",
         @classes
       ].compact.join(" "))

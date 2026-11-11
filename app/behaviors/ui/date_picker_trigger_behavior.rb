@@ -23,7 +23,7 @@ module UI::DatePickerTriggerBehavior
 
   # Trigger classes - button with outline variant style
   def date_picker_trigger_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       # Button base styles
       "inline-flex items-center justify-between gap-2 whitespace-nowrap rounded-md text-sm font-medium",
       "ring-offset-background transition-colors",

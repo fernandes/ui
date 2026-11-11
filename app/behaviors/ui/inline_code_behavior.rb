@@ -19,7 +19,7 @@ module UI::InlineCodeBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def inline_code_classes
-    TailwindMerge::Merger.new.merge([inline_code_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([inline_code_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

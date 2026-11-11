@@ -19,7 +19,7 @@ module UI::MutedBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def muted_classes
-    TailwindMerge::Merger.new.merge([muted_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([muted_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

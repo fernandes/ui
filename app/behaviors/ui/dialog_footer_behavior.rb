@@ -13,7 +13,7 @@ module UI::DialogFooterBehavior
 
   # Returns combined CSS classes for the dialog footer
   def dialog_footer_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       dialog_footer_base_classes,
       @classes
     ].compact.join(" "))

@@ -20,7 +20,7 @@ module UI::TableRowBehavior
   end
 
   def row_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       row_base_classes,
       @classes
     ].compact.join(" "))

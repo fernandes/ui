@@ -11,7 +11,7 @@ module UI::CarouselItemBehavior
 
   # Merge base classes with custom classes
   def carousel_item_classes
-    TailwindMerge::Merger.new.merge([carousel_item_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([carousel_item_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

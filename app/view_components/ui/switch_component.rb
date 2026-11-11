@@ -17,7 +17,7 @@ class UI::SwitchComponent < ViewComponent::Base
     attrs[:id] = @id if @id.present?
 
     # Merge Tailwind classes intelligently
-    attrs[:class] = TailwindMerge::Merger.new.merge([
+    attrs[:class] = UI::ClassMerger.merge([
       switch_html_attributes[:class],
       @attributes[:class]
     ].compact.join(" "))

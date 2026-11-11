@@ -18,7 +18,7 @@ module UI::DrawerOverlayBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def drawer_overlay_classes
-    TailwindMerge::Merger.new.merge([drawer_overlay_base_classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_overlay_base_classes].compact.join(" "))
   end
 
   # Container wrapper classes
@@ -29,7 +29,7 @@ module UI::DrawerOverlayBehavior
 
   # Merge container base classes with custom classes
   def drawer_overlay_container_classes
-    TailwindMerge::Merger.new.merge([drawer_overlay_container_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_overlay_container_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for container

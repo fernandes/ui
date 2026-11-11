@@ -30,7 +30,7 @@ class UI::InputGroupButton < Phlex::HTML
   def view_template(&block)
     # Merge classes from @attributes[:class] with input_group_button_classes
     # This is needed when as_child patterns pass classes through attributes
-    merged_classes = TailwindMerge::Merger.new.merge([
+    merged_classes = UI::ClassMerger.merge([
       input_group_button_classes,
       @attributes[:class]
     ].compact.join(" "))

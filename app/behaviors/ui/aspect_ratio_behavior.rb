@@ -26,7 +26,7 @@ module UI::AspectRatioBehavior
 
   # Merge base classes with custom classes
   def aspect_ratio_classes
-    TailwindMerge::Merger.new.merge([@classes].compact.join(" "))
+    UI::ClassMerger.merge([@classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for aspect ratio container

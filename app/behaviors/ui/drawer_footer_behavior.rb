@@ -12,7 +12,7 @@ module UI::DrawerFooterBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def drawer_footer_classes
-    TailwindMerge::Merger.new.merge([drawer_footer_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_footer_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for footer

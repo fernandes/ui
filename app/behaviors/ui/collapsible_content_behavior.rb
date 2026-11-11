@@ -17,7 +17,7 @@ module UI::CollapsibleContentBehavior
 
   def collapsible_content_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       collapsible_content_base_classes,
       classes_value
     ].compact.join(" "))

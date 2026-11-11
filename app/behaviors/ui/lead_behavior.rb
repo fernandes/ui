@@ -19,7 +19,7 @@ module UI::LeadBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def lead_classes
-    TailwindMerge::Merger.new.merge([lead_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([lead_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

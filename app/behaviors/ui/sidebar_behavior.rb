@@ -31,7 +31,7 @@ module UI::SidebarBehavior
 
   def sidebar_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sidebar_base_classes,
       sidebar_variant_classes,
       classes_value

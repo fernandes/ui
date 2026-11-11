@@ -27,7 +27,7 @@ module UI::FieldErrorBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "text-destructive text-sm font-normal"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 
   # Returns true if errors should be displayed

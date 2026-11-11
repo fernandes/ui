@@ -60,7 +60,7 @@ module UI::DrawerContentBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def drawer_content_classes
-    TailwindMerge::Merger.new.merge([drawer_content_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([drawer_content_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus target (go inside data: hash)

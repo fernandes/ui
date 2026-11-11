@@ -10,7 +10,7 @@ module UI::PaginationPreviousBehavior
 
   # Merge additional classes with custom classes using TailwindMerge
   def previous_classes
-    TailwindMerge::Merger.new.merge([previous_additional_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([previous_additional_classes, @classes].compact.join(" "))
   end
 
   # Merge aria-label with user attributes

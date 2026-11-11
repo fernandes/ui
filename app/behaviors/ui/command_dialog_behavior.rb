@@ -22,7 +22,7 @@ module UI::CommandDialogBehavior
   end
 
   def command_dialog_classes
-    UI::TailwindMerge.merge([command_dialog_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([command_dialog_base_classes, @classes].compact.join(" "))
   end
 
   def command_dialog_html_attributes

@@ -18,7 +18,7 @@ module UI::CardTitleBehavior
 
   def card_title_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       card_title_base_classes,
       classes_value
     ].compact.join(" "))

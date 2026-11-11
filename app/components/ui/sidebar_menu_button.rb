@@ -56,7 +56,7 @@ class UI::SidebarMenuButton < Phlex::HTML
       all_attributes = sidebar_menu_button_html_attributes
 
       if @attributes.key?(:class)
-        merged_class = TailwindMerge::Merger.new.merge([
+        merged_class = UI::ClassMerger.merge([
           all_attributes[:class],
           @attributes[:class]
         ].compact.join(" "))

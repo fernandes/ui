@@ -25,7 +25,7 @@ module UI::ScrollAreaThumbBehavior
   # Returns combined CSS classes
   def scroll_area_thumb_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       scroll_area_thumb_base_classes,
       classes_value
     ].compact.join(" "))

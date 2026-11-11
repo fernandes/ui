@@ -20,7 +20,7 @@ module UI::TableCaptionBehavior
   end
 
   def caption_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       caption_base_classes,
       @classes
     ].compact.join(" "))

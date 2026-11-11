@@ -34,7 +34,7 @@ module UI::SeparatorBehavior
   # Returns combined CSS classes for the separator
   def separator_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       separator_base_classes,
       separator_orientation_classes,
       classes_value

@@ -50,7 +50,7 @@ module UI::SwitchBehavior
   # Returns combined CSS classes for the switch
   def switch_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       switch_base_classes,
       classes_value
     ].compact.join(" "))

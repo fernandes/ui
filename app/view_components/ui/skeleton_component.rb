@@ -9,7 +9,7 @@ class UI::SkeletonComponent < ViewComponent::Base
     attrs = component_html_attributes.deep_merge(@attributes)
 
     # Merge Tailwind classes intelligently
-    attrs[:class] = TailwindMerge::Merger.new.merge([
+    attrs[:class] = UI::ClassMerger.merge([
       component_html_attributes[:class],
       @attributes[:class]
     ].compact.join(" "))

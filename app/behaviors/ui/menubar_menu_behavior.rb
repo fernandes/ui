@@ -22,7 +22,7 @@ module UI::MenubarMenuBehavior
   # Returns combined CSS classes for the menu wrapper
   def menubar_menu_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "relative",
       classes_value
     ].compact.join(" "))

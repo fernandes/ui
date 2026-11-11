@@ -29,6 +29,6 @@ module UI::KbdBehavior
     svg_sizing = "[&_svg:not([class*='size-'])]:size-3"
     tooltip_styling = "[[data-slot=tooltip-content]_&]:bg-background/20 [[data-slot=tooltip-content]_&]:text-background dark:[[data-slot=tooltip-content]_&]:bg-background/10"
 
-    TailwindMerge::Merger.new.merge([base, svg_sizing, tooltip_styling, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, svg_sizing, tooltip_styling, classes_value].compact.join(" "))
   end
 end

@@ -28,7 +28,7 @@ module UI::TooltipTriggerBehavior
   # Returns combined CSS classes for the trigger button
   def tooltip_trigger_classes
     classes_value = instance_variable_defined?(:@classes) ? @classes : nil
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       tooltip_trigger_base_classes,
       classes_value
     ].compact.join(" "))

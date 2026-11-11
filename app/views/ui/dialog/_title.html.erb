@@ -4,7 +4,7 @@
   @classes = local_assigns.fetch(:classes, "")
 
   # Build title classes
-  title_classes = TailwindMerge::Merger.new.merge([
+  title_classes = UI::ClassMerger.merge([
     "text-lg font-semibold",
     @classes
   ].compact.join(" "))

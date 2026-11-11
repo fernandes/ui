@@ -39,7 +39,7 @@ module UI::ToggleGroupItemBehavior
   # Returns combined CSS classes for the toggle group item
   def toggle_group_item_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       toggle_group_item_base_classes,
       toggle_group_item_variant_classes,
       toggle_group_item_size_classes,

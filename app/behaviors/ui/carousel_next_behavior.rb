@@ -11,7 +11,7 @@ module UI::CarouselNextBehavior
 
   # Merge base classes with custom classes
   def carousel_next_classes
-    TailwindMerge::Merger.new.merge([carousel_next_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([carousel_next_base_classes, @classes].compact.join(" "))
   end
 
   # Data attributes for Stimulus action

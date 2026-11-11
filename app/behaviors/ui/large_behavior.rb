@@ -19,7 +19,7 @@ module UI::LargeBehavior
 
   # Merge base classes with custom classes using TailwindMerge
   def large_classes
-    TailwindMerge::Merger.new.merge([large_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([large_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash

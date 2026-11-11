@@ -19,6 +19,6 @@ module UI::FieldDescriptionBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "text-muted-foreground text-sm leading-normal font-normal group-has-[[data-orientation=horizontal]]/field:text-balance last:mt-0 nth-last-2:-mt-1 [[data-variant=legend]+&]:-mt-1.5 [&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 end

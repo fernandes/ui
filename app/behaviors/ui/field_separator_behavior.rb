@@ -21,7 +21,7 @@ module UI::FieldSeparatorBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "relative -my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 
   # Returns true if separator has content (text/label)

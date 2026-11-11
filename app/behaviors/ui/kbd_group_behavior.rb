@@ -19,6 +19,6 @@ module UI::KbdGroupBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "inline-flex items-center gap-1"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 end

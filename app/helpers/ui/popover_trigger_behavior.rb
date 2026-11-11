@@ -17,7 +17,7 @@ module UI::PopoverTriggerBehavior
   # Returns combined CSS classes for the popover trigger
   def popover_trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       popover_trigger_base_classes,
       classes_value
 

@@ -19,6 +19,6 @@ module UI::FieldContentBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "group/field-content flex flex-1 flex-col gap-1.5 leading-snug"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 end

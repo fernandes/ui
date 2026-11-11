@@ -46,7 +46,7 @@ module UI::NavigationMenuBehavior
   # Returns combined CSS classes for the navigation menu
   def navigation_menu_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       "group/navigation-menu relative flex max-w-max flex-1 items-center justify-center",
       classes_value
     ].compact.join(" "))

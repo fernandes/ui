@@ -17,6 +17,6 @@ module UI::ContextMenuSeparatorBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base_classes = "bg-border -mx-1 my-1 h-px"
 
-    TailwindMerge::Merger.new.merge([base_classes, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base_classes, classes_value].compact.join(" "))
   end
 end

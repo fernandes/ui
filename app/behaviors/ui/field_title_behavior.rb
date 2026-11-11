@@ -19,6 +19,6 @@ module UI::FieldTitleBehavior
     classes_value = respond_to?(:classes, true) ? classes : @classes
     base = "flex w-fit items-center gap-2 text-sm leading-snug font-medium group-data-[disabled=true]/field:opacity-50"
 
-    TailwindMerge::Merger.new.merge([base, classes_value].compact.join(" "))
+    UI::ClassMerger.merge([base, classes_value].compact.join(" "))
   end
 end

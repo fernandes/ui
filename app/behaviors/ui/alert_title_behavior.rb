@@ -12,7 +12,7 @@ module UI::AlertTitleBehavior
 
   # Merge base classes with custom classes
   def alert_title_classes
-    TailwindMerge::Merger.new.merge([alert_title_base_classes, @classes].compact.join(" "))
+    UI::ClassMerger.merge([alert_title_base_classes, @classes].compact.join(" "))
   end
 
   # Build complete HTML attributes hash for alert title

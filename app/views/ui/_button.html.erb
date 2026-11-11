@@ -33,14 +33,14 @@
     @attributes = @attributes.deep_merge(data: splatted_data)
   end
   if splatted_class.present?
-    @attributes[:class] = TailwindMerge::Merger.new.merge([@attributes[:class], splatted_class].compact.join(" "))
+    @attributes[:class] = UI::ClassMerger.merge([@attributes[:class], splatted_class].compact.join(" "))
   end
 
   extend UI::ButtonBehavior
   base_attrs = button_html_attributes
 
   # Merge classes using TailwindMerge to properly combine button classes with passed attributes
-  merged_class = TailwindMerge::Merger.new.merge([
+  merged_class = UI::ClassMerger.merge([
     base_attrs[:class],
     @attributes[:class]
   ].compact.join(" "))

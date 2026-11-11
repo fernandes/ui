@@ -28,7 +28,7 @@ module UI::NavigationMenuViewportBehavior
   # Returns combined CSS classes for the viewport
   def navigation_menu_viewport_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       # Base styles
       "origin-top-center bg-popover text-popover-foreground",
       "relative mt-1.5 overflow-hidden rounded-md border shadow",

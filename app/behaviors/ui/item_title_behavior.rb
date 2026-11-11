@@ -16,7 +16,7 @@ module UI::ItemTitleBehavior
   # Returns combined CSS classes
   def item_title_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       item_title_base_classes,
       classes_value
 

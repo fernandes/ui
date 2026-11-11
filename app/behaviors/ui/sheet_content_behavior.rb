@@ -48,7 +48,7 @@ module UI::SheetContentBehavior
 
   # Merge base classes with side classes and custom classes
   def sheet_content_classes
-    TailwindMerge::Merger.new.merge([
+    UI::ClassMerger.merge([
       sheet_content_base_classes,
       sheet_content_side_classes,
       @classes
