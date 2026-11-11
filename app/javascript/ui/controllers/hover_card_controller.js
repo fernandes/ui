@@ -1,8 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 import { setState } from "../utils/state-manager.js"
+import { createEscapeLayer } from "../utils/escape-key-manager.js"
+
+const TABBABLE = 'a[href], button, input, select, textarea, [tabindex], [contenteditable=""], [contenteditable="true"]'
 
 // Hover Card controller for floating content on hover
-// Supports both mouse hover and keyboard focus for accessibility
+// Supports both mouse hover and keyboard focus for accessibility.
+//
+// Like Radix HoverCard, the card is for sighted pointer users: it opens on
+// hover and on keyboard focus of the trigger, Escape dismisses it
+// (WCAG 1.4.13), and the elements inside it are taken out of the Tab order
+// so tabbing past the trigger moves on and closes the card.
 export default class extends Controller {
   static targets = ["trigger", "content"]
   static values = {
@@ -20,6 +28,14 @@ export default class extends Controller {
     // Position content as fixed to overlay on page
     if (this.hasContentTarget) {
       this.contentTarget.style.position = 'fixed'
+      this.removeContentFromTabOrder()
+
+      this.escapeLayer = createEscapeLayer(() => this.close(), { element: this.contentTarget })
+
+      // Focus that reached the card (a click on a link inside) closes it
+      // once it leaves both the card and the trigger
+      this.boundHandleContentFocusOut = this.handleContentFocusOut.bind(this)
+      this.contentTarget.addEventListener('focusout', this.boundHandleContentFocusOut)
     }
 
     // Setup focus/blur handlers on trigger for keyboard accessibility
@@ -33,12 +49,39 @@ export default class extends Controller {
 
   disconnect() {
     this.clearTimeouts()
+    this.escapeLayer?.deactivate()
 
     // Remove focus/blur handlers
     if (this.hasTriggerTarget && this.boundHandleFocus) {
       this.triggerTarget.removeEventListener('focus', this.boundHandleFocus)
       this.triggerTarget.removeEventListener('blur', this.boundHandleBlur)
     }
+
+    if (this.hasContentTarget && this.boundHandleContentFocusOut) {
+      this.contentTarget.removeEventListener('focusout', this.boundHandleContentFocusOut)
+    }
+  }
+
+  // Radix HoverCard: the card's links and buttons are not tab stops
+  removeContentFromTabOrder() {
+    this.contentTarget.querySelectorAll(TABBABLE).forEach(element => {
+      const tabindex = element.getAttribute('tabindex')
+      if (tabindex === null || parseInt(tabindex, 10) >= 0) {
+        element.setAttribute('tabindex', '-1')
+      }
+    })
+  }
+
+  handleContentFocusOut(event) {
+    const next = event.relatedTarget
+    if (next && (this.contentTarget.contains(next) || this.triggerTarget?.contains(next))) return
+    this.hide()
+  }
+
+  // Close at once (Escape)
+  close() {
+    this.clearTimeouts()
+    this.closeNow()
   }
 
   // Open on focus (for keyboard navigation)
@@ -61,9 +104,11 @@ export default class extends Controller {
 
     this.showTimeout = setTimeout(() => {
       this.openValue = true
+      this.removeContentFromTabOrder()
       this.contentTarget.classList.remove('invisible')
       this.contentTarget.classList.add('visible')
       setState(this.contentTarget, 'open')
+      this.escapeLayer?.activate()
       this.positionContent()
     }, this.openDelayValue)
   }
@@ -71,12 +116,16 @@ export default class extends Controller {
   hide() {
     this.clearTimeouts()
 
-    this.hideTimeout = setTimeout(() => {
-      this.openValue = false
-      this.contentTarget.classList.remove('visible')
-      this.contentTarget.classList.add('invisible')
-      setState(this.contentTarget, 'closed')
-    }, this.closeDelayValue)
+    this.hideTimeout = setTimeout(() => this.closeNow(), this.closeDelayValue)
+  }
+
+  closeNow() {
+    this.hideTimeout = null
+    this.openValue = false
+    this.escapeLayer?.deactivate()
+    this.contentTarget.classList.remove('visible')
+    this.contentTarget.classList.add('invisible')
+    setState(this.contentTarget, 'closed')
   }
 
   keepOpen() {

@@ -42,6 +42,11 @@ module UI
         content.hover
       end
 
+      # Give the trigger keyboard focus (opens the card like a Tab would)
+      def focus_trigger
+        trigger.execute_script("this.focus()")
+      end
+
       # === State Queries ===
 
       # Check if the hover card content is visible

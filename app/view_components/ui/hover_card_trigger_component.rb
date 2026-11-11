@@ -20,10 +20,10 @@ class UI::HoverCardTriggerComponent < ViewComponent::Base
   include UI::HoverCardTriggerBehavior
 
   # @param as_child [Boolean] If true, yields attributes to block instead of wrapping
-  # @param tag [Symbol] HTML tag to use for the trigger (default: :span)
+  # @param tag [Symbol] HTML tag to use for the trigger (default: :a — pass href: for a link)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(as_child: false, tag: :span, classes: "", **attributes)
+  def initialize(as_child: false, tag: DEFAULT_TRIGGER_TAG, classes: "", **attributes)
     @as_child = as_child
     @tag = tag
     @classes = classes
@@ -45,8 +45,7 @@ class UI::HoverCardTriggerComponent < ViewComponent::Base
 
   def call
     # Default: render with full styling and tabindex for keyboard focus
-    attrs = trigger_html_attributes.merge(@attributes)
-    attrs[:tabindex] ||= "0" if @tag == :span || @tag == :div
+    attrs = trigger_element_attributes(trigger_html_attributes.merge(@attributes), @tag)
     content_tag @tag, **attrs do
       content
     end

@@ -20,10 +20,10 @@ class UI::HoverCardTrigger < Phlex::HTML
   include UI::HoverCardTriggerBehavior
 
   # @param as_child [Boolean] If true, yields attributes to block instead of rendering wrapper
-  # @param tag [Symbol] HTML tag to use for the trigger (default: :span)
+  # @param tag [Symbol] HTML tag to use for the trigger (default: :a — pass href: for a link)
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
-  def initialize(as_child: false, tag: :span, classes: "", **attributes)
+  def initialize(as_child: false, tag: DEFAULT_TRIGGER_TAG, classes: "", **attributes)
     @as_child = as_child
     @tag = tag
     @classes = classes
@@ -37,10 +37,9 @@ class UI::HoverCardTrigger < Phlex::HTML
       # Yield attributes to block - child must accept and apply them
       yield(trigger_attrs) if block_given?
     else
-      # Add tabindex for keyboard focus on non-focusable elements
-      trigger_attrs[:tabindex] ||= "0" if [:span, :div].include?(@tag)
-      # Default: render as specified tag (span by default)
-      public_send(@tag, **trigger_attrs, &block)
+      # Default: render as specified tag (<a> by default); non-focusable
+      # tags get tabindex="0" so keyboard focus can open the card
+      public_send(@tag, **trigger_element_attributes(trigger_attrs, @tag), &block)
     end
   end
 end

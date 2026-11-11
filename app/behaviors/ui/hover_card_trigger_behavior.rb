@@ -13,6 +13,20 @@ module UI::HoverCardTriggerBehavior
     }.merge(attributes_value)
   end
 
+  # Default trigger tag. Radix renders an <a>: a hover card usually previews
+  # what a link points to, so pass `href:` and screen readers get a link.
+  DEFAULT_TRIGGER_TAG = :a
+
+  # Attributes for the default (non as_child) trigger element. A tag that
+  # isn't focusable on its own (<span>, <div>, an <a> without href) gets
+  # tabindex="0" so keyboard focus can open the card.
+  def trigger_element_attributes(attrs, tag)
+    attrs = attrs.dup
+    focusable = (tag.to_sym == :a) ? attrs.key?(:href) : !%i[span div].include?(tag.to_sym)
+    attrs[:tabindex] = "0" unless focusable || attrs.key?(:tabindex)
+    attrs
+  end
+
   # Returns combined CSS classes for the hover card trigger
   def trigger_classes
     classes_value = respond_to?(:classes, true) ? classes : @classes

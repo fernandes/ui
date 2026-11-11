@@ -138,9 +138,9 @@ class HoverCardTest < UI::SystemTestCase
   test "works without asChild pattern" do
     hover_card = find_element(UI::Testing::HoverCardElement, "#default-hover-card [data-controller='ui--hover-card']")
 
-    # Trigger should be a span when not using asChild
+    # Trigger defaults to a link (like Radix) when not using asChild
     trigger = hover_card.trigger
-    assert_equal "span", trigger.tag_name, "Trigger should be a span element without asChild"
+    assert_equal "a", trigger.tag_name, "Trigger should be a link without asChild"
 
     hover_card.show
 
@@ -213,5 +213,36 @@ class HoverCardTest < UI::SystemTestCase
 
     # Should stay open
     assert hover_card.visible?, "Should stay open during rapid movement to content"
+  end
+
+  # === Accessibility ===
+
+  test "Escape closes the hover card" do
+    hover_card = find_element(UI::Testing::HoverCardElement, "#basic-hover-card [data-controller='ui--hover-card']")
+
+    hover_card.show
+    page.send_keys(:escape)
+    hover_card.wait_for_hidden_content
+
+    assert hover_card.closed?
+  end
+
+  test "Tab from the trigger skips the card and closes it" do
+    hover_card = find_element(UI::Testing::HoverCardElement, "#default-hover-card [data-controller='ui--hover-card']")
+
+    hover_card.focus_trigger
+    hover_card.wait_for_visible_content
+    page.send_keys(:tab)
+    hover_card.wait_for_hidden_content
+
+    assert_equal "after-default-hover-card", page.evaluate_script("document.activeElement.id")
+    assert hover_card.closed?
+  end
+
+  test "default trigger renders as a link" do
+    hover_card = find_element(UI::Testing::HoverCardElement, "#default-hover-card [data-controller='ui--hover-card']")
+
+    assert_equal "a", hover_card.trigger.tag_name
+    assert hover_card.trigger[:href].present?
   end
 end

@@ -90,13 +90,13 @@
     <div class="space-y-2">
       <h2 class="text-2xl font-semibold">Without asChild (ERB)</h2>
       <p class="text-sm text-muted-foreground">
-        Default trigger without composition - renders as a span element.
+        Default trigger without composition - renders as a link (pass <code>href:</code>).
       </p>
     </div>
     <div class="flex items-center gap-2">
       <span class="text-sm">Hover over</span>
       <%= render "ui/hover_card" do %>
-        <%= render "ui/hover_card/trigger", classes: "cursor-pointer font-medium underline underline-offset-4" do %>
+        <%= render "ui/hover_card/trigger", href: "#default-hover-card", classes: "cursor-pointer font-medium underline underline-offset-4" do %>
           this trigger
         <% end %>
 
@@ -104,13 +104,15 @@
           <div class="space-y-2">
             <h4 class="text-sm font-semibold">Default Trigger</h4>
             <p class="text-sm text-muted-foreground">
-              This trigger doesn't use asChild, so it renders as a simple span element
+              This trigger doesn't use asChild, so it renders as a link
               with hover card functionality.
             </p>
+            <a href="#alignment-hover-cards" class="text-sm underline">Card link</a>
           </div>
         <% end %>
       <% end %>
       <span class="text-sm">for basic example.</span>
+      <button type="button" id="after-default-hover-card" class="text-sm underline">After</button>
     </div>
   </div>
 

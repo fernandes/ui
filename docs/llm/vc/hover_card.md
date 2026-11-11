@@ -50,7 +50,7 @@ For sighted users to preview content available behind a link.
 ### TriggerComponent
 
 - `as_child` (Boolean, default: false) - Enable composition
-- `tag` (Symbol, default: :span) - HTML tag when not using asChild
+- `tag` (Symbol, default: :a) - HTML tag when not using asChild. Pass `href:` so the default `<a>` is a real link; tags that are not focusable on their own get `tabindex="0"`
 - `classes` (String) - Additional CSS classes
 - `attributes` (Hash) - Additional HTML attributes
 
@@ -96,6 +96,17 @@ For sighted users to preview content available behind a link.
   <% end %>
 <% end %>
 ```
+
+## Accessibility
+
+Like Radix HoverCard, the card is a preview for sighted pointer users:
+
+- Opens on hover and on keyboard focus of the trigger; Escape closes it (WCAG 1.4.13)
+- Links and buttons inside the card are taken out of the Tab order (`tabindex="-1"`), so Tab
+  from the trigger moves on and the card closes. Don't put anything essential only in the card.
+- Focus that does reach the card (a click on a link inside) closes it once it leaves
+- The default trigger is an `<a>`: pass `href:` (or use `as_child` with a link/button) so screen
+  readers get a real link or button
 
 ## See Also
 

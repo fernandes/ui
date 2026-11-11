@@ -1,7 +1,8 @@
 <%# HoverCard Trigger - shadcn/ui inspired component for Rails %>
 <%
   @as_child = local_assigns.fetch(:as_child, false)
-  @tag = local_assigns.fetch(:tag, :span)
+  @tag = local_assigns.fetch(:tag, UI::HoverCardTriggerBehavior::DEFAULT_TRIGGER_TAG)
+  @href = local_assigns.fetch(:href, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
@@ -10,18 +11,15 @@
 
   # Get HTML attributes from behavior
   trigger_attrs = trigger_html_attributes.deep_merge(@attributes)
-
-  # Add tabindex for keyboard focus on non-focusable elements
-  if [:span, :div].include?(@tag) && !trigger_attrs.key?(:tabindex)
-    trigger_attrs[:tabindex] = "0"
-  end
+  trigger_attrs[:href] = @href if @href
 -%>
 <% if @as_child %>
   <%# Yield attributes to block - child must accept and apply them %>
   <%= yield(trigger_attrs) if block_given? %>
 <% else %>
   <%# Default: render as specified tag %>
-  <%= content_tag @tag, trigger_attrs do %>
+  <%# Keyboard focus opens the card: non-focusable tags get tabindex="0" %>
+  <%= content_tag @tag, trigger_element_attributes(trigger_attrs, @tag) do %>
     <%= yield %>
   <% end %>
 <% end %>
