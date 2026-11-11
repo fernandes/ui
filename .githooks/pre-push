@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+#
+# pre-push: bloqueia o push se lint ou testes rápidos falharem.
+#
+# Espelha os jobs `lint` e `test` do .github/workflows/ci.yml.
+# Os system tests (Playwright) ficam apenas no CI por serem lentos.
+#
+# Ativar (uma vez por clone):  git config core.hooksPath .githooks
+# Pular pontualmente:          git push --no-verify  (ou SKIP_HOOKS=1 git push)
+
+set -uo pipefail
+
+if [ "${SKIP_HOOKS:-}" = "1" ]; then
+  echo "pre-push: SKIP_HOOKS=1, pulando verificações"
+  exit 0
+fi
+
+root="$(git rev-parse --show-toplevel)"
+cd "$root" || exit 1
+
+# Usa mise quando disponível para garantir as versões de Ruby/Bun do projeto
+if command -v mise >/dev/null 2>&1; then
+  run() { mise exec -- "$@"; }
+else
+  run() { "$@"; }
+fi
+
+failed=()
+
+step() {
+  local name="$1"
+  shift
+  echo ""
+  echo "──▶ $name"
+  if "$@"; then
+    echo "  ✔ $name"
+  else
+    echo "  ✘ $name"
+    failed+=("$name")
+  fi
+}
+
+# bun test depende dos node_modules da raiz e do dummy app
+[ -d node_modules ] || run bun install
+[ -d test/dummy/node_modules ] || (cd test/dummy && run bun install)
+
+step "standardrb" run bundle exec standardrb
+step "rails test" run bundle exec rails test
+step "bun test" run bun test
+
+echo ""
+if [ ${#failed[@]} -ne 0 ]; then
+  echo "pre-push: push abortado — falhou: ${failed[*]}"
+  echo "Corrija (standardrb --fix ajuda no lint) ou use 'git push --no-verify' se souber o que está fazendo."
+  exit 1
+fi
+
+echo "pre-push: tudo verde, seguindo com o push"
+exit 0

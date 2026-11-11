@@ -220,6 +220,34 @@ This runs both the Rails server and Tailwind CSS watcher simultaneously.
 
 ## Development
 
+### Git Hooks
+
+Ative o hook de `pre-push` uma vez por clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Antes de cada push ele roda `standardrb`, `bundle exec rails test` e `bun test` (os mesmos jobs `lint` e `test` do CI) e aborta o push se algum falhar. Os system tests com Playwright ficam só no CI por serem lentos.
+
+Para pular pontualmente: `git push --no-verify` ou `SKIP_HOOKS=1 git push`.
+
+### Running Tests
+
+```bash
+bundle exec standardrb          # lint (Ruby Standard Style)
+bundle exec standardrb --fix    # corrige automaticamente
+bundle exec rails test          # testes unitários
+bun test                        # testes JavaScript (Bun + happy-dom)
+bundle exec rails test:system   # system tests (Playwright/Chromium)
+```
+
+Os system tests exigem os assets do dummy app compilados:
+
+```bash
+cd test/dummy && bun install && bun run build:css && bun run build:js
+```
+
 ### Running the Dummy App
 
 The engine includes a dummy Rails application for testing:
