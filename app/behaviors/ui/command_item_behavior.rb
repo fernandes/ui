@@ -29,7 +29,7 @@ module UI::CommandItemBehavior
     attrs = {
       slot: "command-item",
       ui__command_target: "item",
-      action: "click->ui--command#select",
+      action: "click->ui--command#select pointermove->ui--command#highlight",
       value: @value || ""
     }
     attrs[:disabled] = "" if @disabled

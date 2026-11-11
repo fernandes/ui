@@ -7,13 +7,19 @@ require "tailwind_merge"
 # Shared behavior for CommandGroup component.
 module UI::CommandGroupBehavior
   def command_group_html_attributes
-    attrs = {
+    # aria-labelledby → heading is wired by the controller (per-instance id)
+    {
       class: command_group_classes,
       data: command_group_data_attributes,
       role: "group"
     }
-    attrs["aria-labelledby"] = @heading_id if @heading.present?
-    attrs
+  end
+
+  def command_group_heading_html_attributes
+    {
+      class: command_group_heading_classes,
+      data: {slot: "command-group-heading"}
+    }
   end
 
   def command_group_classes

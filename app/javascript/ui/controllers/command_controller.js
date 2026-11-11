@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
 
 // Command controller for command palette functionality
 // Implements filtering, keyboard navigation, and item selection
@@ -12,6 +13,7 @@ export default class extends Controller {
   connect() {
     this.selectedIndex = -1
     this.updateVisibility()
+    this.wireAria()
 
     // Listen at the document level because popover:show / drawer:show are
     // dispatched on the popover/drawer root — an ANCESTOR of this Command.
@@ -37,6 +39,29 @@ export default class extends Controller {
     document.removeEventListener("drawer:show",  this._boundHandleShow)
     document.removeEventListener("popover:hide", this._boundHandleHide)
     document.removeEventListener("drawer:hide",  this._boundHandleHide)
+  }
+
+  // Ids and relationships, wired client-side so all three renderers share
+  // them (cmdk / React Aria useComboBox): the input controls the list, the
+  // list is named, each group is named by its heading and every item has an
+  // id the input can point at with aria-activedescendant.
+  wireAria() {
+    if (this.hasListTarget) {
+      ensureId(this.listTarget, "command-list")
+      if (!this.listTarget.hasAttribute("aria-label") && !this.listTarget.hasAttribute("aria-labelledby")) {
+        this.listTarget.setAttribute("aria-label", "Suggestions")
+      }
+      if (this.hasInputTarget) setIdRefs(this.inputTarget, "aria-controls", this.listTarget)
+    }
+    this.groupTargets.forEach((group) => {
+      const heading = group.querySelector('[data-slot="command-group-heading"]')
+      if (heading) setIdRefs(group, "aria-labelledby", heading, { prefix: "command-group-heading" })
+    })
+    this.itemTargets.forEach((item) => ensureId(item, "command-item"))
+  }
+
+  itemTargetConnected(item) {
+    ensureId(item, "command-item")
   }
 
   handleShow() {
@@ -171,7 +196,7 @@ export default class extends Controller {
   selectCurrent(items) {
     if (this.selectedIndex >= 0 && this.selectedIndex < items.length) {
       const item = items[this.selectedIndex]
-      if (!item.dataset.disabled) {
+      if (!this.isDisabled(item)) {
         this.triggerSelect(item)
       }
     }
@@ -179,9 +204,22 @@ export default class extends Controller {
 
   select(event) {
     const item = event.currentTarget
-    if (!item.dataset.disabled) {
+    if (!this.isDisabled(item)) {
       this.triggerSelect(item)
     }
+  }
+
+  // Pointer moves the highlight, like cmdk (onPointerMove)
+  highlight(event) {
+    const index = this.visibleItems.indexOf(event.currentTarget)
+    if (index === -1 || index === this.selectedIndex) return
+    this.selectedIndex = index
+    this.updateSelection({ scroll: false })
+  }
+
+  // Ruby renders `data-disabled=""` (an empty string), so check presence
+  isDisabled(item) {
+    return item.hasAttribute("data-disabled") || item.getAttribute("aria-disabled") === "true"
   }
 
   triggerSelect(item) {
@@ -207,21 +245,28 @@ export default class extends Controller {
     // via data-action attribute on the item element
   }
 
-  updateSelection() {
-    const items = this.visibleItems
+  updateSelection({ scroll = true } = {}) {
+    const active = this.visibleItems[this.selectedIndex] || null
 
-    items.forEach((item, index) => {
-      const isSelected = index === this.selectedIndex
+    // Every item, not only the visible ones: a filtered-out or disabled item
+    // must not keep a stale highlight
+    this.itemTargets.forEach((item) => {
+      const isSelected = item === active
       item.dataset.selected = isSelected
       item.setAttribute("aria-selected", isSelected)
-
-      if (isSelected) {
-        item.scrollIntoView({ block: "nearest" })
-        if (this.hasListTarget) {
-          this.listTarget.setAttribute("aria-activedescendant", item.id || "")
-        }
-      }
     })
+
+    if (active && scroll) active.scrollIntoView?.({ block: "nearest" })
+
+    // The input keeps DOM focus; the highlighted option is exposed through
+    // aria-activedescendant on the input (React Aria useComboBox)
+    if (this.hasInputTarget) {
+      if (active) {
+        this.inputTarget.setAttribute("aria-activedescendant", ensureId(active, "command-item"))
+      } else {
+        this.inputTarget.removeAttribute("aria-activedescendant")
+      }
+    }
   }
 
   updateVisibility() {
@@ -234,6 +279,6 @@ export default class extends Controller {
   }
 
   get visibleItems() {
-    return this.itemTargets.filter(item => !item.hidden && !item.dataset.disabled)
+    return this.itemTargets.filter(item => !item.hidden && !this.isDisabled(item))
   }
 }

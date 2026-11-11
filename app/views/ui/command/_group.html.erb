@@ -8,7 +8,6 @@
   # @param attributes [Hash] Additional HTML attributes
 
   @heading = local_assigns.fetch(:heading, nil)
-  @heading_id = "command-group-#{SecureRandom.hex(4)}" if @heading
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
@@ -17,7 +16,7 @@
 %>
 <%= content_tag :div, all_attributes do %>
   <% if @heading %>
-    <div class="<%= command_group_heading_classes %>" id="<%= @heading_id %>"><%= @heading %></div>
+    <%= content_tag :div, @heading, **command_group_heading_html_attributes %>
   <% end %>
   <%= yield %>
 <% end %>

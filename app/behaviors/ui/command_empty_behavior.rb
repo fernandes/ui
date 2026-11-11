@@ -7,9 +7,12 @@ require "tailwind_merge"
 # Shared behavior for CommandEmpty component.
 module UI::CommandEmptyBehavior
   def command_empty_html_attributes
+    # A polite live region, so "No results" is announced when it appears
     {
       class: command_empty_classes,
-      data: command_empty_data_attributes
+      data: command_empty_data_attributes,
+      role: "status",
+      "aria-live": "polite"
     }
   end
 
