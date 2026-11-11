@@ -253,6 +253,29 @@ render UI::Drawer::Drawer.new(modal: false) do
 end
 ```
 
+## Responsive Dialog
+
+Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
+
+```ruby
+render UI::ResponsiveDialog.new(breakpoint: 768, direction: "bottom") do |rd|
+  rd.with_trigger { "Edit profile" }
+  rd.with_content do
+    render UI::DialogTitle.new { "Edit profile" }
+    render UI::DialogDescription.new { "Make changes to your profile here." }
+    render UI::Input.new(id: "name", value: "Pedro Duarte", "aria-label": "Name")
+  end
+end
+```
+
+The body is rendered **once** (inside the Dialog) and the controller moves it
+into whichever variant is visible, so ids in it stay unique. A heading in the
+body (a Dialog/Drawer Title, or any `h1`–`h6`) names the dialog; a
+Dialog/Drawer Description describes it. `open: true` opens only the visible
+variant. Crossing the breakpoint while open closes the hidden variant and opens
+the visible one (focus, inert background and scroll lock move with it).
+Anything with `data-action="click->ui--responsive-dialog#close"` closes it.
+
 ## asChild Pattern
 
 The `Trigger` component supports the `as_child` pattern for composition:

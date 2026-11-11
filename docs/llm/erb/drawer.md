@@ -260,79 +260,30 @@ Background remains interactive when drawer is open:
 <% end %>
 ```
 
-## Responsive Dialog Pattern
+## Responsive Dialog
 
 Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
 
 ```erb
-<div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
-  <!-- Mobile: Drawer -->
-  <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-    <%= render "ui/drawer/drawer" do %>
-      <%= render "ui/drawer/trigger" do %>
-        Edit Profile (Mobile)
-      <% end %>
-      <%= render "ui/drawer/overlay" %>
-      <%= render "ui/drawer/content" do %>
-        <%= render "ui/drawer/handle" %>
-        <%= render "ui/drawer/header", classes: "text-left" do %>
-          <%= render "ui/drawer/title" do %>
-            Edit profile
-          <% end %>
-          <%= render "ui/drawer/description" do %>
-            Make changes to your profile.
-          <% end %>
-        <% end %>
-        <div class="grid gap-4 px-4">
-          <%= render "ui/label/label", for: "name-drawer" do %>
-            Name
-          <% end %>
-          <%= render "ui/input/input", id: "name-drawer", value: "Pedro Duarte" %>
-        </div>
-        <%= render "ui/drawer/footer", classes: "pt-2" do %>
-          <%= render "ui/button/button", variant: :default do %>
-            Save changes
-          <% end %>
-          <%= render "ui/drawer/close" do %>
-            Cancel
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-
-  <!-- Desktop: Dialog -->
-  <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-    <%= render "ui/dialog/dialog" do %>
-      <%= render "ui/dialog/trigger" do %>
-        Edit Profile (Desktop)
-      <% end %>
-      <%= render "ui/dialog/overlay" %>
-      <%= render "ui/dialog/content" do %>
-        <%= render "ui/dialog/header" do %>
-          <%= render "ui/dialog/title" do %>
-            Edit profile
-          <% end %>
-          <%= render "ui/dialog/description" do %>
-            Make changes to your profile.
-          <% end %>
-        <% end %>
-        <div class="grid gap-4 py-4">
-          <%= render "ui/label/label", for: "name" do %>
-            Name
-          <% end %>
-          <%= render "ui/input/input", id: "name", value: "Pedro Duarte" %>
-        </div>
-        <%= render "ui/dialog/footer" do %>
-          <%= render "ui/button/button", variant: :default do %>
-            Save changes
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-</div>
+<%= render "ui/responsive_dialog", trigger: "Edit profile", breakpoint: 768, direction: "bottom" do %>
+  <%= render "ui/dialog/header" do %>
+    <%= render "ui/dialog/title" do %>Edit profile<% end %>
+    <%= render "ui/dialog/description" do %>Make changes to your profile here.<% end %>
+  <% end %>
+  <%= render "ui/input", id: "name", value: "Pedro Duarte", attributes: { "aria-label": "Name" } %>
+<% end %>
 ```
+
+Locals: `trigger:` (String or proc, rendered in both variants), `open:`,
+`breakpoint:`, `direction:` (drawer), `classes:`, `attributes:`.
+
+The body is rendered **once** (inside the Dialog) and the controller moves it
+into whichever variant is visible, so ids in it stay unique. A heading in the
+body (a Dialog/Drawer Title, or any `h1`–`h6`) names the dialog; a
+Dialog/Drawer Description describes it. `open: true` opens only the visible
+variant. Crossing the breakpoint while open closes the hidden variant and opens
+the visible one (focus, inert background and scroll lock move with it).
+Anything with `data-action="click->ui--responsive-dialog#close"` closes it.
 
 ## asChild Pattern
 

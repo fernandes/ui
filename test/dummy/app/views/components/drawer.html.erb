@@ -547,193 +547,44 @@
     <div class="space-y-2">
       <h2 class="text-2xl font-semibold">Responsive Dialog</h2>
       <p class="text-sm text-muted-foreground">
-        Shows Dialog on desktop (≥768px) and Drawer on mobile (&lt;768px). Resize browser to see it switch!
+        Shows Dialog on desktop (≥768px) and Drawer on mobile (&lt;768px). The body is rendered once and moved into
+        the visible one; resize while open to hand over.
       </p>
     </div>
 
-    <!-- Phlex -->
-    <div class="space-y-2">
-      <h3 class="text-lg font-medium">Phlex</h3>
-      <div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
-        <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-          <%= render UI::Drawer.new do %>
-            <%= render UI::DrawerTrigger.new do %>
-              Edit Profile (Mobile)
-            <% end %>
-            <%= render UI::DrawerOverlay.new %>
-            <%= render UI::DrawerContent.new do %>
-              <%= render UI::DrawerHandle.new %>
-              <%= render UI::DrawerHeader.new(classes: "text-left") do %>
-                <%= render UI::DrawerTitle.new { "Edit profile" } %>
-                <%= render UI::DrawerDescription.new { "Make changes to your profile." } %>
-              <% end %>
-              <div class="grid gap-4 px-4">
-                <div class="space-y-2">
-                  <%= render UI::Label.new(for: "name-phlex") { "Name" } %>
-                  <%= render UI::Input.new(id: "name-phlex", value: "Pedro Duarte") %>
-                </div>
-              </div>
-              <%= render UI::DrawerFooter.new(classes: "pt-2") do %>
-                <%= render UI::Button.new { "Save" } %>
-                <%= render UI::DrawerClose.new { "Cancel" } %>
-              <% end %>
-            <% end %>
+    <div class="flex flex-wrap gap-4">
+      <%= render UI::ResponsiveDialog.new(id: "responsive-dialog-phlex") do |rd| %>
+        <% rd.with_trigger { "Edit profile (Phlex)" } %>
+        <% rd.with_content do %>
+          <%= render UI::DialogHeader.new do %>
+            <%= render UI::DialogTitle.new { "Edit profile" } %>
+            <%= render UI::DialogDescription.new { "Make changes to your profile here." } %>
           <% end %>
-        </div>
-        <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-          <%= render UI::Dialog.new do %>
-            <%= render UI::DialogTrigger.new do %>
-              Edit Profile (Desktop)
-            <% end %>
-            <%= render UI::DialogOverlay.new %>
-            <%= render UI::DialogContent.new do %>
-              <%= render UI::DialogHeader.new do %>
-                <%= render UI::DialogTitle.new { "Edit profile" } %>
-                <%= render UI::DialogDescription.new { "Make changes to your profile." } %>
-              <% end %>
-              <div class="grid gap-4 py-4">
-                <div class="grid grid-cols-4 items-center gap-4">
-                  <%= render UI::Label.new(for: "name-phlex-d", classes: "text-right") { "Name" } %>
-                  <%= render UI::Input.new(id: "name-phlex-d", value: "Pedro Duarte", classes: "col-span-3") %>
-                </div>
-              </div>
-              <%= render UI::DialogFooter.new do %>
-                <%= render UI::Button.new { "Save" } %>
-              <% end %>
-            <% end %>
+          <%= form_with url: "#", method: :post, class: "grid gap-4 p-4" do %>
+            <%= render UI::Input.new(id: "responsive-name-phlex", value: "Pedro Duarte", "aria-label": "Name") %>
+            <%= render UI::Button.new(type: "button", data: {action: "click->ui--responsive-dialog#close"}) { "Save changes" } %>
           <% end %>
-        </div>
-      </div>
-    </div>
+        <% end %>
+      <% end %>
 
-    <!-- ERB -->
-    <div class="space-y-2">
-      <h3 class="text-lg font-medium">ERB</h3>
-      <div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
-        <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-          <%= render "ui/drawer" do %>
-            <%= render "ui/drawer/trigger" do %>
-              Edit Profile (Mobile)
-            <% end %>
-            <%= render "ui/drawer/overlay" %>
-            <%= render "ui/drawer/content" do %>
-              <%= render "ui/drawer/handle" %>
-              <%= render "ui/drawer/header", classes: "text-left" do %>
-                <%= render "ui/drawer/title" do %>
-                  Edit profile
-                <% end %>
-                <%= render "ui/drawer/description" do %>
-                  Make changes to your profile.
-                <% end %>
-              <% end %>
-              <div class="grid gap-4 px-4">
-                <div class="space-y-2">
-                  <%= render "ui/label", for: "name-erb" do %>
-                    Name
-                  <% end %>
-                  <%= render "ui/input", id: "name-erb", value: "Pedro Duarte" %>
-                </div>
-              </div>
-              <%= render "ui/drawer/footer", classes: "pt-2" do %>
-                <%= render "ui/button" do %>
-                  Save
-                <% end %>
-                <%= render "ui/drawer/close" do %>
-                  Cancel
-                <% end %>
-              <% end %>
-            <% end %>
-          <% end %>
+      <%= render "ui/responsive_dialog", trigger: "Edit profile (ERB)", attributes: { id: "responsive-dialog-erb" } do %>
+        <%= render "ui/dialog/header" do %>
+          <%= render "ui/dialog/title" do %>Edit profile<% end %>
+          <%= render "ui/dialog/description" do %>Make changes to your profile here.<% end %>
+        <% end %>
+        <div class="p-4">
+          <%= render "ui/input", id: "responsive-name-erb", value: "Pedro Duarte", attributes: { "aria-label": "Name" } %>
         </div>
-        <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-          <%= render UI::Dialog.new do %>
-            <%= render UI::DialogTrigger.new do %>
-              Edit Profile (Desktop)
-            <% end %>
-            <%= render UI::DialogOverlay.new %>
-            <%= render UI::DialogContent.new do %>
-              <%= render UI::DialogHeader.new do %>
-                <%= render UI::DialogTitle.new { "Edit profile" } %>
-                <%= render UI::DialogDescription.new { "Make changes to your profile." } %>
-              <% end %>
-              <div class="grid gap-4 py-4">
-                <div class="grid grid-cols-4 items-center gap-4">
-                  <%= render UI::Label.new(for: "name-erb-d", classes: "text-right") { "Name" } %>
-                  <%= render UI::Input.new(id: "name-erb-d", value: "Pedro Duarte", classes: "col-span-3") %>
-                </div>
-              </div>
-              <%= render UI::DialogFooter.new do %>
-                <%= render UI::Button.new { "Save" } %>
-              <% end %>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-    </div>
+      <% end %>
 
-    <!-- ViewComponent -->
-    <div class="space-y-2">
-      <h3 class="text-lg font-medium">ViewComponent</h3>
-      <div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
-        <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-          <%= render UI::DrawerComponent.new do %>
-            <%= render UI::DrawerTriggerComponent.new do %>
-              Edit Profile (Mobile)
-            <% end %>
-            <%= render UI::DrawerOverlayComponent.new %>
-            <%= render UI::DrawerContentComponent.new do %>
-              <%= render UI::DrawerHandleComponent.new %>
-              <%= render UI::DrawerHeaderComponent.new(classes: "text-left") do %>
-                <%= render UI::DrawerTitleComponent.new do %>
-                  Edit profile
-                <% end %>
-                <%= render UI::DrawerDescriptionComponent.new do %>
-                  Make changes to your profile.
-                <% end %>
-              <% end %>
-              <div class="grid gap-4 px-4">
-                <div class="space-y-2">
-                  <%= render UI::LabelComponent.new(for: "name-vc") do %>
-                    Name
-                  <% end %>
-                  <%= render UI::InputComponent.new(id: "name-vc", value: "Pedro Duarte") %>
-                </div>
-              </div>
-              <%= render UI::DrawerFooterComponent.new(classes: "pt-2") do %>
-                <%= render UI::ButtonComponent.new do %>
-                  Save
-                <% end %>
-                <%= render UI::DrawerCloseComponent.new do %>
-                  Cancel
-                <% end %>
-              <% end %>
-            <% end %>
-          <% end %>
+      <%= render UI::ResponsiveDialogComponent.new(attributes: { id: "responsive-dialog-vc" }) do |rd| %>
+        <% rd.with_trigger { "Edit profile (ViewComponent)" } %>
+        <%= render UI::DialogTitleComponent.new.with_content("Edit profile") %>
+        <%= render UI::DialogDescriptionComponent.new.with_content("Make changes to your profile here.") %>
+        <div class="p-4">
+          <%= render UI::InputComponent.new(id: "responsive-name-vc", value: "Pedro Duarte", "aria-label": "Name") %>
         </div>
-        <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-          <%= render UI::Dialog.new do %>
-            <%= render UI::DialogTrigger.new do %>
-              Edit Profile (Desktop)
-            <% end %>
-            <%= render UI::DialogOverlay.new %>
-            <%= render UI::DialogContent.new do %>
-              <%= render UI::DialogHeader.new do %>
-                <%= render UI::DialogTitle.new { "Edit profile" } %>
-                <%= render UI::DialogDescription.new { "Make changes to your profile." } %>
-              <% end %>
-              <div class="grid gap-4 py-4">
-                <div class="grid grid-cols-4 items-center gap-4">
-                  <%= render UI::Label.new(for: "name-vc-d", classes: "text-right") { "Name" } %>
-                  <%= render UI::Input.new(id: "name-vc-d", value: "Pedro Duarte", classes: "col-span-3") %>
-                </div>
-              </div>
-              <%= render UI::DialogFooter.new do %>
-                <%= render UI::Button.new { "Save" } %>
-              <% end %>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
+      <% end %>
     </div>
   </section>
 

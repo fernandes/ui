@@ -1,44 +1,57 @@
-<%# ResponsiveDialog Component - Combines Dialog (desktop) and Drawer (mobile) %>
-<%#
-  Hybrid CSS + Stimulus approach:
-  - Renders both Dialog and Drawer
-  - CSS hides one based on breakpoint (md:hidden / md:block)
-  - Stimulus controller syncs state between them
+<%# ResponsiveDialog - Dialog on desktop, Drawer on mobile.
+    Renders both, hiding one with CSS. The block (body) is rendered ONCE,
+    inside the Dialog; the controller moves it into the visible variant,
+    syncs open state and hands over when the breakpoint is crossed.
 
-  Usage:
-  <%= render "ui/responsive_dialog/responsive_dialog",
-             open: false,
-             breakpoint: 768,
-             direction: "bottom" do %>
-    <%# Content goes here - will be rendered in both Dialog and Drawer %>
-  <% end %>
+    render "ui/responsive_dialog", open: false, trigger: "Edit profile" do
+      (body: a heading names the dialog)
+    end
 %>
 <%
   content ||= local_assigns.fetch(:content, nil)
+  trigger = local_assigns.fetch(:trigger, nil)
   @open = local_assigns.fetch(:open, false)
   @breakpoint = local_assigns.fetch(:breakpoint, 768)
   @direction = local_assigns.fetch(:direction, "bottom")
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 
-  # Extend behavior for shared logic
   extend UI::ResponsiveDialogBehavior
 
-  # Get HTML attributes from behavior
-  all_attributes = responsive_dialog_html_attributes.deep_merge(@attributes)
+  # Nested partials reassign @attributes/@direction on this view: read
+  # everything into locals before rendering any of them
+  direction = @direction
+  root_attributes = responsive_dialog_html_attributes
+  body = content || capture { yield }
+  trigger_body = trigger.respond_to?(:call) ? trigger.call : trigger
 -%>
-<%= content_tag :div, all_attributes do %>
-  <%# Mobile: Drawer (hidden on md and up) %>
-  <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-    <%= render "ui/drawer/drawer", open: @open, direction: @direction do %>
-      <%= content || yield %>
+<%= content_tag :div, **root_attributes do %>
+  <%# Mobile: Drawer. Children render closed; the controller opens the visible one %>
+  <%= content_tag :div, **responsive_dialog_variant_attributes(:drawer) do %>
+    <%= render "ui/drawer", direction: direction do %>
+      <% if trigger_body %>
+        <%= render "ui/drawer/trigger" do %><%= trigger_body %><% end %>
+      <% end %>
+      <%= render "ui/drawer/overlay" %>
+      <%= render "ui/drawer/content", direction: direction do %>
+        <%= content_tag :div, "", **responsive_dialog_slot_attributes(:drawer) %>
+      <% end %>
     <% end %>
-  </div>
+  <% end %>
 
-  <%# Desktop: Dialog (hidden below md) %>
-  <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-    <%= render "ui/dialog/dialog", open: @open do %>
-      <%= content || yield %>
+  <%# Desktop: Dialog. The body lives here until the controller moves it %>
+  <%= content_tag :div, **responsive_dialog_variant_attributes(:dialog) do %>
+    <%= render "ui/dialog" do %>
+      <% if trigger_body %>
+        <%= render "ui/dialog/trigger" do %><%= trigger_body %><% end %>
+      <% end %>
+      <%= render "ui/dialog/overlay" do %>
+        <%= render "ui/dialog/content" do %>
+          <%= content_tag :div, **responsive_dialog_slot_attributes(:dialog) do %>
+            <%= content_tag :div, body, **responsive_dialog_body_attributes %>
+          <% end %>
+        <% end %>
+      <% end %>
     <% end %>
-  </div>
+  <% end %>
 <% end %>

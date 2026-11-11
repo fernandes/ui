@@ -24,11 +24,9 @@
 class UI::ResponsiveDialogComponent < ViewComponent::Base
   include UI::ResponsiveDialogBehavior
 
-  # @param open [Boolean] whether the dialog/drawer is open
-  # @param breakpoint [Integer] responsive breakpoint in pixels (default: 768 = md)
-  # @param direction [String] drawer direction: "bottom", "top", "left", "right"
-  # @param classes [String] additional CSS classes
-  # @param attributes [Hash] additional HTML attributes
+  # Trigger content, rendered in both variants (only one is visible)
+  renders_one :trigger
+
   def initialize(
     open: false,
     breakpoint: 768,
@@ -44,38 +42,40 @@ class UI::ResponsiveDialogComponent < ViewComponent::Base
   end
 
   def call
-    attrs = responsive_dialog_html_attributes
-    attrs[:data] = attrs[:data].merge(@attributes.fetch(:data, {}))
-
-    content_tag :div, **attrs.merge(@attributes.except(:data)) do
-      # Mobile: Drawer (hidden on md and up)
-      mobile_wrapper + desktop_wrapper
+    content_tag :div, **responsive_dialog_html_attributes do
+      content_tag(:div, **responsive_dialog_variant_attributes(:drawer)) { render_drawer } +
+        content_tag(:div, **responsive_dialog_variant_attributes(:dialog)) { render_dialog }
     end
   end
 
   private
 
-  def mobile_wrapper
-    content_tag :div, class: "md:hidden", data: {"ui--responsive-dialog-target": "drawer"} do
-      render_drawer
-    end
-  end
-
-  def desktop_wrapper
-    content_tag :div, class: "hidden md:block", data: {"ui--responsive-dialog-target": "dialog"} do
-      render_dialog
-    end
-  end
-
+  # Children render closed: the controller opens only the visible one
   def render_drawer
-    render UI::DrawerComponent.new(open: @open, direction: @direction) do
-      content
+    render UI::DrawerComponent.new(open: false, direction: @direction) do
+      safe_join([
+        (render(UI::DrawerTriggerComponent.new.with_content(trigger.to_s)) if trigger?),
+        render(UI::DrawerOverlayComponent.new),
+        render(UI::DrawerContentComponent.new(direction: @direction)) do
+          content_tag(:div, "", **responsive_dialog_slot_attributes(:drawer))
+        end
+      ].compact)
     end
   end
 
+  # The body (content) is rendered once, here; the controller moves it to the drawer
   def render_dialog
-    render UI::DialogComponent.new(open: @open) do
-      content
+    render UI::DialogComponent.new(open: false) do
+      safe_join([
+        (render(UI::DialogTriggerComponent.new.with_content(trigger.to_s)) if trigger?),
+        render(UI::DialogOverlayComponent.new) do
+          render(UI::DialogContentComponent.new) do
+            content_tag(:div, **responsive_dialog_slot_attributes(:dialog)) do
+              content_tag(:div, content, **responsive_dialog_body_attributes)
+            end
+          end
+        end
+      ].compact)
     end
   end
 end

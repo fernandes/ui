@@ -277,79 +277,28 @@ Background remains interactive when drawer is open:
 <% end %>
 ```
 
-## Responsive Dialog Pattern
+## Responsive Dialog
 
 Show Dialog on desktop (≥768px) and Drawer on mobile (<768px):
 
 ```erb
-<div data-controller="ui--responsive-dialog" data-ui--responsive-dialog-breakpoint-value="768">
-  <!-- Mobile: Drawer -->
-  <div class="md:hidden" data-ui--responsive-dialog-target="drawer">
-    <%= render UI::Drawer::DrawerComponent.new do %>
-      <%= render UI::Drawer::TriggerComponent.new do %>
-        Edit Profile (Mobile)
-      <% end %>
-      <%= render UI::Drawer::OverlayComponent.new %>
-      <%= render UI::Drawer::ContentComponent.new do %>
-        <%= render UI::Drawer::HandleComponent.new %>
-        <%= render UI::Drawer::HeaderComponent.new(classes: "text-left") do %>
-          <%= render UI::Drawer::TitleComponent.new do %>
-            Edit profile
-          <% end %>
-          <%= render UI::Drawer::DescriptionComponent.new do %>
-            Make changes to your profile.
-          <% end %>
-        <% end %>
-        <div class="grid gap-4 px-4">
-          <%= render UI::Label::LabelComponent.new(for: "name-drawer") do %>
-            Name
-          <% end %>
-          <%= render UI::Input::InputComponent.new(id: "name-drawer", value: "Pedro Duarte") %>
-        </div>
-        <%= render UI::Drawer::FooterComponent.new(classes: "pt-2") do %>
-          <%= render UI::Button::ButtonComponent.new do %>
-            Save changes
-          <% end %>
-          <%= render UI::Drawer::CloseComponent.new do %>
-            Cancel
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-
-  <!-- Desktop: Dialog -->
-  <div class="hidden md:block" data-ui--responsive-dialog-target="dialog">
-    <%= render UI::Dialog::DialogComponent.new do %>
-      <%= render UI::Dialog::TriggerComponent.new do %>
-        Edit Profile (Desktop)
-      <% end %>
-      <%= render UI::Dialog::OverlayComponent.new %>
-      <%= render UI::Dialog::ContentComponent.new do %>
-        <%= render UI::Dialog::HeaderComponent.new do %>
-          <%= render UI::Dialog::TitleComponent.new do %>
-            Edit profile
-          <% end %>
-          <%= render UI::Dialog::DescriptionComponent.new do %>
-            Make changes to your profile.
-          <% end %>
-        <% end %>
-        <div class="grid gap-4 py-4">
-          <%= render UI::Label::LabelComponent.new(for: "name") do %>
-            Name
-          <% end %>
-          <%= render UI::Input::InputComponent.new(id: "name", value: "Pedro Duarte") %>
-        </div>
-        <%= render UI::Dialog::FooterComponent.new do %>
-          <%= render UI::Button::ButtonComponent.new do %>
-            Save changes
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-</div>
+<%= render UI::ResponsiveDialogComponent.new(breakpoint: 768, direction: "bottom") do |rd| %>
+  <% rd.with_trigger { "Edit profile" } %>
+  <%= render UI::DialogTitleComponent.new.with_content("Edit profile") %>
+  <%= render UI::DialogDescriptionComponent.new.with_content("Make changes to your profile here.") %>
+  <%= render UI::InputComponent.new(id: "name", value: "Pedro Duarte", "aria-label": "Name") %>
+<% end %>
 ```
+
+The block content is the body; the `trigger` slot is rendered in both variants.
+
+The body is rendered **once** (inside the Dialog) and the controller moves it
+into whichever variant is visible, so ids in it stay unique. A heading in the
+body (a Dialog/Drawer Title, or any `h1`–`h6`) names the dialog; a
+Dialog/Drawer Description describes it. `open: true` opens only the visible
+variant. Crossing the breakpoint while open closes the hidden variant and opens
+the visible one (focus, inert background and scroll lock move with it).
+Anything with `data-action="click->ui--responsive-dialog#close"` closes it.
 
 ## asChild Pattern
 

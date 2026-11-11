@@ -126,50 +126,10 @@ describe("ResponsiveDialogController", () => {
   })
 
   describe("Open/Close", () => {
-    test("opens on desktop", async () => {
-      mockMatchMedia(true) // Desktop
-      container.innerHTML = createResponsiveDialog()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      let dialogOpenEventFired = false
-      const dialog = container.querySelector('[data-testid="dialog"]')
-      dialog.addEventListener("dialog:open", () => {
-        dialogOpenEventFired = true
-      })
-
-      const trigger = container.querySelector('[data-testid="trigger"]')
-      trigger.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-controller="ui--responsive-dialog"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--responsive-dialog")
-
-      expect(controller.openValue).toBe(true)
-      expect(dialogOpenEventFired).toBe(true)
-    })
-
-    test("opens on mobile", async () => {
-      mockMatchMedia(false) // Mobile
-      container.innerHTML = createResponsiveDialog()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      let drawerOpenEventFired = false
-      const drawer = container.querySelector('[data-testid="drawer"]')
-      drawer.addEventListener("drawer:open", () => {
-        drawerOpenEventFired = true
-      })
-
-      const trigger = container.querySelector('[data-testid="trigger"]')
-      trigger.click()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-controller="ui--responsive-dialog"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--responsive-dialog")
-
-      expect(controller.openValue).toBe(true)
-      expect(drawerOpenEventFired).toBe(true)
-    })
-
+    // "opens on desktop" / "opens on mobile" / "syncs state when breakpoint
+    // changes" asserted dialog:open / drawer:open events that no controller
+    // listened to (audit: Responsive Dialog #1). Replaced by black-box tests
+    // with real Dialog/Drawer children in responsive_dialog_accessibility.test.js.
     test("closes component", async () => {
       mockMatchMedia(true) // Desktop
       container.innerHTML = createResponsiveDialog()
@@ -210,36 +170,6 @@ describe("ResponsiveDialogController", () => {
   })
 
   describe("Breakpoint handling", () => {
-    test("syncs state when breakpoint changes", async () => {
-      mockMatchMedia(true) // Start as desktop
-      container.innerHTML = createResponsiveDialog()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      const element = container.querySelector('[data-controller="ui--responsive-dialog"]')
-      const controller = application.getControllerForElementAndIdentifier(element, "ui--responsive-dialog")
-
-      // Open while on desktop
-      controller.open()
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      let drawerOpenEventFired = false
-
-      const drawer = container.querySelector('[data-testid="drawer"]')
-      drawer.addEventListener("drawer:open", () => {
-        drawerOpenEventFired = true
-      })
-
-      // Mock mediaQuery to return mobile
-      controller.mediaQuery = { matches: false }
-
-      // Simulate breakpoint change to mobile
-      controller.handleBreakpointChange({ matches: false })
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      // Should open drawer when switching to mobile while open
-      expect(drawerOpenEventFired).toBe(true)
-    })
-
     test("dispatches resize event on breakpoint change", async () => {
       mockMatchMedia(true) // Start as desktop
       container.innerHTML = createResponsiveDialog()
@@ -256,6 +186,7 @@ describe("ResponsiveDialogController", () => {
       })
 
       // Simulate breakpoint change to mobile
+      controller.mediaQuery = { matches: false }
       controller.handleBreakpointChange({ matches: false })
       await new Promise(resolve => setTimeout(resolve, 10))
 

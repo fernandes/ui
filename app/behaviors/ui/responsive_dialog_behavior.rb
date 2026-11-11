@@ -39,6 +39,26 @@ module UI::ResponsiveDialogBehavior
     )
   end
 
+  # The caller's body, rendered once inside the Dialog; the controller moves
+  # it into the Drawer below the breakpoint (no duplicated ids).
+  # `contents` keeps its children laid out by the content's grid/flex.
+  def responsive_dialog_body_attributes
+    {class: "contents", data: {ui__responsive_dialog_target: "body"}}
+  end
+
+  # Where the body goes in each variant's content (:drawer or :dialog)
+  def responsive_dialog_slot_attributes(type)
+    {class: "contents", data: {ui__responsive_dialog_target: "#{type}Slot"}}
+  end
+
+  # Wrapper that shows a variant only on its side of the breakpoint
+  def responsive_dialog_variant_attributes(type)
+    {
+      class: (type == :drawer) ? "md:hidden" : "hidden md:block",
+      data: {ui__responsive_dialog_target: type.to_s}
+    }
+  end
+
   # Base CSS classes
   def responsive_dialog_base_classes
     ""
