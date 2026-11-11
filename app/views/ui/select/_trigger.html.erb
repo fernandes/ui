@@ -2,7 +2,10 @@
 <%
   @as_child = local_assigns.fetch(:as_child, false)
   @classes = local_assigns.fetch(:classes, "")
-  @attributes = local_assigns.fetch(:attributes, {})
+  # Other locals (id:, aria-label:, ...) are HTML attributes, like Phlex/VC
+  # **attributes — so `id:` reaches the button and <label for> works
+  @attributes = local_assigns.except(:as_child, :classes, :attributes, :placeholder)
+    .deep_merge(local_assigns.fetch(:attributes, {}))
   @placeholder = local_assigns.fetch(:placeholder, "Select...")
 
   # Extend behavior for shared logic

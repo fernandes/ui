@@ -207,6 +207,46 @@ class SelectTest < UI::SystemTestCase
     assert select.option_disabled?("Angular (Coming Soon)")
   end
 
+  # === Focus (screen readers announce the focused option) ===
+
+  test "the highlighted option has DOM focus" do
+    select = fruits_select
+
+    select.trigger.native.focus
+    select.press_arrow_down
+
+    assert select.open?
+    assert_equal "Apple", select.focused_option
+
+    select.navigate_down
+    assert_equal "Banana", select.focused_option
+  end
+
+  test "Tab while open closes the listbox and moves on" do
+    select = fruits_select
+
+    select.trigger.native.focus
+    select.press_arrow_down
+    assert select.open?
+
+    select.press_tab
+    select.wait_for_closed
+
+    assert select.closed?
+    assert_equal "", select.focused_option
+    refute select.trigger_focused?, "Tab should move past the trigger"
+  end
+
+  test "typing a letter on the closed trigger selects the matching option" do
+    select = fruits_select
+
+    select.trigger.native.focus
+    select.send_keys("g")
+
+    assert select.closed?
+    assert_equal "Grape", select.selected
+  end
+
   # === State Persistence Tests ===
 
   test "maintains selection after closing and reopening" do

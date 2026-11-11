@@ -200,10 +200,16 @@ end
 
 ## Keyboard Navigation
 
-- **↓ / ↑** - Navigate through items
+- **↓ / ↑** on the closed trigger - Open (Enter / Space too)
+- **Letters** on the closed trigger - Select the matching item without opening
+- **↓ / ↑** - Navigate through items (focus moves onto the option)
+- **Letters** - Typeahead: focus the next item starting with the typed text
 - **Home / End** - Jump to first/last item
-- **Enter / Space** - Select focused item
-- **Esc** - Close dropdown
+- **Enter / Space** - Select focused item, focus returns to the trigger
+- **Esc** - Close dropdown (only the select, not a dialog around it)
+- **Tab** - Close and move on
+
+Ids, `aria-controls` (trigger → listbox) and group `aria-labelledby` (→ its label) are wired by the controller.
 
 ## Integration Patterns
 

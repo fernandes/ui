@@ -27,7 +27,7 @@ module UI::SelectItemBehavior
       attrs[:data][:state] = "disabled"
     end
 
-    attrs.merge(attributes_value || {})
+    attrs.deep_merge(attributes_value || {})
   end
 
   # Returns combined CSS classes

@@ -182,6 +182,25 @@ module UI
         highlighted&.text&.strip
       end
 
+      # Text of the option that has DOM focus ("" when focus is elsewhere)
+      #
+      # @return [String]
+      #
+      def focused_option
+        page.evaluate_script(<<~JS)
+          (() => {
+            const el = document.activeElement
+            return el && el.getAttribute("role") === "option" ? el.textContent.trim() : ""
+          })()
+        JS
+      end
+
+      # Whether the trigger has DOM focus
+      def trigger_focused?
+        page.evaluate_script("document.activeElement?.dataset?.uiSelectTarget === 'trigger'") &&
+          page.evaluate_script("document.activeElement.closest('[data-controller=\"ui--select\"]').id") == node[:id]
+      end
+
       # === Sub-elements ===
 
       # Get the trigger button element

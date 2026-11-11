@@ -16,10 +16,10 @@ module UI::SelectTriggerBehavior
       class: select_trigger_classes,
       data: {
         ui__select_target: "trigger",
-        action: "click->ui--select#toggle",
+        action: "click->ui--select#toggle keydown->ui--select#handleTriggerKeydown",
         slot: "select-trigger"
       }
-    }.merge(attributes_value || {})
+    }.deep_merge(attributes_value || {})
   end
 
   # Returns combined CSS classes

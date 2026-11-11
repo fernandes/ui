@@ -1,5 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 import { computePosition, flip, shift, offset, size } from "@floating-ui/dom"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
+import { createEscapeLayer } from "../utils/escape-key-manager.js"
+import { createTypeahead, isTypeaheadKey } from "../utils/typeahead.js"
+
+// Keys that open a closed select from its trigger (Radix OPEN_KEYS; Enter
+// and Space already open it through the native button click)
+const OPEN_KEYS = ["ArrowDown", "ArrowUp"]
+
+// The highlighted option gets real DOM focus (tabindex=-1), like Radix
+// Select: screen readers announce it without depending on
+// aria-activedescendant support on a button, and the trigger stays a plain
+// button with aria-controls -> listbox.
 
 // Connects to data-controller="ui--select"
 export default class extends Controller {
@@ -41,8 +53,16 @@ export default class extends Controller {
     // Hide content initially using invisible pattern (not display:none)
     this.contentTarget.dataset.state = "closed"
 
-    // Setup keyboard navigation
+    this.wireAria()
+    this.typeahead = createTypeahead()
+    this.escapeLayer = createEscapeLayer(() => this.close(), { element: this.contentTarget })
+
+    // Keyboard navigation while open: listen on the root (trigger and options
+    // live inside it), bound once so Turbo reconnects don't stack listeners
     this.boundHandleKeydown = this.handleKeydown.bind(this)
+    this.element.addEventListener("keydown", this.boundHandleKeydown)
+    this.boundHandleFocusout = this.handleFocusout.bind(this)
+    this.element.addEventListener("focusout", this.boundHandleFocusout)
 
     // Setup scroll handler
     this.boundHandleScroll = this.handleScroll.bind(this)
@@ -51,6 +71,27 @@ export default class extends Controller {
       // Adding both via addEventListener AND data-action for maximum compatibility
       this.viewportTarget.addEventListener("scroll", this.boundHandleScroll, { passive: true })
     }
+  }
+
+  // Ids and relationships (X1): trigger -> listbox, options, group -> label
+  wireAria() {
+    ensureId(this.contentTarget, "select-content")
+    setIdRefs(this.triggerTarget, "aria-controls", this.contentTarget)
+    this.itemTargets.forEach((item) => this.prepareItem(item))
+    this.element.querySelectorAll('[data-slot="select-group"]').forEach((group) => {
+      const label = group.querySelector('[data-slot="select-label"]')
+      if (label) setIdRefs(group, "aria-labelledby", label, { prefix: "select-label" })
+    })
+  }
+
+  itemTargetConnected(item) {
+    this.prepareItem(item)
+  }
+
+  prepareItem(item) {
+    ensureId(item, "select-item")
+    // Focusable by script, not by Tab
+    if (!item.hasAttribute("tabindex")) item.setAttribute("tabindex", "-1")
   }
 
   // Callback when value changes externally (e.g., from another controller)
@@ -83,11 +124,14 @@ export default class extends Controller {
     // Position using Floating UI and set CSS variables
     await this.updatePosition()
 
+    this.escapeLayer.activate()
+
     // Setup click outside
     this.boundHandleClickOutside = this.handleClickOutside.bind(this)
     setTimeout(() => {
-      document.addEventListener("click", this.boundHandleClickOutside)
-      document.addEventListener("keydown", this.boundHandleKeydown)
+      if (this.openValue && this.boundHandleClickOutside) {
+        document.addEventListener("click", this.boundHandleClickOutside)
+      }
     }, 0)
 
     // Check scroll button visibility after content is fully rendered
@@ -100,19 +144,20 @@ export default class extends Controller {
     this.focusItem(this.getSelectedItem() || this.getFirstItem())
   }
 
-  close() {
+  close({ restoreFocus = true } = {}) {
     this.openValue = false
+    this.escapeLayer.deactivate()
+    this.typeahead.reset()
     this.contentTarget.dataset.state = "closed"
     this.triggerTarget.setAttribute("aria-expanded", "false")
 
     if (this.boundHandleClickOutside) {
       document.removeEventListener("click", this.boundHandleClickOutside)
-      document.removeEventListener("keydown", this.boundHandleKeydown)
       this.boundHandleClickOutside = null
     }
 
     // Return focus to trigger
-    this.triggerTarget.focus()
+    if (restoreFocus) this.triggerTarget.focus()
   }
 
   async updatePosition() {
@@ -159,7 +204,7 @@ export default class extends Controller {
     const item = event.currentTarget
     const value = item.dataset.value
 
-    if (item.dataset.disabled === "true") return
+    if (this.isDisabled(item)) return
 
     this.valueValue = value
     this.updateDisplay(value)
@@ -213,11 +258,58 @@ export default class extends Controller {
     }
   }
 
-  // Keyboard navigation
+  // Keys on the closed trigger: arrows open, printable keys select the
+  // matching option directly (Radix SelectTrigger)
+  handleTriggerKeydown(event) {
+    if (this.openValue) return
+
+    if (OPEN_KEYS.includes(event.key)) {
+      event.preventDefault()
+      this.open()
+      return
+    }
+
+    if (isTypeaheadKey(event) && !(event.key === " " && !this.typeahead.isTyping)) {
+      event.preventDefault()
+      const current = this.itemTargets.find((item) => item.dataset.value === this.valueValue) || null
+      const match = this.typeahead.search(event.key, this.getEnabledItems(), current)
+      if (match) this.commitValue(match.dataset.value)
+    }
+  }
+
+  // Focus leaving the select for another element closes it
+  handleFocusout(event) {
+    if (!this.openValue) return
+    const next = event.relatedTarget
+    if (next && !this.element.contains(next)) this.close({ restoreFocus: false })
+  }
+
+  // Keyboard navigation while open. Handled keys stop here so a container
+  // (a Calendar's grid, a Dialog) doesn't act on them too.
   handleKeydown(event) {
     if (!this.openValue) return
+    // The keydown that just opened the select from the trigger
+    if (event.target === this.triggerTarget && OPEN_KEYS.includes(event.key) && event.defaultPrevented) return
 
     const currentItem = this.getFocusedItem()
+
+    // Tab moves on: close and put focus back on the trigger, so the browser's
+    // default Tab continues from there (React Aria / Base UI)
+    if (event.key === "Tab") {
+      this.close()
+      return
+    }
+
+    if (isTypeaheadKey(event) && !(event.key === " " && !this.typeahead.isTyping)) {
+      event.preventDefault()
+      event.stopPropagation()
+      const match = this.typeahead.search(event.key, this.getEnabledItems(), currentItem)
+      if (match) this.focusItem(match)
+      return
+    }
+
+    const handled = ["ArrowDown", "ArrowUp", "Enter", " ", "Home", "End"]
+    if (handled.includes(event.key)) event.stopPropagation()
 
     switch (event.key) {
       case "ArrowDown":
@@ -235,10 +327,6 @@ export default class extends Controller {
           currentItem.click()
         }
         break
-      case "Escape":
-        event.preventDefault()
-        this.close()
-        break
       case "Home":
         event.preventDefault()
         this.focusItem(this.getFirstItem())
@@ -251,10 +339,22 @@ export default class extends Controller {
   }
 
   getFocusedItem() {
-    return this.itemTargets.find(item =>
-      item.classList.contains("bg-accent") ||
-      item.classList.contains("text-accent-foreground")
-    )
+    return this.itemTargets.find(item => item.dataset.highlighted === "true")
+  }
+
+  isDisabled(item) {
+    return item.dataset.disabled === "true" || item.getAttribute("aria-disabled") === "true"
+  }
+
+  // Select a value without a click (typeahead on the closed trigger)
+  commitValue(value) {
+    this.valueValue = value
+    this.updateDisplay(value)
+    this.updateSelection(value)
+    if (this.hasHiddenInputTarget) {
+      this.hiddenInputTarget.value = value
+      this.hiddenInputTarget.dispatchEvent(new Event("change", { bubbles: true }))
+    }
   }
 
   getSelectedItem() {
@@ -271,7 +371,7 @@ export default class extends Controller {
   }
 
   getEnabledItems() {
-    return this.itemTargets.filter(item => item.dataset.disabled !== "true")
+    return this.itemTargets.filter(item => !this.isDisabled(item))
   }
 
   focusItem(item, scrollDirection = null) {
@@ -286,6 +386,7 @@ export default class extends Controller {
     // Add focus to target item
     item.classList.add("bg-accent", "text-accent-foreground")
     item.dataset.highlighted = "true"
+    this.moveFocusTo(item)
 
     // Check if this is first or last item
     const items = this.getEnabledItems()
@@ -332,6 +433,16 @@ export default class extends Controller {
       // Default behavior for first/last items or no direction
       item.scrollIntoView({ block: "nearest", behavior: "auto" })
     }
+  }
+
+  // Real focus on the option. The content may still be visibility:hidden on
+  // the frame it opens (CSS transition), so retry on the next frames.
+  moveFocusTo(item, attempts = 3) {
+    item.focus({ preventScroll: true })
+    if (document.activeElement === item || attempts <= 0 || !this.openValue) return
+    requestAnimationFrame(() => {
+      if (item.dataset.highlighted === "true") this.moveFocusTo(item, attempts - 1)
+    })
   }
 
   focusNextItem(currentItem) {
@@ -433,7 +544,7 @@ export default class extends Controller {
     if (!this.openValue) return
 
     const item = event.currentTarget
-    if (item.dataset.disabled === "true") return
+    if (this.isDisabled(item)) return
 
     this.focusItem(item)
   }
@@ -445,9 +556,12 @@ export default class extends Controller {
 
   disconnect() {
     this.stopScroll()
+    this.escapeLayer?.deactivate()
+    this.typeahead?.reset()
+    this.element.removeEventListener("keydown", this.boundHandleKeydown)
+    this.element.removeEventListener("focusout", this.boundHandleFocusout)
     if (this.boundHandleClickOutside) {
       document.removeEventListener("click", this.boundHandleClickOutside)
-      document.removeEventListener("keydown", this.boundHandleKeydown)
     }
     if (this.boundHandleScroll && this.hasViewportTarget) {
       this.viewportTarget.removeEventListener("scroll", this.boundHandleScroll)

@@ -18,7 +18,7 @@ module UI::SelectContentBehavior
       role: "listbox",
       # CSS variables for positioning (set by JavaScript)
       style: "box-sizing: border-box; display: flex; flex-direction: column; outline: none;"
-    }.merge(attributes_value || {})
+    }.deep_merge(attributes_value || {})
   end
 
   # Returns combined CSS classes

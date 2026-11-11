@@ -294,7 +294,7 @@ describe("SelectController", () => {
       expect(content.dataset.state).toBe("open")
 
       const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
-      document.dispatchEvent(escapeEvent)
+      document.activeElement.dispatchEvent(escapeEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(content.dataset.state).toBe("closed")
@@ -309,7 +309,7 @@ describe("SelectController", () => {
       await new Promise(resolve => setTimeout(resolve, 50))
 
       const arrowDownEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      document.dispatchEvent(arrowDownEvent)
+      document.activeElement.dispatchEvent(arrowDownEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Check that some item is highlighted
@@ -327,16 +327,16 @@ describe("SelectController", () => {
 
       // Go down first
       const arrowDownEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      document.dispatchEvent(arrowDownEvent)
+      document.activeElement.dispatchEvent(arrowDownEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Go down again
-      document.dispatchEvent(arrowDownEvent)
+      document.activeElement.dispatchEvent(arrowDownEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Go up
       const arrowUpEvent = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true })
-      document.dispatchEvent(arrowUpEvent)
+      document.activeElement.dispatchEvent(arrowUpEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const highlightedItem = container.querySelector('[data-highlighted="true"]')
@@ -353,12 +353,12 @@ describe("SelectController", () => {
 
       // Navigate to an item
       const arrowDownEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      document.dispatchEvent(arrowDownEvent)
+      document.activeElement.dispatchEvent(arrowDownEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Select with Enter
       const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      document.dispatchEvent(enterEvent)
+      document.activeElement.dispatchEvent(enterEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const element = container.querySelector('[data-controller="ui--select"]')
@@ -377,13 +377,13 @@ describe("SelectController", () => {
 
       // Navigate down a couple times
       const arrowDownEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-      document.dispatchEvent(arrowDownEvent)
-      document.dispatchEvent(arrowDownEvent)
+      document.activeElement.dispatchEvent(arrowDownEvent)
+      document.activeElement.dispatchEvent(arrowDownEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Press Home
       const homeEvent = new KeyboardEvent("keydown", { key: "Home", bubbles: true })
-      document.dispatchEvent(homeEvent)
+      document.activeElement.dispatchEvent(homeEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const appleItem = container.querySelector('[data-testid="item-apple"]')
@@ -400,7 +400,7 @@ describe("SelectController", () => {
 
       // Press End
       const endEvent = new KeyboardEvent("keydown", { key: "End", bubbles: true })
-      document.dispatchEvent(endEvent)
+      document.activeElement.dispatchEvent(endEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const orangeItem = container.querySelector('[data-testid="item-orange"]')

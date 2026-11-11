@@ -14,7 +14,7 @@ module UI::SelectGroupBehavior
       data: {
         slot: "select-group" # ADDED: data-slot attribute
       }
-    }.merge(attributes_value || {})
+    }.deep_merge(attributes_value || {})
   end
 
   # Returns combined CSS classes
