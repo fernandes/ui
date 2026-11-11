@@ -424,6 +424,28 @@ module UI
         end
       end
 
+      # === Focus ===
+
+      # Whether the focused element is inside this component
+      def focus_inside?
+        node.evaluate_script("this.contains(document.activeElement)")
+      end
+
+      # Whether something other than <body> has focus (focus wasn't lost)
+      def page_has_focus?
+        node.evaluate_script("document.activeElement !== document.body && document.activeElement !== null")
+      end
+
+      # Accessible text of the focused element
+      def focused_text
+        node.evaluate_script("document.activeElement && document.activeElement.textContent.trim()")
+      end
+
+      # Press a key on whatever element has focus
+      def keyboard(*keys)
+        node.session.send_keys(*keys)
+      end
+
       private
 
       def find_trigger(menu_name)

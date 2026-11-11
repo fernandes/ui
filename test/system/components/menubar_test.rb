@@ -366,4 +366,30 @@ class MenubarTest < UI::SystemTestCase
     menu.close_menu
     assert menu.menu_closed?("Edit")
   end
+
+  # === Focus (real browser: Tab order, focus restore) ===
+
+  test "keyboard open focuses the first item; Escape returns to the trigger" do
+    menu = menubar
+    first_item = menu.menu_items("File").first
+    assert menu.focus_inside?, "pointer open should focus the menu"
+
+    menu.keyboard(:down)
+    assert menu.focused_text.start_with?(first_item), "expected #{first_item} focused, got #{menu.focused_text}"
+
+    menu.keyboard(:escape)
+    menu.wait_for_all_closed
+    assert_equal "File", menu.focused_text
+  end
+
+  test "Tab from an open menu closes it and leaves the menubar" do
+    menu = menubar
+    menu.open_menu("File")
+    menu.keyboard(:down)
+
+    menu.keyboard(:tab)
+    menu.wait_for_all_closed
+    assert menu.page_has_focus?, "focus dropped to <body>"
+    refute menu.focus_inside?, "focus stayed in the menubar"
+  end
 end

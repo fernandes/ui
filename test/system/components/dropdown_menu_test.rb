@@ -119,4 +119,26 @@ class DropdownMenuTest < UI::SystemTestCase
     assert menu1.closed?
     assert menu2.open?
   end
+
+  # === Focus (real browser: Tab order, focus restore) ===
+
+  test "Escape returns focus to the trigger" do
+    menu = basic_menu
+    menu.open
+    assert menu.focus_inside?, "opening should focus the first item"
+
+    menu.keyboard(:escape)
+    menu.wait_for_closed
+    assert menu.focus_inside?, "focus should be back on the trigger"
+  end
+
+  test "Tab from an open menu closes it and moves on past the menu button" do
+    menu = basic_menu
+    menu.open
+
+    menu.keyboard(:tab)
+    menu.wait_for_closed
+    assert menu.page_has_focus?, "focus dropped to <body>"
+    refute menu.focus_inside?, "focus stayed in the dropdown"
+  end
 end

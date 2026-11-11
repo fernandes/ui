@@ -315,10 +315,7 @@ module UI
       assert menu.has_item?("Settings")
 
       menu.select_item("Settings")
-      assert menu.open?, "Menu should remain open after clicking item"
-
-      menu.close
-      assert menu.closed?
+      assert menu.closed?, "Selecting an item closes the menu"
     end
 
     test "ViewComponent complete example has all features" do
