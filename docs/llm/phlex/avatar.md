@@ -45,7 +45,7 @@ end
 
 **Parameters:**
 - `src:` String (required) - Image source URL
-- `alt:` String - Alternative text for the image (default: "")
+- `alt:` String - Alternative text for the image (default: `""`, which marks the image decorative). **Required** whenever the avatar is the only thing naming the person: once the image loads the fallback is hidden, so an empty `alt` leaves it with no accessible name
 - `classes:` String - Additional Tailwind CSS classes to merge
 - `**attributes` Hash - Any additional HTML attributes
 
@@ -307,7 +307,7 @@ render UI::Avatar::Image.new(
 ## Accessibility
 
 **Alt Text:**
-- Always provide meaningful `alt` text for images
+- Pass a meaningful `alt` unless the avatar is decorative (the person's name is already next to it, e.g. in a user menu row). The default `alt: ""` hides the image from screen readers, and once it loads the fallback initials are hidden too, so a standalone avatar with no `alt` has no name at all
 - Describe who the avatar represents
 - Example: "Chester Nelson's profile picture"
 
