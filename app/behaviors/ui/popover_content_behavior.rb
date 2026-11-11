@@ -10,6 +10,12 @@ module UI::PopoverContentBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     {
       class: popover_content_classes,
+      # Non-modal dialog (Radix PopoverContent). tabindex=-1 lets a click on
+      # non-focusable content keep focus inside instead of dropping to <body>
+      # (which would close the popover). The id and the trigger's
+      # aria-controls are wired by the controller.
+      role: "dialog",
+      tabindex: "-1",
       data: popover_content_data_attributes
     }.merge(attributes_value)
   end

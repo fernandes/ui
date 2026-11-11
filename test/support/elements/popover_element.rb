@@ -138,6 +138,38 @@ module UI
         find_within('[data-ui--popover-target="content"]', visible: :all)
       end
 
+      # The focusable element of the trigger (the button inside the wrapper,
+      # or the trigger itself with as_child) — where aria-* and focus go.
+      def trigger_button
+        trigger.matches_css?("button, a[href]", wait: 0) ? trigger : trigger.find("button, a[href]", match: :first)
+      end
+
+      # === Focus ===
+
+      def focus_inside_content?
+        page.evaluate_script(<<~JS)
+          (() => {
+            const content = document.querySelector('##{node[:id]} [data-ui--popover-target="content"]')
+            return !!content && content.contains(document.activeElement)
+          })()
+        JS
+      end
+
+      def trigger_button_focused?
+        page.evaluate_script(<<~JS)
+          (() => {
+            const trigger = document.querySelector('##{node[:id]} [data-ui--popover-target="trigger"]')
+            const active = document.activeElement
+            return !!trigger && (trigger === active || trigger.contains(active))
+          })()
+        JS
+      end
+
+      # Mouse-click a non-focusable piece of text inside the content
+      def click_content_text(text)
+        content.find(:xpath, ".//*[normalize-space(text())=#{text.inspect}]").click
+      end
+
       # === Positioning Queries ===
 
       # Get the computed left position of the content

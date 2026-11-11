@@ -428,6 +428,50 @@ class PopoverTest < UI::SystemTestCase
     assert_equal "closed", popover.content["data-state"]
   end
 
+  test "trigger button announces the dialog it controls" do
+    popover = basic_popover
+    button = popover.trigger_button
+
+    assert_equal "dialog", button["aria-haspopup"]
+    assert_equal popover.content["id"], button["aria-controls"]
+    assert_equal "dialog", popover.content["role"]
+    assert_equal "false", button["aria-expanded"]
+
+    popover.open
+    assert_equal "true", popover.trigger_button["aria-expanded"]
+  end
+
+  test "opening moves focus into the content and Escape returns it to the trigger" do
+    popover = form_popover
+
+    popover.open
+    assert_predicate popover, :focus_inside_content?
+
+    page.send_keys(:escape)
+    popover.wait_for_closed
+    assert_predicate popover, :trigger_button_focused?
+  end
+
+  test "clicking non-focusable text inside the content keeps it open" do
+    popover = form_popover
+
+    popover.open
+    popover.click_content_text("Configure your preferences.")
+    sleep 0.2
+
+    assert popover.open?, "clicking plain text inside the popover closed it"
+  end
+
+  test "Tab out of the content closes the popover" do
+    popover = basic_popover
+
+    popover.open
+    page.send_keys(:tab)
+    popover.wait_for_closed
+
+    assert popover.closed?
+  end
+
   # === Click Outside Behavior ===
 
   test "clicking outside closes popover" do

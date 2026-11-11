@@ -8,10 +8,20 @@ module UI::PopoverTriggerBehavior
   # Returns HTML attributes for the popover trigger element
   def popover_trigger_html_attributes
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
-    {
+    attrs = {
       class: popover_trigger_classes,
       data: {ui__popover_target: "trigger"}
-    }.merge(attributes_value)
+    }
+
+    # With as_child the trigger IS the button, so it carries the static ARIA.
+    # The default wrapper is a <div>: the controller puts aria-* on the
+    # focusable element inside it. aria-controls is wired on connect.
+    if instance_variable_defined?(:@as_child) && @as_child
+      attrs[:"aria-haspopup"] = "dialog"
+      attrs[:"aria-expanded"] = "false"
+    end
+
+    attrs.merge(attributes_value)
   end
 
   # Returns combined CSS classes for the popover trigger

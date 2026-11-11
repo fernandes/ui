@@ -34,6 +34,7 @@ class UI::Popover < Phlex::HTML
   # @param offset [Integer] Distance in pixels from the trigger
   # @param trigger [String] Trigger type ("click" or "hover")
   # @param hover_delay [Integer] Delay in milliseconds for hover trigger
+  # @param auto_focus [Boolean] Move focus into the content when opened from the trigger
   # @param classes [String] Additional CSS classes to merge
   # @param attributes [Hash] Additional HTML attributes
   def initialize(
@@ -42,6 +43,7 @@ class UI::Popover < Phlex::HTML
     offset: 4,
     trigger: "click",
     hover_delay: 200,
+    auto_focus: true,
     classes: "",
     align: nil,
     side_offset: nil,
@@ -52,6 +54,7 @@ class UI::Popover < Phlex::HTML
     @offset = side_offset || offset
     @trigger = trigger
     @hover_delay = hover_delay
+    @auto_focus = auto_focus
     @classes = classes
     @align = align
     @attributes = attributes

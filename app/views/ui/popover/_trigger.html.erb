@@ -17,6 +17,7 @@
 <%
   content ||= local_assigns.fetch(:content, nil)
   as_child = local_assigns.fetch(:as_child, false)
+  @as_child = as_child
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
 

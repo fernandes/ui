@@ -193,12 +193,22 @@ The floating content panel.
 
 ## Accessibility
 
-The component includes:
+Non-modal dialog (Radix Popover), wired by the `ui--popover` controller on connect (same for ERB,
+Phlex and ViewComponent):
 
-- Focus management with Escape key to close
-- Click outside to dismiss
-- Proper ARIA attributes via `data-state` attribute
-- Keyboard navigation support
+- Content renders `role="dialog"` and `tabindex="-1"`; the controller gives it a per-instance id.
+- The focusable trigger (the button inside the trigger wrapper, or the element itself with
+  `as_child`) gets `aria-haspopup="dialog"` (an author value such as `"listbox"` is kept),
+  `aria-controls` → content, and `aria-expanded` kept in sync.
+- Opening from the trigger moves focus to the first field in the content (`[autofocus]` wins).
+  Pass `auto_focus: false` to keep focus on the trigger. Programmatic `show()` doesn't move focus
+  (`show({ focus: true })` does).
+- Escape closes only the topmost overlay and returns focus to the trigger. Tabbing out or clicking
+  outside closes without moving focus. A button with `data-action="click->ui--popover#close"`
+  inside the content closes it and returns focus too.
+- `trigger: "hover"` popovers also open with Enter/Space on the trigger.
+- `popover:show` / `popover:hide` fire only on a real state change; `hide()` on a closed popover
+  does nothing. `hide({ returnFocus: true })` focuses the trigger after closing.
 
 ## Positioning
 

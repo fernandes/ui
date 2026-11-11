@@ -53,13 +53,17 @@ module UI::PopoverBehavior
 
   # Returns data attributes for the popover controller
   def popover_data_attributes
-    {
+    data = {
       controller: "ui--popover",
       ui__popover_placement_value: normalized_placement,
       ui__popover_offset_value: @offset,
       ui__popover_trigger_value: @trigger,
       ui__popover_hover_delay_value: @hover_delay
     }
+    # Opening from the trigger moves focus into the content (Radix); pass
+    # auto_focus: false to keep it on the trigger.
+    data[:ui__popover_auto_focus_value] = "false" if instance_variable_defined?(:@auto_focus) && @auto_focus == false
+    data
   end
 
   private
