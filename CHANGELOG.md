@@ -24,7 +24,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Sonner] Toaster partial no longer recurses forever because of an ERB output tag inside its doc comment
 - [Button, Checkbox] Add `ring-offset-background` and `focus-visible:ring-offset-2` to the focus ring
 
+## 0.1.9
+
+### Fixed
+
+- [Command] Defer input focus to the next microtask on show, so focus lands on the input after the popover becomes visible (some browsers silently ignored it)
+
+## 0.1.8
+
+### Added
+
+- [Dev] `rake app:ui:release` task: bumps `version.rb` and `package.json`, rebuilds the JS bundle and refreshes the lockfiles
+
+### Fixed
+
+- [Command] Forward popover/drawer `show`/`hide` events to a nested Command; the previous listeners sat on a descendant and never fired
+- [Command] Clear the search input on close, so the next open doesn't show a stale filter
+- [Command] Remove event listeners on disconnect (they were leaking because each call bound a new function)
+- [JS] Rebuild the JS bundle (`ui.js` / `ui.esm.js`), which 0.1.7 shipped stale: its JavaScript changes only reach importmap and npm users from this version on
+
 ## 0.1.7
+
+### Added
+
+- [Positioner] Expose `--ui-popover-trigger-width` on floating content, so it can match the trigger width with `w-[var(--ui-popover-trigger-width)]`
+
+### Changed
+
+- [Command] Auto-select the first visible item while filtering, so Enter activates the top match
+- [CSS] `--popover` falls back to `var(--card)` in the light theme, so customizing `--card` alone keeps popovers consistent (dark theme unchanged)
+- [Dependencies] Allow `tailwind_merge` `>= 0.13, < 2.0` (was `~> 0.13`)
+
+### Fixed
+
+- [Popover] Keep `inert` in sync with the open/closed state, so a closed popover's content can't be focused on Safari iOS/iPadOS
 
 ## 0.1.6
 
