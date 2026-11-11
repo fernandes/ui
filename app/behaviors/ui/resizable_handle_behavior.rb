@@ -50,7 +50,8 @@ module UI::ResizableHandleBehavior
       "pointerenter->ui--resizable#handleEnter",
       "pointerleave->ui--resizable#handleLeave",
       "focus->ui--resizable#handleFocus",
-      "blur->ui--resizable#handleBlur"
+      "blur->ui--resizable#handleBlur",
+      "keydown->ui--resizable#handleKeyDown"
     ].join(" ")
   end
 
@@ -65,9 +66,8 @@ module UI::ResizableHandleBehavior
       "data-slot": "resizable-handle",
       tabindex: "0",
       role: "separator",
-      "aria-valuenow": "50",
-      "aria-valuemin": "0",
-      "aria-valuemax": "100",
+      # aria-valuenow/min/max, aria-orientation and aria-controls come from
+      # the panels; the resizable controller sets them on connect.
       data: data_attrs
     )
   end

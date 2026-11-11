@@ -333,6 +333,31 @@ class ResizableTest < UI::SystemTestCase
     assert_equal "100", aria[:valuemax]
   end
 
+  test "handle reports the first panel's limits and controls it" do
+    resizable = constrained_resizable
+
+    aria = resizable.handle_aria_attributes(0)
+
+    assert_equal "50", aria[:valuenow]
+    assert_equal "20", aria[:valuemin]
+    assert_equal "80", aria[:valuemax]
+    assert_equal "vertical", aria[:orientation]
+    assert_equal resizable.panels[0]["id"], aria[:controls]
+  end
+
+  test "a vertical group has a horizontal separator" do
+    assert_equal "horizontal", vertical_resizable.handle_aria_attributes(0)[:orientation]
+  end
+
+  test "one arrow press resizes by one step" do
+    resizable = constrained_resizable
+
+    resizable.keyboard_resize(0, :right, times: 1)
+
+    assert_in_delta 60.0, resizable.panel_size(0), 0.01
+    assert_equal "60", resizable.handle_aria_attributes(0)[:valuenow]
+  end
+
   test "handle is focusable with tabindex" do
     resizable = handle_grip_resizable
 

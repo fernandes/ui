@@ -42,7 +42,7 @@ describe("ResizableController", () => {
 
     const handlesHtml = panelSizes.slice(0, -1).map((_, index) => `
       <div data-ui--resizable-target="handle"
-           data-action="pointerdown->ui--resizable#startDrag mouseenter->ui--resizable#handleEnter mouseleave->ui--resizable#handleLeave focus->ui--resizable#handleFocus blur->ui--resizable#handleBlur"
+           data-action="pointerdown->ui--resizable#startDrag mouseenter->ui--resizable#handleEnter mouseleave->ui--resizable#handleLeave focus->ui--resizable#handleFocus blur->ui--resizable#handleBlur keydown->ui--resizable#handleKeyDown"
            data-testid="handle-${index}">
       </div>
     `).join("")
@@ -57,7 +57,7 @@ describe("ResizableController", () => {
           const maxAttr = maxSizes[index] ? `data-max-size="${maxSizes[index]}"` : ""
           const handleHtml = index < panelSizes.length - 1 ? `
             <div data-ui--resizable-target="handle"
-                 data-action="pointerdown->ui--resizable#startDrag mouseenter->ui--resizable#handleEnter mouseleave->ui--resizable#handleLeave focus->ui--resizable#handleFocus blur->ui--resizable#handleBlur"
+                 data-action="pointerdown->ui--resizable#startDrag mouseenter->ui--resizable#handleEnter mouseleave->ui--resizable#handleLeave focus->ui--resizable#handleFocus blur->ui--resizable#handleBlur keydown->ui--resizable#handleKeyDown"
                  data-testid="handle-${index}"
                  style="width: 4px; cursor: col-resize;">
             </div>
@@ -207,7 +207,8 @@ describe("ResizableController", () => {
         key: "ArrowRight",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(controller.getCurrentSizes()[0]).toBe(60)
@@ -225,7 +226,8 @@ describe("ResizableController", () => {
         key: "ArrowLeft",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(controller.getCurrentSizes()[0]).toBe(40)
@@ -243,7 +245,8 @@ describe("ResizableController", () => {
         key: "ArrowDown",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(controller.getCurrentSizes()[0]).toBe(60)
@@ -261,7 +264,8 @@ describe("ResizableController", () => {
         key: "ArrowUp",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(controller.getCurrentSizes()[0]).toBe(40)
@@ -279,7 +283,8 @@ describe("ResizableController", () => {
         key: "Home",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(controller.getCurrentSizes()[0]).toBe(10)
@@ -297,7 +302,8 @@ describe("ResizableController", () => {
         key: "End",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(controller.getCurrentSizes()[0]).toBe(80)
@@ -318,7 +324,8 @@ describe("ResizableController", () => {
         key: "Home",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // Home should set to min size
@@ -337,7 +344,8 @@ describe("ResizableController", () => {
         key: "End",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       // End should set to max size
@@ -520,7 +528,8 @@ describe("ResizableController", () => {
         key: "ArrowRight",
         preventDefault: () => {}
       }
-      controller.handleKeyDown.call(controller, 0, mockEvent)
+      // Real keydown on the handle (bound with data-action)
+      container.querySelector('[data-testid="handle-0"]').dispatchEvent(new KeyboardEvent("keydown", { key: mockEvent.key, bubbles: true, cancelable: true }))
       await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(eventFired).toBe(true)

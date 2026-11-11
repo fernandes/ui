@@ -288,7 +288,9 @@ module UI
           role: handle["role"],
           valuenow: handle["aria-valuenow"],
           valuemin: handle["aria-valuemin"],
-          valuemax: handle["aria-valuemax"]
+          valuemax: handle["aria-valuemax"],
+          orientation: handle["aria-orientation"],
+          controls: handle["aria-controls"]
         }
       end
 

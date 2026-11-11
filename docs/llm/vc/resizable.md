@@ -167,15 +167,16 @@ The component dispatches the following Stimulus events:
 
 ## Keyboard Support
 
-- `ArrowLeft` / `ArrowUp` - Decrease left panel size
-- `ArrowRight` / `ArrowDown` - Increase left panel size
-- `Home` - Minimize left panel
-- `End` - Maximize left panel
+- `ArrowLeft` / `ArrowRight` (horizontal group) or `ArrowUp` / `ArrowDown` (vertical group) - Resize the panel before the handle; arrows across the axis are left to the page (scrolling)
+- `Home` - Minimize the panel before the handle
+- `End` - Maximize the panel before the handle
+- `Enter` - Collapse the panel before the handle to its `min_size`, press again to restore it
 
 ## Accessibility
 
-- Handles have `role="separator"`
-- `aria-valuenow`, `aria-valuemin`, `aria-valuemax` for screen readers
+- Handles have `role="separator"` and `aria-orientation` (`vertical` in a horizontal group)
+- `aria-valuenow`, `aria-valuemin`, `aria-valuemax` are the size, `min_size` and `max_size` of the panel before the handle, set on connect and kept in sync
+- `aria-controls` points at that panel (it gets a per-instance id; an `id` you pass is kept). Give the panel an `aria-label` and the handle is named after it, or pass `aria-label` to the handle
 - Full keyboard navigation support
 - Focus visible styling on handles
 

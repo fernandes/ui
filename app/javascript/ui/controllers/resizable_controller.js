@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { ensureId, setIdRefs } from "../utils/id-manager.js"
 
 /**
  * Resizable controller for resizable panel groups
@@ -30,18 +31,29 @@ export default class extends Controller {
     // Set up data attributes
     this.element.setAttribute("data-panel-group-direction", this.directionValue)
 
-    // Add keyboard support to handles
+    // Window splitter semantics (APG). Keyboard is bound with data-action
+    // (keydown->ui--resizable#handleKeyDown), so nothing piles up on reconnect.
+    this.collapsedFrom = new Map()
     this.handleTargets.forEach((handle, index) => {
       handle.setAttribute("tabindex", "0")
       handle.setAttribute("role", "separator")
-      handle.setAttribute("aria-valuenow", "50")
-      handle.setAttribute("aria-valuemin", "0")
-      handle.setAttribute("aria-valuemax", "100")
+      // A horizontal group is split by a vertical separator, and vice versa
+      handle.setAttribute("aria-orientation", this.directionValue === "horizontal" ? "vertical" : "horizontal")
       handle.setAttribute("data-resize-handle-state", "inactive")
       handle.setAttribute("data-panel-group-direction", this.directionValue)
       // Set touch-action to none to prevent scroll interference on touch devices
       handle.style.touchAction = "none"
-      handle.addEventListener("keydown", this.handleKeyDown.bind(this, index))
+
+      // The separator controls (and is named after) the panel before it
+      const panel = this.panelTargets[index]
+      if (panel) {
+        ensureId(panel, "resizable-panel")
+        setIdRefs(handle, "aria-controls", panel)
+        if (panel.hasAttribute("aria-label") && !handle.hasAttribute("aria-label")) {
+          setIdRefs(handle, "aria-labelledby", panel)
+        }
+      }
+      this.syncHandleAria(index)
     })
 
     // Store bound handlers for cleanup
@@ -50,9 +62,6 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.handleTargets.forEach((handle, index) => {
-      handle.removeEventListener("keydown", this.handleKeyDown.bind(this, index))
-    })
     document.removeEventListener("pointermove", this._boundHandleMove)
     document.removeEventListener("pointerup", this._boundEndDrag)
     document.removeEventListener("pointercancel", this._boundEndDrag)
@@ -116,6 +125,20 @@ export default class extends Controller {
     panel.style.flexGrow = size.toString()
     panel.style.flexShrink = size.toString()
     panel.style.flexBasis = "0"
+  }
+
+  /**
+   * aria-valuenow/min/max of a handle: the size and limits of the panel
+   * before it (react-resizable-panels)
+   */
+  syncHandleAria(handleIndex) {
+    const handle = this.handleTargets[handleIndex]
+    const panel = this.panelTargets[handleIndex]
+    if (!handle || !panel) return
+
+    handle.setAttribute("aria-valuenow", Math.round(this.getPanelSize(panel)))
+    handle.setAttribute("aria-valuemin", Math.round(parseFloat(panel.dataset.minSize) || 0))
+    handle.setAttribute("aria-valuemax", Math.round(parseFloat(panel.dataset.maxSize) || 100))
   }
 
   /**
@@ -307,9 +330,15 @@ export default class extends Controller {
   }
 
   /**
-   * Keyboard navigation for handles
+   * Keyboard navigation for handles (APG window splitter):
+   * arrows along the group axis resize, Home/End go to min/max, Enter
+   * collapses the panel before the handle to its minimum and restores it.
+   * Perpendicular arrows are left to the page.
    */
-  handleKeyDown(handleIndex, event) {
+  handleKeyDown(event) {
+    const handleIndex = this.handleTargets.indexOf(event.currentTarget)
+    if (handleIndex === -1) return
+
     const leftPanel = this.panelTargets[handleIndex]
     const rightPanel = this.panelTargets[handleIndex + 1]
 
@@ -320,21 +349,19 @@ export default class extends Controller {
 
     const isHorizontal = this.directionValue === "horizontal"
 
+    const leftMinSize = parseFloat(leftPanel.dataset.minSize) || 0
+
     switch (event.key) {
       case "ArrowLeft":
-        if (isHorizontal) delta = -resizeBy
-        event.preventDefault()
-        break
       case "ArrowRight":
-        if (isHorizontal) delta = resizeBy
+        if (!isHorizontal) return
+        delta = event.key === "ArrowRight" ? resizeBy : -resizeBy
         event.preventDefault()
         break
       case "ArrowUp":
-        if (!isHorizontal) delta = -resizeBy
-        event.preventDefault()
-        break
       case "ArrowDown":
-        if (!isHorizontal) delta = resizeBy
+        if (isHorizontal) return
+        delta = event.key === "ArrowDown" ? resizeBy : -resizeBy
         event.preventDefault()
         break
       case "Home":
@@ -347,11 +374,19 @@ export default class extends Controller {
         delta = (parseFloat(leftPanel.dataset.maxSize) || 100) - this.getPanelSize(leftPanel)
         event.preventDefault()
         break
-      case "Enter":
-      case " ":
-        // Toggle between equal and current sizes (optional feature)
+      case "Enter": {
         event.preventDefault()
+        const current = this.getPanelSize(leftPanel)
+        const restoreTo = this.collapsedFrom.get(handleIndex)
+        if (restoreTo !== undefined && current <= leftMinSize + 0.01) {
+          delta = restoreTo - current
+          this.collapsedFrom.delete(handleIndex)
+        } else {
+          this.collapsedFrom.set(handleIndex, current)
+          delta = leftMinSize - current
+        }
         break
+      }
       default:
         return
     }
@@ -389,7 +424,7 @@ export default class extends Controller {
     this.setPanelSize(rightPanel, newRightSize)
 
     // Update ARIA
-    handle.setAttribute("aria-valuenow", Math.round(newLeftSize))
+    this.syncHandleAria(handleIndex)
 
     // Dispatch resize event
     this.dispatch("resize", {
@@ -438,9 +473,7 @@ export default class extends Controller {
     })
 
     // Update ARIA on handles
-    this.handleTargets.forEach((handle, index) => {
-      handle.setAttribute("aria-valuenow", Math.round(sizes[index]))
-    })
+    this.handleTargets.forEach((_handle, index) => this.syncHandleAria(index))
 
     this.dispatch("resize", {
       detail: { sizes: this.getCurrentSizes() }
