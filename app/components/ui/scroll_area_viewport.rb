@@ -5,7 +5,7 @@
 # Scrollable content container with hidden native scrollbar.
 #
 # @example Basic usage (automatically used by ScrollArea)
-#   render UI::Viewport.new do
+#   render UI::ScrollAreaViewport.new do
 #     # Content here
 #   end
 class UI::ScrollAreaViewport < Phlex::HTML

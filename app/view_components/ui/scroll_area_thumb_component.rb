@@ -5,7 +5,7 @@
 # Draggable scroll indicator inside the scrollbar.
 #
 # @example Default usage (automatically used by ScrollbarComponent)
-#   <%= render UI::ThumbComponent.new %>
+#   <%= render UI::ScrollAreaThumbComponent.new %>
 class UI::ScrollAreaThumbComponent < ViewComponent::Base
   include UI::ScrollAreaThumbBehavior
 

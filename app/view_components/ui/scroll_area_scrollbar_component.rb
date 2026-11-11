@@ -5,10 +5,10 @@
 # Custom scrollbar track that contains the draggable thumb.
 #
 # @example Vertical scrollbar (default)
-#   <%= render UI::ScrollbarComponent.new(orientation: "vertical") %>
+#   <%= render UI::ScrollAreaScrollbarComponent.new(orientation: "vertical") %>
 #
 # @example Horizontal scrollbar
-#   <%= render UI::ScrollbarComponent.new(orientation: "horizontal") %>
+#   <%= render UI::ScrollAreaScrollbarComponent.new(orientation: "horizontal") %>
 class UI::ScrollAreaScrollbarComponent < ViewComponent::Base
   include UI::ScrollAreaScrollbarBehavior
 
@@ -29,7 +29,7 @@ class UI::ScrollAreaScrollbarComponent < ViewComponent::Base
     scrollbar_attrs[:data][:"ui--scroll-area-target"] = "scrollbar"
 
     content_tag :div, **scrollbar_attrs do
-      render UI::ThumbComponent.new
+      render UI::ScrollAreaThumbComponent.new
     end
   end
 end

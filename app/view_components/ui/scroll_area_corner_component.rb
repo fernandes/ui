@@ -5,7 +5,7 @@
 # Intersection element between vertical and horizontal scrollbars.
 #
 # @example Default usage (automatically used by ScrollAreaComponent)
-#   <%= render UI::CornerComponent.new %>
+#   <%= render UI::ScrollAreaCornerComponent.new %>
 class UI::ScrollAreaCornerComponent < ViewComponent::Base
   include UI::ScrollAreaCornerBehavior
 

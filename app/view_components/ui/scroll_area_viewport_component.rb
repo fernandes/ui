@@ -5,7 +5,7 @@
 # Scrollable content container with hidden native scrollbar.
 #
 # @example Basic usage (automatically used by ScrollAreaComponent)
-#   <%= render UI::ViewportComponent.new do %>
+#   <%= render UI::ScrollAreaViewportComponent.new do %>
 #     <!-- Content here -->
 #   <% end %>
 class UI::ScrollAreaViewportComponent < ViewComponent::Base

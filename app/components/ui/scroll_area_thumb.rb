@@ -5,7 +5,7 @@
 # Draggable scroll indicator inside the scrollbar.
 #
 # @example Default usage (automatically used by Scrollbar)
-#   render UI::Thumb.new
+#   render UI::ScrollAreaThumb.new
 class UI::ScrollAreaThumb < Phlex::HTML
   include UI::ScrollAreaThumbBehavior
   include UI::SharedAsChildBehavior

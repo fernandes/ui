@@ -5,7 +5,7 @@
 # Intersection element between vertical and horizontal scrollbars.
 #
 # @example Default usage (automatically used by ScrollArea)
-#   render UI::Corner.new
+#   render UI::ScrollAreaCorner.new
 class UI::ScrollAreaCorner < Phlex::HTML
   include UI::ScrollAreaCornerBehavior
   include UI::SharedAsChildBehavior

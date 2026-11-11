@@ -48,14 +48,14 @@ class UI::ScrollArea < Phlex::HTML
     if @as_child && block_given?
       # asChild mode: yield attributes to block, but also render scrollbar and corner
       yield(root_attrs)
-      render UI::Scrollbar.new(orientation: "vertical")
-      render UI::Corner.new
+      render UI::ScrollAreaScrollbar.new(orientation: "vertical")
+      render UI::ScrollAreaCorner.new
     else
       # Default mode: render as div with viewport, scrollbar, and corner
       div(**root_attrs) do
-        render UI::Viewport.new(&block)
-        render UI::Scrollbar.new(orientation: "vertical")
-        render UI::Corner.new
+        render UI::ScrollAreaViewport.new(&block)
+        render UI::ScrollAreaScrollbar.new(orientation: "vertical")
+        render UI::ScrollAreaCorner.new
       end
     end
   end

@@ -8,6 +8,34 @@ module UI
       visit_component("scroll_area")
     end
 
+    # === Accessibility ===
+
+    test "a viewport that overflows is a tab stop, one that fits is not" do
+      overflowing = find_element(UI::Testing::ScrollAreaElement, "#large-scroll-area")
+      fitting = find_element(UI::Testing::ScrollAreaElement, "#fitting-scroll-area")
+
+      assert_equal "0", overflowing.viewport["tabindex"]
+      assert_equal "-1", fitting.viewport["tabindex"]
+    end
+
+    test "a viewport becomes a tab stop when its content grows" do
+      fitting = find_element(UI::Testing::ScrollAreaElement, "#fitting-scroll-area")
+
+      page.execute_script(<<~JS)
+        const content = document.querySelector("#fitting-scroll-area [data-ui--scroll-area-target='viewport'] > div")
+        for (let i = 0; i < 30; i++) content.insertAdjacentHTML("beforeend", "<div>More</div>")
+      JS
+      sleep 0.3 # ResizeObserver callback
+
+      assert_equal "0", fitting.viewport["tabindex"]
+    end
+
+    test "custom scrollbars are hidden from assistive technology" do
+      scroll_area = find_element(UI::Testing::ScrollAreaElement, "#basic-scroll-area")
+
+      assert_equal "true", scroll_area.vertical_scrollbar["aria-hidden"]
+    end
+
     # === Basic Rendering ===
 
     test "renders scroll area with content" do

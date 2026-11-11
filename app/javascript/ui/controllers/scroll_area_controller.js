@@ -56,8 +56,21 @@ export default class extends Controller {
     this.boundHandleViewportFocus = this.handleViewportFocus.bind(this)
     this.boundHandleViewportFocusOut = this.handleViewportFocusOut.bind(this)
 
-    this.viewportTarget.addEventListener('focus', this.boundHandleViewportFocus)
+    // focusin/focusout bubble, so focus on a link or field inside the
+    // viewport shows the scrollbars too (not only focus on the viewport)
+    this.viewportTarget.addEventListener('focusin', this.boundHandleViewportFocus)
     this.viewportTarget.addEventListener('focusout', this.boundHandleViewportFocusOut)
+
+    this.updateViewportTabStop()
+  }
+
+  // Base UI: a viewport with nothing to scroll is not a tab stop; one that
+  // overflows is, so keyboard users can scroll it
+  updateViewportTabStop() {
+    if (!this.hasViewportTarget) return
+    const viewport = this.viewportTarget
+    const overflows = viewport.scrollHeight > viewport.clientHeight || viewport.scrollWidth > viewport.clientWidth
+    viewport.setAttribute('tabindex', overflows ? '0' : '-1')
   }
 
   handleViewportFocus() {
@@ -73,7 +86,10 @@ export default class extends Controller {
     })
   }
 
-  handleViewportFocusOut() {
+  handleViewportFocusOut(event) {
+    // Focus moving to another element inside the viewport: keep them shown
+    if (event?.relatedTarget && this.viewportTarget.contains(event.relatedTarget)) return
+
     // Hide scrollbars after delay when focus leaves viewport
     this.scrollbarTargets.forEach(scrollbar => {
       const timer = setTimeout(() => {
@@ -315,6 +331,7 @@ export default class extends Controller {
         }
       })
       this.updateThumbSize()
+      this.updateViewportTabStop()
     })
 
     this.resizeObserver.observe(this.viewportTarget)
@@ -607,7 +624,7 @@ export default class extends Controller {
     // Clean up viewport focus handlers
     if (this.hasViewportTarget) {
       if (this.boundHandleViewportFocus) {
-        this.viewportTarget.removeEventListener('focus', this.boundHandleViewportFocus)
+        this.viewportTarget.removeEventListener('focusin', this.boundHandleViewportFocus)
       }
       if (this.boundHandleViewportFocusOut) {
         this.viewportTarget.removeEventListener('focusout', this.boundHandleViewportFocusOut)

@@ -70,6 +70,14 @@
       </div>
     </div>
 
+    <!-- Content That Fits -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-semibold">Content That Fits</h2>
+      <%= render "ui/scroll_area", classes: "h-24 w-full rounded-md border p-4", attributes: { id: "fitting-scroll-area" } do %>
+        <div class="text-sm">Nothing to scroll here. <a href="#" class="underline">A link</a></div>
+      <% end %>
+    </div>
+
     <!-- Long Content Example -->
     <div class="space-y-4">
       <h2 class="text-2xl font-semibold">Long Content</h2>

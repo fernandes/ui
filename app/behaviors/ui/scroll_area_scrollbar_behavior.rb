@@ -18,6 +18,8 @@ module UI::ScrollAreaScrollbarBehavior
 
     {
       class: scroll_area_scrollbar_classes,
+      # Decorative: the viewport scrolls with the keyboard (Base UI)
+      "aria-hidden": "true",
       data: {
         slot: "scroll-area-scrollbar",
         orientation: orientation_value

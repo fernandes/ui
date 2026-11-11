@@ -37,9 +37,9 @@ class UI::ScrollAreaComponent < ViewComponent::Base
 
     content_tag :div, **root_attrs do
       safe_join([
-        render(UI::ViewportComponent.new) { content },
-        render(UI::ScrollbarComponent.new(orientation: "vertical")),
-        render(UI::CornerComponent.new)
+        render(UI::ScrollAreaViewportComponent.new) { content },
+        render(UI::ScrollAreaScrollbarComponent.new(orientation: "vertical")),
+        render(UI::ScrollAreaCornerComponent.new)
       ])
     end
   end

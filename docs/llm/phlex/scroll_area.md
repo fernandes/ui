@@ -146,3 +146,9 @@ render UI::ScrollArea::ScrollArea.new(classes: "h-[200px] w-full border") do
   # Will scroll properly
 end
 ```
+
+## Accessibility
+
+- The viewport is a tab stop (`tabindex="0"`) only while its content overflows, so keyboard users can scroll it; with nothing to scroll the controller sets `tabindex="-1"` (Base UI). It re-checks when the content resizes.
+- The custom scrollbars and the corner are `aria-hidden="true"`: they are decorative, the viewport itself scrolls with the keyboard.
+- Scrollbars also show while focus is on anything inside the viewport (`focusin`), not only on the viewport.

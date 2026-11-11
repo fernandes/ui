@@ -5,10 +5,10 @@
 # Custom scrollbar track that contains the draggable thumb.
 #
 # @example Vertical scrollbar (default)
-#   render UI::Scrollbar.new(orientation: "vertical")
+#   render UI::ScrollAreaScrollbar.new(orientation: "vertical")
 #
 # @example Horizontal scrollbar
-#   render UI::Scrollbar.new(orientation: "horizontal")
+#   render UI::ScrollAreaScrollbar.new(orientation: "horizontal")
 class UI::ScrollAreaScrollbar < Phlex::HTML
   include UI::ScrollAreaScrollbarBehavior
   include UI::SharedAsChildBehavior
@@ -34,11 +34,11 @@ class UI::ScrollAreaScrollbar < Phlex::HTML
     if @as_child && block_given?
       # asChild mode: yield attributes to block, but also render thumb if not provided
       yield(scrollbar_attrs)
-      render UI::Thumb.new unless block_given?
+      render UI::ScrollAreaThumb.new unless block_given?
     else
       # Default mode: render as div with thumb
       div(**scrollbar_attrs) do
-        render UI::Thumb.new
+        render UI::ScrollAreaThumb.new
       end
     end
   end

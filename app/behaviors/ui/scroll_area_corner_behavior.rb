@@ -16,6 +16,8 @@ module UI::ScrollAreaCornerBehavior
     attributes_value = respond_to?(:attributes, true) ? attributes : @attributes
     {
       class: scroll_area_corner_classes,
+      # Decorative: the viewport scrolls with the keyboard (Base UI)
+      "aria-hidden": "true",
       data: {
         slot: "scroll-area-corner"
       }
