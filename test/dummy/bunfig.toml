@@ -1,6 +1,6 @@
 [test]
 # Use happy-dom for faster DOM testing
-preload = ["./test/javascript/setup.js"]
+preload = ["./test/javascript/register_dom.js", "./test/javascript/setup.js"]
 
 # Test file patterns
 include = ["**/*.test.js", "**/*.spec.js"]

@@ -1,12 +1,12 @@
 // Test setup file
 // Automatically loaded by Bun before running tests
 
-import { GlobalRegistrator } from '@happy-dom/global-registrator';
-import { afterEach } from "bun:test"
+import { afterEach, expect } from "bun:test"
+import * as matchers from "@testing-library/jest-dom/matchers"
 import { resetScrollLockState } from "../../../../app/javascript/ui/utils/scroll-lock-manager.js"
 
-// Register happy-dom globals (document, window, etc.)
-GlobalRegistrator.register();
+// jest-dom matchers (toBeVisible, toHaveAccessibleName, toHaveFocus, ...)
+expect.extend(matchers)
 
 // Reset shared utility state between tests
 afterEach(() => {

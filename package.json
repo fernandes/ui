@@ -52,6 +52,8 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@tailwindcss/cli": "^4.1.17",
     "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/user-event": "^14.6.1",
     "happy-dom": "^21.0.4",
     "playwright": "^1.49.0",
     "rollup": "^4.53.2",
