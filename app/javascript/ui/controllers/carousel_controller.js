@@ -3,7 +3,7 @@ import EmblaCarousel from "embla-carousel"
 import Autoplay from "embla-carousel-autoplay"
 
 export default class extends Controller {
-  static targets = ["viewport", "prevButton", "nextButton", "container"]
+  static targets = ["viewport", "prevButton", "nextButton", "container", "autoplayToggle"]
   static values = {
     orientation: { type: String, default: "horizontal" },
     opts: { type: Object, default: {} },
@@ -17,6 +17,7 @@ export default class extends Controller {
   disconnect() {
     if (this.emblaApi) {
       this.emblaApi.destroy()
+      this.emblaApi = null
     }
   }
 
@@ -48,6 +49,12 @@ export default class extends Controller {
     this.emblaApi.on("select", () => this.updateButtonStates())
     this.emblaApi.on("reInit", () => this.updateButtonStates())
 
+    // Autoplay: live region off while rotating, pause control in sync (WCAG 2.2.2)
+    this.userPaused = false
+    this.emblaApi.on("autoplay:play", () => this.onAutoplayPlay())
+    this.emblaApi.on("autoplay:stop", () => this.syncAutoplayState())
+    this.syncAutoplayState()
+
     // Dispatch custom event with API
     this.element.dispatchEvent(new CustomEvent("carousel:init", {
       detail: { api: this.emblaApi },
@@ -61,7 +68,9 @@ export default class extends Controller {
     // Process plugin configurations from pluginsValue
     this.pluginsValue.forEach(pluginConfig => {
       if (pluginConfig.name === "autoplay") {
-        plugins.push(Autoplay(pluginConfig.options || {}))
+        // Pause while the pointer is over the carousel unless the author
+        // opted out (WCAG 2.2.2); focus inside already pauses it (Embla default)
+        plugins.push(Autoplay({ stopOnMouseEnter: true, ...(pluginConfig.options || {}) }))
       }
       // Add more plugins here as needed
     })
@@ -131,24 +140,83 @@ export default class extends Controller {
     this.updateButtonStates()
   }
 
+  get autoplay() {
+    return this.emblaApi?.plugins?.()?.autoplay
+  }
+
+  isAutoplaying() {
+    return !!this.autoplay?.isPlaying?.()
+  }
+
+  // A pause the user asked for wins over Embla resuming on mouseleave /
+  // focusout (stopOnInteraction: false)
+  onAutoplayPlay() {
+    if (this.userPaused) {
+      this.autoplay.stop()
+      return
+    }
+    this.syncAutoplayState()
+  }
+
+  // Play / pause control: any button with
+  // data-ui--carousel-target="autoplayToggle" data-action="ui--carousel#toggleAutoplay"
+  toggleAutoplay() {
+    const autoplay = this.autoplay
+    if (!autoplay) return
+
+    if (autoplay.isPlaying()) {
+      this.userPaused = true
+      autoplay.stop()
+    } else {
+      this.userPaused = false
+      autoplay.play()
+    }
+    this.syncAutoplayState()
+  }
+
+  // APG carousel: slide changes are announced (aria-live="polite") unless
+  // the carousel rotates on its own; then the live region is off.
+  syncAutoplayState() {
+    const playing = this.isAutoplaying()
+
+    if (this.hasContainerTarget) {
+      this.containerTarget.setAttribute("aria-live", playing ? "off" : "polite")
+    }
+
+    this.autoplayToggleTargets.forEach((toggle) => {
+      toggle.hidden = !this.autoplay
+      toggle.dataset.state = playing ? "playing" : "paused"
+      const label = playing
+        ? (toggle.dataset.pauseLabel || "Pause slides")
+        : (toggle.dataset.playLabel || "Play slides")
+      toggle.setAttribute("aria-label", label)
+      // Plain-text buttons show the label; icon buttons keep their content
+      if (toggle.children.length === 0) toggle.textContent = label
+    })
+  }
+
   updateButtonStates() {
     if (!this.emblaApi) return
 
-    // Update previous button state
     if (this.hasPrevButtonTarget) {
-      const canScrollPrev = this.emblaApi.canScrollPrev()
-      this.prevButtonTarget.disabled = !canScrollPrev
-      this.prevButtonTarget.classList.toggle("opacity-50", !canScrollPrev)
-      this.prevButtonTarget.classList.toggle("cursor-not-allowed", !canScrollPrev)
+      this.setButtonEnabled(this.prevButtonTarget, this.emblaApi.canScrollPrev())
     }
-
-    // Update next button state
     if (this.hasNextButtonTarget) {
-      const canScrollNext = this.emblaApi.canScrollNext()
-      this.nextButtonTarget.disabled = !canScrollNext
-      this.nextButtonTarget.classList.toggle("opacity-50", !canScrollNext)
-      this.nextButtonTarget.classList.toggle("cursor-not-allowed", !canScrollNext)
+      this.setButtonEnabled(this.nextButtonTarget, this.emblaApi.canScrollNext())
     }
+  }
+
+  // aria-disabled instead of disabled: a focused button that reaches the
+  // end keeps focus instead of dropping it to <body>
+  setButtonEnabled(button, enabled) {
+    button.disabled = false
+    if (enabled) {
+      button.removeAttribute("aria-disabled")
+    } else {
+      button.setAttribute("aria-disabled", "true")
+    }
+    button.classList.toggle("opacity-50", !enabled)
+    button.classList.toggle("cursor-not-allowed", !enabled)
   }
 
   scrollPrev() {
@@ -168,8 +236,11 @@ export default class extends Controller {
     return this.emblaApi
   }
 
-  // Handle keyboard navigation
+  // Keyboard navigation, bound on the root (keydown->ui--carousel#keydown)
+  // like shadcn's onKeyDownCapture. Arrows inside text fields are left alone.
   keydown(event) {
+    if (this.isEditable(event.target)) return
+
     if (this.orientationValue === "horizontal") {
       if (event.key === "ArrowLeft") {
         event.preventDefault()
@@ -187,5 +258,10 @@ export default class extends Controller {
         this.scrollNext()
       }
     }
+  }
+
+  isEditable(element) {
+    if (!(element instanceof HTMLElement)) return false
+    return element.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName)
   }
 }

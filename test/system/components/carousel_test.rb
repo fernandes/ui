@@ -179,6 +179,79 @@ class CarouselTest < UI::SystemTestCase
     refute carousel.horizontal?
   end
 
+  test "ArrowRight and ArrowLeft move between slides when focus is inside" do
+    carousel = basic_carousel
+
+    carousel.next_button.native.focus
+    page.send_keys(:right)
+    carousel.wait_for_slide(1)
+    assert_equal 1, carousel.current_slide_index
+
+    page.send_keys(:left)
+    carousel.wait_for_slide(0)
+    assert_equal 0, carousel.current_slide_index
+  end
+
+  test "ArrowUp and ArrowDown move a vertical carousel" do
+    carousel = orientation_carousel
+
+    carousel.next_button.native.focus
+    page.send_keys(:down)
+    carousel.wait_for_slide(1)
+    assert_equal 1, carousel.current_slide_index
+  end
+
+  test "focus stays on the next button when it reaches the last slide" do
+    carousel = basic_carousel
+
+    carousel.next_button.native.focus
+    4.times do |i|
+      page.send_keys(:enter)
+      carousel.wait_for_slide(i + 1)
+    end
+
+    assert carousel.at_last_slide?
+    refute carousel.can_scroll_next?
+    assert page.evaluate_script("document.activeElement.getAttribute('data-ui--carousel-target') === 'nextButton'"),
+      "focus must stay on the (aria-)disabled next button"
+  end
+
+  test "slides are announced politely when the carousel isn't auto-rotating" do
+    assert_equal "polite", basic_carousel.live_region
+  end
+
+  test "an auto-rotating carousel turns its live region off" do
+    assert_equal "off", autoplay_carousel.live_region
+  end
+
+  test "hovering an auto-rotating carousel pauses it" do
+    carousel = autoplay_carousel
+    carousel.container.hover
+    index = carousel.current_slide_index
+
+    sleep 2.5
+
+    assert_equal index, carousel.current_slide_index
+  end
+
+  test "the autoplay toggle pauses and resumes rotation" do
+    carousel = autoplay_carousel
+    toggle = carousel.autoplay_toggle
+
+    toggle.click
+    assert_equal "Play slides", toggle["aria-label"]
+    assert_equal "polite", carousel.live_region
+
+    page.find("h1").hover
+    index = carousel.current_slide_index
+    sleep 2.5
+    assert_equal index, carousel.current_slide_index, "paused carousel must not advance"
+
+    toggle.click
+    assert_equal "Pause slides", toggle["aria-label"]
+    assert_equal "off", carousel.live_region
+  end
+
   # === Loop Behavior Tests ===
 
   test "carousel without loop disables navigation at boundaries" do

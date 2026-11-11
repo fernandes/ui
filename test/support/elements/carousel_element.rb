@@ -79,7 +79,7 @@ module UI
       # @return [Boolean]
       #
       def can_scroll_prev?
-        has_prev_button? && !prev_button.disabled?
+        has_prev_button? && !prev_button.disabled? && prev_button["aria-disabled"] != "true"
       end
 
       # Check if carousel can scroll to next slide
@@ -87,7 +87,7 @@ module UI
       # @return [Boolean]
       #
       def can_scroll_next?
-        has_next_button? && !next_button.disabled?
+        has_next_button? && !next_button.disabled? && next_button["aria-disabled"] != "true"
       end
 
       # Check if at the first slide
@@ -216,6 +216,22 @@ module UI
       #
       def next_button
         find_within('[data-ui--carousel-target="nextButton"]')
+      end
+
+      # Play / pause button wired to ui--carousel#toggleAutoplay
+      #
+      # @return [Capybara::Node::Element]
+      #
+      def autoplay_toggle
+        find_within('[data-ui--carousel-target="autoplayToggle"]')
+      end
+
+      # aria-live of the slide container ("off" while auto-rotating)
+      #
+      # @return [String, nil]
+      #
+      def live_region
+        container["aria-live"]
       end
 
       # Check if carousel has previous button

@@ -180,3 +180,16 @@ render UI::Carousel::Carousel.new do
   # ...
 end
 ```
+
+## Accessibility
+
+- Arrow keys move between slides while focus is inside the carousel (Left/Right, or Up/Down when `orientation: "vertical"`); arrows typed in a text field are left alone.
+- At either end the Previous/Next button gets `aria-disabled="true"` (not `disabled`), so a focused button keeps focus.
+- The slide container is `aria-live="polite"`, and `"off"` while autoplay is rotating.
+- Autoplay pauses on hover by default (`stopOnMouseEnter: true`; pass `stopOnMouseEnter: false` in the plugin options to opt out) and on focus inside (Embla default).
+- Autoplay carousels need a pause control (WCAG 2.2.2). Put a button inside the carousel with the `autoplayToggle` target and the `toggleAutoplay` action. The controller keeps its `aria-label` and `data-state` (`playing` / `paused`) in sync. Text-only buttons also get their text updated. Override the labels with `data-pause-label` / `data-play-label`:
+
+```erb
+<%= render UI::Button.new(variant: :outline, size: :sm,
+  data: { ui__carousel_target: "autoplayToggle", action: "ui--carousel#toggleAutoplay" }) { "Pause slides" } %>
+```

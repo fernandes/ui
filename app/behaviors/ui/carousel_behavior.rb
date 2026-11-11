@@ -63,7 +63,9 @@ module UI::CarouselBehavior
   # Merge user-provided data attributes
   def merged_carousel_data_attributes
     user_data = @attributes&.fetch(:data, {}) || {}
-    user_data.merge(carousel_data_attributes)
+    # Arrow keys (shadcn onKeyDownCapture); an author's data-action is kept
+    action = [user_data[:action], "keydown->ui--carousel#keydown"].compact.join(" ")
+    user_data.merge(carousel_data_attributes).merge(action: action)
   end
 
   # Build complete HTML attributes hash

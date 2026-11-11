@@ -149,6 +149,10 @@
         <% end %>
         <%= render "ui/carousel/previous" %>
         <%= render "ui/carousel/next" %>
+        <div class="mt-2 flex justify-center">
+          <%= render "ui/button", variant: :outline, size: :sm, content: "Pause slides",
+            attributes: { data: { ui__carousel_target: "autoplayToggle", action: "ui--carousel#toggleAutoplay" } } %>
+        </div>
       <% end %>
     </div>
   </div>
