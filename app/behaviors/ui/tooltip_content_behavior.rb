@@ -9,7 +9,10 @@ require "tailwind_merge"
 module UI::TooltipContentBehavior
   # Returns HTML attributes for the tooltip content element
   def tooltip_content_html_attributes
+    # role="tooltip"; the controller gives it a per-instance id and adds it
+    # to the trigger's aria-describedby.
     {
+      role: "tooltip",
       class: tooltip_content_classes,
       data: tooltip_content_data_attributes
     }.compact

@@ -227,10 +227,13 @@ end
 
 ## Accessibility
 
-- Automatically adds proper ARIA attributes
-- Keyboard accessible (focus shows tooltip)
-- ESC key closes tooltip
-- Mouse hover shows/hides tooltip
+- Content renders `role="tooltip"`; the controller gives it a per-instance id and adds it to the
+  trigger's `aria-describedby` (an `aria-describedby` you set on the trigger is kept), so screen
+  readers read the tooltip text as the trigger's description
+- Keyboard focus shows the tooltip; the focus caused by a mouse click doesn't
+- Escape closes it (only the topmost overlay, so a tooltip inside a dialog doesn't close the dialog)
+- Hoverable (WCAG 1.4.13): the pointer can move from the trigger onto the tooltip without it closing
+- Put essential information in the trigger's own label: the tooltip is a supplementary description
 - Tooltip positioned to avoid viewport overflow
 
 ## Notes

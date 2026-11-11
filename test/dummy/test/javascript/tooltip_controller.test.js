@@ -108,7 +108,7 @@ describe("TooltipController", () => {
       // Hide
       const mouseLeaveEvent = new MouseEvent("mouseleave", { bubbles: true })
       trigger.dispatchEvent(mouseLeaveEvent)
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise(resolve => setTimeout(resolve, 150)) // closes after the hoverable grace period
 
       expect(content.getAttribute("data-state")).toBe("closed")
     })

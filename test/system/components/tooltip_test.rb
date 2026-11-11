@@ -144,14 +144,37 @@ class TooltipTest < UI::SystemTestCase
 
   # === ARIA Accessibility Tests ===
 
-  # TODO: Add role="tooltip" attribute to content component
-  # test "content has role tooltip" do
-  #   tooltip = basic_tooltip
-  #
-  #   tooltip.show
-  #
-  #   assert_equal "tooltip", tooltip.content_role
-  # end
+  test "content has role tooltip and describes the trigger" do
+    tooltip = basic_tooltip
+
+    assert_equal "tooltip", tooltip.content_role
+    assert tooltip.content["id"].present?
+    assert_includes tooltip.trigger_describedby.split, tooltip.content["id"]
+  end
+
+  test "pointer can move from the trigger onto the tooltip without it closing" do
+    tooltip = basic_tooltip
+
+    tooltip.show
+    tooltip.content.hover
+    sleep 0.3
+
+    assert tooltip.open?, "tooltip closed while the pointer was on it (WCAG 1.4.13)"
+
+    page.find("h1").hover
+    tooltip.wait_for_hidden_content
+    assert tooltip.closed?
+  end
+
+  test "Escape closes the tooltip" do
+    tooltip = basic_tooltip
+
+    tooltip.show
+    page.send_keys(:escape)
+    tooltip.wait_for_hidden_content
+
+    assert tooltip.closed?
+  end
 
   # === asChild Composition Tests ===
 
