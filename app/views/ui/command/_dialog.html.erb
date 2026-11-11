@@ -1,17 +1,44 @@
-<%# locals: (shortcut: "meta+j", classes: "", **attributes) %>
-<%
-  dialog_behavior = Class.new { include UI::DialogBehavior }.new
-  dialog_behavior.instance_variable_set(:@shortcut, shortcut)
-  dialog_behavior.instance_variable_set(:@classes, classes)
+<%# Command Dialog - a command palette in a modal Dialog, toggled by a
+    keyboard shortcut (default meta+j).
+
+    render "ui/command/dialog", shortcut: "meta+j", title: "Command Palette" do
+      render "ui/command/input" ... render "ui/command/list" ...
+    end
+
+    The title/description are visually hidden (shadcn) and name the dialog.
 %>
-<div <%= tag.attributes(dialog_behavior.command_dialog_html_attributes.deep_merge(attributes)) %>>
-  <%= render "ui/dialog/dialog", close_on_escape: true, close_on_overlay_click: true do %>
+<%
+  known = %i[shortcut autofocus title description classes attributes]
+  @shortcut = local_assigns.fetch(:shortcut, "meta+j")
+  @title = local_assigns.fetch(:title, nil)
+  @description = local_assigns.fetch(:description, nil)
+  @classes = local_assigns.fetch(:classes, "")
+  autofocus = local_assigns.fetch(:autofocus, true)
+  # Extra locals (id:, data:) are HTML attributes too, like the old `**attributes`
+  attributes = local_assigns.except(*known).merge(local_assigns.fetch(:attributes, {}))
+
+  extend UI::CommandDialogBehavior
+
+  # Nested partials reassign ivars on this view: read everything first
+  root_attributes = command_dialog_html_attributes.deep_merge(attributes)
+  content_classes = command_dialog_content_classes
+  header_classes = command_dialog_header_classes
+  title = command_dialog_title
+  description = command_dialog_description
+  body = block_given? ? capture { yield } : nil
+-%>
+<%= content_tag :div, **root_attributes do %>
+  <%= render "ui/dialog", close_on_escape: true, close_on_overlay_click: true do %>
     <%= render "ui/dialog/overlay" do %>
-      <%= render "ui/dialog/content", classes: dialog_behavior.command_dialog_content_classes do %>
-        <%= render "ui/command/command" do %>
-          <%= yield if block_given? %>
+      <%= render "ui/dialog/content", classes: content_classes do %>
+        <%= render "ui/dialog/header", classes: header_classes do %>
+          <%= render "ui/dialog/title", content: title %>
+          <%= render "ui/dialog/description", content: description %>
+        <% end %>
+        <%= render "ui/command", autofocus: autofocus do %>
+          <%= body %>
         <% end %>
       <% end %>
     <% end %>
   <% end %>
-</div>
+<% end %>

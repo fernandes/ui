@@ -43,4 +43,19 @@ module UI::CommandDialogBehavior
   def command_dialog_content_classes
     "overflow-hidden p-0"
   end
+
+  # Accessible name and description (shadcn renders them sr-only, Radix Dialog
+  # needs a title). They are Dialog title/description targets, so the Dialog
+  # controller wires aria-labelledby/aria-describedby.
+  def command_dialog_title
+    @title || "Command Palette"
+  end
+
+  def command_dialog_description
+    @description || "Search for a command to run..."
+  end
+
+  def command_dialog_header_classes
+    "sr-only"
+  end
 end

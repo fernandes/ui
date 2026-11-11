@@ -1,96 +1,71 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Command Dialog controller
-// Opens a command palette dialog with keyboard shortcut (default: Cmd/Ctrl+J)
+// Opens a command palette dialog with a keyboard shortcut (default: Cmd+J).
 // Uses Stimulus keyboard event filter: https://stimulus.hotwired.dev/reference/actions#keyboardevent-filter
+//
+// The nested ui--dialog controller does the modal work: focus trap, inert
+// page, Escape layer and focus restore on close. This controller only toggles
+// it, makes the search input the initial focus and clears the search on close.
 export default class extends Controller {
   static values = {
     shortcut: { type: String, default: "meta+j" }
   }
 
+  constructor() {
+    super(...arguments)
+  }
+
   connect() {
-    // Find the nested dialog controller
-    this.dialogElement = this.element.querySelector("[data-controller*='ui--dialog']")
+    this.dialogElement = this.element.querySelector("[data-controller~='ui--dialog']")
 
-    // Bind handlers
-    this.boundHandleDialogClose = this.handleDialogClose.bind(this)
-    this.boundHandleFocusOut = this.handleFocusOut.bind(this)
-
-    // Listen for dialog close events to clear input
-    this.element.addEventListener("dialog:close", this.boundHandleDialogClose)
-
-    // Listen for focus out to close when focus leaves the dialog
-    this.element.addEventListener("focusout", this.boundHandleFocusOut)
+    this.handleDialogClose = this.handleDialogClose.bind(this)
+    this.element.addEventListener("dialog:close", this.handleDialogClose)
   }
 
   disconnect() {
-    this.element.removeEventListener("dialog:close", this.boundHandleDialogClose)
-    this.element.removeEventListener("focusout", this.boundHandleFocusOut)
+    this.element.removeEventListener("dialog:close", this.handleDialogClose)
   }
 
-  handleDialogClose() {
-    this.clearInput()
+  get dialogController() {
+    if (!this.dialogElement) return null
+    return this.application.getControllerForElementAndIdentifier(this.dialogElement, "ui--dialog")
   }
 
-  handleFocusOut(event) {
-    // Check if the dialog is open
-    if (!this.dialogElement) return
+  get input() {
+    return this.element.querySelector("[data-ui--command-target='input']")
+  }
 
-    const dialogController = this.application.getControllerForElementAndIdentifier(
-      this.dialogElement,
-      "ui--dialog"
-    )
-
-    if (!dialogController || !dialogController.openValue) return
-
-    // Use setTimeout to check relatedTarget after the focus has moved
-    // This is necessary because relatedTarget might be null during the transition
-    setTimeout(() => {
-      // Check if the new focused element is outside the dialog
-      const activeElement = document.activeElement
-      const dialogContent = this.dialogElement.querySelector("[data-ui--dialog-target='content']")
-
-      if (dialogContent && !dialogContent.contains(activeElement)) {
-        dialogController.close()
-      }
-    }, 0)
+  get commandAutofocus() {
+    const command = this.input?.closest("[data-controller~='ui--command']")
+    return command?.getAttribute("data-ui--command-autofocus-value") !== "false"
   }
 
   toggle(event) {
     event.preventDefault()
 
-    if (!this.dialogElement) return
+    const dialog = this.dialogController
+    if (!dialog) return
 
-    // Get the dialog controller instance
-    const dialogController = this.application.getControllerForElementAndIdentifier(
-      this.dialogElement,
-      "ui--dialog"
-    )
-
-    if (dialogController) {
-      if (dialogController.openValue) {
-        dialogController.close()
-      } else {
-        dialogController.open()
-        // Focus the command input after opening
-        this.focusInput()
-      }
+    if (dialog.openValue) {
+      dialog.close()
+    } else {
+      // The dialog's initial focus honours [autofocus] (also on mobile, where
+      // it otherwise skips text inputs), so the palette opens on its search
+      // field without a timer
+      if (this.commandAutofocus) this.input?.setAttribute("autofocus", "")
+      dialog.open()
     }
   }
 
-  focusInput() {
-    // Small delay to ensure dialog is open and animations started
-    setTimeout(() => {
-      const input = this.element.querySelector("[data-ui--command-target='input']")
-      if (input) {
-        input.focus()
-        input.select()
-      }
-    }, 50)
+  handleDialogClose() {
+    // Only needed while open; don't leave an [autofocus] for Turbo to find
+    this.input?.removeAttribute("autofocus")
+    this.clearInput()
   }
 
   clearInput() {
-    const input = this.element.querySelector("[data-ui--command-target='input']")
+    const input = this.input
     if (input) {
       input.value = ""
       // Trigger input event to reset filtering

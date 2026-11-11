@@ -69,6 +69,8 @@ Fast, composable command palette for searching and selecting items.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `shortcut` | String | `"meta+j"` | Keyboard shortcut to open dialog (uses Stimulus keyboard filter syntax) |
+| `title` | String | `"Command Palette"` | Visually hidden dialog title (its accessible name) |
+| `description` | String | `"Search for a command to run..."` | Visually hidden dialog description |
 | `classes` | String | `""` | Additional CSS classes |
 
 ## Examples

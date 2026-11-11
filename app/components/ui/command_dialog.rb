@@ -3,8 +3,11 @@
 class UI::CommandDialog < Phlex::HTML
   include UI::CommandDialogBehavior
 
-  def initialize(shortcut: "meta+j", autofocus: true, classes: "", **attributes)
+  def initialize(shortcut: "meta+j", autofocus: true, title: "Command Palette",
+    description: "Search for a command to run...", classes: "", **attributes)
     @shortcut = shortcut
+    @title = title
+    @description = description
     @autofocus = autofocus
     @classes = classes
     @attributes = attributes
@@ -15,6 +18,10 @@ class UI::CommandDialog < Phlex::HTML
       render UI::Dialog.new(close_on_escape: true, close_on_overlay_click: true) do
         render UI::DialogOverlay.new do
           render UI::DialogContent.new(classes: command_dialog_content_classes) do
+            render UI::DialogHeader.new(classes: command_dialog_header_classes) do
+              render UI::DialogTitle.new { command_dialog_title }
+              render UI::DialogDescription.new { command_dialog_description }
+            end
             render UI::Command.new(autofocus: @autofocus) do
               yield if block_given?
             end

@@ -3,8 +3,11 @@
 class UI::CommandDialogComponent < ViewComponent::Base
   include UI::CommandDialogBehavior
 
-  def initialize(shortcut: "meta+j", autofocus: true, classes: "", **attributes)
+  def initialize(shortcut: "meta+j", autofocus: true, title: "Command Palette",
+    description: "Search for a command to run...", classes: "", **attributes)
     @shortcut = shortcut
+    @title = title
+    @description = description
     @autofocus = autofocus
     @classes = classes
     @attributes = attributes
@@ -15,9 +18,15 @@ class UI::CommandDialogComponent < ViewComponent::Base
       render UI::DialogComponent.new(close_on_escape: true, close_on_overlay_click: true) do
         render UI::DialogOverlayComponent.new do
           render UI::DialogContentComponent.new(classes: command_dialog_content_classes) do
-            render UI::CommandComponent.new(autofocus: @autofocus) do
-              content
-            end
+            safe_join([
+              render(UI::DialogHeaderComponent.new(classes: command_dialog_header_classes)) do
+                safe_join([
+                  render(UI::DialogTitleComponent.new.with_content(command_dialog_title)),
+                  render(UI::DialogDescriptionComponent.new.with_content(command_dialog_description))
+                ])
+              end,
+              render(UI::CommandComponent.new(autofocus: @autofocus)) { content }
+            ])
           end
         end
       end
