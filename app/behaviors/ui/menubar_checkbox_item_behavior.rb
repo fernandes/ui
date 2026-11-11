@@ -15,7 +15,10 @@ module UI::MenubarCheckboxItemBehavior
     }
 
     # Add disabled attribute if specified
-    attrs[:"data-disabled"] = "" if disabled?
+    if disabled?
+      attrs[:"data-disabled"] = ""
+      attrs[:"aria-disabled"] = "true"
+    end
 
     attrs
   end

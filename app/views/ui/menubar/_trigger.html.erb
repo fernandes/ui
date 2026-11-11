@@ -3,6 +3,7 @@
   content ||= local_assigns.fetch(:content, nil)
   @classes = local_assigns.fetch(:classes, "")
   @attributes = local_assigns.fetch(:attributes, {})
+  @first = local_assigns.fetch(:first, false)
 
   # Extend behavior for shared logic
   extend UI::MenubarTriggerBehavior

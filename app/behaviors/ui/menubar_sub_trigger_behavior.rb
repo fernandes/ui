@@ -10,11 +10,16 @@ module UI::MenubarSubTriggerBehavior
       class: menubar_sub_trigger_classes,
       data: menubar_sub_trigger_data_attributes,
       role: "menuitem",
+      "aria-haspopup": "menu",
+      "aria-expanded": "false",
       tabindex: "-1"
     }
 
     # Add disabled attribute if specified
-    attrs[:"data-disabled"] = "" if disabled?
+    if disabled?
+      attrs[:"data-disabled"] = ""
+      attrs[:"aria-disabled"] = "true"
+    end
 
     attrs
   end
