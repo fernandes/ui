@@ -1462,37 +1462,181 @@ const computePosition = (reference, floating, options) => {
   });
 };
 
-function getFocusableItems(container, currentMenu = null) {
-  if (!currentMenu) {
-    const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    const currentItem = Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
-    if (currentItem) {
-      currentMenu = currentItem.closest('[role="menu"]');
-    }
+let counter = 0;
+
+const written = new WeakMap;
+
+function ensureId(element, prefix = "ui") {
+  if (!element) return null;
+  if (element.id) return element.id;
+  let id;
+  do {
+    counter += 1;
+    id = `ui-${prefix}-${counter}`;
+  } while (document.getElementById(id));
+  element.id = id;
+  return id;
+}
+
+function setIdRefs(element, attribute, targets, options = {}) {
+  if (!element) return null;
+  const {prefix: prefix = "ui", overwrite: overwrite = false} = options;
+  const current = element.getAttribute(attribute);
+  const ours = written.get(element)?.[attribute];
+  if (current && current !== ours && !overwrite) return current;
+  const ids = toArray(targets).map(target => ensureId(target, prefix));
+  if (ids.length === 0) {
+    element.removeAttribute(attribute);
+    remember(element, attribute, null);
+    return null;
   }
-  if (!currentMenu) return [];
-  const items = [];
-  Array.from(currentMenu.children).forEach(child => {
-    const role = child.getAttribute("role");
-    if (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio") {
-      if (!child.hasAttribute("data-disabled")) {
-        items.push(child);
-      }
-    } else if (role === "group") {
-      const radioItems = child.querySelectorAll('[role="menuitemradio"]');
-      radioItems.forEach(radioItem => {
-        if (!radioItem.hasAttribute("data-disabled")) {
-          items.push(radioItem);
-        }
-      });
-    } else if (child.classList && child.classList.contains("relative")) {
-      const trigger = child.querySelector(':scope > [role="menuitem"]');
-      if (trigger && !trigger.hasAttribute("data-disabled")) {
-        items.push(trigger);
-      }
-    }
+  const value = ids.join(" ");
+  element.setAttribute(attribute, value);
+  remember(element, attribute, value);
+  return value;
+}
+
+function addIdRef(element, attribute, target, prefix = "ui") {
+  if (!element || !target) return null;
+  const id = ensureId(target, prefix);
+  const tokens = tokenList(element, attribute);
+  if (!tokens.includes(id)) tokens.push(id);
+  element.setAttribute(attribute, tokens.join(" "));
+  return id;
+}
+
+function removeIdRef(element, attribute, target) {
+  if (!element || !target || !target.id) return;
+  const tokens = tokenList(element, attribute).filter(token => token !== target.id);
+  if (tokens.length) {
+    element.setAttribute(attribute, tokens.join(" "));
+  } else {
+    element.removeAttribute(attribute);
+  }
+}
+
+function tokenList(element, attribute) {
+  return (element.getAttribute(attribute) || "").split(/\s+/).filter(Boolean);
+}
+
+function toArray(targets) {
+  if (!targets) return [];
+  const list = Array.isArray(targets) || targets instanceof NodeList ? Array.from(targets) : [ targets ];
+  return list.filter(Boolean);
+}
+
+function remember(element, attribute, value) {
+  const record = written.get(element) || {};
+  record[attribute] = value;
+  written.set(element, record);
+}
+
+function getItemTextValue(item) {
+  if (item.dataset.textValue) return item.dataset.textValue;
+  let text = "";
+  item.childNodes.forEach(node => {
+    if (node.nodeType === 3) text += node.textContent; else if (node.nodeType === 1 && !node.matches('[data-slot="shortcut"], .ml-auto, svg, [aria-hidden="true"]')) text += node.textContent;
   });
-  return items;
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function createTypeahead({timeout: timeout = 1e3} = {}) {
+  let search = "";
+  let timer = null;
+  const reset = () => {
+    search = "";
+    clearTimeout(timer);
+    timer = null;
+  };
+  return {
+    isTypeaheadKey(event) {
+      if (event.ctrlKey || event.metaKey || event.altKey) return false;
+      if (!event.key || event.key.length !== 1) return false;
+      if (event.key === " " && search === "") return false;
+      return true;
+    },
+    handleKey(event, items, current = null) {
+      if (!this.isTypeaheadKey(event)) return null;
+      event.preventDefault();
+      search += event.key;
+      clearTimeout(timer);
+      timer = setTimeout(reset, timeout);
+      return findTypeaheadMatch(items, search, current);
+    },
+    isSearching() {
+      return search !== "";
+    },
+    reset: reset
+  };
+}
+
+function findTypeaheadMatch(items, search, current = null) {
+  if (!items.length || !search) return null;
+  const isRepeated = search.length > 1 && Array.from(search).every(char => char === search[0]);
+  const normalized = (isRepeated ? search[0] : search).toLowerCase();
+  const currentIndex = current ? items.indexOf(current) : -1;
+  const ordered = items.map((_, i) => items[(Math.max(currentIndex, 0) + i) % items.length]);
+  const candidates = normalized.length === 1 ? ordered.filter(item => item !== current) : ordered;
+  const match = candidates.find(item => getItemTextValue(item).toLowerCase().startsWith(normalized));
+  return match && match !== current ? match : null;
+}
+
+const MENU_ITEM_SELECTOR = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
+
+function isItemDisabled(item) {
+  if (!item) return true;
+  return item.hasAttribute("data-disabled") || item.getAttribute("aria-disabled") === "true";
+}
+
+function isEditableTarget(element) {
+  if (!element || element.nodeType !== 1) return false;
+  if (element.isContentEditable) return true;
+  const tag = element.tagName;
+  if (tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (tag !== "INPUT") return false;
+  const type = (element.getAttribute("type") || "text").toLowerCase();
+  return ![ "button", "checkbox", "radio", "submit", "reset", "image", "range", "color", "file" ].includes(type);
+}
+
+const CHECK_ICON = `<span data-state="checked"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>`;
+
+const RADIO_ICON = `<span data-state="checked"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle size-2 fill-current" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle></svg></span>`;
+
+function indicatorContainer(item) {
+  return item.querySelector(".absolute.left-2") || item.querySelector("span.absolute");
+}
+
+function toggleCheckbox(item) {
+  if (!item || item.getAttribute("role") !== "menuitemcheckbox") return false;
+  if (isItemDisabled(item)) return item.getAttribute("aria-checked") === "true";
+  const isChecked = item.getAttribute("aria-checked") !== "true" && item.getAttribute("data-state") !== "checked";
+  item.setAttribute("data-state", isChecked ? "checked" : "unchecked");
+  item.setAttribute("aria-checked", String(isChecked));
+  const iconContainer = indicatorContainer(item);
+  if (iconContainer) iconContainer.innerHTML = isChecked ? CHECK_ICON : "";
+  return isChecked;
+}
+
+function selectRadio(item) {
+  if (!item || item.getAttribute("role") !== "menuitemradio") return;
+  if (isItemDisabled(item)) return;
+  const radioGroup = item.closest('[role="group"]') || item.closest('[role="menu"]');
+  if (!radioGroup) return;
+  radioGroup.querySelectorAll('[role="menuitemradio"]').forEach(radio => {
+    radio.setAttribute("data-state", "unchecked");
+    radio.setAttribute("aria-checked", "false");
+    const iconContainer = indicatorContainer(radio);
+    if (iconContainer) iconContainer.innerHTML = "";
+  });
+  item.setAttribute("data-state", "checked");
+  item.setAttribute("aria-checked", "true");
+  const iconContainer = indicatorContainer(item);
+  if (iconContainer) iconContainer.innerHTML = RADIO_ICON;
+}
+
+function getMenuItems(menu, {includeDisabled: includeDisabled = false} = {}) {
+  if (!menu) return [];
+  return Array.from(menu.querySelectorAll(MENU_ITEM_SELECTOR)).filter(item => item.closest('[role="menu"]') === menu && (includeDisabled || !isItemDisabled(item)));
 }
 
 function findCurrentItemIndex(items) {
@@ -1502,23 +1646,17 @@ function findCurrentItemIndex(items) {
 
 function focusItem(items, index, container) {
   if (items.length === 0 || index < 0 || index >= items.length) return;
-  const allMenuItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-  allMenuItems.forEach(item => {
-    item.setAttribute("tabindex", "-1");
-  });
   const targetItem = items[index];
-  targetItem.setAttribute("tabindex", "0");
+  updateRovingTabindex(container, targetItem);
   targetItem.focus();
   return targetItem;
 }
 
 function focusNextItem(items, container, loop = true) {
   if (items.length === 0) return null;
-  let currentIndex = findCurrentItemIndex(items);
+  const currentIndex = findCurrentItemIndex(items);
   if (currentIndex === -1 || currentIndex >= items.length - 1) {
-    if (loop) {
-      return focusItem(items, 0, container);
-    }
+    if (loop || currentIndex === -1) return focusItem(items, 0, container);
     return null;
   }
   return focusItem(items, currentIndex + 1, container);
@@ -1526,69 +1664,102 @@ function focusNextItem(items, container, loop = true) {
 
 function focusPreviousItem(items, container, loop = true) {
   if (items.length === 0) return null;
-  let currentIndex = findCurrentItemIndex(items);
+  const currentIndex = findCurrentItemIndex(items);
   if (currentIndex === -1 || currentIndex === 0) {
-    if (loop) {
-      return focusItem(items, items.length - 1, container);
-    }
+    if (loop || currentIndex === -1) return focusItem(items, items.length - 1, container);
     return null;
   }
   return focusItem(items, currentIndex - 1, container);
 }
 
-function hasSubmenu(menuItem) {
-  if (!menuItem) return false;
-  const nextSibling = menuItem.nextElementSibling;
-  return nextSibling && nextSibling.getAttribute("role") === "menu";
+function getSubmenu(trigger) {
+  const next = trigger?.nextElementSibling;
+  return next && next.getAttribute("role") === "menu" ? next : null;
 }
 
-function openSubmenu(trigger, submenu) {
+function hasSubmenu(menuItem) {
+  return !!getSubmenu(menuItem);
+}
+
+function isSubmenu(menu) {
+  return !!(menu && menu.getAttribute("role") === "menu" && menu.parentElement?.closest('[role="menu"]'));
+}
+
+function getSubmenuTrigger(submenu) {
+  if (!isSubmenu(submenu)) return null;
+  const trigger = submenu.previousElementSibling;
+  return trigger && trigger.matches(MENU_ITEM_SELECTOR) ? trigger : null;
+}
+
+function initSubmenuTriggers(container, prefix = "menu") {
+  container.querySelectorAll('[role="menu"] [role="menu"]').forEach(submenu => {
+    const trigger = getSubmenuTrigger(submenu);
+    if (!trigger) return;
+    ensureId(submenu, `${prefix}-sub-content`);
+    trigger.setAttribute("aria-haspopup", "menu");
+    trigger.setAttribute("aria-expanded", String(submenu.getAttribute("data-state") === "open"));
+    setIdRefs(trigger, "aria-controls", submenu, {
+      prefix: `${prefix}-sub-trigger`
+    });
+    setIdRefs(submenu, "aria-labelledby", trigger, {
+      prefix: `${prefix}-sub-trigger`
+    });
+  });
+}
+
+function openSubmenu(trigger, submenu, {position: position = true} = {}) {
   if (!submenu || submenu.getAttribute("role") !== "menu") return;
+  if (isItemDisabled(trigger)) return;
   submenu.classList.remove("hidden");
   submenu.setAttribute("data-state", "open");
   trigger.setAttribute("data-state", "open");
-  positionSubmenu(trigger, submenu);
+  trigger.setAttribute("aria-expanded", "true");
+  if (position) positionSubmenu(trigger, submenu);
 }
 
-function closeSubmenu(submenu, trigger) {
-  if (!submenu) return;
-  const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
-  nestedSubmenus.forEach(nested => {
-    nested.classList.add("hidden");
-    nested.setAttribute("data-state", "closed");
-    const nestedTrigger = nested.previousElementSibling;
-    if (nestedTrigger) {
-      nestedTrigger.setAttribute("data-state", "closed");
-    }
-  });
+function markClosed(submenu, trigger) {
   submenu.classList.add("hidden");
   submenu.setAttribute("data-state", "closed");
   if (trigger) {
     trigger.setAttribute("data-state", "closed");
+    if (trigger.hasAttribute("aria-expanded")) trigger.setAttribute("aria-expanded", "false");
   }
 }
 
-function closeAllSubmenus(container) {
-  const submenus = container.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
-  submenus.forEach(submenu => {
-    submenu.classList.add("hidden");
-    submenu.setAttribute("data-state", "closed");
-    const trigger = submenu.previousElementSibling;
-    if (trigger) {
-      trigger.setAttribute("data-state", "closed");
-    }
+function closeSubmenu(submenu, trigger, onClose = null) {
+  if (!submenu) return;
+  submenu.querySelectorAll('[role="menu"]').forEach(nested => {
+    markClosed(nested, getSubmenuTrigger(nested));
+    if (onClose) onClose(nested);
+  });
+  markClosed(submenu, trigger || getSubmenuTrigger(submenu));
+  if (onClose) onClose(submenu);
+}
+
+function closeAllSubmenus(container, onClose = null) {
+  container.querySelectorAll('[role="menu"] [role="menu"]').forEach(submenu => {
+    markClosed(submenu, getSubmenuTrigger(submenu));
+    if (onClose) onClose(submenu);
+  });
+}
+
+function closeSiblingSubmenus(currentItem, menu = null, onClose = null) {
+  const parentMenu = menu || currentItem.closest('[role="menu"]');
+  if (!parentMenu) return;
+  getMenuItems(parentMenu, {
+    includeDisabled: true
+  }).forEach(item => {
+    if (item === currentItem) return;
+    const submenu = getSubmenu(item);
+    if (submenu && submenu.getAttribute("data-state") === "open") closeSubmenu(submenu, item, onClose);
   });
 }
 
 function positionDropdown(trigger, content, options = {}) {
   const {placement: placement = "bottom-start", offsetValue: offsetValue = 4, flipEnabled: flipEnabled = true} = options;
   const middleware = [];
-  if (offsetValue > 0) {
-    middleware.push(offset(offsetValue));
-  }
-  if (flipEnabled) {
-    middleware.push(flip());
-  }
+  if (offsetValue > 0) middleware.push(offset(offsetValue));
+  if (flipEnabled) middleware.push(flip());
   middleware.push(shift({
     padding: 8
   }));
@@ -1608,7 +1779,8 @@ function positionDropdown(trigger, content, options = {}) {
 }
 
 function positionSubmenu(trigger, submenu) {
-  const side = submenu.getAttribute("data-side") || "right";
+  if (!submenu.dataset.preferredSide) submenu.dataset.preferredSide = submenu.getAttribute("data-side") || "right";
+  const side = submenu.dataset.preferredSide;
   const align = submenu.getAttribute("data-align") || "start";
   const placement = `${side}-${align}`;
   computePosition(trigger, submenu, {
@@ -1628,17 +1800,84 @@ function positionSubmenu(trigger, submenu) {
   });
 }
 
+function updateRovingTabindex(container, focusedItem) {
+  container.querySelectorAll(MENU_ITEM_SELECTOR).forEach(item => {
+    item.setAttribute("tabindex", item === focusedItem ? "0" : "-1");
+  });
+}
+
 function clearAllTabindexes(container) {
-  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-  allItems.forEach(item => {
+  container.querySelectorAll(MENU_ITEM_SELECTOR).forEach(item => {
     item.setAttribute("tabindex", "-1");
   });
 }
 
 function getKeyboardFocusedItem(container) {
-  const allItems = container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-  return Array.from(allItems).find(item => item.getAttribute("tabindex") === "0") || null;
+  if (!container) return null;
+  return Array.from(container.querySelectorAll(MENU_ITEM_SELECTOR)).find(item => item.getAttribute("tabindex") === "0") || null;
 }
+
+const layers = [];
+
+let listening$1 = false;
+
+function handleKeydown(event) {
+  if (event.key !== "Escape" || event.defaultPrevented || event.isComposing) return;
+  pruneDisconnected();
+  const top = layers[layers.length - 1];
+  if (!top) return;
+  event.preventDefault();
+  top.onEscape(event);
+}
+
+function pruneDisconnected() {
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const {element: element} = layers[i];
+    if (element && !element.isConnected) layers.splice(i, 1);
+  }
+}
+
+function startListening() {
+  if (listening$1) return;
+  document.addEventListener("keydown", handleKeydown);
+  listening$1 = true;
+}
+
+function stopListeningIfIdle() {
+  if (!listening$1 || layers.length > 0) return;
+  document.removeEventListener("keydown", handleKeydown);
+  listening$1 = false;
+}
+
+function createEscapeLayer(onEscape, options = {}) {
+  const layer = {
+    onEscape: onEscape || (() => {}),
+    element: options.element || null
+  };
+  return {
+    activate() {
+      const index = layers.indexOf(layer);
+      if (index !== -1) layers.splice(index, 1);
+      layers.push(layer);
+      startListening();
+    },
+    deactivate() {
+      const index = layers.indexOf(layer);
+      if (index !== -1) layers.splice(index, 1);
+      stopListeningIfIdle();
+    },
+    isActive() {
+      return layers.includes(layer);
+    },
+    isTopmost() {
+      return layers[layers.length - 1] === layer;
+    }
+  };
+}
+
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+const NATIVE_ACTIVATOR = 'button, a[href], input[type="button"], input[type="submit"], input[type="reset"], summary';
 
 class DropdownController extends Controller {
   static targets=[ "trigger", "menu", "content", "item" ];
@@ -1669,49 +1908,219 @@ class DropdownController extends Controller {
     this.cleanup = null;
     this.closeSubmenuTimeouts = new Map;
     this.lastHoveredItem = null;
-    this.shouldReturnFocusToTrigger = false;
   }
   connect() {
+    this.typeahead = createTypeahead();
     this.boundHandleClickOutside = this.handleClickOutside.bind(this);
     this.boundHandleKeydown = this.handleKeydown.bind(this);
     this.boundHandleFocusOut = this.handleFocusOut.bind(this);
     document.addEventListener("click", this.boundHandleClickOutside);
     this.element.addEventListener("focusout", this.boundHandleFocusOut);
+    this.element.addEventListener("keydown", this.boundHandleKeydown);
+    this.escapeLayer = createEscapeLayer(() => this.handleEscape(), {
+      element: this.element
+    });
+    this.setupAria();
+    this.resetToClosed();
   }
   disconnect() {
     if (this.cleanup) {
       this.cleanup();
       this.cleanup = null;
     }
-    this.closeSubmenuTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
-    this.closeSubmenuTimeouts.clear();
+    this.clearSubmenuTimeouts();
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
     document.removeEventListener("click", this.boundHandleClickOutside);
-    document.removeEventListener("keydown", this.boundHandleKeydown);
+    this.element.removeEventListener("keydown", this.boundHandleKeydown);
     this.element.removeEventListener("focusout", this.boundHandleFocusOut);
   }
-  handleFocusOut(event) {
+  get menuElement() {
+    return this.hasMenuTarget ? this.menuTarget : this.hasContentTarget ? this.contentTarget : null;
+  }
+  get triggerElement() {
+    if (!this.hasTriggerTarget) return null;
+    const trigger = this.triggerTarget;
+    if (trigger.matches(`${NATIVE_ACTIVATOR}, [role="button"]`)) return trigger;
+    return trigger.querySelector(FOCUSABLE) || trigger;
+  }
+  setupAria() {
+    const menu = this.menuElement;
+    const trigger = this.triggerElement;
+    if (!menu) return;
+    ensureId(menu, "dropdown-menu-content");
+    if (trigger) {
+      trigger.setAttribute("aria-haspopup", "menu");
+      trigger.setAttribute("aria-expanded", String(this.openValue));
+      setIdRefs(trigger, "aria-controls", menu, {
+        prefix: "dropdown-menu-trigger"
+      });
+      setIdRefs(menu, "aria-labelledby", trigger, {
+        prefix: "dropdown-menu-trigger"
+      });
+    }
+    initSubmenuTriggers(this.element, "dropdown-menu");
+  }
+  resetToClosed() {
+    const menu = this.menuElement;
+    if (!menu) return;
+    if (this.openValue || menu.getAttribute("data-state") === "open") {
+      this.openValue = false;
+      closeAllSubmenus(this.element);
+      clearAllTabindexes(this.element);
+      menu.classList.add("hidden");
+      menu.setAttribute("data-state", "closed");
+      this.triggerElement?.setAttribute("aria-expanded", "false");
+    }
+  }
+  toggle(event) {
+    if (event && event.type === "keydown") {
+      if (this.isNativeActivation(event)) return;
+      event.preventDefault();
+    }
+    if (this.openValue) {
+      this.close();
+    } else {
+      this.open();
+    }
+  }
+  handleTriggerKeydown(event) {
+    switch (event.key) {
+     case "Enter":
+     case " ":
+      if (this.isNativeActivation(event)) return;
+      event.preventDefault();
+      this.toggle();
+      break;
+
+     case "ArrowDown":
+      event.preventDefault();
+      if (this.openValue) this.focusItem(0); else this.open({
+        focus: "first"
+      });
+      break;
+
+     case "ArrowUp":
+      event.preventDefault();
+      if (this.openValue) this.focusItem(this.getFocusableItems().length - 1); else this.open({
+        focus: "last"
+      });
+      break;
+    }
+  }
+  isNativeActivation(event) {
+    const activator = event.target.closest?.(NATIVE_ACTIVATOR);
+    return !!(activator && this.hasTriggerTarget && this.triggerTarget.contains(activator));
+  }
+  open({focus: focus = "first"} = {}) {
+    const menu = this.menuElement;
+    if (!menu) return;
+    this.openValue = true;
+    this.typeahead.reset();
+    menu.classList.remove("hidden");
+    menu.setAttribute("data-state", "open");
+    this.triggerElement?.setAttribute("aria-expanded", "true");
+    this.positionDropdown();
+    this.escapeLayer.activate();
+    const items = this.getMenuItems(menu);
+    if (focus === "last") this.focusItem(items.length - 1); else if (focus) this.focusItem(0);
+  }
+  close(options = {}) {
+    const {returnFocus: returnFocus = false} = options;
+    const wasOpen = this.openValue;
+    const menu = this.menuElement;
+    this.openValue = false;
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
+    if (returnFocus && wasOpen) this.focusTrigger();
+    this.clearSubmenuTimeouts();
+    closeAllSubmenus(this.element);
+    clearAllTabindexes(this.element);
+    this.lastHoveredItem = null;
+    if (menu) {
+      menu.classList.add("hidden");
+      menu.setAttribute("data-state", "closed");
+    }
+    this.triggerElement?.setAttribute("aria-expanded", "false");
+    if (this.cleanup) {
+      this.cleanup();
+      this.cleanup = null;
+    }
+  }
+  focusTrigger() {
+    this.triggerElement?.focus();
+  }
+  handleEscape() {
+    const focusedCommandOption = this.focusedCommandOption();
+    if (focusedCommandOption) {
+      this.closeCommandSubmenu(focusedCommandOption.closest('[data-controller~="command"]'));
+    } else if (!this.closeCurrentSubmenuWithKeyboard()) {
+      this.close({
+        returnFocus: true
+      });
+    }
+  }
+  handleFocusOut() {
     if (!this.openValue) return;
     setTimeout(() => {
-      const newFocusedElement = document.activeElement;
-      if (!this.element.contains(newFocusedElement)) {
+      if (this.openValue && !this.element.contains(document.activeElement)) {
         this.close({
           returnFocus: false
         });
       }
     }, 0);
   }
+  handleClickOutside(event) {
+    if (!this.openValue) return;
+    if (!this.element.contains(event.target)) {
+      this.close({
+        returnFocus: false
+      });
+    }
+  }
+  select(event) {
+    const item = event.currentTarget;
+    if (isItemDisabled(item)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+    if (hasSubmenu(item)) return;
+    this.close({
+      returnFocus: true
+    });
+  }
+  toggleCheckbox(event) {
+    const item = event.currentTarget;
+    if (item.getAttribute("role") !== "menuitemcheckbox") return;
+    event.stopPropagation();
+    toggleCheckbox(item);
+  }
+  selectRadio(event) {
+    const item = event.currentTarget;
+    if (item.getAttribute("role") !== "menuitemradio") return;
+    event.stopPropagation();
+    selectRadio(item);
+  }
+  trackHoveredItem(event) {
+    const item = event.currentTarget;
+    if (isItemDisabled(item)) return;
+    updateRovingTabindex(this.element, item);
+    item.focus();
+    this.lastHoveredItem = item;
+  }
   openSubmenuHandler(event) {
     const trigger = event.currentTarget;
-    const submenu = trigger.nextElementSibling;
-    clearAllTabindexes(this.element);
-    trigger.setAttribute("tabindex", "0");
+    const submenu = getSubmenu(trigger);
+    if (isItemDisabled(trigger)) return;
+    updateRovingTabindex(this.element, trigger);
     trigger.focus();
     this.lastHoveredItem = trigger;
     if (this.closeSubmenuTimeouts.has(trigger)) {
       clearTimeout(this.closeSubmenuTimeouts.get(trigger));
       this.closeSubmenuTimeouts.delete(trigger);
     }
-    if (submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu") {
+    if (submenu) {
       this.closeSiblingSubmenus(trigger);
       openSubmenu(trigger, submenu);
       this.focusFirstCommandItem(submenu);
@@ -1720,81 +2129,13 @@ class DropdownController extends Controller {
   openSubmenu(event) {
     return this.openSubmenuHandler(event);
   }
-  focusFirstCommandItem(submenu) {
-    const commandElement = submenu.querySelector('[data-controller~="command"]');
-    if (!commandElement) return;
-    setTimeout(() => {
-      const firstOption = commandElement.querySelector('[role="option"]:not([data-hidden])');
-      if (firstOption) {
-        const allOptions = commandElement.querySelectorAll('[role="option"]');
-        allOptions.forEach(option => {
-          option.removeAttribute("data-focused");
-          option.classList.remove("bg-accent", "text-accent-foreground");
-        });
-        firstOption.setAttribute("data-focused", "true");
-        firstOption.classList.add("bg-accent", "text-accent-foreground");
-      }
-    }, 50);
-  }
-  trackHoveredItem(event) {
-    const item = event.currentTarget;
-    clearAllTabindexes(this.element);
-    item.setAttribute("tabindex", "0");
-    item.focus();
-    this.lastHoveredItem = item;
-  }
-  toggleCheckbox(event) {
-    const item = event.currentTarget;
-    if (item.getAttribute("role") !== "menuitemcheckbox") return;
-    event.stopPropagation();
-    const currentState = item.getAttribute("data-state");
-    const newState = currentState === "checked" ? "unchecked" : "checked";
-    const isChecked = newState === "checked";
-    item.setAttribute("data-state", newState);
-    item.setAttribute("aria-checked", isChecked);
-    const checkIcon = item.querySelector('[data-state="checked"]');
-    if (checkIcon) {
-      checkIcon.parentElement.innerHTML = isChecked ? `\n        <span data-state="checked">\n          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4">\n            <path d="M20 6 9 17l-5-5"></path>\n          </svg>\n        </span>\n      ` : "";
-    } else if (isChecked) {
-      const iconContainer = item.querySelector(".absolute.left-2");
-      if (iconContainer) {
-        iconContainer.innerHTML = `\n          <span data-state="checked">\n            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check size-4">\n              <path d="M20 6 9 17l-5-5"></path>\n            </svg>\n          </span>\n        `;
-      }
-    }
-  }
-  selectRadio(event) {
-    const item = event.currentTarget;
-    if (item.getAttribute("role") !== "menuitemradio") return;
-    event.stopPropagation();
-    const radioGroup = item.closest('[role="group"]') || item.closest('[role="menu"]');
-    if (!radioGroup) return;
-    const allRadios = radioGroup.querySelectorAll('[role="menuitemradio"]');
-    allRadios.forEach(radio => {
-      radio.setAttribute("data-state", "unchecked");
-      radio.setAttribute("aria-checked", "false");
-      const iconContainer = radio.querySelector(".absolute.left-2");
-      if (iconContainer) {
-        iconContainer.innerHTML = "";
-      }
-    });
-    item.setAttribute("data-state", "checked");
-    item.setAttribute("aria-checked", "true");
-    const iconContainer = item.querySelector(".absolute.left-2");
-    if (iconContainer) {
-      iconContainer.innerHTML = `\n        <span data-state="checked">\n          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle size-2 fill-current">\n            <circle cx="12" cy="12" r="10"></circle>\n          </svg>\n        </span>\n      `;
-    }
-  }
   closeSubmenuHandler(event) {
     const trigger = event.currentTarget;
-    const submenu = trigger.nextElementSibling;
+    const submenu = getSubmenu(trigger);
     const relatedTarget = event.relatedTarget;
-    if (relatedTarget && submenu && submenu.contains(relatedTarget)) {
-      return;
-    }
+    if (relatedTarget && submenu && submenu.contains(relatedTarget)) return;
     const timeoutId = setTimeout(() => {
-      if (submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu") {
-        closeSubmenu(submenu, trigger);
-      }
+      if (submenu) closeSubmenu(submenu, trigger);
       this.closeSubmenuTimeouts.delete(trigger);
     }, 300);
     this.closeSubmenuTimeouts.set(trigger, timeoutId);
@@ -1803,15 +2144,7 @@ class DropdownController extends Controller {
     return this.closeSubmenuHandler(event);
   }
   closeSiblingSubmenus(currentTrigger) {
-    const parentMenu = currentTrigger.closest('[role="menu"]');
-    if (!parentMenu) return;
-    const siblingTriggers = Array.from(parentMenu.children).filter(child => child !== currentTrigger && child.hasAttribute("data-dropdown-target") && child.getAttribute("data-dropdown-target").includes("item"));
-    siblingTriggers.forEach(sibling => {
-      const siblingSubmenu = sibling.nextElementSibling;
-      if (siblingSubmenu && siblingSubmenu.hasAttribute("role") && siblingSubmenu.getAttribute("role") === "menu") {
-        closeSubmenu(siblingSubmenu, sibling);
-      }
-    });
+    closeSiblingSubmenus(currentTrigger);
   }
   closeAllSubmenusHandler() {
     closeAllSubmenus(this.element);
@@ -1819,294 +2152,179 @@ class DropdownController extends Controller {
   closeAllSubmenus() {
     return this.closeAllSubmenusHandler();
   }
-  toggle(event) {
-    this.openValue = !this.openValue;
-    const target = this.hasMenuTarget ? this.menuTarget : this.contentTarget;
-    target.classList.toggle("hidden");
-    if (!target.classList.contains("hidden")) {
-      target.setAttribute("data-state", "open");
-      this.positionDropdown();
-      this.setupKeyboardNavigation();
-      setTimeout(() => {
-        this.focusItem(0);
-      }, 100);
-    } else {
-      target.setAttribute("data-state", "closed");
-      this.teardownKeyboardNavigation();
-    }
-  }
-  close(options = {}) {
-    const {returnFocus: returnFocus = this.shouldReturnFocusToTrigger} = options;
-    this.openValue = false;
-    const target = this.hasMenuTarget ? this.menuTarget : this.contentTarget;
-    closeAllSubmenus(this.element);
-    clearAllTabindexes(this.element);
-    this.lastHoveredItem = null;
-    if (target) {
-      target.classList.add("hidden");
-      target.setAttribute("data-state", "closed");
-    }
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
-    }
-    this.teardownKeyboardNavigation();
-    if (returnFocus && this.hasTriggerTarget) {
-      setTimeout(() => {
-        this.focusTrigger();
-      }, 0);
-    }
-    this.shouldReturnFocusToTrigger = false;
-  }
-  focusTrigger() {
-    if (!this.triggerTarget) return;
-    const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (isFocusable) {
-      this.triggerTarget.focus();
-    } else {
-      const focusableChild = this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      if (focusableChild) {
-        focusableChild.focus();
-      }
-    }
-  }
-  handleClickOutside(event) {
-    if (!this.element.contains(event.target)) {
-      this.close({
-        returnFocus: false
-      });
-    } else if (this.hasTriggerTarget && this.triggerTarget.contains(event.target)) {
-      return;
-    }
-  }
-  setupKeyboardNavigation() {
-    document.addEventListener("keydown", this.boundHandleKeydown);
-  }
-  teardownKeyboardNavigation() {
-    document.removeEventListener("keydown", this.boundHandleKeydown);
+  clearSubmenuTimeouts() {
+    this.closeSubmenuTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    this.closeSubmenuTimeouts.clear();
   }
   handleKeydown(event) {
-    if (!this.openValue) return;
-    const focusedElement = document.activeElement;
-    const focusedCommandOption = this.element.querySelector('[data-controller~="command"] [role="option"][data-focused="true"]');
+    if (!this.openValue || event.defaultPrevented) return;
+    const menu = this.menuElement;
+    const target = event.target;
+    if (!menu || !menu.contains(target)) return;
+    const focusedCommandOption = this.focusedCommandOption();
     if (focusedCommandOption && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
-      const commandElement = focusedCommandOption.closest('[data-controller~="command"]');
-      this.handleCommandNavigation(event, commandElement);
+      this.handleCommandNavigation(event, focusedCommandOption.closest('[data-controller~="command"]'));
       return;
     }
-    const items = this.getFocusableItems();
+    if (event.key === "Tab") {
+      this.close({
+        returnFocus: true
+      });
+      return;
+    }
+    if (isEditableTarget(target)) return;
+    const current = this.currentItem();
+    if (this.typeahead.isTypeaheadKey(event)) {
+      const match = this.typeahead.handleKey(event, this.getFocusableItems(), current);
+      if (match) this.focusItemElement(match);
+      return;
+    }
     switch (event.key) {
      case "ArrowDown":
       event.preventDefault();
-      this.focusNextItem(items);
+      this.focusNextItem();
       break;
 
      case "ArrowUp":
       event.preventDefault();
-      this.focusPreviousItem(items);
+      this.focusPreviousItem();
       break;
 
      case "ArrowRight":
       event.preventDefault();
-      if (focusedElement && hasSubmenu(focusedElement)) {
-        this.openSubmenuWithKeyboard(focusedElement);
-      }
+      if (current && hasSubmenu(current)) this.openSubmenuWithKeyboard(current);
       break;
 
      case "ArrowLeft":
       event.preventDefault();
       if (focusedCommandOption) {
-        const commandElement = focusedCommandOption.closest('[data-controller~="command"]');
-        this.closeCommandSubmenu(commandElement);
+        this.closeCommandSubmenu(focusedCommandOption.closest('[data-controller~="command"]'));
       } else {
-        this.closeCurrentSubmenuWithKeyboard(focusedElement);
+        this.closeCurrentSubmenuWithKeyboard();
       }
       break;
 
      case "Home":
       event.preventDefault();
-      this.focusItem(0, items);
+      this.focusItem(0);
       break;
 
      case "End":
       event.preventDefault();
-      this.focusItem(items.length - 1, items);
+      this.focusItem(this.getFocusableItems().length - 1);
       break;
 
-     case "Escape":
+     case "Enter":
+     case " ":
       event.preventDefault();
-      if (focusedCommandOption) {
-        const commandElement = focusedCommandOption.closest('[data-controller~="command"]');
-        this.closeCommandSubmenu(commandElement);
-      } else if (!this.closeCurrentSubmenuWithKeyboard(focusedElement)) {
+      this.activateItem(current, {
+        closeOnCheck: event.key === "Enter"
+      });
+      break;
+    }
+  }
+  activateItem(item, {closeOnCheck: closeOnCheck}) {
+    if (!item || isItemDisabled(item)) return;
+    const role = item.getAttribute("role");
+    if (role === "menuitem") {
+      if (hasSubmenu(item)) {
+        this.openSubmenuWithKeyboard(item);
+      } else {
+        item.click();
         this.close({
           returnFocus: true
         });
       }
-      break;
-
-     case "Enter":
-      event.preventDefault();
-      const enterTarget = getKeyboardFocusedItem(this.element) || focusedElement;
-      if (enterTarget && enterTarget.hasAttribute("role")) {
-        const role = enterTarget.getAttribute("role");
-        if (role === "menuitem") {
-          if (hasSubmenu(enterTarget)) {
-            this.openSubmenuWithKeyboard(enterTarget);
-          } else {
-            enterTarget.click();
-            this.close();
-          }
-        } else if (role === "menuitemcheckbox" || role === "menuitemradio") {
-          enterTarget.click();
-          this.shouldReturnFocusToTrigger = true;
-          this.close();
-        }
-      }
-      break;
-
-     case " ":
-      event.preventDefault();
-      const spaceTarget = getKeyboardFocusedItem(this.element) || focusedElement;
-      if (spaceTarget && spaceTarget.hasAttribute("role")) {
-        const role = spaceTarget.getAttribute("role");
-        if (role === "menuitem") {
-          if (hasSubmenu(spaceTarget)) {
-            this.openSubmenuWithKeyboard(spaceTarget);
-          } else {
-            spaceTarget.click();
-            this.close();
-          }
-        } else if (role === "menuitemcheckbox" || role === "menuitemradio") {
-          spaceTarget.click();
-        }
-      }
-      break;
+    } else if (role === "menuitemcheckbox" || role === "menuitemradio") {
+      item.click();
+      if (closeOnCheck) this.close({
+        returnFocus: true
+      });
     }
+  }
+  currentItem() {
+    const active = document.activeElement;
+    if (active && active.matches?.(MENU_ITEM_SELECTOR) && this.element.contains(active)) return active;
+    return getKeyboardFocusedItem(this.element);
+  }
+  focusedCommandOption() {
+    return this.element.querySelector('[data-controller~="command"] [role="option"][data-focused="true"]');
+  }
+  getMenuItems(menu) {
+    return getMenuItems(menu);
   }
   getFocusableItems() {
-    const currentMenu = this.getCurrentMenu();
-    return getFocusableItems(this.element, currentMenu);
+    return getMenuItems(this.getCurrentMenu());
   }
   getCurrentMenu() {
-    const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    const currentItem = Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
-    if (currentItem) {
-      return currentItem.closest('[role="menu"]');
-    }
-    return this.hasMenuTarget ? this.menuTarget : this.contentTarget;
+    const current = this.currentItem();
+    if (current) return current.closest('[role="menu"]');
+    return this.menuElement;
   }
-  focusNextItem(items = null) {
-    items = items || this.getFocusableItems();
-    if (items.length === 0) return;
-    const result = focusNextItem(items, this.element, true);
-    if (result) {
-      this.lastHoveredItem = result;
-    }
+  focusNextItem() {
+    const result = focusNextItem(this.getFocusableItems(), this.element, true);
+    if (result) this.afterKeyboardFocus(result);
   }
-  focusPreviousItem(items = null) {
-    items = items || this.getFocusableItems();
-    if (items.length === 0) return;
-    const result = focusPreviousItem(items, this.element, true);
-    if (result) {
-      this.lastHoveredItem = result;
-    }
+  focusPreviousItem() {
+    const result = focusPreviousItem(this.getFocusableItems(), this.element, true);
+    if (result) this.afterKeyboardFocus(result);
   }
-  focusItem(index, items = null) {
-    items = this.getFocusableItems();
-    if (items.length === 0 || index < 0 || index >= items.length) {
-      return;
-    }
-    const currentMenu = items[0] ? items[0].closest('[role="menu"]') : null;
-    if (currentMenu) {
-      const siblingsWithSubmenus = Array.from(currentMenu.children).filter(child => {
-        if (child.classList && child.classList.contains("relative")) {
-          const trigger = child.querySelector(':scope > [role="menuitem"]');
-          const submenu = trigger?.nextElementSibling;
-          return submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu";
-        }
-        return false;
-      });
-      siblingsWithSubmenus.forEach(container => {
-        const trigger = container.querySelector(':scope > [role="menuitem"]');
-        const submenu = trigger?.nextElementSibling;
-        if (submenu && submenu.getAttribute("data-state") === "open") {
-          closeSubmenu(submenu, trigger);
-        }
-      });
-    }
+  focusItem(index) {
+    const items = this.getFocusableItems();
+    if (items.length === 0 || index < 0 || index >= items.length) return;
     const targetItem = focusItem(items, index, this.element);
-    if (targetItem) {
-      this.lastHoveredItem = targetItem;
-    }
+    if (targetItem) this.afterKeyboardFocus(targetItem);
+  }
+  focusItemElement(item) {
+    updateRovingTabindex(this.element, item);
+    item.focus();
+    this.afterKeyboardFocus(item);
+  }
+  afterKeyboardFocus(item) {
+    this.lastHoveredItem = item;
+    closeSiblingSubmenus(item);
   }
   openSubmenuWithKeyboard(trigger) {
-    const submenu = trigger.nextElementSibling;
-    if (submenu && submenu.hasAttribute("role") && submenu.getAttribute("role") === "menu") {
-      this.closeSiblingSubmenus(trigger);
-      openSubmenu(trigger, submenu);
-      const commandElement = submenu.querySelector('[data-controller~="command"]');
-      if (commandElement) {
-        this.focusFirstCommandItem(submenu);
-        return;
-      }
-      const submenuItems = [];
-      Array.from(submenu.children).forEach(child => {
-        if (child.hasAttribute("role") && child.getAttribute("role") === "menuitem") {
-          if (!child.hasAttribute("data-disabled")) {
-            submenuItems.push(child);
-          }
-        } else if (child.classList && child.classList.contains("relative")) {
-          const itemTrigger = child.querySelector(':scope > [role="menuitem"]');
-          if (itemTrigger && !itemTrigger.hasAttribute("data-disabled")) {
-            submenuItems.push(itemTrigger);
-          }
-        }
-      });
-      clearAllTabindexes(this.element);
-      if (submenuItems.length > 0) {
-        const firstItem = submenuItems[0];
-        firstItem.setAttribute("tabindex", "0");
-        firstItem.focus();
-        this.lastHoveredItem = firstItem;
-      }
+    const submenu = getSubmenu(trigger);
+    if (!submenu || isItemDisabled(trigger)) return;
+    this.closeSiblingSubmenus(trigger);
+    openSubmenu(trigger, submenu);
+    if (submenu.querySelector('[data-controller~="command"]')) {
+      this.focusFirstCommandItem(submenu);
+      return;
+    }
+    const first = getMenuItems(submenu)[0];
+    if (first) {
+      updateRovingTabindex(this.element, first);
+      first.focus();
+      this.lastHoveredItem = first;
     }
   }
-  closeCurrentSubmenuWithKeyboard(focusedElement) {
-    const allItems = this.element.querySelectorAll('[role="menuitem"]');
-    const currentItem = Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
-    if (!currentItem) return false;
-    const parentMenu = currentItem.closest('[role="menu"]');
-    if (!parentMenu) return false;
-    const dataSide = parentMenu.getAttribute("data-side");
-    if (dataSide === "right" || dataSide === "right-start") {
-      const trigger = parentMenu.previousElementSibling;
-      closeSubmenu(parentMenu, trigger);
-      if (trigger) {
-        const triggerParentMenu = trigger.closest('[role="menu"]');
-        if (triggerParentMenu) {
-          const parentMenuItems = [];
-          Array.from(triggerParentMenu.children).forEach(child => {
-            if (child.hasAttribute("role") && child.getAttribute("role") === "menuitem") {
-              parentMenuItems.push(child);
-            } else if (child.classList && child.classList.contains("relative")) {
-              const itemTrigger = child.querySelector(':scope > [role="menuitem"]');
-              if (itemTrigger) {
-                parentMenuItems.push(itemTrigger);
-              }
-            }
-          });
-          parentMenuItems.forEach(item => {
-            item.setAttribute("tabindex", "-1");
-          });
-        }
-        trigger.setAttribute("tabindex", "0");
-        trigger.focus();
-        this.lastHoveredItem = trigger;
-      }
-      return true;
-    }
-    return false;
+  closeCurrentSubmenuWithKeyboard() {
+    const current = this.currentItem();
+    if (!current) return false;
+    const menu = current.closest('[role="menu"]');
+    const trigger = getSubmenuTrigger(menu);
+    if (!trigger) return false;
+    closeSubmenu(menu, trigger);
+    updateRovingTabindex(this.element, trigger);
+    trigger.focus();
+    this.lastHoveredItem = trigger;
+    return true;
+  }
+  focusFirstCommandItem(submenu) {
+    const commandElement = submenu.querySelector('[data-controller~="command"]');
+    if (!commandElement) return;
+    setTimeout(() => {
+      const firstOption = commandElement.querySelector('[role="option"]:not([data-hidden])');
+      if (!firstOption) return;
+      commandElement.querySelectorAll('[role="option"]').forEach(option => {
+        option.removeAttribute("data-focused");
+        option.classList.remove("bg-accent", "text-accent-foreground");
+      });
+      firstOption.setAttribute("data-focused", "true");
+      firstOption.classList.add("bg-accent", "text-accent-foreground");
+    }, 50);
   }
   handleCommandNavigation(event, commandElement) {
     event.preventDefault();
@@ -2125,59 +2343,35 @@ class DropdownController extends Controller {
     if (allOptions[currentIndex]) {
       allOptions[currentIndex].setAttribute("data-focused", "true");
       allOptions[currentIndex].classList.add("bg-accent", "text-accent-foreground");
-      allOptions[currentIndex].scrollIntoView({
+      allOptions[currentIndex].scrollIntoView?.({
         block: "nearest",
         behavior: "smooth"
       });
     }
   }
   closeCommandSubmenu(commandElement) {
-    const submenu = commandElement.closest('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
-    if (!submenu) return false;
-    const trigger = submenu.previousElementSibling;
-    if (!trigger || trigger.getAttribute("role") !== "menuitem") return false;
-    const allCommandOptions = commandElement.querySelectorAll('[role="option"]');
-    allCommandOptions.forEach(option => {
+    const submenu = commandElement.closest('[role="menu"]');
+    if (!isSubmenu(submenu)) return false;
+    const trigger = getSubmenuTrigger(submenu);
+    if (!trigger) return false;
+    commandElement.querySelectorAll('[role="option"]').forEach(option => {
       option.removeAttribute("data-focused");
       option.classList.remove("bg-accent", "text-accent-foreground");
     });
     closeSubmenu(submenu, trigger);
-    const parentMenu = trigger.closest('[role="menu"]');
-    if (parentMenu) {
-      const parentItems = [];
-      Array.from(parentMenu.children).forEach(child => {
-        if (child.hasAttribute("role") && child.getAttribute("role") === "menuitem") {
-          parentItems.push(child);
-        } else if (child.classList && child.classList.contains("relative")) {
-          const itemTrigger = child.querySelector(':scope > [role="menuitem"]');
-          if (itemTrigger) {
-            parentItems.push(itemTrigger);
-          }
-        }
-      });
-      parentItems.forEach(item => {
-        item.setAttribute("tabindex", "-1");
-      });
-    }
-    trigger.setAttribute("tabindex", "0");
+    updateRovingTabindex(this.element, trigger);
     trigger.focus();
     this.lastHoveredItem = trigger;
     return true;
   }
   positionDropdown() {
     const trigger = this.hasTriggerTarget ? this.triggerTarget : this.element;
-    const content = this.hasContentTarget ? this.contentTarget : this.menuTarget;
+    const content = this.menuElement;
     if (!trigger || !content) return;
-    if (this.cleanup) {
-      this.cleanup();
-    }
+    if (this.cleanup) this.cleanup();
     const middleware = [];
-    if (this.offsetValue > 0) {
-      middleware.push(offset(this.offsetValue));
-    }
-    if (this.flipValue) {
-      middleware.push(flip());
-    }
+    if (this.offsetValue > 0) middleware.push(offset(this.offsetValue));
+    if (this.flipValue) middleware.push(flip());
     middleware.push(shift({
       padding: 8
     }));
@@ -2187,17 +2381,16 @@ class DropdownController extends Controller {
         placement: this.placementValue,
         middleware: middleware,
         strategy: this.strategyValue
-      }).then(({x: x, y: y, placement: placement, middlewareData: middlewareData}) => {
+      }).then(({x: x, y: y, placement: placement}) => {
         content.style.setProperty("--ui-dropdown-menu-trigger-width", `${trigger.offsetWidth}px`);
         Object.assign(content.style, {
           position: this.strategyValue,
           left: `${x}px`,
           top: `${y}px`
         });
-        const side = placement.split("-")[0];
+        const [side, align] = placement.split("-");
         content.setAttribute("data-side", side);
-        const align = placement.split("-")[1] || "center";
-        content.setAttribute("data-align", align);
+        content.setAttribute("data-align", align || "center");
       });
     };
     this.cleanup = autoUpdate(trigger, content, update, {
@@ -2261,10 +2454,11 @@ class AccordionController extends Controller {
     },
     collapsible: {
       type: Boolean,
-      default: false
+      default: true
     }
   };
   connect() {
+    this.wireItems();
     this.setupItems();
     this.setupKeyboardNavigation();
   }
@@ -2278,22 +2472,55 @@ class AccordionController extends Controller {
   removeKeyboardNavigation() {
     this.element.removeEventListener("keydown", this.handleKeydown);
   }
+  wireItems() {
+    this.itemTargets.forEach((item, index) => {
+      const trigger = this.triggerTargets[index];
+      const content = this.contentTargets[index];
+      if (!trigger || !content) return;
+      ensureId(trigger, "accordion-trigger");
+      ensureId(content, "accordion-content");
+      setIdRefs(trigger, "aria-controls", content);
+      setIdRefs(content, "aria-labelledby", trigger);
+      if (item.hasAttribute("data-disabled")) {
+        trigger.disabled = true;
+        trigger.setAttribute("data-disabled", "");
+        content.setAttribute("data-disabled", "");
+      }
+    });
+    this.syncLockedTriggers();
+  }
+  isDisabled(trigger) {
+    return trigger.disabled || trigger.hasAttribute("data-disabled");
+  }
+  syncLockedTriggers() {
+    const locks = this.typeValue === "single" && !this.collapsibleValue;
+    this.itemTargets.forEach((item, index) => {
+      const trigger = this.triggerTargets[index];
+      if (!trigger || this.isDisabled(trigger)) return;
+      if (locks && item.dataset.state === "open") {
+        trigger.setAttribute("aria-disabled", "true");
+      } else {
+        trigger.removeAttribute("aria-disabled");
+      }
+    });
+  }
   handleKeydown(event) {
     const trigger = event.target.closest("[data-ui--accordion-target='trigger']");
     if (!trigger) return;
-    const currentIndex = this.triggerTargets.indexOf(trigger);
+    const triggers = this.triggerTargets.filter(t => !this.isDisabled(t));
+    const currentIndex = triggers.indexOf(trigger);
     if (currentIndex === -1) return;
     let targetIndex = -1;
     let shouldPreventDefault = true;
     switch (event.key) {
      case "ArrowDown":
-      targetIndex = (currentIndex + 1) % this.triggerTargets.length;
+      targetIndex = (currentIndex + 1) % triggers.length;
       break;
 
      case "ArrowUp":
       targetIndex = currentIndex - 1;
       if (targetIndex < 0) {
-        targetIndex = this.triggerTargets.length - 1;
+        targetIndex = triggers.length - 1;
       }
       break;
 
@@ -2302,7 +2529,7 @@ class AccordionController extends Controller {
       break;
 
      case "End":
-      targetIndex = this.triggerTargets.length - 1;
+      targetIndex = triggers.length - 1;
       break;
 
      case "Enter":
@@ -2318,8 +2545,8 @@ class AccordionController extends Controller {
     if (shouldPreventDefault) {
       event.preventDefault();
     }
-    if (targetIndex !== -1 && this.triggerTargets[targetIndex]) {
-      this.triggerTargets[targetIndex].focus();
+    if (targetIndex !== -1 && triggers[targetIndex]) {
+      triggers[targetIndex].focus();
     }
   }
   setupItems() {
@@ -2341,8 +2568,10 @@ class AccordionController extends Controller {
     const index = this.triggerTargets.indexOf(trigger);
     const item = this.itemTargets[index];
     const content = this.contentTargets[index];
+    if (!item || this.isDisabled(trigger)) return;
     const isOpen = item.dataset.state === "open";
     const shouldOpen = !isOpen;
+    if (isOpen && this.typeValue === "single" && !this.collapsibleValue) return;
     if (this.typeValue === "single" && shouldOpen) {
       this.itemTargets.forEach((otherItem, otherIndex) => {
         if (otherIndex !== index) {
@@ -2351,6 +2580,7 @@ class AccordionController extends Controller {
       });
     }
     this.updateItemState(item, trigger, content, shouldOpen);
+    this.syncLockedTriggers();
   }
   updateItemState(item, trigger, content, isOpen) {
     const state = isOpen ? "open" : "closed";
@@ -2369,117 +2599,250 @@ class AccordionController extends Controller {
       content.style.height = `${currentHeight}px`;
       content.offsetHeight;
       content.style.height = "0px";
-      content.addEventListener("transitionend", () => {
+      const hideIfClosed = () => {
         if (content.dataset.state === "closed") {
           content.setAttribute("hidden", "");
         }
-      }, {
-        once: true
-      });
+      };
+      if (!this.isAnimating(content)) {
+        hideIfClosed();
+      } else {
+        content.addEventListener("transitionend", hideIfClosed, {
+          once: true
+        });
+        content.addEventListener("transitioncancel", hideIfClosed, {
+          once: true
+        });
+      }
     }
+  }
+  isAnimating(element) {
+    if (typeof element.getAnimations !== "function") return true;
+    return element.getAnimations().length > 0;
   }
 }
 
-function createEscapeKeyHandler(onEscape, options = {}) {
-  const {enabled: enabled = true, stopPropagation: stopPropagation = false, preventDefault: preventDefault = false} = options;
-  let handler = null;
-  let isAttached = false;
-  const keydownHandler = event => {
-    if (event.key === "Escape") {
-      if (stopPropagation) {
-        event.stopPropagation();
-      }
-      if (preventDefault) {
-        event.preventDefault();
-      }
-      onEscape(event);
-    }
-  };
-  return {
-    attach() {
-      if (!enabled || isAttached) return;
-      handler = keydownHandler;
-      document.addEventListener("keydown", handler);
-      isAttached = true;
-    },
-    detach() {
-      if (!isAttached || !handler) return;
-      document.removeEventListener("keydown", handler);
-      handler = null;
-      isAttached = false;
-    },
-    isAttached() {
-      return isAttached;
-    },
-    disable() {
-      if (handler) {
-        document.removeEventListener("keydown", handler);
-      }
-    },
-    enable() {
-      if (handler && isAttached) {
-        document.addEventListener("keydown", handler);
-      }
-    }
-  };
+const CANDIDATE_SELECTOR = [ "a[href]", "area[href]", "button", "input", "select", "textarea", "iframe", "summary", "audio[controls]", "video[controls]", "[contenteditable]:not([contenteditable='false'])", "[tabindex]" ].join(", ");
+
+const INPUT_SELECTOR = "input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']), textarea";
+
+function isTabbable(element) {
+  if (!element || !element.matches(CANDIDATE_SELECTOR)) return false;
+  const tabindex = element.getAttribute("tabindex");
+  if (tabindex !== null && parseInt(tabindex, 10) < 0) return false;
+  if (element.matches(":disabled")) return false;
+  if (element.localName === "input" && element.type === "hidden") return false;
+  if (element.closest("[hidden], [inert]")) return false;
+  if (element.closest("fieldset[disabled]") && !element.closest("legend")) return false;
+  return isRendered(element);
 }
 
-function onEscapeKey(onEscape, options = {}) {
-  const handler = createEscapeKeyHandler(onEscape, options);
-  handler.attach();
-  return () => handler.detach();
+function isFocusable(element) {
+  if (!element || typeof element.focus !== "function" || !element.isConnected) return false;
+  if (element === document.body) return false;
+  if (element.closest("[inert], [hidden]")) return false;
+  if (element.matches(":disabled")) return false;
+  return isRendered(element);
 }
 
-function onEscapeKeyWhen(onEscape, condition) {
-  const keydownHandler = event => {
-    if (event.key === "Escape" && condition()) {
-      onEscape(event);
-    }
-  };
-  document.addEventListener("keydown", keydownHandler);
-  return () => document.removeEventListener("keydown", keydownHandler);
+function isRendered(element) {
+  if (typeof element.checkVisibility === "function") {
+    return element.checkVisibility({
+      visibilityProperty: true
+    });
+  }
+  return element.getClientRects().length > 0;
 }
 
-const FOCUSABLE_SELECTOR = [ "button:not([disabled])", "[href]", "input:not([disabled])", "select:not([disabled])", "textarea:not([disabled])", '[tabindex]:not([tabindex="-1"])' ].join(", ");
-
-const INPUT_SELECTOR = 'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]), textarea';
-
-function getFocusableElements(container) {
+function getTabbableElements(container) {
   if (!container) return [];
-  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR));
+  return Array.from(container.querySelectorAll(CANDIDATE_SELECTOR)).filter(isTabbable);
 }
 
 function getFirstFocusable(container, options = {}) {
-  const elements = getFocusableElements(container);
+  const elements = getTabbableElements(container);
   if (options.skipInputs) {
-    const nonInput = elements.find(el => !el.matches(INPUT_SELECTOR));
-    return nonInput || elements[0] || null;
+    return elements.find(el => !el.matches(INPUT_SELECTOR)) || elements[0] || null;
   }
   return elements[0] || null;
+}
+
+function getLastFocusable(container) {
+  const elements = getTabbableElements(container);
+  return elements[elements.length - 1] || null;
 }
 
 function isMobileDevice() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 }
 
-function focusFirstElement(container, options = {}) {
-  const {mobileAware: mobileAware = true, excludeInputsOnMobile: excludeInputsOnMobile = mobileAware, preventScroll: preventScroll = false, preferredElement: preferredElement = null} = options;
+function focusInitial(container, options = {}) {
+  if (!container) return null;
+  const {mobileAware: mobileAware = true, preventScroll: preventScroll = false} = options;
   const focusOptions = preventScroll ? {
     preventScroll: true
   } : undefined;
-  if (preferredElement && container.contains(preferredElement)) {
-    preferredElement.focus(focusOptions);
-    return preferredElement;
-  }
-  const skipInputs = excludeInputsOnMobile && isMobileDevice();
-  const element = getFirstFocusable(container, {
+  const preferred = resolve$1(options.preferredElement);
+  const autofocus = container.querySelector("[autofocus]");
+  const skipInputs = mobileAware && isMobileDevice();
+  const candidates = [ preferred && container.contains(preferred) ? preferred : null, autofocus, getFirstFocusable(container, {
     skipInputs: skipInputs
-  });
-  if (element) {
-    element.focus(focusOptions);
-    return element;
+  }) ];
+  for (const candidate of candidates) {
+    if (candidate && isFocusable(candidate)) {
+      candidate.focus(focusOptions);
+      if (document.activeElement === candidate) return candidate;
+    }
   }
-  return null;
+  if (!container.hasAttribute("tabindex")) container.setAttribute("tabindex", "-1");
+  container.focus(focusOptions);
+  return document.activeElement === container ? container : null;
+}
+
+const traps = [];
+
+let listening = false;
+
+function handleTabKey(event) {
+  if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return;
+  for (let i = traps.length - 1; i >= 0; i--) {
+    if (!traps[i].container.isConnected) traps.splice(i, 1);
+  }
+  const top = traps[traps.length - 1];
+  if (top) top.handleTab(event);
+}
+
+function updateListener() {
+  if (traps.length && !listening) {
+    document.addEventListener("keydown", handleTabKey);
+    listening = true;
+  } else if (!traps.length && listening) {
+    document.removeEventListener("keydown", handleTabKey);
+    listening = false;
+  }
+}
+
+function createFocusTrap(container, _options = {}) {
+  const trap = {
+    container: container,
+    handleTab(event) {
+      const active = document.activeElement;
+      if (!container.contains(active)) return;
+      const tabbables = getTabbableElements(container);
+      if (tabbables.length === 0) {
+        event.preventDefault();
+        container.focus();
+        return;
+      }
+      const first = tabbables[0];
+      const last = tabbables[tabbables.length - 1];
+      if (event.shiftKey && (active === first || active === container)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  };
+  return {
+    activate() {
+      const index = traps.indexOf(trap);
+      if (index !== -1) traps.splice(index, 1);
+      traps.push(trap);
+      updateListener();
+    },
+    deactivate() {
+      const index = traps.indexOf(trap);
+      if (index !== -1) traps.splice(index, 1);
+      updateListener();
+    },
+    isActive() {
+      return traps.includes(trap);
+    },
+    focusFirst() {
+      focusInitial(container, {
+        mobileAware: false
+      });
+    },
+    focusLast() {
+      const element = getLastFocusable(container);
+      if (element) element.focus();
+    }
+  };
+}
+
+function resolve$1(value) {
+  return typeof value === "function" ? value() : value;
+}
+
+const SKIP_SELECTOR = "script, style, template, link, meta, noscript, [aria-live]";
+
+const MARKER = "data-ui-inert";
+
+const stack = [];
+
+const managed = new Map;
+
+function inertOthers(keep) {
+  if (!keep || !keep.isConnected) return () => {};
+  const entry = {
+    keep: keep
+  };
+  stack.push(entry);
+  apply();
+  listenForTurboCache();
+  return () => {
+    const index = stack.indexOf(entry);
+    if (index === -1) return;
+    stack.splice(index, 1);
+    apply();
+  };
+}
+
+function apply() {
+  for (let i = stack.length - 1; i >= 0; i--) {
+    if (!stack[i].keep.isConnected) stack.splice(i, 1);
+  }
+  const top = stack[stack.length - 1];
+  const targets = top ? siblingsAlongPath(top.keep) : new Set;
+  for (const [element, wasInert] of managed) {
+    if (!targets.has(element)) {
+      element.inert = wasInert;
+      element.removeAttribute(MARKER);
+      managed.delete(element);
+    }
+  }
+  for (const element of targets) {
+    if (managed.has(element)) continue;
+    const wasInert = element.hasAttribute(MARKER) ? false : element.inert;
+    managed.set(element, wasInert);
+    element.inert = true;
+    element.setAttribute(MARKER, "");
+  }
+}
+
+function siblingsAlongPath(keep) {
+  const result = new Set;
+  let node = keep;
+  while (node && node !== document.body && node.parentElement) {
+    for (const sibling of node.parentElement.children) {
+      if (sibling !== node && !sibling.matches(SKIP_SELECTOR)) result.add(sibling);
+    }
+    node = node.parentElement;
+  }
+  return result;
+}
+
+let turboListener = false;
+
+function listenForTurboCache() {
+  if (turboListener) return;
+  turboListener = true;
+  document.addEventListener("turbo:before-cache", () => {
+    stack.length = 0;
+    apply();
+  });
 }
 
 let scrollLockCount = 0;
@@ -2529,8 +2892,77 @@ function unlockScroll() {
   }
 }
 
+function createModalSession(options = {}) {
+  const {content: content, isolate: isolate = content, initialFocus: initialFocus = null, returnFocus: returnFocus = null, onEscape: onEscape = null, trapFocus: trapFocus = true, inertBackground: inertBackground = true, lockScroll: shouldLockScroll = true, autoFocus: autoFocus = true, mobileAware: mobileAware = true} = options;
+  const trap = content ? createFocusTrap(content) : null;
+  const escapeLayer = onEscape ? createEscapeLayer(onEscape, {
+    element: content
+  }) : null;
+  let active = false;
+  let previouslyFocused = null;
+  let releaseInert = null;
+  let scrollLocked = false;
+  let focusFrame = null;
+  function moveFocusIn(framesLeft = 30) {
+    focusFrame = null;
+    if (!active || content.contains(document.activeElement)) return;
+    focusInitial(content, {
+      preferredElement: initialFocus,
+      mobileAware: mobileAware
+    });
+    if (!content.contains(document.activeElement) && framesLeft > 0) {
+      focusFrame = requestAnimationFrame(() => moveFocusIn(framesLeft - 1));
+    }
+  }
+  return {
+    activate() {
+      if (active || !content) return;
+      active = true;
+      previouslyFocused = document.activeElement;
+      if (inertBackground) releaseInert = inertOthers(isolate);
+      if (shouldLockScroll) {
+        lockScroll();
+        scrollLocked = true;
+      }
+      if (trapFocus) trap.activate();
+      if (escapeLayer) escapeLayer.activate();
+      if (autoFocus) moveFocusIn();
+    },
+    deactivate({restoreFocus: restoreFocus = true} = {}) {
+      if (!active) return;
+      active = false;
+      if (focusFrame !== null) {
+        cancelAnimationFrame(focusFrame);
+        focusFrame = null;
+      }
+      if (escapeLayer) escapeLayer.deactivate();
+      if (trap) trap.deactivate();
+      if (scrollLocked) {
+        unlockScroll();
+        scrollLocked = false;
+      }
+      if (releaseInert) {
+        releaseInert();
+        releaseInert = null;
+      }
+      const saved = previouslyFocused;
+      previouslyFocused = null;
+      if (!restoreFocus) return;
+      const target = [ saved, resolve(returnFocus) ].find(el => el && isFocusable(el) && !content.contains(el));
+      if (target) target.focus();
+    },
+    isActive() {
+      return active;
+    }
+  };
+}
+
+function resolve(value) {
+  return typeof value === "function" ? value() : value;
+}
+
 class AlertDialogController extends Controller {
-  static targets=[ "container", "overlay", "content" ];
+  static targets=[ "container", "overlay", "content", "trigger", "title", "description", "cancel" ];
   static values={
     open: {
       type: Boolean,
@@ -2541,13 +2973,68 @@ class AlertDialogController extends Controller {
       default: true
     }
   };
+  constructor() {
+    super(...arguments);
+  }
   connect() {
-    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
-      enabled: this.closeOnEscapeValue
-    });
+    this.wireAria();
+    if (this.hasContentTarget) {
+      this.session = createModalSession({
+        content: this.contentTarget,
+        isolate: this.hasContainerTarget ? this.containerTarget : this.contentTarget,
+        initialFocus: () => this.hasCancelTarget ? this.cancelTarget : null,
+        returnFocus: () => this.triggers[0],
+        onEscape: () => {
+          if (this.closeOnEscapeValue) this.close();
+        }
+      });
+    }
     if (this.openValue) {
       this.show();
+    } else {
+      this.setInitialClosedState();
     }
+  }
+  disconnect() {
+    this.session?.deactivate({
+      restoreFocus: false
+    });
+  }
+  wireAria() {
+    if (!this.hasContentTarget) return;
+    const content = this.contentTarget;
+    ensureId(content, "alert-dialog-content");
+    if (this.hasTitleTarget) setIdRefs(content, "aria-labelledby", this.titleTarget, {
+      prefix: "alert-dialog-title"
+    });
+    if (this.hasDescriptionTarget) setIdRefs(content, "aria-describedby", this.descriptionTarget, {
+      prefix: "alert-dialog-description"
+    });
+    this.triggers.forEach(trigger => {
+      if (!trigger.hasAttribute("aria-haspopup")) trigger.setAttribute("aria-haspopup", "dialog");
+      setIdRefs(trigger, "aria-controls", content);
+    });
+    this.syncTriggers(this.openValue);
+  }
+  get triggers() {
+    const own = el => el.closest("[data-controller~='ui--alert-dialog']") === this.element;
+    const byAction = Array.from(this.element.querySelectorAll("[data-action*='ui--alert-dialog#open']")).filter(own);
+    const candidates = Array.from(new Set([ ...this.triggerTargets, ...byAction ]));
+    return Array.from(new Set(candidates.map(el => this.interactiveElementFor(el)).filter(Boolean)));
+  }
+  interactiveElementFor(el) {
+    if (el.matches("button, a[href], [role='button'], input, select, textarea")) return el;
+    return el.querySelector("button, a[href], [role='button']");
+  }
+  syncTriggers(open) {
+    this.triggers.forEach(trigger => trigger.setAttribute("aria-expanded", open ? "true" : "false"));
+  }
+  get stateTargets() {
+    return [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+  }
+  setInitialClosedState() {
+    this.stateTargets.forEach(target => setState(target, "closed"));
+    if (this.hasContentTarget) this.contentTarget.inert = true;
   }
   open() {
     this.openValue = true;
@@ -2558,15 +3045,10 @@ class AlertDialogController extends Controller {
     this.hide();
   }
   show() {
-    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
-    targets.forEach(target => setState(target, "open"));
-    lockScroll();
-    if (this.hasContentTarget) {
-      focusFirstElement(this.contentTarget);
-    }
-    if (this.closeOnEscapeValue) {
-      this.escapeHandler.attach();
-    }
+    this.stateTargets.forEach(target => setState(target, "open"));
+    if (this.hasContentTarget) this.contentTarget.inert = false;
+    this.syncTriggers(true);
+    this.session?.activate();
     this.element.dispatchEvent(new CustomEvent("alertdialog:open", {
       bubbles: true,
       detail: {
@@ -2575,10 +3057,10 @@ class AlertDialogController extends Controller {
     }));
   }
   hide() {
-    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
-    targets.forEach(target => setState(target, "closed"));
-    unlockScroll();
-    this.escapeHandler.detach();
+    this.session?.deactivate();
+    this.syncTriggers(false);
+    this.stateTargets.forEach(target => setState(target, "closed"));
+    if (this.hasContentTarget) this.contentTarget.inert = true;
     this.element.dispatchEvent(new CustomEvent("alertdialog:close", {
       bubbles: true,
       detail: {
@@ -2588,10 +3070,6 @@ class AlertDialogController extends Controller {
   }
   preventOverlayClose(event) {
     event.stopPropagation();
-  }
-  disconnect() {
-    unlockScroll();
-    this.escapeHandler.detach();
   }
 }
 
@@ -2655,7 +3133,7 @@ class AvatarController extends Controller {
 }
 
 class DialogController extends Controller {
-  static targets=[ "container", "overlay", "content" ];
+  static targets=[ "container", "overlay", "content", "trigger", "title", "description" ];
   static values={
     open: {
       type: Boolean,
@@ -2670,19 +3148,61 @@ class DialogController extends Controller {
       default: true
     }
   };
+  constructor() {
+    super(...arguments);
+  }
   connect() {
-    this.escapeHandler = createEscapeKeyHandler(() => this.close(), {
-      enabled: this.closeOnEscapeValue
-    });
+    this.wireAria();
+    if (this.hasContentTarget) {
+      this.session = createModalSession({
+        content: this.contentTarget,
+        isolate: this.hasContainerTarget ? this.containerTarget : this.contentTarget,
+        returnFocus: () => this.triggers[0],
+        onEscape: () => {
+          if (this.closeOnEscapeValue) this.close();
+        }
+      });
+    }
     if (this.openValue) {
       this.show();
     } else {
       this.setInitialClosedState();
     }
   }
+  disconnect() {
+    this.session?.deactivate({
+      restoreFocus: false
+    });
+  }
+  wireAria() {
+    if (!this.hasContentTarget) return;
+    const content = this.contentTarget;
+    ensureId(content, "dialog-content");
+    if (this.hasTitleTarget) setIdRefs(content, "aria-labelledby", this.titleTarget, {
+      prefix: "dialog-title"
+    });
+    if (this.hasDescriptionTarget) setIdRefs(content, "aria-describedby", this.descriptionTarget, {
+      prefix: "dialog-description"
+    });
+    this.triggers.forEach(trigger => {
+      if (!trigger.hasAttribute("aria-haspopup")) trigger.setAttribute("aria-haspopup", "dialog");
+      setIdRefs(trigger, "aria-controls", content);
+    });
+    this.syncTriggers(this.openValue);
+  }
+  get triggers() {
+    const own = el => el.closest("[data-controller~='ui--dialog']") === this.element;
+    const byAction = Array.from(this.element.querySelectorAll("[data-action*='ui--dialog#open']")).filter(own);
+    return Array.from(new Set([ ...this.triggerTargets, ...byAction ]));
+  }
+  syncTriggers(open) {
+    this.triggers.forEach(trigger => trigger.setAttribute("aria-expanded", open ? "true" : "false"));
+  }
+  get stateTargets() {
+    return [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
+  }
   setInitialClosedState() {
-    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
-    targets.forEach(target => {
+    this.stateTargets.forEach(target => {
       setState(target, "closed");
       target.setAttribute("data-initial", "");
     });
@@ -2699,21 +3219,15 @@ class DialogController extends Controller {
     this.hide();
   }
   show() {
-    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
-    targets.forEach(target => {
+    this.stateTargets.forEach(target => {
       target.removeAttribute("data-initial");
       setState(target, "open");
     });
     if (this.hasContentTarget) {
       this.contentTarget.inert = false;
     }
-    lockScroll();
-    if (this.hasContentTarget) {
-      focusFirstElement(this.contentTarget);
-    }
-    if (this.closeOnEscapeValue) {
-      this.escapeHandler.attach();
-    }
+    this.syncTriggers(true);
+    this.session?.activate();
     this.element.dispatchEvent(new CustomEvent("dialog:open", {
       bubbles: true,
       detail: {
@@ -2722,15 +3236,14 @@ class DialogController extends Controller {
     }));
   }
   hide() {
-    const targets = [ this.hasContainerTarget ? this.containerTarget : null, this.hasOverlayTarget ? this.overlayTarget : null, this.hasContentTarget ? this.contentTarget : null ].filter(Boolean);
-    targets.forEach(target => {
+    this.session?.deactivate();
+    this.syncTriggers(false);
+    this.stateTargets.forEach(target => {
       setState(target, "closed");
     });
     if (this.hasContentTarget) {
       this.contentTarget.inert = true;
     }
-    unlockScroll();
-    this.escapeHandler.detach();
     this.element.dispatchEvent(new CustomEvent("dialog:close", {
       bubbles: true,
       detail: {
@@ -2743,26 +3256,40 @@ class DialogController extends Controller {
       this.close();
     }
   }
-  disconnect() {
-    unlockScroll();
-    this.escapeHandler.detach();
-  }
 }
 
 class CheckboxController extends Controller {
+  constructor() {
+    super(...arguments);
+  }
   connect() {
+    this.initialIndeterminate = this.element.dataset.indeterminate === "true";
+    if (this.initialIndeterminate) this.element.indeterminate = true;
     this.updateState();
-    this.boundHandleChange = this.handleChange.bind(this);
-    this.element.addEventListener("change", this.boundHandleChange);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleReset = this.handleReset.bind(this);
+    this.element.addEventListener("change", this.handleChange);
+    this.form = this.element.form;
+    if (this.form) this.form.addEventListener("reset", this.handleReset);
   }
   disconnect() {
-    this.element.removeEventListener("change", this.boundHandleChange);
+    this.element.removeEventListener("change", this.handleChange);
+    if (this.form) this.form.removeEventListener("reset", this.handleReset);
+    this.form = null;
   }
   handleChange() {
     this.updateState();
   }
+  handleReset() {
+    setTimeout(() => {
+      this.element.indeterminate = this.initialIndeterminate;
+      this.updateState();
+    }, 0);
+  }
   updateState() {
-    syncCheckedState(this.element, this.element.checked);
+    const state = this.element.indeterminate ? "indeterminate" : this.element.checked ? "checked" : "unchecked";
+    this.element.setAttribute("data-state", state);
+    this.element.removeAttribute("aria-checked");
   }
 }
 
@@ -2779,7 +3306,32 @@ class CollapsibleController extends Controller {
     }
   };
   connect() {
+    if (this.hasTriggerTarget && this.hasContentTarget) {
+      ensureId(this.contentTarget, "collapsible-content");
+      setIdRefs(this.triggerTarget, "aria-controls", this.contentTarget);
+    }
+    this.syncDisabled();
     this.updateState(this.openValue, false);
+  }
+  disabledValueChanged() {
+    this.syncDisabled();
+  }
+  syncDisabled() {
+    const disabled = this.disabledValue;
+    const parts = [ this.element ];
+    if (this.hasContentTarget) parts.push(this.contentTarget);
+    if (this.hasTriggerTarget) {
+      const trigger = this.triggerTarget;
+      parts.push(trigger);
+      if (trigger instanceof HTMLButtonElement) {
+        trigger.disabled = disabled;
+      } else if (disabled) {
+        trigger.setAttribute("aria-disabled", "true");
+      } else {
+        trigger.removeAttribute("aria-disabled");
+      }
+    }
+    parts.forEach(el => el.toggleAttribute("data-disabled", disabled));
   }
   toggle(event) {
     if (this.disabledValue) return;
@@ -2801,21 +3353,28 @@ class CollapsibleController extends Controller {
         void content.offsetHeight;
         content.style.height = `${content.scrollHeight}px`;
       } else {
-        if (animate) {
-          content.style.height = "0px";
-          content.addEventListener("transitionend", () => {
-            if (content.dataset.state === "closed") {
-              content.setAttribute("hidden", "");
-            }
-          }, {
+        const hideIfClosed = () => {
+          if (content.dataset.state === "closed") {
+            content.setAttribute("hidden", "");
+          }
+        };
+        content.style.height = "0px";
+        if (animate && this.isAnimating(content)) {
+          content.addEventListener("transitionend", hideIfClosed, {
+            once: true
+          });
+          content.addEventListener("transitioncancel", hideIfClosed, {
             once: true
           });
         } else {
-          content.style.height = "0px";
           content.setAttribute("hidden", "");
         }
       }
     }
+  }
+  isAnimating(element) {
+    if (typeof element.getAnimations !== "function") return true;
+    return element.getAnimations().length > 0;
   }
 }
 
@@ -2836,6 +3395,26 @@ class ComboboxController extends Controller {
     if (this.valueValue) {
       this.updateCheckIcons();
     }
+    this.wireTrigger();
+  }
+  wireTrigger() {
+    const trigger = this.findTrigger();
+    if (!trigger) return;
+    if (!trigger.hasAttribute("role")) trigger.setAttribute("role", "combobox");
+    trigger.setAttribute("aria-expanded", "false");
+    const list = this.element.querySelector('[data-slot="command-list"]');
+    if (list) setIdRefs(trigger, "aria-controls", list, {
+      prefix: "command-list"
+    });
+  }
+  findTrigger() {
+    const target = this.element.querySelector('[data-ui--popover-target="trigger"], [data-ui--drawer-target="trigger"], [data-ui--dropdown-target="trigger"]');
+    if (!target) return null;
+    const focusable = 'button, [href], input, [tabindex]:not([tabindex="-1"])';
+    return target.matches(focusable) ? target : target.querySelector(focusable);
+  }
+  setExpanded(expanded) {
+    this.findTrigger()?.setAttribute("aria-expanded", String(expanded));
   }
   disconnect() {
     this.element.removeEventListener("command:select", this.boundHandleSelect);
@@ -2845,6 +3424,7 @@ class ComboboxController extends Controller {
     this.element.removeEventListener("drawer:close", this.boundHandleClose);
   }
   handleOpen() {
+    this.setExpanded(true);
     requestAnimationFrame(() => {
       const input = this.element.querySelector('[data-slot="command-input"]');
       if (input) {
@@ -2853,6 +3433,7 @@ class ComboboxController extends Controller {
     });
   }
   handleClose() {
+    this.setExpanded(false);
     const input = this.element.querySelector('[data-slot="command-input"]');
     if (input && input.value) {
       input.value = "";
@@ -2889,7 +3470,9 @@ class ComboboxController extends Controller {
   closeContainer() {
     const popoverController = this.application.getControllerForElementAndIdentifier(this.element, "ui--popover");
     if (popoverController) {
-      popoverController.hide();
+      popoverController.hide({
+        returnFocus: true
+      });
       return;
     }
     let drawerController = this.application.getControllerForElementAndIdentifier(this.element, "ui--drawer");
@@ -2925,22 +3508,40 @@ class CommandController extends Controller {
   connect() {
     this.selectedIndex = -1;
     this.updateVisibility();
+    this.wireAria();
     this._boundHandleShow = event => {
       if (event.target.contains(this.element)) this.handleShow();
     };
     this._boundHandleHide = event => {
       if (event.target.contains(this.element)) this.handleHide();
     };
-    document.addEventListener("popover:show", this._boundHandleShow);
-    document.addEventListener("drawer:show", this._boundHandleShow);
-    document.addEventListener("popover:hide", this._boundHandleHide);
-    document.addEventListener("drawer:hide", this._boundHandleHide);
+    this.showEvents = [ "popover:show", "drawer:open", "drawer:show" ];
+    this.hideEvents = [ "popover:hide", "drawer:close", "drawer:hide" ];
+    this.showEvents.forEach(name => document.addEventListener(name, this._boundHandleShow));
+    this.hideEvents.forEach(name => document.addEventListener(name, this._boundHandleHide));
   }
   disconnect() {
-    document.removeEventListener("popover:show", this._boundHandleShow);
-    document.removeEventListener("drawer:show", this._boundHandleShow);
-    document.removeEventListener("popover:hide", this._boundHandleHide);
-    document.removeEventListener("drawer:hide", this._boundHandleHide);
+    this.showEvents.forEach(name => document.removeEventListener(name, this._boundHandleShow));
+    this.hideEvents.forEach(name => document.removeEventListener(name, this._boundHandleHide));
+  }
+  wireAria() {
+    if (this.hasListTarget) {
+      ensureId(this.listTarget, "command-list");
+      if (!this.listTarget.hasAttribute("aria-label") && !this.listTarget.hasAttribute("aria-labelledby")) {
+        this.listTarget.setAttribute("aria-label", "Suggestions");
+      }
+      if (this.hasInputTarget) setIdRefs(this.inputTarget, "aria-controls", this.listTarget);
+    }
+    this.groupTargets.forEach(group => {
+      const heading = group.querySelector('[data-slot="command-group-heading"]');
+      if (heading) setIdRefs(group, "aria-labelledby", heading, {
+        prefix: "command-group-heading"
+      });
+    });
+    this.itemTargets.forEach(item => ensureId(item, "command-item"));
+  }
+  itemTargetConnected(item) {
+    ensureId(item, "command-item");
   }
   handleShow() {
     if (this.autofocusValue && this.hasInputTarget) {
@@ -3047,16 +3648,27 @@ class CommandController extends Controller {
   selectCurrent(items) {
     if (this.selectedIndex >= 0 && this.selectedIndex < items.length) {
       const item = items[this.selectedIndex];
-      if (!item.dataset.disabled) {
+      if (!this.isDisabled(item)) {
         this.triggerSelect(item);
       }
     }
   }
   select(event) {
     const item = event.currentTarget;
-    if (!item.dataset.disabled) {
+    if (!this.isDisabled(item)) {
       this.triggerSelect(item);
     }
+  }
+  highlight(event) {
+    const index = this.visibleItems.indexOf(event.currentTarget);
+    if (index === -1 || index === this.selectedIndex) return;
+    this.selectedIndex = index;
+    this.updateSelection({
+      scroll: false
+    });
+  }
+  isDisabled(item) {
+    return item.hasAttribute("data-disabled") || item.getAttribute("aria-disabled") === "true";
   }
   triggerSelect(item) {
     const value = item.dataset.value || item.textContent.trim();
@@ -3076,21 +3688,23 @@ class CommandController extends Controller {
       }
     }
   }
-  updateSelection() {
-    const items = this.visibleItems;
-    items.forEach((item, index) => {
-      const isSelected = index === this.selectedIndex;
+  updateSelection({scroll: scroll = true} = {}) {
+    const active = this.visibleItems[this.selectedIndex] || null;
+    this.itemTargets.forEach(item => {
+      const isSelected = item === active;
       item.dataset.selected = isSelected;
       item.setAttribute("aria-selected", isSelected);
-      if (isSelected) {
-        item.scrollIntoView({
-          block: "nearest"
-        });
-        if (this.hasListTarget) {
-          this.listTarget.setAttribute("aria-activedescendant", item.id || "");
-        }
-      }
     });
+    if (active && scroll) active.scrollIntoView?.({
+      block: "nearest"
+    });
+    if (this.hasInputTarget) {
+      if (active) {
+        this.inputTarget.setAttribute("aria-activedescendant", ensureId(active, "command-item"));
+      } else {
+        this.inputTarget.removeAttribute("aria-activedescendant");
+      }
+    }
   }
   updateVisibility() {
     this.itemTargets.forEach(item => item.hidden = false);
@@ -3100,9 +3714,11 @@ class CommandController extends Controller {
     }
   }
   get visibleItems() {
-    return this.itemTargets.filter(item => !item.hidden && !item.dataset.disabled);
+    return this.itemTargets.filter(item => !item.hidden && !this.isDisabled(item));
   }
 }
+
+let activeMenu = null;
 
 class ContextMenuController extends Controller {
   static targets=[ "trigger", "content", "item" ];
@@ -3115,173 +3731,241 @@ class ContextMenuController extends Controller {
   constructor() {
     super(...arguments);
     this.lastHoveredItem = null;
+    this.returnFocusTo = null;
   }
   connect() {
+    this.typeahead = createTypeahead();
     this.boundHandleClickOutside = this.handleClickOutside.bind(this);
     this.boundHandleKeydown = this.handleKeydown.bind(this);
-    document.addEventListener("click", this.boundHandleClickOutside);
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this);
+    this.escapeLayer = createEscapeLayer(() => this.close({
+      returnFocus: true
+    }), {
+      element: this.element
+    });
+    if (this.hasContentTarget) {
+      ensureId(this.contentTarget, "context-menu-content");
+      this.contentTarget.addEventListener("keydown", this.boundHandleKeydown);
+      this.contentTarget.addEventListener("focusout", this.boundHandleFocusOut);
+    }
+    this.resetToClosed();
   }
   disconnect() {
-    document.removeEventListener("click", this.boundHandleClickOutside);
-    document.removeEventListener("keydown", this.boundHandleKeydown);
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
+    this.removeDocumentListeners();
+    if (activeMenu === this) activeMenu = null;
+    if (this.hasContentTarget) {
+      this.contentTarget.removeEventListener("keydown", this.boundHandleKeydown);
+      this.contentTarget.removeEventListener("focusout", this.boundHandleFocusOut);
+    }
+  }
+  resetToClosed() {
+    if (!this.hasContentTarget) return;
+    if (this.openValue || this.contentTarget.getAttribute("data-state") === "open") {
+      this.openValue = false;
+      this.contentTarget.classList.add("hidden");
+      this.contentTarget.setAttribute("data-state", "closed");
+      clearAllTabindexes(this.element);
+    }
   }
   open(event) {
     event.preventDefault();
     event.stopPropagation();
-    this.closeAllContextMenus();
-    this.openValue = true;
+    if (activeMenu && activeMenu !== this) activeMenu.close({
+      returnFocus: false
+    });
+    activeMenu = this;
     const content = this.contentTarget;
+    if (!this.openValue) {
+      const active = document.activeElement;
+      this.returnFocusTo = active && !content.contains(active) ? active : null;
+    }
+    this.openValue = true;
+    this.typeahead.reset();
     content.classList.remove("hidden");
     content.setAttribute("data-state", "open");
-    this.positionContextMenu(event.clientX, event.clientY);
-    this.setupKeyboardNavigation();
-    setTimeout(() => {
-      this.focusItem(0);
-    }, 100);
+    const {x: x, y: y} = this.pointFor(event);
+    this.positionContextMenu(x, y);
+    this.escapeLayer.activate();
+    this.addDocumentListeners();
+    this.focusItem(0);
   }
-  close() {
+  close(options = {}) {
+    const {returnFocus: returnFocus = false} = options;
+    const wasOpen = this.openValue;
     this.openValue = false;
-    const content = this.contentTarget;
-    if (content) {
-      content.classList.add("hidden");
-      content.setAttribute("data-state", "closed");
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
+    this.removeDocumentListeners();
+    if (activeMenu === this) activeMenu = null;
+    if (returnFocus && wasOpen) this.restoreFocus();
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.add("hidden");
+      this.contentTarget.setAttribute("data-state", "closed");
     }
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    allMenuItems.forEach(item => {
-      item.setAttribute("tabindex", "-1");
-    });
+    clearAllTabindexes(this.element);
     this.lastHoveredItem = null;
-    this.teardownKeyboardNavigation();
+  }
+  restoreFocus() {
+    const target = this.returnFocusTo;
+    this.returnFocusTo = null;
+    if (target && target.isConnected && target !== document.body && typeof target.focus === "function") {
+      target.focus();
+    } else if (this.hasContentTarget && this.contentTarget.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
   }
   closeAllContextMenus() {
-    document.querySelectorAll('[data-ui--context-menu-target="content"][data-state="open"]').forEach(menu => {
-      menu.classList.add("hidden");
-      menu.setAttribute("data-state", "closed");
+    if (activeMenu && activeMenu !== this) activeMenu.close({
+      returnFocus: false
     });
   }
+  addDocumentListeners() {
+    if (this.listening) return;
+    document.addEventListener("click", this.boundHandleClickOutside);
+    document.addEventListener("contextmenu", this.boundHandleClickOutside);
+    this.listening = true;
+  }
+  removeDocumentListeners() {
+    if (!this.listening) return;
+    document.removeEventListener("click", this.boundHandleClickOutside);
+    document.removeEventListener("contextmenu", this.boundHandleClickOutside);
+    this.listening = false;
+  }
   handleClickOutside(event) {
-    if (!this.element.contains(event.target)) {
-      this.close();
+    if (!this.openValue) return;
+    if (!this.contentTarget.contains(event.target)) this.close({
+      returnFocus: false
+    });
+  }
+  handleFocusOut() {
+    if (!this.openValue) return;
+    setTimeout(() => {
+      if (this.openValue && !this.contentTarget.contains(document.activeElement)) {
+        this.close({
+          returnFocus: false
+        });
+      }
+    }, 0);
+  }
+  select(event) {
+    const item = event.currentTarget;
+    if (isItemDisabled(item)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+    const role = item.getAttribute("role");
+    if (role === "menuitemcheckbox") {
+      toggleCheckbox(item);
+    } else if (role === "menuitemradio") {
+      selectRadio(item);
+    } else {
+      this.close({
+        returnFocus: true
+      });
     }
   }
-  setupKeyboardNavigation() {
-    document.addEventListener("keydown", this.boundHandleKeydown);
-  }
-  teardownKeyboardNavigation() {
-    document.removeEventListener("keydown", this.boundHandleKeydown);
+  trackHoveredItem(event) {
+    const item = event.currentTarget;
+    if (isItemDisabled(item)) return;
+    updateRovingTabindex(this.element, item);
+    item.focus();
+    this.lastHoveredItem = item;
   }
   handleKeydown(event) {
-    if (!this.openValue) return;
-    const items = this.getFocusableItems();
+    if (!this.openValue || event.defaultPrevented) return;
+    if (event.key === "Tab") {
+      this.close({
+        returnFocus: true
+      });
+      return;
+    }
+    if (isEditableTarget(event.target)) return;
+    const current = this.currentItem();
+    if (this.typeahead.isTypeaheadKey(event)) {
+      const match = this.typeahead.handleKey(event, this.getFocusableItems(), current);
+      if (match) this.focusItemElement(match);
+      return;
+    }
     switch (event.key) {
      case "ArrowDown":
       event.preventDefault();
-      this.focusNextItem(items);
+      this.focusNextItem();
       break;
 
      case "ArrowUp":
       event.preventDefault();
-      this.focusPreviousItem(items);
+      this.focusPreviousItem();
       break;
 
      case "Home":
       event.preventDefault();
-      this.focusItem(0, items);
+      this.focusItem(0);
       break;
 
      case "End":
       event.preventDefault();
-      this.focusItem(items.length - 1, items);
-      break;
-
-     case "Escape":
-      event.preventDefault();
-      this.close();
+      this.focusItem(this.getFocusableItems().length - 1);
       break;
 
      case "Enter":
      case " ":
-      event.preventDefault();
-      const target = this.getKeyboardFocusedItem();
-      if (target) {
-        target.click();
-        this.close();
+      {
+        event.preventDefault();
+        if (!current || isItemDisabled(current)) break;
+        const isCheckable = current.getAttribute("role") !== "menuitem";
+        current.click();
+        if (this.openValue && (!isCheckable || event.key === "Enter")) this.close({
+          returnFocus: true
+        });
+        break;
       }
-      break;
     }
+  }
+  currentItem() {
+    const active = document.activeElement;
+    if (active && active.matches?.(MENU_ITEM_SELECTOR) && this.contentTarget.contains(active)) return active;
+    return getKeyboardFocusedItem(this.element);
   }
   getFocusableItems() {
     if (!this.hasContentTarget) return [];
-    const content = this.contentTarget;
-    const items = [];
-    Array.from(content.children).forEach(child => {
-      const role = child.getAttribute("role");
-      if (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio") {
-        if (!child.hasAttribute("data-disabled")) {
-          items.push(child);
-        }
-      } else if (role === "group") {
-        const radioItems = child.querySelectorAll('[role="menuitemradio"]');
-        radioItems.forEach(radioItem => {
-          if (!radioItem.hasAttribute("data-disabled")) {
-            items.push(radioItem);
-          }
-        });
-      }
-    });
-    return items;
+    return getMenuItems(this.contentTarget);
   }
   getKeyboardFocusedItem() {
-    const allItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    return Array.from(allItems).find(item => item.getAttribute("tabindex") === "0");
+    return getKeyboardFocusedItem(this.element);
   }
-  focusNextItem(items = null) {
-    items = items || this.getFocusableItems();
-    if (items.length === 0) return;
-    let currentIndex = this.findCurrentItemIndex(items);
-    if (currentIndex === -1 || currentIndex >= items.length - 1) {
-      this.focusItem(0, items);
-    } else {
-      this.focusItem(currentIndex + 1, items);
-    }
+  focusNextItem() {
+    const item = focusNextItem(this.getFocusableItems(), this.element, true);
+    if (item) this.lastHoveredItem = item;
   }
-  focusPreviousItem(items = null) {
-    items = items || this.getFocusableItems();
-    if (items.length === 0) return;
-    let currentIndex = this.findCurrentItemIndex(items);
-    if (currentIndex === -1 || currentIndex === 0) {
-      this.focusItem(items.length - 1, items);
-    } else {
-      this.focusItem(currentIndex - 1, items);
-    }
+  focusPreviousItem() {
+    const item = focusPreviousItem(this.getFocusableItems(), this.element, true);
+    if (item) this.lastHoveredItem = item;
   }
-  findCurrentItemIndex(items) {
-    const currentItem = items.find(item => item.getAttribute("tabindex") === "0");
-    return currentItem ? items.indexOf(currentItem) : -1;
+  focusItem(index) {
+    const item = focusItem(this.getFocusableItems(), index, this.element);
+    if (item) this.lastHoveredItem = item;
   }
-  focusItem(index, items = null) {
-    items = items || this.getFocusableItems();
-    if (items.length === 0 || index < 0 || index >= items.length) return;
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    allMenuItems.forEach(item => {
-      item.setAttribute("tabindex", "-1");
-    });
-    const targetItem = items[index];
-    targetItem.setAttribute("tabindex", "0");
-    targetItem.focus();
-    this.lastHoveredItem = targetItem;
-  }
-  trackHoveredItem(event) {
-    const item = event.currentTarget;
-    if (document.activeElement && document.activeElement.hasAttribute("role") && (document.activeElement.getAttribute("role") === "menuitem" || document.activeElement.getAttribute("role") === "menuitemcheckbox" || document.activeElement.getAttribute("role") === "menuitemradio")) {
-      document.activeElement.blur();
-    }
-    const allMenuItems = this.element.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]');
-    allMenuItems.forEach(menuItem => {
-      menuItem.setAttribute("tabindex", "-1");
-    });
-    item.setAttribute("tabindex", "0");
+  focusItemElement(item) {
+    updateRovingTabindex(this.element, item);
+    item.focus();
     this.lastHoveredItem = item;
+  }
+  pointFor(event) {
+    if (event.clientX || event.clientY) return {
+      x: event.clientX,
+      y: event.clientY
+    };
+    const rect = event.target?.getBoundingClientRect?.();
+    return rect ? {
+      x: rect.left,
+      y: rect.bottom
+    } : {
+      x: 0,
+      y: 0
+    };
   }
   positionContextMenu(x, y) {
     const content = this.contentTarget;
@@ -3297,12 +3981,8 @@ class ContextMenuController extends Controller {
       const viewportHeight = window.innerHeight;
       let adjustedX = x;
       let adjustedY = y;
-      if (rect.right > viewportWidth) {
-        adjustedX = viewportWidth - rect.width - 8;
-      }
-      if (rect.bottom > viewportHeight) {
-        adjustedY = viewportHeight - rect.height - 8;
-      }
+      if (rect.right > viewportWidth) adjustedX = viewportWidth - rect.width - 8;
+      if (rect.bottom > viewportHeight) adjustedY = viewportHeight - rect.height - 8;
       adjustedX = Math.max(8, adjustedX);
       adjustedY = Math.max(8, adjustedY);
       content.style.left = `${adjustedX}px`;
@@ -3325,56 +4005,45 @@ class CommandDialogController extends Controller {
       default: "meta+j"
     }
   };
+  constructor() {
+    super(...arguments);
+  }
   connect() {
-    this.dialogElement = this.element.querySelector("[data-controller*='ui--dialog']");
-    this.boundHandleDialogClose = this.handleDialogClose.bind(this);
-    this.boundHandleFocusOut = this.handleFocusOut.bind(this);
-    this.element.addEventListener("dialog:close", this.boundHandleDialogClose);
-    this.element.addEventListener("focusout", this.boundHandleFocusOut);
+    this.dialogElement = this.element.querySelector("[data-controller~='ui--dialog']");
+    this.handleDialogClose = this.handleDialogClose.bind(this);
+    this.element.addEventListener("dialog:close", this.handleDialogClose);
   }
   disconnect() {
-    this.element.removeEventListener("dialog:close", this.boundHandleDialogClose);
-    this.element.removeEventListener("focusout", this.boundHandleFocusOut);
+    this.element.removeEventListener("dialog:close", this.handleDialogClose);
   }
-  handleDialogClose() {
-    this.clearInput();
+  get dialogController() {
+    if (!this.dialogElement) return null;
+    return this.application.getControllerForElementAndIdentifier(this.dialogElement, "ui--dialog");
   }
-  handleFocusOut(event) {
-    if (!this.dialogElement) return;
-    const dialogController = this.application.getControllerForElementAndIdentifier(this.dialogElement, "ui--dialog");
-    if (!dialogController || !dialogController.openValue) return;
-    setTimeout(() => {
-      const activeElement = document.activeElement;
-      const dialogContent = this.dialogElement.querySelector("[data-ui--dialog-target='content']");
-      if (dialogContent && !dialogContent.contains(activeElement)) {
-        dialogController.close();
-      }
-    }, 0);
+  get input() {
+    return this.element.querySelector("[data-ui--command-target='input']");
+  }
+  get commandAutofocus() {
+    const command = this.input?.closest("[data-controller~='ui--command']");
+    return command?.getAttribute("data-ui--command-autofocus-value") !== "false";
   }
   toggle(event) {
     event.preventDefault();
-    if (!this.dialogElement) return;
-    const dialogController = this.application.getControllerForElementAndIdentifier(this.dialogElement, "ui--dialog");
-    if (dialogController) {
-      if (dialogController.openValue) {
-        dialogController.close();
-      } else {
-        dialogController.open();
-        this.focusInput();
-      }
+    const dialog = this.dialogController;
+    if (!dialog) return;
+    if (dialog.openValue) {
+      dialog.close();
+    } else {
+      if (this.commandAutofocus) this.input?.setAttribute("autofocus", "");
+      dialog.open();
     }
   }
-  focusInput() {
-    setTimeout(() => {
-      const input = this.element.querySelector("[data-ui--command-target='input']");
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    }, 50);
+  handleDialogClose() {
+    this.input?.removeAttribute("autofocus");
+    this.clearInput();
   }
   clearInput() {
-    const input = this.element.querySelector("[data-ui--command-target='input']");
+    const input = this.input;
     if (input) {
       input.value = "";
       input.dispatchEvent(new Event("input", {
@@ -3385,7 +4054,7 @@ class CommandDialogController extends Controller {
 }
 
 class DrawerController extends Controller {
-  static targets=[ "container", "overlay", "content", "handle" ];
+  static targets=[ "container", "overlay", "content", "handle", "trigger", "title", "description" ];
   static values={
     open: {
       type: Boolean,
@@ -3436,6 +4105,9 @@ class DrawerController extends Controller {
   CLOSE_THRESHOLD=.25;
   DRAG_CLASS="vaul-dragging";
   SCROLL_LOCK_TIMEOUT=500;
+  constructor() {
+    super(...arguments);
+  }
   connect() {
     this.isPointerDown = false;
     this.pointerStart = null;
@@ -3451,6 +4123,21 @@ class DrawerController extends Controller {
     if (this.hasContentTarget) {
       this.resizeObserver.observe(this.contentTarget);
     }
+    this.wireAria();
+    if (this.hasContentTarget) {
+      const modal = this.modalValue;
+      this.session = createModalSession({
+        content: this.contentTarget,
+        isolate: this.element,
+        returnFocus: () => this.triggers[0],
+        trapFocus: modal,
+        inertBackground: modal,
+        lockScroll: modal,
+        onEscape: () => {
+          if (this.dismissibleValue) this.animateToClosedPosition();
+        }
+      });
+    }
     if (this.openValue) {
       this.show();
     } else {
@@ -3462,8 +4149,10 @@ class DrawerController extends Controller {
     }
   }
   disconnect() {
-    unlockScroll();
-    this.cleanupEscapeHandler();
+    this.clearCloseTimer();
+    this.session?.deactivate({
+      restoreFocus: false
+    });
     if (this.preventScrollHandler) {
       document.removeEventListener("touchmove", this.preventScrollHandler);
     }
@@ -3473,6 +4162,30 @@ class DrawerController extends Controller {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+  }
+  wireAria() {
+    if (!this.hasContentTarget) return;
+    const content = this.contentTarget;
+    ensureId(content, "drawer-content");
+    if (this.hasTitleTarget) setIdRefs(content, "aria-labelledby", this.titleTarget, {
+      prefix: "drawer-title"
+    });
+    if (this.hasDescriptionTarget) setIdRefs(content, "aria-describedby", this.descriptionTarget, {
+      prefix: "drawer-description"
+    });
+    this.triggers.forEach(trigger => {
+      if (!trigger.hasAttribute("aria-haspopup")) trigger.setAttribute("aria-haspopup", "dialog");
+      setIdRefs(trigger, "aria-controls", content);
+    });
+    this.syncTriggers(this.openValue);
+  }
+  get triggers() {
+    const own = el => el.closest("[data-controller~='ui--drawer']") === this.element;
+    const byAction = Array.from(this.element.querySelectorAll("[data-action*='ui--drawer#open']")).filter(own);
+    return Array.from(new Set([ ...this.triggerTargets, ...byAction ]));
+  }
+  syncTriggers(open) {
+    this.triggers.forEach(trigger => trigger.setAttribute("aria-expanded", open ? "true" : "false"));
   }
   open() {
     this.openValue = true;
@@ -3856,7 +4569,10 @@ class DrawerController extends Controller {
     this.overlayTarget.style.opacity = String(opacity);
   }
   show() {
+    this.clearCloseTimer();
+    this.closing = false;
     this.setAllTargetsState("open");
+    this.syncTriggers(true);
     if (this.hasSnapPoints()) {
       const initialIndex = 0;
       if (this.hasContentTarget) {
@@ -3873,17 +4589,13 @@ class DrawerController extends Controller {
       }
       this.hasBeenOpened = true;
     }
-    if (this.modalValue) {
-      lockScroll();
+    if (this.modalValue && !this.preventScrollHandler) {
       this.preventScrollHandler = this.handlePreventScroll.bind(this);
       document.addEventListener("touchmove", this.preventScrollHandler, {
         passive: false
       });
     }
-    this.setupFocusTrap();
-    if (this.dismissibleValue) {
-      this.setupEscapeHandler();
-    }
+    this.session?.activate();
     this.dispatchEvent("drawer:open", {
       open: true
     });
@@ -3892,6 +4604,9 @@ class DrawerController extends Controller {
     this.animateToClosedPosition();
   }
   animateToClosedPosition() {
+    this.session?.deactivate();
+    this.syncTriggers(false);
+    this.closing = true;
     if (this.hasContentTarget) {
       const closedPosition = this.getClosedPosition();
       this.contentTarget.style.transition = this.getTransitionStyle();
@@ -3900,11 +4615,19 @@ class DrawerController extends Controller {
         this.overlayTarget.style.transition = `opacity ${this.TRANSITIONS.DURATION}s`;
         this.overlayTarget.style.opacity = "0";
       }
-      setTimeout(() => {
+      this.clearCloseTimer();
+      this.closeTimer = setTimeout(() => {
+        this.closeTimer = null;
         this.cleanupAfterClose();
       }, this.TRANSITIONS.DURATION * 1e3);
     } else {
-      this.close();
+      this.cleanupAfterClose();
+    }
+  }
+  clearCloseTimer() {
+    if (this.closeTimer) {
+      clearTimeout(this.closeTimer);
+      this.closeTimer = null;
     }
   }
   cleanupAfterClose() {
@@ -3916,27 +4639,21 @@ class DrawerController extends Controller {
       this.overlayTarget.style.transition = "none";
       this.overlayTarget.style.opacity = "";
     }
+    this.closing = false;
+    this.session?.deactivate();
+    this.syncTriggers(false);
     this.setAllTargetsState("closed");
     this.openValue = false;
-    unlockScroll();
     if (this.preventScrollHandler) {
       document.removeEventListener("touchmove", this.preventScrollHandler);
       this.preventScrollHandler = null;
     }
-    this.cleanupEscapeHandler();
     this.dispatchEvent("drawer:close", {
       open: false
     });
   }
   isMobile() {
     return /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }
-  setupFocusTrap() {
-    if (!this.hasContentTarget) return;
-    focusFirstElement(this.contentTarget, {
-      excludeInputsOnMobile: true,
-      preventScroll: true
-    });
   }
   handleResize() {
     if (this.openValue && this.snapPointsValue && this.snapPointsValue.length > 0 && this.activeSnapPointValue >= 0) {
@@ -4001,18 +4718,6 @@ class DrawerController extends Controller {
   getTransitionStyle() {
     return `transform ${this.TRANSITIONS.DURATION}s cubic-bezier(${this.TRANSITIONS.EASE.join(",")})`;
   }
-  setupEscapeHandler() {
-    this.cleanupEscapeHandler();
-    this.escapeCleanup = onEscapeKey(() => {
-      this.animateToClosedPosition();
-    });
-  }
-  cleanupEscapeHandler() {
-    if (this.escapeCleanup) {
-      this.escapeCleanup();
-      this.escapeCleanup = null;
-    }
-  }
   applyTransform(transform, animated = false, clearAfter = false) {
     if (!this.hasContentTarget) return;
     if (animated) {
@@ -4041,6 +4746,8 @@ class DrawerController extends Controller {
     }));
   }
 }
+
+const TABBABLE = 'a[href], button, input, select, textarea, [tabindex], [contenteditable=""], [contenteditable="true"]';
 
 class HoverCardController extends Controller {
   static targets=[ "trigger", "content" ];
@@ -4071,6 +4778,12 @@ class HoverCardController extends Controller {
     this.hideTimeout = null;
     if (this.hasContentTarget) {
       this.contentTarget.style.position = "fixed";
+      this.removeContentFromTabOrder();
+      this.escapeLayer = createEscapeLayer(() => this.close(), {
+        element: this.contentTarget
+      });
+      this.boundHandleContentFocusOut = this.handleContentFocusOut.bind(this);
+      this.contentTarget.addEventListener("focusout", this.boundHandleContentFocusOut);
     }
     if (this.hasTriggerTarget) {
       this.boundHandleFocus = this.handleFocus.bind(this);
@@ -4081,10 +4794,31 @@ class HoverCardController extends Controller {
   }
   disconnect() {
     this.clearTimeouts();
+    this.escapeLayer?.deactivate();
     if (this.hasTriggerTarget && this.boundHandleFocus) {
       this.triggerTarget.removeEventListener("focus", this.boundHandleFocus);
       this.triggerTarget.removeEventListener("blur", this.boundHandleBlur);
     }
+    if (this.hasContentTarget && this.boundHandleContentFocusOut) {
+      this.contentTarget.removeEventListener("focusout", this.boundHandleContentFocusOut);
+    }
+  }
+  removeContentFromTabOrder() {
+    this.contentTarget.querySelectorAll(TABBABLE).forEach(element => {
+      const tabindex = element.getAttribute("tabindex");
+      if (tabindex === null || parseInt(tabindex, 10) >= 0) {
+        element.setAttribute("tabindex", "-1");
+      }
+    });
+  }
+  handleContentFocusOut(event) {
+    const next = event.relatedTarget;
+    if (next && (this.contentTarget.contains(next) || this.triggerTarget?.contains(next))) return;
+    this.hide();
+  }
+  close() {
+    this.clearTimeouts();
+    this.closeNow();
   }
   handleFocus() {
     this.show();
@@ -4099,20 +4833,25 @@ class HoverCardController extends Controller {
     this.clearTimeouts();
     this.showTimeout = setTimeout(() => {
       this.openValue = true;
+      this.removeContentFromTabOrder();
       this.contentTarget.classList.remove("invisible");
       this.contentTarget.classList.add("visible");
       setState(this.contentTarget, "open");
+      this.escapeLayer?.activate();
       this.positionContent();
     }, this.openDelayValue);
   }
   hide() {
     this.clearTimeouts();
-    this.hideTimeout = setTimeout(() => {
-      this.openValue = false;
-      this.contentTarget.classList.remove("visible");
-      this.contentTarget.classList.add("invisible");
-      setState(this.contentTarget, "closed");
-    }, this.closeDelayValue);
+    this.hideTimeout = setTimeout(() => this.closeNow(), this.closeDelayValue);
+  }
+  closeNow() {
+    this.hideTimeout = null;
+    this.openValue = false;
+    this.escapeLayer?.deactivate();
+    this.contentTarget.classList.remove("visible");
+    this.contentTarget.classList.add("invisible");
+    setState(this.contentTarget, "closed");
   }
   keepOpen() {
     this.clearTimeouts();
@@ -4166,7 +4905,7 @@ class HoverCardController extends Controller {
 }
 
 class InputOtpController extends Controller {
-  static targets=[ "input" ];
+  static targets=[ "input", "slot" ];
   static values={
     length: {
       type: Number,
@@ -4179,81 +4918,176 @@ class InputOtpController extends Controller {
     complete: {
       type: Boolean,
       default: false
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
     }
   };
+  constructor() {
+    super(...arguments);
+    this.handleReset = this.handleReset.bind(this);
+  }
   connect() {
-    if (this.hasInputTarget) {
-      this.inputTargets[0]?.focus();
+    this.focused = false;
+    this.completeValue = this.currentValue().length >= this.lengthValue;
+    this.render();
+    this.form = this.hasInputTarget ? this.inputTarget.form : null;
+    if (this.form) this.form.addEventListener("reset", this.handleReset);
+    if (this.autofocusValue && this.hasInputTarget && !this.inputTarget.disabled) {
+      this.inputTarget.focus();
     }
   }
-  input(event) {
-    const input = event.target;
-    const value = input.value;
-    const index = this.inputTargets.indexOf(input);
-    const regex = new RegExp(`^${this.patternValue}$`);
-    if (value && !regex.test(value)) {
-      input.value = "";
-      return;
+  disconnect() {
+    if (this.form) this.form.removeEventListener("reset", this.handleReset);
+    this.form = null;
+  }
+  input() {
+    const input = this.inputTarget;
+    const caret = input.selectionStart ?? input.value.length;
+    const before = this.sanitize(input.value.slice(0, caret));
+    const cleaned = this.sanitize(input.value);
+    if (cleaned !== input.value) {
+      input.value = cleaned;
+      this.setCaret(Math.min(before.length, cleaned.length));
     }
-    if (value && index < this.inputTargets.length - 1) {
-      this.inputTargets[index + 1].focus();
-    }
+    this.selectCurrent();
+    this.render();
     this.checkComplete();
-  }
-  keydown(event) {
-    const input = event.target;
-    const index = this.inputTargets.indexOf(input);
-    if (event.key === "Backspace") {
-      if (!input.value && index > 0) {
-        event.preventDefault();
-        this.inputTargets[index - 1].focus();
-        this.inputTargets[index - 1].value = "";
-      }
-    }
-    if (event.key === "ArrowLeft" && index > 0) {
-      event.preventDefault();
-      this.inputTargets[index - 1].focus();
-    }
-    if (event.key === "ArrowRight" && index < this.inputTargets.length - 1) {
-      event.preventDefault();
-      this.inputTargets[index + 1].focus();
-    }
-    if (event.key === "Home") {
-      event.preventDefault();
-      this.inputTargets[0].focus();
-    }
-    if (event.key === "End") {
-      event.preventDefault();
-      this.inputTargets[this.inputTargets.length - 1].focus();
-    }
   }
   paste(event) {
+    const text = event.clipboardData?.getData("text") ?? "";
     event.preventDefault();
-    const pastedData = event.clipboardData.getData("text").trim();
-    const regex = new RegExp(`^${this.patternValue}+$`);
-    if (!regex.test(pastedData)) {
+    const input = this.inputTarget;
+    const pasted = this.sanitize(text);
+    if (!pasted) return;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? start;
+    const value = (input.value.slice(0, start) + pasted + input.value.slice(end)).slice(0, this.lengthValue);
+    input.value = value;
+    this.setCaret(Math.min(start + pasted.length, value.length));
+    this.selectCurrent();
+    this.render();
+    this.checkComplete();
+    input.dispatchEvent(new Event("input", {
+      bubbles: true
+    }));
+  }
+  keydown(event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const index = this.activeIndex();
+    const last = this.lastIndex();
+    let next = null;
+    switch (event.key) {
+     case "ArrowLeft":
+      next = Math.max(0, index - 1);
+      break;
+
+     case "ArrowRight":
+      next = Math.min(last, index + 1);
+      break;
+
+     case "Home":
+      next = 0;
+      break;
+
+     case "End":
+      next = last;
+      break;
+
+     default:
       return;
     }
-    const chars = pastedData.split("");
-    chars.forEach((char, index) => {
-      if (index < this.inputTargets.length) {
-        this.inputTargets[index].value = char;
+    event.preventDefault();
+    this.moveTo(next);
+  }
+  focus() {
+    this.focused = true;
+    requestAnimationFrame(() => {
+      if (document.activeElement !== this.inputTarget) return;
+      this.moveTo(this.lastIndex());
+    });
+    this.moveTo(this.lastIndex());
+  }
+  blur() {
+    this.focused = false;
+    this.render();
+  }
+  handleReset() {
+    setTimeout(() => {
+      this.completeValue = this.currentValue().length >= this.lengthValue;
+      this.render();
+    }, 0);
+  }
+  activeIndex() {
+    if (!this.hasInputTarget) return 0;
+    const start = this.inputTarget.selectionStart ?? this.currentValue().length;
+    return Math.min(start, this.lengthValue - 1);
+  }
+  lastIndex() {
+    return Math.min(this.currentValue().length, this.lengthValue - 1);
+  }
+  moveTo(index) {
+    const value = this.currentValue();
+    if (index < value.length) {
+      this.setSelection(index, index + 1);
+    } else {
+      this.setCaret(index);
+    }
+    this.render();
+  }
+  selectCurrent() {
+    const input = this.inputTarget;
+    const value = input.value;
+    if (input.selectionStart !== input.selectionEnd) return;
+    let index = input.selectionStart ?? value.length;
+    if (index >= this.lengthValue) index = this.lengthValue - 1;
+    if (index < value.length) this.setSelection(index, index + 1);
+  }
+  setCaret(index) {
+    this.setSelection(index, index);
+  }
+  setSelection(start, end) {
+    try {
+      this.inputTarget.setSelectionRange(start, end);
+    } catch {}
+  }
+  render() {
+    const value = this.currentValue();
+    const active = this.focused && document.activeElement === this.inputTarget ? this.activeIndex() : -1;
+    this.slotTargets.forEach((slot, index) => {
+      const char = value[index] || "";
+      this.setSlotChar(slot, char);
+      const isActive = index === active;
+      slot.setAttribute("data-active", isActive ? "true" : "false");
+      if (isActive && !char) {
+        slot.setAttribute("data-caret", "true");
+      } else {
+        slot.removeAttribute("data-caret");
       }
     });
-    const nextEmptyIndex = this.inputTargets.findIndex(input => !input.value);
-    if (nextEmptyIndex >= 0) {
-      this.inputTargets[nextEmptyIndex].focus();
+  }
+  setSlotChar(slot, char) {
+    const first = slot.firstChild;
+    if (first && first.nodeType === Node.TEXT_NODE) {
+      if (first.textContent !== char) first.textContent = char;
     } else {
-      this.inputTargets[this.inputTargets.length - 1].focus();
+      slot.insertBefore(document.createTextNode(char), first);
     }
-    this.checkComplete();
+  }
+  currentValue() {
+    return this.hasInputTarget ? this.inputTarget.value : "";
+  }
+  sanitize(text) {
+    const regex = new RegExp(`^(?:${this.patternValue})$`);
+    return Array.from(text).filter(char => regex.test(char)).join("").slice(0, this.lengthValue);
   }
   checkComplete() {
-    const allFilled = this.inputTargets.every(input => input.value);
+    const value = this.currentValue();
+    const isComplete = value.length >= this.lengthValue;
     const wasComplete = this.completeValue;
-    this.completeValue = allFilled;
-    if (allFilled && !wasComplete) {
-      const value = this.inputTargets.map(input => input.value).join("");
+    this.completeValue = isComplete;
+    if (isComplete && !wasComplete) {
       this.element.dispatchEvent(new CustomEvent("inputotp:complete", {
         bubbles: true,
         detail: {
@@ -4263,16 +5097,14 @@ class InputOtpController extends Controller {
     }
   }
   getValue() {
-    return this.inputTargets.map(input => input.value).join("");
+    return this.currentValue();
   }
   clear() {
-    this.inputTargets.forEach(input => {
-      input.value = "";
-    });
+    if (!this.hasInputTarget) return;
+    this.inputTarget.value = "";
     this.completeValue = false;
-    if (this.hasInputTarget) {
-      this.inputTargets[0].focus();
-    }
+    this.inputTarget.focus();
+    this.moveTo(0);
   }
 }
 
@@ -4423,6 +5255,8 @@ function getPlacementFromAttributes(element) {
   return align ? `${side}-${align}` : side;
 }
 
+const HIDE_GRACE_MS = 100;
+
 class TooltipController extends Controller {
   static targets=[ "trigger", "content" ];
   static values={
@@ -4437,17 +5271,45 @@ class TooltipController extends Controller {
   };
   connect() {
     this.hoverTimeout = null;
+    this.hideTimeout = null;
     this.isOpen = false;
     this.positioner = null;
-    this.cleanupEscape = onEscapeKeyWhen(() => this.hide(), () => this.isOpen);
+    this.pointerDown = false;
     if (this.hasContentTarget) {
       this.content = this.contentTarget;
       this.originalParent = this.content.parentNode;
+      ensureId(this.content, "tooltip");
+      if (this.hasTriggerTarget) {
+        this.trigger = this.triggerTarget;
+        addIdRef(this.trigger, "aria-describedby", this.content, "tooltip");
+      }
+      this.escapeLayer = createEscapeLayer(() => this.hide(), {
+        element: this.content
+      });
+      this.onContentEnter = () => this.cancelHide();
+      this.onContentLeave = () => this.scheduleHide();
+      this.content.addEventListener("mouseenter", this.onContentEnter);
+      this.content.addEventListener("mouseleave", this.onContentLeave);
       requestAnimationFrame(() => {
         if (this.content) {
           document.body.appendChild(this.content);
         }
       });
+    }
+    if (this.hasTriggerTarget) {
+      this.onPointerDown = () => {
+        this.pointerDown = true;
+        this.hide();
+        document.addEventListener("pointerup", this.onPointerUp, {
+          once: true
+        });
+      };
+      this.onPointerUp = () => {
+        setTimeout(() => {
+          this.pointerDown = false;
+        }, 0);
+      };
+      this.triggerTarget.addEventListener("pointerdown", this.onPointerDown);
     }
   }
   disconnect() {
@@ -4455,9 +5317,16 @@ class TooltipController extends Controller {
       this.positioner.stop();
       this.positioner = null;
     }
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-      this.hoverTimeout = null;
+    this.clearTimers();
+    this.escapeLayer?.deactivate();
+    if (this.trigger) {
+      this.trigger.removeEventListener("pointerdown", this.onPointerDown);
+      if (this.content) removeIdRef(this.trigger, "aria-describedby", this.content);
+    }
+    document.removeEventListener("pointerup", this.onPointerUp);
+    if (this.content) {
+      this.content.removeEventListener("mouseenter", this.onContentEnter);
+      this.content.removeEventListener("mouseleave", this.onContentLeave);
     }
     if (this.content && this.content.parentNode === document.body) {
       if (this.originalParent) {
@@ -4466,32 +5335,59 @@ class TooltipController extends Controller {
         document.body.removeChild(this.content);
       }
     }
-    if (this.cleanupEscape) {
-      this.cleanupEscape();
-    }
   }
-  show() {
+  show(event) {
+    if (event?.type === "focus" && this.pointerDown) return;
+    this.cancelHide();
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
       this.hoverTimeout = null;
     }
     this.hoverTimeout = setTimeout(() => {
+      this.hoverTimeout = null;
       if (!this.content || !this.hasTriggerTarget) return;
       this.isOpen = true;
       setState(this.content, "open");
+      this.escapeLayer?.activate();
       this.updatePosition();
     }, this.hoverDelayValue);
   }
-  hide() {
+  hide(event) {
+    if (event?.type === "mouseleave" && this.isOpen) {
+      this.scheduleHide();
+      return;
+    }
+    this.clearTimers();
+    if (!this.content) return;
+    this.isOpen = false;
+    setState(this.content, "closed");
+    this.escapeLayer?.deactivate();
+    if (this.positioner) {
+      this.positioner.stop();
+    }
+  }
+  scheduleHide() {
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
       this.hoverTimeout = null;
     }
-    if (!this.content) return;
-    this.isOpen = false;
-    setState(this.content, "closed");
-    if (this.positioner) {
-      this.positioner.stop();
+    this.cancelHide();
+    this.hideTimeout = setTimeout(() => {
+      this.hideTimeout = null;
+      this.hide();
+    }, HIDE_GRACE_MS);
+  }
+  cancelHide() {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+  }
+  clearTimers() {
+    this.cancelHide();
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
     }
   }
   updatePosition() {
@@ -4547,6 +5443,8 @@ function createClickOutsideHandler(elements, onClickOutside, options = {}) {
   };
 }
 
+const FOCUSABLE_TRIGGER = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
 class PopoverController extends Controller {
   static targets=[ "trigger", "content" ];
   static values={
@@ -4569,30 +5467,40 @@ class PopoverController extends Controller {
     hoverDelay: {
       type: Number,
       default: 200
+    },
+    autoFocus: {
+      type: Boolean,
+      default: true
     }
   };
   connect() {
     if (!this.hasTriggerTarget || !this.hasContentTarget) {
       return;
     }
-    if (!this.contentTarget.hasAttribute("data-state")) {
-      setState(this.contentTarget, this.openValue ? "open" : "closed");
-    }
-    if (this.contentTarget.dataset.state === "closed") {
-      this.contentTarget.inert = true;
-    }
+    this.isShown = false;
+    const startOpen = this.openValue;
+    this.openValue = false;
+    setState(this.contentTarget, "closed");
+    this.contentTarget.inert = true;
+    ensureId(this.contentTarget, "popover-content");
+    this.syncTriggerAria();
     this.positioner = createPositioner(this.triggerTarget, this.contentTarget, {
       placement: this.placementValue,
       offsetValue: this.offsetValue
+    });
+    this.escapeLayer = createEscapeLayer(() => this.hide({
+      returnFocus: true
+    }), {
+      element: this.contentTarget
     });
     if (this.triggerValue === "click") {
       this.setupClickTrigger();
     } else if (this.triggerValue === "hover") {
       this.setupHoverTrigger();
     }
-    this.boundHandleKeydown = this.handleKeydown.bind(this);
     this.boundHandleFocusOut = this.handleFocusOut.bind(this);
     this.element.addEventListener("focusout", this.boundHandleFocusOut);
+    if (startOpen) this.show();
   }
   disconnect() {
     if (this.positioner) {
@@ -4603,7 +5511,8 @@ class PopoverController extends Controller {
       clearTimeout(this.hoverTimeout);
       this.hoverTimeout = null;
     }
-    this.teardownKeyboardNavigation();
+    this.cancelFocusRetry();
+    this.escapeLayer?.deactivate();
     if (this.clickOutsideHandler) {
       this.clickOutsideHandler.detach();
     }
@@ -4618,19 +5527,26 @@ class PopoverController extends Controller {
       this.element.removeEventListener("focusout", this.boundHandleFocusOut);
     }
   }
-  setupKeyboardNavigation() {
-    document.addEventListener("keydown", this.boundHandleKeydown);
+  findTriggerElementToFocus() {
+    if (!this.hasTriggerTarget) return null;
+    if (this.triggerTarget.matches(FOCUSABLE_TRIGGER)) return this.triggerTarget;
+    return this.triggerTarget.querySelector(FOCUSABLE_TRIGGER);
   }
-  teardownKeyboardNavigation() {
-    if (this.boundHandleKeydown) {
-      document.removeEventListener("keydown", this.boundHandleKeydown);
-    }
+  syncTriggerAria() {
+    const button = this.findTriggerElementToFocus();
+    if (!button) return;
+    if (!button.hasAttribute("aria-haspopup")) button.setAttribute("aria-haspopup", "dialog");
+    button.setAttribute("aria-expanded", String(Boolean(this.isShown)));
+    setIdRefs(button, "aria-controls", this.contentTarget, {
+      prefix: "popover-content"
+    });
   }
-  handleFocusOut(event) {
-    if (!this.openValue || this.isClosing) return;
+  handleFocusOut() {
+    if (!this.isShown || this.isClosing) return;
     setTimeout(() => {
+      if (!this.isShown || this.isClosing) return;
       const newFocusedElement = document.activeElement;
-      if (newFocusedElement === document.body) {
+      if (!newFocusedElement || newFocusedElement === document.body) {
         return this.hide({
           returnFocus: true
         });
@@ -4641,14 +5557,6 @@ class PopoverController extends Controller {
         });
       }
     }, 0);
-  }
-  handleKeydown(event) {
-    if (event.key === "Escape" && this.openValue) {
-      event.preventDefault();
-      this.hide({
-        returnFocus: true
-      });
-    }
   }
   setupClickTrigger() {
     this.boundHandleTriggerClick = this.toggle.bind(this);
@@ -4661,26 +5569,53 @@ class PopoverController extends Controller {
     this.boundHandleMouseLeave = this.handleMouseLeave.bind(this);
     this.triggerTarget.addEventListener("mouseenter", this.boundHandleMouseEnter);
     this.element.addEventListener("mouseleave", this.boundHandleMouseLeave);
+    this.boundHandleTriggerClick = this.handleHoverTriggerClick.bind(this);
+    this.triggerTarget.addEventListener("click", this.boundHandleTriggerClick);
   }
-  toggle(event) {
-    event.stopPropagation();
-    this.openValue = !this.openValue;
-    if (this.openValue) {
-      this.show();
+  handleHoverTriggerClick(event) {
+    const fromKeyboard = event.detail === 0;
+    if (!this.isShown) {
+      this.show({
+        focus: fromKeyboard && this.autoFocusValue
+      });
+    } else if (fromKeyboard) {
+      this.hide({
+        returnFocus: true
+      });
     } else {
-      this.hide();
+      this.openedByHover = false;
     }
   }
-  show() {
-    this.triggerElementToFocus = this.findTriggerElementToFocus();
+  toggle(event) {
+    event?.stopPropagation?.();
+    if (this.isShown) {
+      this.hide();
+    } else {
+      this.show({
+        focus: this.autoFocusValue
+      });
+    }
+  }
+  close() {
+    this.hide({
+      returnFocus: true
+    });
+  }
+  show(options = {}) {
+    if (this.isShown || !this.hasContentTarget) return;
+    const focus = options instanceof Event ? this.autoFocusValue : Boolean(options?.focus);
+    this.isShown = true;
     this.openValue = true;
+    this.triggerElementToFocus = this.findTriggerElementToFocus();
     setState(this.contentTarget, "open");
     this.contentTarget.classList.remove("hidden");
     this.contentTarget.inert = false;
+    this.syncTriggerAria();
     if (this.positioner) {
       this.positioner.start();
     }
-    this.setupKeyboardNavigation();
+    this.escapeLayer?.activate();
+    if (focus) this.moveFocusIn();
     this.element.dispatchEvent(new CustomEvent("popover:show", {
       bubbles: true,
       detail: {
@@ -4688,33 +5623,32 @@ class PopoverController extends Controller {
       }
     }));
   }
-  findTriggerElementToFocus() {
-    if (!this.triggerTarget) return null;
-    const isFocusable = this.triggerTarget.matches('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (isFocusable) {
-      return this.triggerTarget;
-    } else {
-      return this.triggerTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    }
-  }
   hide(options = {}) {
-    const {returnFocus: returnFocus = false} = options;
+    if (!this.isShown) return;
+    const returnFocus = !(options instanceof Event) && Boolean(options?.returnFocus);
     this.isClosing = true;
+    this.isShown = false;
     this.openValue = false;
+    this.openedByHover = false;
+    this.cancelFocusRetry();
+    this.escapeLayer?.deactivate();
     setState(this.contentTarget, "closed");
     this.contentTarget.classList.add("hidden");
+    this.syncTriggerAria();
+    const target = this.triggerElementToFocus || this.findTriggerElementToFocus();
+    if (returnFocus && target) target.focus();
     this.contentTarget.inert = true;
     if (this.positioner) {
       this.positioner.stop();
     }
-    this.teardownKeyboardNavigation();
-    if (returnFocus && this.triggerElementToFocus) {
+    if (returnFocus && target) {
       setTimeout(() => {
-        if (this.triggerElementToFocus) {
-          this.triggerElementToFocus.focus();
+        const active = document.activeElement;
+        if (!this.isShown && (!active || active === document.body || this.contentTarget.contains(active))) {
+          target.focus();
         }
         this.isClosing = false;
-      }, 100);
+      }, 0);
     } else {
       this.isClosing = false;
     }
@@ -4725,12 +5659,28 @@ class PopoverController extends Controller {
       }
     }));
   }
+  moveFocusIn(framesLeft = 10) {
+    this.focusFrame = null;
+    if (!this.isShown || this.contentTarget.contains(document.activeElement)) return;
+    focusInitial(this.contentTarget);
+    if (!this.contentTarget.contains(document.activeElement) && framesLeft > 0) {
+      this.focusFrame = requestAnimationFrame(() => this.moveFocusIn(framesLeft - 1));
+    }
+  }
+  cancelFocusRetry() {
+    if (this.focusFrame) {
+      cancelAnimationFrame(this.focusFrame);
+      this.focusFrame = null;
+    }
+  }
   handleMouseEnter() {
     if (this.hoverTimeout) {
       clearTimeout(this.hoverTimeout);
     }
     this.hoverTimeout = setTimeout(() => {
+      if (this.isShown) return;
       this.show();
+      this.openedByHover = true;
     }, this.hoverDelayValue);
   }
   handleMouseLeave() {
@@ -4738,12 +5688,12 @@ class PopoverController extends Controller {
       clearTimeout(this.hoverTimeout);
       this.hoverTimeout = null;
     }
-    this.hide();
+    if (this.openedByHover) this.hide();
   }
 }
 
 class ResponsiveDialogController extends Controller {
-  static targets=[ "drawer", "dialog" ];
+  static targets=[ "drawer", "dialog", "body", "drawerSlot", "dialogSlot", "title", "description" ];
   static values={
     breakpoint: {
       type: Number,
@@ -4754,83 +5704,120 @@ class ResponsiveDialogController extends Controller {
       default: false
     }
   };
+  constructor() {
+    super(...arguments);
+  }
   connect() {
     this.mediaQuery = window.matchMedia(`(min-width: ${this.breakpointValue}px)`);
-    this.handleBreakpointChangeHandler = this.handleBreakpointChange.bind(this);
-    this.mediaQuery.addEventListener("change", this.handleBreakpointChangeHandler);
-    this.syncState();
+    this.handleBreakpointChange = this.handleBreakpointChange.bind(this);
+    this.mediaQuery.addEventListener("change", this.handleBreakpointChange);
+    this.onChildToggle = this.onChildToggle.bind(this);
+    for (const type of [ "dialog:open", "dialog:close", "drawer:open", "drawer:close" ]) {
+      this.element.addEventListener(type, this.onChildToggle);
+    }
+    this.active = this.activeComponentType;
+    this.placeBody();
+    if (this.openValue) this.openChild(this.active);
   }
   disconnect() {
-    if (this.mediaQuery) {
-      this.mediaQuery.removeEventListener("change", this.handleBreakpointChangeHandler);
+    this.mediaQuery?.removeEventListener("change", this.handleBreakpointChange);
+    for (const type of [ "dialog:open", "dialog:close", "drawer:open", "drawer:close" ]) {
+      this.element.removeEventListener(type, this.onChildToggle);
     }
   }
   open() {
     this.openValue = true;
-    this.syncState();
+    this.openChild(this.active);
   }
   close() {
     this.openValue = false;
-    this.syncState();
+    this.closeChild(this.active);
   }
   toggle() {
-    this.openValue = !this.openValue;
-    this.syncState();
+    this.openValue ? this.close() : this.open();
+  }
+  onChildToggle(event) {
+    const [type, action] = event.type.split(":");
+    if (type !== this.active) return;
+    if (event.target !== this.childElement(type)) return;
+    this.openValue = action === "open";
   }
   handleBreakpointChange(event) {
-    this.syncState();
+    const next = this.activeComponentType;
+    if (next === this.active) return;
+    const previous = this.active;
+    this.active = next;
+    this.placeBody();
     if (this.openValue) {
-      this.transferFocus();
+      this.closeChild(previous);
+      const hiddenWrapper = previous === "dialog" ? this.dialogTarget : this.drawerTarget;
+      if (hiddenWrapper.contains(document.activeElement)) document.activeElement.blur();
+      this.openChild(next);
     }
     this.element.dispatchEvent(new CustomEvent("responsive-dialog:resize", {
       bubbles: true,
       detail: {
-        isDesktop: event.matches,
+        isDesktop: this.isDesktop,
         breakpoint: this.breakpointValue
       }
     }));
   }
-  syncState() {
-    const isDesktop = this.mediaQuery.matches;
-    const activeComponent = isDesktop ? "dialog" : "drawer";
-    const inactiveComponent = isDesktop ? "drawer" : "dialog";
-    if (this.openValue) {
-      this.openComponent(activeComponent);
-      this.ensureClosedComponent(inactiveComponent);
+  openChild(type) {
+    const controller = this.childController(type);
+    if (controller) {
+      if (!this.childIsOpen(type)) controller.open();
     } else {
-      this.ensureClosedComponent("drawer");
-      this.ensureClosedComponent("dialog");
+      this.childElement(type)?.setAttribute(`data-ui--${type}-open-value`, "true");
     }
   }
-  openComponent(componentType) {
-    const target = componentType === "dialog" ? this.dialogTarget : this.drawerTarget;
-    if (!target) return;
-    const openEvent = new CustomEvent(`${componentType}:open`, {
-      bubbles: true,
-      detail: {
-        open: true
-      }
-    });
-    target.dispatchEvent(openEvent);
+  closeChild(type) {
+    const controller = this.childController(type);
+    if (controller) {
+      if (!this.childIsOpen(type)) return;
+      type === "drawer" ? controller.hide() : controller.close();
+    } else {
+      this.childElement(type)?.setAttribute(`data-ui--${type}-open-value`, "false");
+    }
   }
-  ensureClosedComponent(componentType) {
-    const target = componentType === "dialog" ? this.dialogTarget : this.drawerTarget;
-    if (!target) return;
-    const closeEvent = new CustomEvent(`${componentType}:close`, {
-      bubbles: true,
-      detail: {
-        open: false
-      }
-    });
-    target.dispatchEvent(closeEvent);
+  childIsOpen(type) {
+    return this.childElement(type)?.getAttribute(`data-ui--${type}-open-value`) === "true";
   }
-  transferFocus() {
-    const isDesktop = this.mediaQuery.matches;
-    const targetEl = isDesktop ? this.dialogTarget : this.drawerTarget;
-    if (!targetEl) return;
-    setTimeout(() => {
-      focusFirstElement(targetEl);
-    }, 100);
+  placeBody() {
+    if (!this.hasBodyTarget) return;
+    const slot = this.active === "dialog" ? this.hasDialogSlotTarget ? this.dialogSlotTarget : null : this.hasDrawerSlotTarget ? this.drawerSlotTarget : null;
+    if (!slot) return;
+    if (this.bodyTarget.parentElement !== slot) slot.appendChild(this.bodyTarget);
+    this.wireAria();
+  }
+  wireAria() {
+    const content = this.childElement(this.active)?.querySelector("[role='dialog']");
+    if (!content) return;
+    const title = this.findTitle();
+    const description = this.findDescription();
+    if (title) setIdRefs(content, "aria-labelledby", title, {
+      prefix: "responsive-dialog-title",
+      overwrite: true
+    });
+    if (description) setIdRefs(content, "aria-describedby", description, {
+      prefix: "responsive-dialog-description",
+      overwrite: true
+    });
+  }
+  findTitle() {
+    if (this.hasTitleTarget) return this.titleTarget;
+    return this.bodyTarget.querySelector("[data-ui--dialog-target='title'], [data-ui--drawer-target='title'], h1, h2, h3, h4, h5, h6, [role='heading']");
+  }
+  findDescription() {
+    if (this.hasDescriptionTarget) return this.descriptionTarget;
+    return this.bodyTarget.querySelector("[data-ui--dialog-target='description'], [data-ui--drawer-target='description']");
+  }
+  childElement(type) {
+    const wrapper = type === "dialog" ? this.hasDialogTarget ? this.dialogTarget : null : this.hasDrawerTarget ? this.drawerTarget : null;
+    return wrapper?.querySelector(`[data-controller~='ui--${type}']`) || null;
+  }
+  childController(type) {
+    const element = this.childElement(type);
+    return element ? this.application.getControllerForElementAndIdentifier(element, `ui--${type}`) : null;
   }
   get isDesktop() {
     return this.mediaQuery.matches;
@@ -4881,8 +5868,15 @@ class ScrollAreaController extends Controller {
     if (!this.hasViewportTarget) return;
     this.boundHandleViewportFocus = this.handleViewportFocus.bind(this);
     this.boundHandleViewportFocusOut = this.handleViewportFocusOut.bind(this);
-    this.viewportTarget.addEventListener("focus", this.boundHandleViewportFocus);
+    this.viewportTarget.addEventListener("focusin", this.boundHandleViewportFocus);
     this.viewportTarget.addEventListener("focusout", this.boundHandleViewportFocusOut);
+    this.updateViewportTabStop();
+  }
+  updateViewportTabStop() {
+    if (!this.hasViewportTarget) return;
+    const viewport = this.viewportTarget;
+    const overflows = viewport.scrollHeight > viewport.clientHeight || viewport.scrollWidth > viewport.clientWidth;
+    viewport.setAttribute("tabindex", overflows ? "0" : "-1");
   }
   handleViewportFocus() {
     this.scrollbarTargets.forEach(scrollbar => {
@@ -4894,7 +5888,8 @@ class ScrollAreaController extends Controller {
       scrollbar.dataset.state = "visible";
     });
   }
-  handleViewportFocusOut() {
+  handleViewportFocusOut(event) {
+    if (event?.relatedTarget && this.viewportTarget.contains(event.relatedTarget)) return;
     this.scrollbarTargets.forEach(scrollbar => {
       const timer = setTimeout(() => {
         scrollbar.dataset.state = "hidden";
@@ -5097,6 +6092,7 @@ class ScrollAreaController extends Controller {
         }
       });
       this.updateThumbSize();
+      this.updateViewportTabStop();
     });
     this.resizeObserver.observe(this.viewportTarget);
     if (this.viewportTarget.firstElementChild) {
@@ -5303,7 +6299,7 @@ class ScrollAreaController extends Controller {
     document.removeEventListener("pointerup", this.boundHandlePointerUp);
     if (this.hasViewportTarget) {
       if (this.boundHandleViewportFocus) {
-        this.viewportTarget.removeEventListener("focus", this.boundHandleViewportFocus);
+        this.viewportTarget.removeEventListener("focusin", this.boundHandleViewportFocus);
       }
       if (this.boundHandleViewportFocusOut) {
         this.viewportTarget.removeEventListener("focusout", this.boundHandleViewportFocusOut);
@@ -5315,6 +6311,8 @@ class ScrollAreaController extends Controller {
     this.scrollEndTimers.clear();
   }
 }
+
+const OPEN_KEYS = [ "ArrowDown", "ArrowUp" ];
 
 class SelectController extends Controller {
   static targets=[ "trigger", "content", "item", "valueDisplay", "hiddenInput", "scrollUpButton", "scrollDownButton", "viewport", "itemCheck" ];
@@ -5339,13 +6337,39 @@ class SelectController extends Controller {
       this.hiddenInputTarget.value = this.valueValue;
     }
     this.contentTarget.dataset.state = "closed";
+    this.wireAria();
+    this.typeahead = createTypeahead();
+    this.escapeLayer = createEscapeLayer(() => this.close(), {
+      element: this.contentTarget
+    });
     this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.element.addEventListener("keydown", this.boundHandleKeydown);
+    this.boundHandleFocusout = this.handleFocusout.bind(this);
+    this.element.addEventListener("focusout", this.boundHandleFocusout);
     this.boundHandleScroll = this.handleScroll.bind(this);
     if (this.hasViewportTarget) {
       this.viewportTarget.addEventListener("scroll", this.boundHandleScroll, {
         passive: true
       });
     }
+  }
+  wireAria() {
+    ensureId(this.contentTarget, "select-content");
+    setIdRefs(this.triggerTarget, "aria-controls", this.contentTarget);
+    this.itemTargets.forEach(item => this.prepareItem(item));
+    this.element.querySelectorAll('[data-slot="select-group"]').forEach(group => {
+      const label = group.querySelector('[data-slot="select-label"]');
+      if (label) setIdRefs(group, "aria-labelledby", label, {
+        prefix: "select-label"
+      });
+    });
+  }
+  itemTargetConnected(item) {
+    this.prepareItem(item);
+  }
+  prepareItem(item) {
+    ensureId(item, "select-item");
+    if (!item.hasAttribute("tabindex")) item.setAttribute("tabindex", "-1");
   }
   valueValueChanged(value, previousValue) {
     if (previousValue === undefined) return;
@@ -5368,26 +6392,29 @@ class SelectController extends Controller {
     this.contentTarget.dataset.state = "open";
     this.triggerTarget.setAttribute("aria-expanded", "true");
     await this.updatePosition();
+    this.escapeLayer.activate();
     this.boundHandleClickOutside = this.handleClickOutside.bind(this);
     setTimeout(() => {
-      document.addEventListener("click", this.boundHandleClickOutside);
-      document.addEventListener("keydown", this.boundHandleKeydown);
+      if (this.openValue && this.boundHandleClickOutside) {
+        document.addEventListener("click", this.boundHandleClickOutside);
+      }
     }, 0);
     setTimeout(() => {
       this.handleScroll();
     }, 50);
     this.focusItem(this.getSelectedItem() || this.getFirstItem());
   }
-  close() {
+  close({restoreFocus: restoreFocus = true} = {}) {
     this.openValue = false;
+    this.escapeLayer.deactivate();
+    this.typeahead.reset();
     this.contentTarget.dataset.state = "closed";
     this.triggerTarget.setAttribute("aria-expanded", "false");
     if (this.boundHandleClickOutside) {
       document.removeEventListener("click", this.boundHandleClickOutside);
-      document.removeEventListener("keydown", this.boundHandleKeydown);
       this.boundHandleClickOutside = null;
     }
-    this.triggerTarget.focus();
+    if (restoreFocus) this.triggerTarget.focus();
   }
   async updatePosition() {
     const maxHeight = 384;
@@ -5418,7 +6445,7 @@ class SelectController extends Controller {
     if (!event || !event.currentTarget) return;
     const item = event.currentTarget;
     const value = item.dataset.value;
-    if (item.dataset.disabled === "true") return;
+    if (this.isDisabled(item)) return;
     this.valueValue = value;
     this.updateDisplay(value);
     this.updateSelection(value);
@@ -5460,9 +6487,42 @@ class SelectController extends Controller {
       this.close();
     }
   }
+  handleTriggerKeydown(event) {
+    if (this.openValue) return;
+    if (OPEN_KEYS.includes(event.key)) {
+      event.preventDefault();
+      this.open();
+      return;
+    }
+    if (this.typeahead.isTypeaheadKey(event)) {
+      const current = this.itemTargets.find(item => item.dataset.value === this.valueValue) || null;
+      const match = this.typeahead.handleKey(event, this.getEnabledItems(), current);
+      if (match) this.commitValue(match.dataset.value);
+    }
+  }
+  handleFocusout(event) {
+    if (!this.openValue) return;
+    const next = event.relatedTarget;
+    if (next && !this.element.contains(next)) this.close({
+      restoreFocus: false
+    });
+  }
   handleKeydown(event) {
     if (!this.openValue) return;
+    if (event.target === this.triggerTarget && OPEN_KEYS.includes(event.key) && event.defaultPrevented) return;
     const currentItem = this.getFocusedItem();
+    if (event.key === "Tab") {
+      this.close();
+      return;
+    }
+    if (this.typeahead.isTypeaheadKey(event)) {
+      event.stopPropagation();
+      const match = this.typeahead.handleKey(event, this.getEnabledItems(), currentItem);
+      if (match) this.focusItem(match);
+      return;
+    }
+    const handled = [ "ArrowDown", "ArrowUp", "Enter", " ", "Home", "End" ];
+    if (handled.includes(event.key)) event.stopPropagation();
     switch (event.key) {
      case "ArrowDown":
       event.preventDefault();
@@ -5482,11 +6542,6 @@ class SelectController extends Controller {
       }
       break;
 
-     case "Escape":
-      event.preventDefault();
-      this.close();
-      break;
-
      case "Home":
       event.preventDefault();
       this.focusItem(this.getFirstItem());
@@ -5499,7 +6554,21 @@ class SelectController extends Controller {
     }
   }
   getFocusedItem() {
-    return this.itemTargets.find(item => item.classList.contains("bg-accent") || item.classList.contains("text-accent-foreground"));
+    return this.itemTargets.find(item => item.dataset.highlighted === "true");
+  }
+  isDisabled(item) {
+    return item.dataset.disabled === "true" || item.getAttribute("aria-disabled") === "true";
+  }
+  commitValue(value) {
+    this.valueValue = value;
+    this.updateDisplay(value);
+    this.updateSelection(value);
+    if (this.hasHiddenInputTarget) {
+      this.hiddenInputTarget.value = value;
+      this.hiddenInputTarget.dispatchEvent(new Event("change", {
+        bubbles: true
+      }));
+    }
   }
   getSelectedItem() {
     return this.itemTargets.find(item => item.getAttribute("aria-selected") === "true");
@@ -5512,7 +6581,7 @@ class SelectController extends Controller {
     return items[items.length - 1];
   }
   getEnabledItems() {
-    return this.itemTargets.filter(item => item.dataset.disabled !== "true");
+    return this.itemTargets.filter(item => !this.isDisabled(item));
   }
   focusItem(item, scrollDirection = null) {
     if (!item) return;
@@ -5522,6 +6591,7 @@ class SelectController extends Controller {
     });
     item.classList.add("bg-accent", "text-accent-foreground");
     item.dataset.highlighted = "true";
+    this.moveFocusTo(item);
     const items = this.getEnabledItems();
     const isFirstItem = item === items[0];
     const isLastItem = item === items[items.length - 1];
@@ -5559,6 +6629,15 @@ class SelectController extends Controller {
         behavior: "auto"
       });
     }
+  }
+  moveFocusTo(item, attempts = 3) {
+    item.focus({
+      preventScroll: true
+    });
+    if (document.activeElement === item || attempts <= 0 || !this.openValue) return;
+    requestAnimationFrame(() => {
+      if (item.dataset.highlighted === "true") this.moveFocusTo(item, attempts - 1);
+    });
   }
   focusNextItem(currentItem) {
     const items = this.getEnabledItems();
@@ -5633,15 +6712,18 @@ class SelectController extends Controller {
   handleItemMouseEnter(event) {
     if (!this.openValue) return;
     const item = event.currentTarget;
-    if (item.dataset.disabled === "true") return;
+    if (this.isDisabled(item)) return;
     this.focusItem(item);
   }
   handleItemMouseLeave(event) {}
   disconnect() {
     this.stopScroll();
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
+    this.element.removeEventListener("keydown", this.boundHandleKeydown);
+    this.element.removeEventListener("focusout", this.boundHandleFocusout);
     if (this.boundHandleClickOutside) {
       document.removeEventListener("click", this.boundHandleClickOutside);
-      document.removeEventListener("keydown", this.boundHandleKeydown);
     }
     if (this.boundHandleScroll && this.hasViewportTarget) {
       this.viewportTarget.removeEventListener("scroll", this.boundHandleScroll);
@@ -5650,7 +6732,7 @@ class SelectController extends Controller {
 }
 
 class SidebarController extends Controller {
-  static targets=[ "sidebar", "trigger", "mobileSheet", "mobileDrawer" ];
+  static targets=[ "sidebar", "trigger", "mobileSheet", "mobileDrawer", "content", "mobileContent" ];
   static values={
     open: {
       type: Boolean,
@@ -5686,6 +6768,7 @@ class SidebarController extends Controller {
     window.addEventListener("resize", this.boundHandleResize);
     this.boundHandleSheetClose = this.handleSheetClose.bind(this);
     this.element.addEventListener("dialog:close", this.boundHandleSheetClose);
+    this.placeContent();
     this.updateState();
   }
   disconnect() {
@@ -5754,9 +6837,10 @@ class SidebarController extends Controller {
     this.updateMobileDrawer();
   }
   updateMobileDrawer() {
+    this.syncTriggers();
     if (this.hasMobileSheetTarget) {
       const sheetController = this.application.getControllerForElementAndIdentifier(this.mobileSheetTarget, "ui--dialog");
-      if (sheetController) {
+      if (sheetController && sheetController.openValue !== this.openMobileValue) {
         if (this.openMobileValue) {
           sheetController.open();
         } else {
@@ -5796,9 +6880,32 @@ class SidebarController extends Controller {
       this.sidebarTarget.dataset.collapsible = collapsibleAttr;
       this.sidebarTarget.dataset.side = this.sideValue;
     }
+    if (this.hasSidebarTarget) {
+      this.sidebarTarget.inert = !this.isMobile() && state === "collapsed" && this.collapsibleValue === "offcanvas";
+    }
     this.triggerTargets.forEach(trigger => {
       trigger.dataset.state = state;
     });
+    this.syncTriggers();
+  }
+  syncTriggers() {
+    const mobile = this.isMobile() && this.hasMobileContentTarget;
+    const controlled = mobile ? this.mobileContentTarget : this.hasSidebarTarget ? this.sidebarTarget : null;
+    const expanded = mobile ? this.openMobileValue : this.getState() === "expanded";
+    this.triggerTargets.forEach(trigger => {
+      trigger.setAttribute("aria-expanded", String(expanded));
+      if (controlled) setIdRefs(trigger, "aria-controls", controlled, {
+        prefix: "sidebar"
+      });
+    });
+  }
+  placeContent() {
+    if (!this.hasContentTarget) return;
+    const mobile = this.isMobile() && this.hasMobileContentTarget;
+    const host = mobile ? this.mobileContentTarget : this.hasSidebarTarget ? this.sidebarTarget : null;
+    if (!host || this.contentTarget.parentElement === host) return;
+    if (!mobile && this.openMobileValue) this.closeMobile();
+    host.append(this.contentTarget);
   }
   saveCookie() {
     const expires = new Date;
@@ -5820,11 +6927,17 @@ class SidebarController extends Controller {
     }
   }
   handleResize() {
+    this.placeContent();
     this.updateState();
   }
   handleSheetClose(event) {
     if (this.hasMobileSheetTarget && this.mobileSheetTarget.contains(event.target)) {
       this.openMobileValue = false;
+      this.syncTriggers();
+      const active = document.activeElement;
+      if (!active || active === document.body) {
+        this.triggerTargets.find(trigger => !this.mobileSheetTarget.contains(trigger))?.focus();
+      }
     }
   }
   dispatchToggleEvent() {
@@ -5851,6 +6964,10 @@ class SidebarController extends Controller {
     this.updateState();
   }
 }
+
+const HOTKEY = "F8";
+
+const REGION_LABEL = `Notifications (${HOTKEY})`;
 
 class SonnerController extends Controller {
   static values={
@@ -5895,11 +7012,153 @@ class SonnerController extends Controller {
     this.toasts = [];
     this.toastId = 0;
     this.isHovered = false;
+    this.isFocused = false;
+    this.windowBlurred = false;
+    this.returnFocusTo = null;
     this.lastCloseTimestamp = 0;
     this.setupContainer();
+    this.setupRegion();
     this.setupEventListeners();
     this.setupHoverListeners();
+    this.setupFocusListeners();
     this.detectTheme();
+  }
+  setupRegion() {
+    this.region = this.element.closest("[data-sonner-region]");
+    if (!this.region) {
+      this.region = this.element;
+      const defaults = {
+        "aria-live": "polite",
+        "aria-relevant": "additions text",
+        "aria-atomic": "false",
+        "aria-label": REGION_LABEL,
+        tabindex: "-1"
+      };
+      Object.entries(defaults).forEach(([name, value]) => {
+        if (!this.element.hasAttribute(name)) this.element.setAttribute(name, value);
+      });
+    }
+    this.alertsContainer = this.region.querySelector("[data-sonner-alerts]");
+    if (!this.alertsContainer) {
+      this.alertsContainer = document.createElement("div");
+      this.alertsContainer.className = "sr-only";
+      this.alertsContainer.setAttribute("data-sonner-alerts", "");
+      if (this.region === this.element) {
+        this.element.after(this.alertsContainer);
+      } else {
+        this.region.append(this.alertsContainer);
+      }
+      this.createdAlertsContainer = true;
+    }
+  }
+  setupFocusListeners() {
+    this.listeners = new AbortController;
+    const {signal: signal} = this.listeners;
+    this.region.addEventListener("focusin", this.handleFocusIn, {
+      signal: signal
+    });
+    this.region.addEventListener("focusout", this.handleFocusOut, {
+      signal: signal
+    });
+    this.region.addEventListener("keydown", this.handleRegionKeydown, {
+      signal: signal
+    });
+    document.addEventListener("keydown", this.handleHotkey, {
+      signal: signal
+    });
+    window.addEventListener("blur", this.handleWindowBlur, {
+      signal: signal
+    });
+    window.addEventListener("focus", this.handleWindowFocus, {
+      signal: signal
+    });
+  }
+  handleHotkey=event => {
+    if (event.key !== HOTKEY || event.defaultPrevented || !this.element.isConnected) return;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    event.preventDefault();
+    const active = document.activeElement;
+    if (active && active !== document.body && !this.region.contains(active)) {
+      this.returnFocusTo = active;
+    }
+    this.region.focus();
+  };
+  handleFocusIn=event => {
+    const from = event.relatedTarget;
+    if (!this.isFocused && from && !this.region.contains(from)) this.returnFocusTo = from;
+    this.isFocused = true;
+    this.expandToasts();
+    this.syncTimers();
+    this.alertsContainer?.replaceChildren();
+    this.syncAccessibility();
+  };
+  handleFocusOut=event => {
+    if (event.relatedTarget && this.region.contains(event.relatedTarget)) return;
+    this.isFocused = false;
+    if (!this.isHovered) this.collapseToasts();
+    this.syncTimers();
+    this.syncAccessibility();
+  };
+  handleRegionKeydown=event => {
+    if (event.key !== "Escape" || event.defaultPrevented) return;
+    const toastElement = event.target.closest?.("[data-sonner-toast]");
+    const toast = this.toasts.find(t => t.element === toastElement);
+    if (!toast) return;
+    event.preventDefault();
+    this.dismiss(toast.id);
+  };
+  handleWindowBlur=() => {
+    this.windowBlurred = true;
+    this.syncTimers();
+  };
+  handleWindowFocus=() => {
+    this.windowBlurred = false;
+    this.syncTimers();
+  };
+  isPaused() {
+    return this.isHovered || this.isFocused || this.windowBlurred;
+  }
+  syncTimers() {
+    if (this.isPaused()) {
+      this.pauseAllTimers();
+    } else {
+      this.resumeAllTimers();
+    }
+  }
+  syncAccessibility() {
+    this.toasts.forEach(t => {
+      if (t.important && !this.isFocused) {
+        t.element.setAttribute("aria-hidden", "true");
+      } else {
+        t.element.removeAttribute("aria-hidden");
+      }
+    });
+  }
+  announceAssertively(toastData, message, description) {
+    if (this.isFocused || !this.alertsContainer) return;
+    const alert = document.createElement("div");
+    alert.setAttribute("role", "alert");
+    alert.setAttribute("aria-atomic", "true");
+    alert.textContent = description ? `${message}. ${description}` : message;
+    this.alertsContainer.append(alert);
+    toastData.alert = alert;
+  }
+  moveFocusFrom(toast) {
+    const others = this.toasts.filter(t => t !== toast && !t.removed);
+    const index = this.toasts.indexOf(toast);
+    const ordered = [ ...others.filter(t => this.toasts.indexOf(t) < index).reverse(), ...others.filter(t => this.toasts.indexOf(t) > index) ];
+    for (const candidate of ordered) {
+      const [first] = getTabbableElements(candidate.element);
+      if (first) {
+        first.focus();
+        return;
+      }
+    }
+    if (this.returnFocusTo?.isConnected && !this.region.contains(this.returnFocusTo)) {
+      this.returnFocusTo.focus();
+    } else {
+      this.region.focus();
+    }
   }
   setupContainer() {
     const [yPos, xPos] = this.positionValue.split("-");
@@ -5938,8 +7197,11 @@ class SonnerController extends Controller {
   }
   handleMouseLeave() {
     this.isHovered = false;
-    this.collapseToasts();
-    this.resumeAllTimers();
+    if (!this.isFocused) this.collapseToasts();
+    this.syncTimers();
+  }
+  isExpanded() {
+    return this.isHovered || this.isFocused || this.expandValue;
   }
   expandToasts() {
     this.toasts.forEach(t => {
@@ -5966,9 +7228,10 @@ class SonnerController extends Controller {
   resumeAllTimers() {
     const now = Date.now();
     this.toasts.forEach(t => {
-      if (t.remainingTime !== undefined && t.remainingTime > 0) {
+      if (!t.timerId && !t.removed && t.remainingTime > 0) {
         t.dismissAt = now + t.remainingTime;
         t.timerId = setTimeout(() => this.dismiss(t.id), t.remainingTime);
+        t.remainingTime = null;
       }
     });
   }
@@ -5983,9 +7246,12 @@ class SonnerController extends Controller {
       timerId: null,
       dismissAt: null,
       remainingTime: null,
-      height: null
+      height: null,
+      important: options.type === "error"
     };
     this.toasts.push(toastData);
+    if (toastData.important) this.announceAssertively(toastData, message, options.description);
+    this.syncAccessibility();
     this.updateToastPositions();
     requestAnimationFrame(() => {
       const height = toast.getBoundingClientRect().height;
@@ -5996,7 +7262,7 @@ class SonnerController extends Controller {
     });
     const duration = options.duration ?? this.durationValue;
     if (duration !== Infinity) {
-      if (!this.isHovered) {
+      if (!this.isPaused()) {
         toastData.dismissAt = Date.now() + duration;
         toastData.timerId = setTimeout(() => this.dismiss(id), duration);
       } else {
@@ -6015,7 +7281,7 @@ class SonnerController extends Controller {
     toast.setAttribute("data-front", "true");
     toast.setAttribute("data-visible", "true");
     toast.setAttribute("data-swipe-out", "false");
-    toast.setAttribute("data-expanded", this.isHovered || this.expandValue ? "true" : "false");
+    toast.setAttribute("data-expanded", this.isExpanded() ? "true" : "false");
     if (options.type) toast.setAttribute("data-type", options.type);
     if (this.richColorsValue) toast.setAttribute("data-rich-colors", "true");
     let html = "";
@@ -6080,7 +7346,7 @@ class SonnerController extends Controller {
   updateToastPositions() {
     const visible = this.toasts.slice(-this.visibleToastsValue);
     const totalToasts = this.toasts.length;
-    const isExpanded = this.isHovered || this.expandValue;
+    const isExpanded = this.isExpanded();
     const heights = this.toasts.map(t => t.height || t.element.getBoundingClientRect().height || 50);
     let heightOffset = 0;
     for (let i = totalToasts - 1; i >= 0; i--) {
@@ -6126,9 +7392,14 @@ class SonnerController extends Controller {
     const index = this.toasts.findIndex(t => t.id === id);
     if (index === -1) return;
     const toast = this.toasts[index];
+    if (toast.removed) return;
+    toast.removed = true;
     if (toast.timerId) {
       clearTimeout(toast.timerId);
+      toast.timerId = null;
     }
+    toast.alert?.remove();
+    if (toast.element.contains(document.activeElement)) this.moveFocusFrom(toast);
     toast.element.setAttribute("data-removed", "true");
     toast.element.setAttribute("data-front", "true");
     setTimeout(() => {
@@ -6211,6 +7482,8 @@ class SonnerController extends Controller {
     }
   }
   disconnect() {
+    this.listeners?.abort();
+    if (this.createdAlertsContainer) this.alertsContainer?.remove();
     document.removeEventListener("ui:toast", this.boundHandleToast);
     this.element.removeEventListener("mouseenter", this.boundHandleMouseEnter);
     this.element.removeEventListener("mouseleave", this.boundHandleMouseLeave);
@@ -6253,9 +7526,24 @@ class ToggleGroupController extends Controller {
     value: {
       type: String,
       default: "[]"
+    },
+    loop: {
+      type: Boolean,
+      default: true
     }
   };
+  constructor() {
+    super(...arguments);
+    this.handleKeydown = this.handleKeydown.bind(this);
+    this.handleFocusin = this.handleFocusin.bind(this);
+  }
+  disconnect() {
+    this.element.removeEventListener("keydown", this.handleKeydown);
+    this.element.removeEventListener("focusin", this.handleFocusin);
+  }
   connect() {
+    this.element.addEventListener("keydown", this.handleKeydown);
+    this.element.addEventListener("focusin", this.handleFocusin);
     try {
       this.selectedValues = JSON.parse(this.valueValue || "[]");
       if (!Array.isArray(this.selectedValues)) {
@@ -6265,11 +7553,91 @@ class ToggleGroupController extends Controller {
       this.selectedValues = [];
     }
     this.updateAllItems();
+    this.updateTabStops();
+  }
+  itemTargetConnected() {
+    if (this.selectedValues) this.updateTabStops();
+  }
+  isFocusable(item) {
+    return !item.disabled && !item.hasAttribute("data-disabled") && item.getAttribute("aria-disabled") !== "true";
+  }
+  focusableItems() {
+    return this.itemTargets.filter(item => this.isFocusable(item));
+  }
+  updateTabStops(current = null) {
+    const items = this.focusableItems();
+    let stop = items.includes(current) ? current : null;
+    if (!stop) stop = items.find(item => item === this.tabStop);
+    if (!stop) stop = items.find(item => this.selectedValues.includes(item.dataset.value));
+    if (!stop) stop = items[0];
+    this.tabStop = stop;
+    this.itemTargets.forEach(item => {
+      item.setAttribute("tabindex", item === stop ? "0" : "-1");
+    });
+  }
+  handleFocusin(event) {
+    const item = this.itemTargets.find(item => item === event.target);
+    if (item) this.updateTabStops(item);
+  }
+  handleKeydown(event) {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    const item = this.itemTargets.find(item => item === event.target);
+    if (!item) return;
+    const items = this.focusableItems();
+    if (items.length === 0) return;
+    const orientation = this.element.getAttribute("data-orientation");
+    const horizontal = orientation !== "vertical";
+    const vertical = orientation !== "horizontal";
+    let next = null;
+    switch (event.key) {
+     case "ArrowRight":
+      if (horizontal) next = this.step(items, item, 1); else return;
+      break;
+
+     case "ArrowLeft":
+      if (horizontal) next = this.step(items, item, -1); else return;
+      break;
+
+     case "ArrowDown":
+      if (vertical) next = this.step(items, item, 1); else return;
+      break;
+
+     case "ArrowUp":
+      if (vertical) next = this.step(items, item, -1); else return;
+      break;
+
+     case "Home":
+      next = items[0];
+      break;
+
+     case "End":
+      next = items[items.length - 1];
+      break;
+
+     default:
+      return;
+    }
+    event.preventDefault();
+    if (next && next !== item) next.focus();
+  }
+  step(items, item, direction) {
+    const all = this.itemTargets;
+    const start = all.indexOf(item);
+    for (let offset = 1; offset <= all.length; offset++) {
+      let index = start + direction * offset;
+      if (index < 0 || index >= all.length) {
+        if (!this.loopValue) return null;
+        index = (index + all.length) % all.length;
+      }
+      const candidate = all[index];
+      if (items.includes(candidate)) return candidate;
+    }
+    return null;
   }
   toggle(event) {
     const item = event.currentTarget;
     const value = item.dataset.value;
-    if (!value) return;
+    if (!value || !this.isFocusable(item)) return;
     if (this.typeValue === "single") {
       this.toggleSingle(value, item);
     } else {
@@ -6347,8 +7715,18 @@ class TabsController extends Controller {
     }
   };
   connect() {
+    this.wireIds();
     this.setupTabs();
-    this.setupKeyboardNavigation();
+  }
+  wireIds() {
+    this.triggerTargets.forEach(trigger => {
+      const content = this.contentTargets.find(c => c.dataset.value === trigger.dataset.value);
+      if (!content) return;
+      ensureId(trigger, "tabs-trigger");
+      ensureId(content, "tabs-content");
+      setIdRefs(trigger, "aria-controls", content);
+      setIdRefs(content, "aria-labelledby", trigger);
+    });
   }
   setupTabs() {
     const activeValue = this.defaultValueValue;
@@ -6357,8 +7735,14 @@ class TabsController extends Controller {
       const isActive = value === activeValue;
       if (isActive) {
         this.activateTrigger(trigger);
+      } else {
+        this.deactivateTrigger(trigger);
       }
     });
+    if (!this.triggerTargets.some(t => t.getAttribute("tabindex") === "0")) {
+      const first = this.enabledTriggers()[0];
+      if (first) first.setAttribute("tabindex", "0");
+    }
     this.contentTargets.forEach(content => {
       const value = content.dataset.value;
       const isActive = value === activeValue;
@@ -6369,13 +7753,15 @@ class TabsController extends Controller {
       }
     });
   }
-  setupKeyboardNavigation() {
-    this.triggerTargets.forEach(trigger => {
-      trigger.addEventListener("keydown", this.handleKeyDown.bind(this));
-    });
+  enabledTriggers() {
+    return this.triggerTargets.filter(t => !this.isDisabled(t));
+  }
+  isDisabled(trigger) {
+    return trigger.disabled || trigger.hasAttribute("data-disabled") || trigger.getAttribute("aria-disabled") === "true";
   }
   selectTab(event) {
     const trigger = event.currentTarget;
+    if (this.isDisabled(trigger)) return;
     const value = trigger.dataset.value;
     this.triggerTargets.forEach(t => {
       this.deactivateTrigger(t);
@@ -6409,9 +7795,10 @@ class TabsController extends Controller {
     content.setAttribute("hidden", "");
   }
   handleKeyDown(event) {
-    const trigger = event.target;
-    const triggers = this.triggerTargets;
+    const trigger = event.currentTarget;
+    const triggers = this.enabledTriggers();
     const currentIndex = triggers.indexOf(trigger);
+    if (currentIndex === -1 || triggers.length === 0) return;
     let nextIndex = currentIndex;
     const isHorizontal = this.orientationValue === "horizontal";
     switch (event.key) {
@@ -6467,7 +7854,7 @@ class TabsController extends Controller {
 }
 
 class SliderController extends Controller {
-  static targets=[ "track", "range", "thumb" ];
+  static targets=[ "track", "range", "thumb", "input" ];
   static values={
     min: {
       type: Number,
@@ -6506,6 +7893,12 @@ class SliderController extends Controller {
       default: null
     }
   };
+  constructor() {
+    super(...arguments);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleMove = this.handleMove.bind(this);
+    this.endDrag = this.endDrag.bind(this);
+  }
   connect() {
     this.isDragging = false;
     this.currentThumbIndex = -1;
@@ -6516,15 +7909,17 @@ class SliderController extends Controller {
     if (this.hasRangeTarget) {
       this.rangeTarget.setAttribute("data-orientation", orientation);
     }
+    this.syncInputs();
     this.updateUI();
-    this.thumbTargets.forEach((thumb, index) => {
-      thumb.addEventListener("keydown", this.handleKeyDown.bind(this, index));
-    });
   }
   disconnect() {
-    this.thumbTargets.forEach((thumb, index) => {
-      thumb.removeEventListener("keydown", this.handleKeyDown.bind(this, index));
-    });
+    this.stopDragListeners();
+  }
+  thumbTargetConnected(thumb) {
+    thumb.addEventListener("keydown", this.handleKeyDown);
+  }
+  thumbTargetDisconnected(thumb) {
+    thumb.removeEventListener("keydown", this.handleKeyDown);
   }
   startDrag(event) {
     if (this.disabledValue) return;
@@ -6532,28 +7927,28 @@ class SliderController extends Controller {
     const thumbIndex = this.thumbTargets.indexOf(event.currentTarget);
     this.currentThumbIndex = thumbIndex;
     this.isDragging = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    document.addEventListener("pointermove", this.handleMove.bind(this));
-    document.addEventListener("pointerup", this.endDrag.bind(this));
+    event.currentTarget.focus?.();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    document.addEventListener("pointermove", this.handleMove);
+    document.addEventListener("pointerup", this.endDrag);
   }
   handleMove(event) {
     if (!this.isDragging || this.currentThumbIndex === -1) return;
     event.preventDefault();
-    const newValue = this.getValueFromPointer(event);
-    const newValues = [ ...this.valueValue ];
-    newValues[this.currentThumbIndex] = newValue;
-    newValues.sort((a, b) => a - b);
-    this.valueValue = newValues;
-    this.updateUI();
-    this.dispatchChangeEvent();
+    this.setThumbValue(this.currentThumbIndex, this.getValueFromPointer(event), {
+      commit: false
+    });
   }
-  endDrag(event) {
+  endDrag() {
     if (!this.isDragging) return;
     this.isDragging = false;
     this.currentThumbIndex = -1;
-    document.removeEventListener("pointermove", this.handleMove.bind(this));
-    document.removeEventListener("pointerup", this.endDrag.bind(this));
+    this.stopDragListeners();
     this.dispatchCommitEvent();
+  }
+  stopDragListeners() {
+    document.removeEventListener("pointermove", this.handleMove);
+    document.removeEventListener("pointerup", this.endDrag);
   }
   clickTrack(event) {
     if (this.disabledValue) return;
@@ -6561,13 +7956,8 @@ class SliderController extends Controller {
     event.preventDefault();
     const clickValue = this.getValueFromPointer(event);
     const closestIndex = this.getClosestThumbIndex(clickValue);
-    const newValues = [ ...this.valueValue ];
-    newValues[closestIndex] = clickValue;
-    newValues.sort((a, b) => a - b);
-    this.valueValue = newValues;
-    this.updateUI();
-    this.dispatchChangeEvent();
-    this.dispatchCommitEvent();
+    this.setThumbValue(closestIndex, clickValue);
+    this.thumbTargets[closestIndex]?.focus();
   }
   getValueFromPointer(event) {
     if (!this.hasTrackTarget) return this.minValue;
@@ -6583,73 +7973,139 @@ class SliderController extends Controller {
       if (this.invertedValue) percentage = 1 - percentage;
     }
     percentage = Math.max(0, Math.min(1, percentage));
-    const rawValue = this.minValue + percentage * (this.maxValue - this.minValue);
-    const steppedValue = Math.round((rawValue - this.minValue) / this.stepValue) * this.stepValue + this.minValue;
-    return Math.max(this.minValue, Math.min(this.maxValue, steppedValue));
+    return this.snap(this.minValue + percentage * (this.maxValue - this.minValue));
   }
   getClosestThumbIndex(value) {
     let closestIndex = 0;
     let closestDistance = Math.abs(this.valueValue[0] - value);
     for (let i = 1; i < this.valueValue.length; i++) {
       const distance = Math.abs(this.valueValue[i] - value);
-      if (distance < closestDistance) {
+      if (distance < closestDistance || distance === closestDistance && value > this.valueValue[i]) {
         closestDistance = distance;
         closestIndex = i;
       }
     }
     return closestIndex;
   }
-  handleKeyDown(thumbIndex, event) {
-    if (this.disabledValue) return;
-    let newValue = this.valueValue[thumbIndex];
-    const largeStep = (this.maxValue - this.minValue) / 10;
+  handleKeyDown(event) {
+    const thumbIndex = this.thumbTargets.indexOf(event.currentTarget);
+    if (thumbIndex === -1 || this.disabledValue) return;
+    const current = this.valueValue[thumbIndex] ?? this.minValue;
+    const largeStep = this.largeStep();
+    const arrowStep = event.shiftKey ? largeStep : this.stepValue;
+    let newValue;
     switch (event.key) {
      case "ArrowRight":
-     case "ArrowUp":
-      newValue += this.stepValue;
-      event.preventDefault();
-      break;
-
      case "ArrowLeft":
+     case "ArrowUp":
      case "ArrowDown":
-      newValue -= this.stepValue;
-      event.preventDefault();
+      newValue = current + (this.isIncreaseKey(event.key) ? arrowStep : -arrowStep);
       break;
 
      case "PageUp":
-      newValue += largeStep;
-      event.preventDefault();
+      newValue = current + largeStep;
       break;
 
      case "PageDown":
-      newValue -= largeStep;
-      event.preventDefault();
+      newValue = current - largeStep;
       break;
 
      case "Home":
       newValue = this.minValue;
-      event.preventDefault();
       break;
 
      case "End":
       newValue = this.maxValue;
-      event.preventDefault();
       break;
 
      default:
       return;
     }
-    newValue = Math.max(this.minValue, Math.min(this.maxValue, newValue));
-    const newValues = [ ...this.valueValue ];
-    newValues[thumbIndex] = newValue;
-    newValues.sort((a, b) => a - b);
-    this.valueValue = newValues;
-    this.updateUI();
+    event.preventDefault();
+    this.setThumbValue(thumbIndex, newValue);
+  }
+  isIncreaseKey(key) {
+    const horizontal = this.orientationValue !== "vertical";
+    let increases = horizontal ? key === "ArrowRight" || key === "ArrowUp" : key === "ArrowUp" || key === "ArrowRight";
+    if (this.invertedValue) {
+      increases = horizontal ? key === "ArrowLeft" || key === "ArrowUp" : key === "ArrowDown" || key === "ArrowRight";
+    }
+    return increases;
+  }
+  largeStep() {
+    const steps = Math.max(1, Math.floor((this.maxValue - this.minValue) / 10 / this.stepValue));
+    return steps * this.stepValue;
+  }
+  snap(value) {
+    const stepped = Math.round((value - this.minValue) / this.stepValue) * this.stepValue + this.minValue;
+    const clamped = Math.max(this.minValue, Math.min(this.maxValue, stepped));
+    return this.roundToStepPrecision(clamped);
+  }
+  roundToStepPrecision(value) {
+    const decimals = Math.max(this.decimalCount(this.stepValue), this.decimalCount(this.minValue));
+    return Number(value.toFixed(decimals));
+  }
+  decimalCount(number) {
+    return (String(number).split(".")[1] || "").length;
+  }
+  setThumbValue(index, value, {commit: commit = true} = {}) {
+    const values = [ ...this.valueValue ];
+    const lower = index > 0 ? values[index - 1] : this.minValue;
+    const upper = index < values.length - 1 ? values[index + 1] : this.maxValue;
+    const next = Math.max(lower, Math.min(upper, this.snap(value)));
+    if (next === values[index]) return;
+    values[index] = next;
+    this.valueValue = values;
     this.dispatchChangeEvent();
-    this.dispatchCommitEvent();
+    if (commit) this.dispatchCommitEvent();
+  }
+  syncInputs() {
+    if (!this.nameValue) return;
+    const values = this.valueValue;
+    const inputName = values.length > 1 ? `${this.nameValue}[]` : this.nameValue;
+    const inputs = this.inputTargets;
+    while (inputs.length < values.length) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.setAttribute("data-ui--slider-target", "input");
+      this.element.appendChild(input);
+      inputs.push(input);
+    }
+    inputs.forEach((input, index) => {
+      if (index >= values.length) {
+        input.remove();
+        return;
+      }
+      input.name = inputName;
+      input.value = String(values[index]);
+      input.disabled = this.disabledValue;
+    });
+  }
+  labelThumbs() {
+    const total = this.thumbTargets.length;
+    this.thumbTargets.forEach((thumb, index) => {
+      const generated = thumb.dataset.uiSliderGeneratedLabel === "true";
+      if (!generated && (thumb.hasAttribute("aria-label") || thumb.hasAttribute("aria-labelledby"))) return;
+      let label = null;
+      if (total > 2) label = `Value ${index + 1} of ${total}`; else if (total === 2) label = [ "Minimum", "Maximum" ][index];
+      thumb.removeAttribute("aria-label");
+      thumb.removeAttribute("aria-labelledby");
+      if (label) {
+        thumb.setAttribute("aria-label", label);
+      } else if (this.element.hasAttribute("aria-labelledby")) {
+        thumb.setAttribute("aria-labelledby", this.element.getAttribute("aria-labelledby"));
+      } else if (this.element.hasAttribute("aria-label")) {
+        thumb.setAttribute("aria-label", this.element.getAttribute("aria-label"));
+      } else {
+        delete thumb.dataset.uiSliderGeneratedLabel;
+        return;
+      }
+      thumb.dataset.uiSliderGeneratedLabel = "true";
+    });
   }
   updateUI() {
     if (!this.hasTrackTarget) return;
+    const range = this.maxValue - this.minValue || 1;
     if (this.hasRangeTarget) {
       let startValue, endValue;
       if (this.valueValue.length === 1) {
@@ -6670,8 +8126,11 @@ class SliderController extends Controller {
         startValue = Math.min(...this.valueValue);
         endValue = Math.max(...this.valueValue);
       }
-      const startPercent = (startValue - this.minValue) / (this.maxValue - this.minValue) * 100;
-      const endPercent = (endValue - this.minValue) / (this.maxValue - this.minValue) * 100;
+      let startPercent = (startValue - this.minValue) / range * 100;
+      let endPercent = (endValue - this.minValue) / range * 100;
+      if (this.invertedValue) {
+        [startPercent, endPercent] = [ 100 - endPercent, 100 - startPercent ];
+      }
       if (this.orientationValue === "horizontal") {
         this.rangeTarget.style.left = `${startPercent}%`;
         this.rangeTarget.style.width = `${endPercent - startPercent}%`;
@@ -6686,7 +8145,8 @@ class SliderController extends Controller {
     }
     this.thumbTargets.forEach((thumb, index) => {
       const value = this.valueValue[index] ?? this.minValue;
-      const percent = (value - this.minValue) / (this.maxValue - this.minValue) * 100;
+      let percent = (value - this.minValue) / range * 100;
+      if (this.invertedValue) percent = 100 - percent;
       if (this.orientationValue === "horizontal") {
         thumb.style.left = `${percent}%`;
         thumb.style.top = "50%";
@@ -6702,10 +8162,13 @@ class SliderController extends Controller {
       thumb.setAttribute("aria-orientation", this.orientationValue);
       if (this.disabledValue) {
         thumb.setAttribute("aria-disabled", "true");
+        thumb.setAttribute("tabindex", "-1");
       } else {
         thumb.removeAttribute("aria-disabled");
+        thumb.setAttribute("tabindex", "0");
       }
     });
+    this.labelThumbs();
   }
   dispatchChangeEvent() {
     this.element.dispatchEvent(new CustomEvent("slider:change", {
@@ -6724,6 +8187,7 @@ class SliderController extends Controller {
     }));
   }
   valueValueChanged() {
+    this.syncInputs();
     this.updateUI();
   }
   disabledValueChanged() {
@@ -6732,6 +8196,7 @@ class SliderController extends Controller {
     } else {
       this.element.removeAttribute("data-disabled");
     }
+    this.syncInputs();
     this.updateUI();
   }
   orientationValueChanged() {
@@ -6752,10 +8217,30 @@ class SwitchController extends Controller {
     checked: {
       type: Boolean,
       default: false
+    },
+    value: {
+      type: String,
+      default: "1"
     }
   };
+  constructor() {
+    super(...arguments);
+  }
   connect() {
+    this.initialChecked = this.checkedValue;
     this.updateState(this.checkedValue, false);
+    this.handleReset = this.handleReset.bind(this);
+    this.form = this.element.closest("form");
+    if (this.form) this.form.addEventListener("reset", this.handleReset);
+  }
+  disconnect() {
+    if (this.form) this.form.removeEventListener("reset", this.handleReset);
+    this.form = null;
+  }
+  handleReset() {
+    setTimeout(() => {
+      this.checkedValue = this.initialChecked;
+    }, 0);
   }
   toggle(event) {
     if (event) {
@@ -6783,7 +8268,7 @@ class SwitchController extends Controller {
     });
     const hiddenInput = this.element.querySelector('input[type="hidden"]');
     if (hiddenInput) {
-      hiddenInput.value = isChecked ? "1" : "0";
+      hiddenInput.value = isChecked ? this.valueValue : "0";
     }
   }
   checkedValueChanged(value) {
@@ -6938,6 +8423,13 @@ function isDate(value) {
 
 function isValid(date) {
   return !(!isDate(date) && typeof date !== "number" || isNaN(+toDate(date)));
+}
+
+function differenceInCalendarMonths(laterDate, earlierDate, options) {
+  const [laterDate_, earlierDate_] = normalizeDates(options?.in, laterDate, earlierDate);
+  const yearsDiff = laterDate_.getFullYear() - earlierDate_.getFullYear();
+  const monthsDiff = laterDate_.getMonth() - earlierDate_.getMonth();
+  return yearsDiff * 12 + monthsDiff;
 }
 
 function differenceInDays(laterDate, earlierDate, options) {
@@ -10238,12 +11730,14 @@ function setYear(date, year, options) {
 }
 
 function subMonths(date, amount, options) {
-  return addMonths(date, -1, options);
+  return addMonths(date, -amount, options);
 }
 
 function subYears(date, amount, options) {
   return addYears(date, -1, options);
 }
+
+const MAX_FALLBACK_DAYS = 62;
 
 class CalendarController extends Controller {
   static targets=[ "grid", "monthLabel", "input", "monthSelect", "yearSelect", "liveRegion", "weekdaysHeader", "monthContainer" ];
@@ -10344,7 +11838,7 @@ class CalendarController extends Controller {
   }
   previousMonth() {
     this.animationDirection = "prev";
-    this.currentMonth = subMonths(this.currentMonth);
+    this.currentMonth = subMonths(this.currentMonth, 1);
     this.render();
     this.announceMonthChange();
     this.dispatchMonthChange();
@@ -10398,6 +11892,15 @@ class CalendarController extends Controller {
     this.announceMonthChange();
     this.dispatchMonthChange();
     this.restoreFocus();
+  }
+  fieldName(field, fallback) {
+    try {
+      return new Intl.DisplayNames(this.localeValue || "en-US", {
+        type: "dateTimeField"
+      }).of(field) || fallback;
+    } catch {
+      return fallback;
+    }
   }
   dispatchMonthChange() {
     this.dispatch("monthChange", {
@@ -10575,9 +12078,62 @@ class CalendarController extends Controller {
     return isSameDay(date, actualEnd);
   }
   render() {
+    this.ensureFocusedDate();
     this.renderMonthLabels();
     this.renderDropdowns();
     this.renderGrids();
+  }
+  visibleRange() {
+    return {
+      start: startOfMonth(this.currentMonth),
+      end: endOfMonth(addMonths(this.currentMonth, Math.max(this.numberOfMonthsValue, 1) - 1))
+    };
+  }
+  isVisible(date) {
+    if (!date) return false;
+    const {start: start, end: end} = this.visibleRange();
+    return !isBefore(date, start) && !isAfter(date, end);
+  }
+  ensureFocusedDate() {
+    const current = this.focusedDate ? parseISO(this.focusedDate) : null;
+    if (this.isVisible(current)) return;
+    const selected = this.selectedValue.map(d => parseISO(d)).find(d => this.isVisible(d));
+    const today = new Date;
+    let date = selected || (this.isVisible(today) ? today : this.visibleRange().start);
+    if (this.isDisabled(date)) date = this.nearestEnabledDate(date) || date;
+    this.focusedDate = format(date, "yyyy-MM-dd");
+  }
+  nearestEnabledDate(date) {
+    for (let offset = 1; offset <= MAX_FALLBACK_DAYS; offset++) {
+      for (const candidate of [ addDays(date, offset), addDays(date, -offset) ]) {
+        if (this.isVisible(candidate) && !this.isDisabled(candidate)) return candidate;
+      }
+    }
+    return null;
+  }
+  dayButton(dateStr) {
+    return this.element.querySelector(`[data-date="${dateStr}"]:not([data-outside])`) || this.element.querySelector(`[data-date="${dateStr}"]`);
+  }
+  updateTabStop(target = this.dayButton(this.focusedDate)) {
+    this.element.querySelectorAll("[data-date]").forEach(button => {
+      button.setAttribute("tabindex", button === target ? "0" : "-1");
+    });
+  }
+  focusDate(date) {
+    if (this.minDateValue && isBefore(date, parseISO(this.minDateValue))) date = parseISO(this.minDateValue);
+    if (this.maxDateValue && isAfter(date, parseISO(this.maxDateValue))) date = parseISO(this.maxDateValue);
+    this.focusedDate = format(date, "yyyy-MM-dd");
+    if (this.isVisible(date)) {
+      this.updateTabStop();
+    } else {
+      const before = isBefore(date, this.visibleRange().start);
+      this.animationDirection = before ? "prev" : "next";
+      this.currentMonth = before ? startOfMonth(date) : startOfMonth(subMonths(date, Math.max(this.numberOfMonthsValue, 1) - 1));
+      this.render();
+      this.announceMonthChange();
+      this.dispatchMonthChange();
+    }
+    this.restoreFocus();
   }
   renderMonthLabels() {
     if (this.hasMonthLabelTarget) {
@@ -10624,6 +12180,8 @@ class CalendarController extends Controller {
       this.monthSelectTargets.forEach((select, index) => {
         const monthDate = addMonths(this.currentMonth, index);
         const value = getMonth(monthDate).toString();
+        this.localizeMonthOptions(select);
+        this.labelSelect(select, this.fieldName("month", "Month"));
         this.updateSelectValue(select, value);
       });
     }
@@ -10631,9 +12189,26 @@ class CalendarController extends Controller {
       this.yearSelectTargets.forEach((select, index) => {
         const monthDate = addMonths(this.currentMonth, index);
         const value = getYear(monthDate).toString();
+        this.labelSelect(select, this.fieldName("year", "Year"));
         this.updateSelectValue(select, value);
       });
     }
+  }
+  labelSelect(element, label) {
+    const target = element.tagName === "SELECT" ? element : element.closest("[data-controller~='ui--select']")?.querySelector("[data-ui--select-target='trigger']");
+    if (!target || target.hasAttribute("aria-labelledby")) return;
+    if (target.hasAttribute("aria-label") && !target.hasAttribute("data-calendar-label")) return;
+    target.setAttribute("aria-label", label);
+    target.setAttribute("data-calendar-label", "");
+  }
+  localizeMonthOptions(select) {
+    if (select.tagName !== "SELECT" || select.dataset.localized === this.localeValue) return;
+    const names = this.getLocalizedMonthNames();
+    Array.from(select.options).forEach(option => {
+      const month = names[parseInt(option.value)];
+      if (month) option.textContent = month.name;
+    });
+    select.dataset.localized = this.localeValue;
   }
   updateSelectValue(element, value) {
     if (element.tagName === "SELECT") {
@@ -10649,12 +12224,32 @@ class CalendarController extends Controller {
   renderGrids() {
     if (!this.hasGridTarget) return;
     if (this.animationDirection) {
-      this.animateMonthTransition();
+      if (this.prefersReducedMotion()) {
+        this.animationDirection = null;
+      } else {
+        this.animateMonthTransition();
+      }
     }
     this.gridTargets.forEach((grid, index) => {
       const monthDate = addMonths(this.currentMonth, index);
       this.renderGrid(grid, monthDate);
+      this.labelGrid(grid, index, monthDate);
     });
+    this.updateTabStop();
+  }
+  labelGrid(grid, index, monthDate) {
+    const table = grid.closest("table") || grid;
+    const label = this.monthLabelTargets[index];
+    if (label) {
+      setIdRefs(table, "aria-labelledby", label, {
+        prefix: "calendar-month"
+      });
+    } else if (!table.hasAttribute("aria-labelledby")) {
+      table.setAttribute("aria-label", this.monthFormatter.format(monthDate));
+    }
+  }
+  prefersReducedMotion() {
+    return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
   animateMonthTransition() {
     this.gridTargets.forEach(grid => {
@@ -10729,11 +12324,14 @@ class CalendarController extends Controller {
     if (this.modeValue === "range") {
       actions += " mouseenter->ui--calendar#handleDayHover mouseleave->ui--calendar#handleDayLeave";
     }
-    return `\n      <td class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20 ${this.getTdClasses(isSelected, isCurrentMonth, isRangeMiddle)}">\n        <button\n          type="button"\n          data-date="${dateStr}"\n          data-action="${actions}"\n          ${isDisabledDate ? "disabled" : ""}\n          aria-selected="${isSelected}"\n          class="${classes}"\n          tabindex="${isSelected || isTodayDate ? 0 : -1}"\n        >${date.getDate()}</button>\n      </td>\n    `;
+    const disabledAttr = isDisabledDate ? 'aria-disabled="true"' : "";
+    return `\n      <td role="gridcell" aria-selected="${isSelected}" ${disabledAttr} class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20 ${this.getTdClasses(isSelected, isCurrentMonth, isRangeMiddle)}">\n        <button\n          type="button"\n          data-date="${dateStr}"\n          data-action="${actions}"\n          aria-label="${this.dayFormatter.format(date)}"\n          ${isTodayDate ? 'aria-current="date"' : ""}\n          ${disabledAttr}\n          ${isCurrentMonth ? "" : "data-outside"}\n          class="${classes}"\n          tabindex="-1"\n        >${date.getDate()}</button>\n      </td>\n    `;
   }
   handleDayFocus(event) {
     const dateStr = event.currentTarget.dataset.date;
     if (!dateStr) return;
+    this.focusedDate = dateStr;
+    this.updateTabStop(event.currentTarget);
     this.dispatch("dayFocus", {
       detail: {
         date: dateStr,
@@ -10815,11 +12413,8 @@ class CalendarController extends Controller {
     }
   }
   handleKeydown(event) {
-    const focusedElement = document.activeElement;
-    const isFocusOnDayButton = focusedElement?.hasAttribute("data-date");
-    if ((event.key === "Enter" || event.key === " ") && !isFocusOnDayButton) {
-      return;
-    }
+    const day = document.activeElement?.closest?.("[data-date]");
+    if (!day || !this.element.contains(day)) return;
     if (event.shiftKey) {
       const shiftActions = {
         ArrowLeft: () => this.navigateAndFocus("previousMonth"),
@@ -10852,130 +12447,59 @@ class CalendarController extends Controller {
       actions[event.key]();
     }
   }
-  moveFocus(days) {
+  currentFocusDate() {
     const focused = this.element.querySelector("[data-date]:focus");
-    let currentDateStr = focused?.dataset.date || this.focusedDate;
-    if (!currentDateStr) {
-      const firstButton = this.element.querySelector("[data-date]");
-      if (!firstButton) return;
-      currentDateStr = firstButton.dataset.date;
-    }
-    const currentDate = parseISO(currentDateStr);
-    const newDate = addDays(currentDate, days);
-    const newDateStr = format(newDate, "yyyy-MM-dd");
-    this.focusedDate = newDateStr;
-    let target = this.element.querySelector(`[data-date="${newDateStr}"]`);
-    if (!target) {
-      if (days > 0) {
-        this.nextMonth();
-      } else {
-        this.previousMonth();
-      }
-      requestAnimationFrame(() => {
-        target = this.element.querySelector(`[data-date="${newDateStr}"]`);
-        target?.focus();
-      });
-    } else {
-      target.focus();
-    }
+    const dateStr = focused?.dataset.date || this.focusedDate;
+    if (dateStr) return parseISO(dateStr);
+    const firstButton = this.element.querySelector("[data-date]");
+    return firstButton ? parseISO(firstButton.dataset.date) : null;
+  }
+  moveFocus(days) {
+    const current = this.currentFocusDate();
+    if (current) this.focusDate(addDays(current, days));
   }
   selectFocusedDate() {
     const focused = this.element.querySelector("[data-date]:focus");
     focused?.click();
   }
   restoreFocus() {
-    if (this.focusedDate) {
-      requestAnimationFrame(() => {
-        const target = this.element.querySelector(`[data-date="${this.focusedDate}"]`);
-        target?.focus();
-      });
-    }
+    if (this.focusedDate) this.dayButton(this.focusedDate)?.focus();
   }
   navigateAndFocus(direction) {
     const focused = this.element.querySelector("[data-date]:focus");
-    let currentDateStr = focused?.dataset.date || this.focusedDate;
+    const currentDateStr = focused?.dataset.date || this.focusedDate;
     if (!currentDateStr) {
       this[direction]();
       return;
     }
     const currentDate = parseISO(currentDateStr);
-    let newDate;
-    switch (direction) {
-     case "previousMonth":
-      newDate = subMonths(currentDate);
-      break;
-
-     case "nextMonth":
-      newDate = addMonths(currentDate, 1);
-      break;
-
-     case "previousYear":
-      newDate = subYears(currentDate);
-      break;
-
-     case "nextYear":
-      newDate = addYears(currentDate, 1);
-      break;
-    }
-    const newDateStr = format(newDate, "yyyy-MM-dd");
-    this.focusedDate = newDateStr;
-    this.currentMonth = startOfMonth(newDate);
+    const shifts = {
+      previousMonth: () => subMonths(currentDate, 1),
+      nextMonth: () => addMonths(currentDate, 1),
+      previousYear: () => subYears(currentDate),
+      nextYear: () => addYears(currentDate, 1)
+    };
+    const newDate = shifts[direction]();
+    const months = differenceInCalendarMonths(newDate, currentDate);
+    this.animationDirection = months > 0 ? "next" : "prev";
+    this.currentMonth = addMonths(this.currentMonth, months);
+    this.focusedDate = format(newDate, "yyyy-MM-dd");
     this.render();
     this.announceMonthChange();
-    requestAnimationFrame(() => {
-      const target = this.element.querySelector(`[data-date="${newDateStr}"]`);
-      target?.focus();
-    });
+    this.dispatchMonthChange();
+    this.restoreFocus();
   }
   moveToStartOfWeek() {
-    const focused = this.element.querySelector("[data-date]:focus");
-    let currentDateStr = focused?.dataset.date || this.focusedDate;
-    if (!currentDateStr) {
-      const firstButton = this.element.querySelector("[data-date]");
-      if (!firstButton) return;
-      currentDateStr = firstButton.dataset.date;
-    }
-    const currentDate = parseISO(currentDateStr);
-    const weekStart = startOfWeek(currentDate, {
+    const current = this.currentFocusDate();
+    if (current) this.focusDate(startOfWeek(current, {
       weekStartsOn: this.weekStartsOnValue
-    });
-    const weekStartStr = format(weekStart, "yyyy-MM-dd");
-    this.focusedDate = weekStartStr;
-    let target = this.element.querySelector(`[data-date="${weekStartStr}"]`);
-    if (!target) {
-      this.previousMonth();
-      requestAnimationFrame(() => {
-        target = this.element.querySelector(`[data-date="${weekStartStr}"]`);
-        target?.focus();
-      });
-    } else {
-      target.focus();
-    }
+    }));
   }
   moveToEndOfWeek() {
-    const focused = this.element.querySelector("[data-date]:focus");
-    let currentDateStr = focused?.dataset.date || this.focusedDate;
-    if (!currentDateStr) {
-      const firstButton = this.element.querySelector("[data-date]");
-      if (!firstButton) return;
-      currentDateStr = firstButton.dataset.date;
-    }
-    const currentDate = parseISO(currentDateStr);
-    const weekEnd = endOfWeek(currentDate, {
+    const current = this.currentFocusDate();
+    if (current) this.focusDate(endOfWeek(current, {
       weekStartsOn: this.weekStartsOnValue
-    });
-    const weekEndStr = format(weekEnd, "yyyy-MM-dd");
-    this.focusedDate = weekEndStr;
-    let target = this.element.querySelector(`[data-date="${weekEndStr}"]`);
-    if (!target) {
-      this.nextMonth();
-      requestAnimationFrame(() => {
-        target = this.element.querySelector(`[data-date="${weekEndStr}"]`);
-        target?.focus();
-      });
-    } else {
-      target.focus();
-    }
+    }));
   }
 }
 
@@ -12709,7 +14233,7 @@ function Autoplay(userOptions = {}) {
 Autoplay.globalOptions = undefined;
 
 class CarouselController extends Controller {
-  static targets=[ "viewport", "prevButton", "nextButton", "container" ];
+  static targets=[ "viewport", "prevButton", "nextButton", "container", "autoplayToggle" ];
   static values={
     orientation: {
       type: String,
@@ -12730,6 +14254,7 @@ class CarouselController extends Controller {
   disconnect() {
     if (this.emblaApi) {
       this.emblaApi.destroy();
+      this.emblaApi = null;
     }
   }
   initializeCarousel() {
@@ -12747,6 +14272,10 @@ class CarouselController extends Controller {
     this.setupButtonStates();
     this.emblaApi.on("select", () => this.updateButtonStates());
     this.emblaApi.on("reInit", () => this.updateButtonStates());
+    this.userPaused = false;
+    this.emblaApi.on("autoplay:play", () => this.onAutoplayPlay());
+    this.emblaApi.on("autoplay:stop", () => this.syncAutoplayState());
+    this.syncAutoplayState();
     this.element.dispatchEvent(new CustomEvent("carousel:init", {
       detail: {
         api: this.emblaApi
@@ -12758,7 +14287,10 @@ class CarouselController extends Controller {
     const plugins = [];
     this.pluginsValue.forEach(pluginConfig => {
       if (pluginConfig.name === "autoplay") {
-        plugins.push(Autoplay(pluginConfig.options || {}));
+        plugins.push(Autoplay({
+          stopOnMouseEnter: true,
+          ...pluginConfig.options || {}
+        }));
       }
     });
     return plugins;
@@ -12808,20 +14340,62 @@ class CarouselController extends Controller {
   setupButtonStates() {
     this.updateButtonStates();
   }
+  get autoplay() {
+    return this.emblaApi?.plugins?.()?.autoplay;
+  }
+  isAutoplaying() {
+    return !!this.autoplay?.isPlaying?.();
+  }
+  onAutoplayPlay() {
+    if (this.userPaused) {
+      this.autoplay.stop();
+      return;
+    }
+    this.syncAutoplayState();
+  }
+  toggleAutoplay() {
+    const autoplay = this.autoplay;
+    if (!autoplay) return;
+    if (autoplay.isPlaying()) {
+      this.userPaused = true;
+      autoplay.stop();
+    } else {
+      this.userPaused = false;
+      autoplay.play();
+    }
+    this.syncAutoplayState();
+  }
+  syncAutoplayState() {
+    const playing = this.isAutoplaying();
+    if (this.hasContainerTarget) {
+      this.containerTarget.setAttribute("aria-live", playing ? "off" : "polite");
+    }
+    this.autoplayToggleTargets.forEach(toggle => {
+      toggle.hidden = !this.autoplay;
+      toggle.dataset.state = playing ? "playing" : "paused";
+      const label = playing ? toggle.dataset.pauseLabel || "Pause slides" : toggle.dataset.playLabel || "Play slides";
+      toggle.setAttribute("aria-label", label);
+      if (toggle.children.length === 0) toggle.textContent = label;
+    });
+  }
   updateButtonStates() {
     if (!this.emblaApi) return;
     if (this.hasPrevButtonTarget) {
-      const canScrollPrev = this.emblaApi.canScrollPrev();
-      this.prevButtonTarget.disabled = !canScrollPrev;
-      this.prevButtonTarget.classList.toggle("opacity-50", !canScrollPrev);
-      this.prevButtonTarget.classList.toggle("cursor-not-allowed", !canScrollPrev);
+      this.setButtonEnabled(this.prevButtonTarget, this.emblaApi.canScrollPrev());
     }
     if (this.hasNextButtonTarget) {
-      const canScrollNext = this.emblaApi.canScrollNext();
-      this.nextButtonTarget.disabled = !canScrollNext;
-      this.nextButtonTarget.classList.toggle("opacity-50", !canScrollNext);
-      this.nextButtonTarget.classList.toggle("cursor-not-allowed", !canScrollNext);
+      this.setButtonEnabled(this.nextButtonTarget, this.emblaApi.canScrollNext());
     }
+  }
+  setButtonEnabled(button, enabled) {
+    button.disabled = false;
+    if (enabled) {
+      button.removeAttribute("aria-disabled");
+    } else {
+      button.setAttribute("aria-disabled", "true");
+    }
+    button.classList.toggle("opacity-50", !enabled);
+    button.classList.toggle("cursor-not-allowed", !enabled);
   }
   scrollPrev() {
     if (this.emblaApi) {
@@ -12837,6 +14411,7 @@ class CarouselController extends Controller {
     return this.emblaApi;
   }
   keydown(event) {
+    if (this.isEditable(event.target)) return;
     if (this.orientationValue === "horizontal") {
       if (event.key === "ArrowLeft") {
         event.preventDefault();
@@ -12854,6 +14429,10 @@ class CarouselController extends Controller {
         this.scrollNext();
       }
     }
+  }
+  isEditable(element) {
+    if (!(element instanceof HTMLElement)) return false;
+    return element.isContentEditable || [ "INPUT", "TEXTAREA", "SELECT" ].includes(element.tagName);
   }
 }
 
@@ -12898,6 +14477,39 @@ class DatepickerController extends Controller {
     if (this.selectedValue.length > 0) {
       this.updateDisplay();
     }
+    this.boundHandlePopoverShow = this.handlePopoverShow.bind(this);
+    this.element.addEventListener("popover:show", this.boundHandlePopoverShow);
+  }
+  disconnect() {
+    this.element.removeEventListener("popover:show", this.boundHandlePopoverShow);
+    if (this.focusFrame) cancelAnimationFrame(this.focusFrame);
+  }
+  handlePopoverShow(event) {
+    const calendar = this.findCalendarElement();
+    if (!calendar || !event.target.contains(calendar)) return;
+    this.focusCalendar(calendar);
+  }
+  focusCalendar(calendar, attempts = 5) {
+    const target = this.dayToFocus(calendar);
+    if (!target) return;
+    target.focus({
+      preventScroll: true
+    });
+    if (document.activeElement === target || attempts <= 0) return;
+    this.focusFrame = requestAnimationFrame(() => this.focusCalendar(calendar, attempts - 1));
+  }
+  dayToFocus(calendar) {
+    const days = Array.from(calendar.querySelectorAll("[data-date]")).filter(day => !day.disabled && day.getAttribute("aria-disabled") !== "true");
+    const byDate = date => {
+      if (!date) return null;
+      const matches = days.filter(day => day.dataset.date === date);
+      return matches.find(day => !day.hasAttribute("data-outside")) || matches[0];
+    };
+    return byDate(this.selectedValue[0]) || byDate(format(new Date, "yyyy-MM-dd")) || days.find(day => day.tabIndex === 0) || days.find(day => day.dataset.date.endsWith("-01")) || days[0] || null;
+  }
+  findCalendarElement() {
+    if (this.hasUiCalendarOutlet) return this.uiCalendarOutlet.element;
+    return this.element.querySelector("[data-controller*='ui--calendar']");
   }
   handleSelect(event) {
     const {selected: selected, date: date} = event.detail;
@@ -13065,14 +14677,18 @@ class DatepickerController extends Controller {
   }
   closePopover() {
     if (this.hasUiPopoverOutlet) {
-      this.uiPopoverOutlet.hide();
+      this.uiPopoverOutlet.hide({
+        returnFocus: true
+      });
       return;
     }
     const popoverElement = this.element.querySelector("[data-controller*='ui--popover']");
     if (popoverElement) {
       const popoverController = this.application.getControllerForElementAndIdentifier(popoverElement, "ui--popover");
       if (popoverController) {
-        popoverController.hide();
+        popoverController.hide({
+          returnFocus: true
+        });
       }
     }
   }
@@ -13142,51 +14758,104 @@ class MenubarController extends Controller {
     this.submenuCleanups = new Map;
     this.lastHoveredItem = null;
     this.isMenubarActive = false;
+    this.typeahead = createTypeahead();
     this.boundHandleClickOutside = this.handleClickOutside.bind(this);
     this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.boundCleanupSubmenu = this.cleanupSubmenu.bind(this);
     document.addEventListener("click", this.boundHandleClickOutside);
+    this.element.addEventListener("keydown", this.boundHandleKeydown);
+    this.escapeLayer = createEscapeLayer(() => this.handleEscape(), {
+      element: this.element
+    });
+    this.resetToClosed();
     this.initializeTriggers();
+    this.setupAria();
   }
   disconnect() {
     this.closeSubmenuTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
     this.closeSubmenuTimeouts.clear();
     this.submenuCleanups.forEach(cleanup => cleanup());
     this.submenuCleanups.clear();
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
+    clearTimeout(this.ignoreClickTimer);
     document.removeEventListener("click", this.boundHandleClickOutside);
-    document.removeEventListener("keydown", this.boundHandleKeydown);
+    this.element.removeEventListener("keydown", this.boundHandleKeydown);
   }
   initializeTriggers() {
     this.triggerTargets.forEach((trigger, index) => {
       trigger.setAttribute("tabindex", index === 0 ? "0" : "-1");
     });
   }
+  setupAria() {
+    this.triggerTargets.forEach((trigger, index) => {
+      const content = this.contentTargets[index];
+      trigger.setAttribute("aria-haspopup", "menu");
+      if (!content) return;
+      ensureId(content, "menubar-content");
+      trigger.setAttribute("aria-expanded", String(content.getAttribute("data-state") === "open"));
+      setIdRefs(trigger, "aria-controls", content, {
+        prefix: "menubar-trigger"
+      });
+      setIdRefs(content, "aria-labelledby", trigger, {
+        prefix: "menubar-trigger"
+      });
+    });
+    initSubmenuTriggers(this.element, "menubar");
+  }
+  resetToClosed() {
+    this.contentTargets.forEach((content, index) => {
+      if (content.getAttribute("data-state") !== "open") return;
+      closeAllSubmenus(content);
+      content.classList.add("hidden");
+      content.setAttribute("data-state", "closed");
+      clearAllTabindexes(content);
+      const trigger = this.triggerTargets[index];
+      if (trigger) {
+        trigger.setAttribute("data-state", "closed");
+        trigger.setAttribute("aria-expanded", "false");
+      }
+    });
+    this.openValue = false;
+  }
+  get activeContent() {
+    return this.contentTargets[this.activeIndexValue] || null;
+  }
   toggle(event) {
-    if (event.detail === 0) return;
+    if (this.ignoreNextClick) {
+      this.ignoreNextClick = false;
+      return;
+    }
     const trigger = event.currentTarget;
     const triggerIndex = this.triggerTargets.indexOf(trigger);
     const content = this.contentTargets[triggerIndex];
     if (!content) return;
-    const isCurrentlyOpen = !content.classList.contains("hidden");
-    this.closeAll();
-    if (!isCurrentlyOpen) {
-      this.openMenu(triggerIndex);
+    const isCurrentlyOpen = content.getAttribute("data-state") === "open";
+    if (isCurrentlyOpen) {
+      this.closeAll();
+      this.focusTrigger(triggerIndex);
+    } else {
+      this.openMenu(triggerIndex, {
+        focus: event.detail === 0 ? "first" : "content"
+      });
     }
   }
-  openMenu(index) {
+  openMenu(index, {focus: focus = "content"} = {}) {
     const trigger = this.triggerTargets[index];
     const content = this.contentTargets[index];
     if (!trigger || !content) return;
     this.triggerTargets.forEach((t, i) => {
       const c = this.contentTargets[i];
-      if (c) {
-        closeAllSubmenus(c);
+      if (c && c !== content) {
+        closeAllSubmenus(c, this.boundCleanupSubmenu);
         c.classList.add("hidden");
         c.setAttribute("data-state", "closed");
         clearAllTabindexes(c);
       }
-      t.setAttribute("data-state", "closed");
-      t.setAttribute("aria-expanded", "false");
-      t.blur();
+      if (t !== trigger) {
+        t.setAttribute("data-state", "closed");
+        t.setAttribute("aria-expanded", "false");
+      }
     });
     content.classList.remove("hidden");
     content.setAttribute("data-state", "open");
@@ -13195,17 +14864,26 @@ class MenubarController extends Controller {
     this.openValue = true;
     this.activeIndexValue = index;
     this.isMenubarActive = true;
+    this.typeahead.reset();
+    this.setTriggerTabindex(index);
     positionDropdown(trigger, content, {
       placement: "bottom-start",
       offsetValue: 4,
       flipEnabled: true
     });
-    this.setupKeyboardNavigation();
+    this.escapeLayer.activate();
     clearAllTabindexes(content);
     this.lastHoveredItem = null;
+    if (focus === "first") this.focusFirstMenuItem(); else if (focus === "last") this.focusLastMenuItem(); else if (focus === "content") content.focus();
   }
   closeAll(options = {}) {
     const {returnFocus: returnFocus = false} = options;
+    const wasOpen = this.openValue;
+    this.escapeLayer?.deactivate();
+    this.typeahead?.reset();
+    if (returnFocus && wasOpen && this.activeIndexValue >= 0) {
+      this.focusTrigger(this.activeIndexValue);
+    }
     this.submenuCleanups.forEach(cleanup => cleanup());
     this.submenuCleanups.clear();
     this.triggerTargets.forEach((trigger, index) => {
@@ -13220,13 +14898,14 @@ class MenubarController extends Controller {
       trigger.setAttribute("aria-expanded", "false");
     });
     this.openValue = false;
+    this.isMenubarActive = false;
     this.lastHoveredItem = null;
-    this.teardownKeyboardNavigation();
-    if (returnFocus && this.activeIndexValue >= 0) {
-      const trigger = this.triggerTargets[this.activeIndexValue];
-      if (trigger) {
-        setTimeout(() => trigger.focus(), 50);
-      }
+  }
+  handleEscape() {
+    if (!this.closeCurrentSubmenu()) {
+      this.closeAll({
+        returnFocus: true
+      });
     }
   }
   handleTriggerHover(event) {
@@ -13234,24 +14913,29 @@ class MenubarController extends Controller {
     const trigger = event.currentTarget;
     const triggerIndex = this.triggerTargets.indexOf(trigger);
     if (triggerIndex !== this.activeIndexValue && triggerIndex >= 0) {
-      this.openMenu(triggerIndex);
+      this.openMenu(triggerIndex, {
+        focus: "content"
+      });
     }
   }
   trackHoveredItem(event) {
     const item = event.currentTarget;
-    const activeContent = this.contentTargets[this.activeIndexValue];
-    if (!activeContent) return;
+    const activeContent = this.activeContent;
+    if (!activeContent || isItemDisabled(item)) return;
     clearAllTabindexes(activeContent);
     item.setAttribute("tabindex", "0");
     item.focus();
     this.lastHoveredItem = item;
     const parentMenu = item.closest('[role="menu"]');
-    if (parentMenu) {
-      this.closeSiblingSubmenus(item, parentMenu);
-    }
+    if (parentMenu) this.closeSiblingSubmenus(item, parentMenu);
   }
   selectItem(event) {
     const item = event.currentTarget;
+    if (isItemDisabled(item)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     const role = item.getAttribute("role");
     if (role === "menuitemcheckbox") {
       event.stopPropagation();
@@ -13259,16 +14943,17 @@ class MenubarController extends Controller {
     } else if (role === "menuitemradio") {
       event.stopPropagation();
       this.selectRadio(item);
-    } else {
-      this.closeAll();
-      this.isMenubarActive = false;
+    } else if (!hasSubmenu(item)) {
+      this.closeAll({
+        returnFocus: true
+      });
     }
   }
   openSubmenu(event) {
     const trigger = event.currentTarget;
-    const submenu = trigger.nextElementSibling;
-    const activeContent = this.contentTargets[this.activeIndexValue];
-    if (!submenu || submenu.getAttribute("role") !== "menu") return;
+    const submenu = getSubmenu(trigger);
+    const activeContent = this.activeContent;
+    if (!submenu || isItemDisabled(trigger)) return;
     if (this.closeSubmenuTimeouts.has(trigger)) {
       clearTimeout(this.closeSubmenuTimeouts.get(trigger));
       this.closeSubmenuTimeouts.delete(trigger);
@@ -13280,21 +14965,18 @@ class MenubarController extends Controller {
       this.lastHoveredItem = trigger;
     }
     const parentMenu = trigger.closest('[role="menu"]');
-    if (parentMenu) {
-      this.closeSiblingSubmenus(trigger, parentMenu);
-    }
+    if (parentMenu) this.closeSiblingSubmenus(trigger, parentMenu);
     this.openSubmenuWithAutoUpdate(trigger, submenu);
   }
   openSubmenuWithAutoUpdate(trigger, submenu) {
     if (!submenu || submenu.getAttribute("role") !== "menu") return;
-    if (this.submenuCleanups.has(submenu)) {
-      this.submenuCleanups.get(submenu)();
-      this.submenuCleanups.delete(submenu);
-    }
+    this.cleanupSubmenu(submenu);
     submenu.classList.remove("hidden");
     submenu.setAttribute("data-state", "open");
     trigger.setAttribute("data-state", "open");
-    const side = submenu.getAttribute("data-side") || "right";
+    trigger.setAttribute("aria-expanded", "true");
+    if (!submenu.dataset.preferredSide) submenu.dataset.preferredSide = submenu.getAttribute("data-side") || "right";
+    const side = submenu.dataset.preferredSide;
     const align = submenu.getAttribute("data-align") || "start";
     const placement = `${side}-${align}`;
     const update = () => {
@@ -13326,39 +15008,22 @@ class MenubarController extends Controller {
     });
     this.submenuCleanups.set(submenu, cleanup);
   }
-  closeSubmenuAndCleanup(submenu, trigger) {
-    if (!submenu) return;
+  cleanupSubmenu(submenu) {
     if (this.submenuCleanups.has(submenu)) {
       this.submenuCleanups.get(submenu)();
       this.submenuCleanups.delete(submenu);
     }
-    const nestedSubmenus = submenu.querySelectorAll('[role="menu"][data-side="right"], [role="menu"][data-side="right-start"]');
-    nestedSubmenus.forEach(nested => {
-      if (this.submenuCleanups.has(nested)) {
-        this.submenuCleanups.get(nested)();
-        this.submenuCleanups.delete(nested);
-      }
-      nested.classList.add("hidden");
-      nested.setAttribute("data-state", "closed");
-      const nestedTrigger = nested.previousElementSibling;
-      if (nestedTrigger) {
-        nestedTrigger.setAttribute("data-state", "closed");
-      }
-    });
-    submenu.classList.add("hidden");
-    submenu.setAttribute("data-state", "closed");
-    if (trigger) {
-      trigger.setAttribute("data-state", "closed");
-    }
+  }
+  closeSubmenuAndCleanup(submenu, trigger) {
+    if (!submenu) return;
+    closeSubmenu(submenu, trigger, this.boundCleanupSubmenu);
   }
   closeSubmenu(event) {
     const trigger = event.currentTarget;
-    const submenu = trigger.nextElementSibling;
+    const submenu = getSubmenu(trigger);
     const relatedTarget = event.relatedTarget;
-    if (!submenu || submenu.getAttribute("role") !== "menu") return;
-    if (relatedTarget && submenu.contains(relatedTarget)) {
-      return;
-    }
+    if (!submenu) return;
+    if (relatedTarget && submenu.contains(relatedTarget)) return;
     const timeoutId = setTimeout(() => {
       this.closeSubmenuAndCleanup(submenu, trigger);
       this.closeSubmenuTimeouts.delete(trigger);
@@ -13366,46 +15031,40 @@ class MenubarController extends Controller {
     this.closeSubmenuTimeouts.set(trigger, timeoutId);
   }
   cancelSubmenuClose(event) {
-    const submenu = event.currentTarget;
-    const trigger = submenu.previousElementSibling;
+    const trigger = getSubmenuTrigger(event.currentTarget);
     if (trigger && this.closeSubmenuTimeouts.has(trigger)) {
       clearTimeout(this.closeSubmenuTimeouts.get(trigger));
       this.closeSubmenuTimeouts.delete(trigger);
     }
   }
   closeSiblingSubmenus(currentItem, parentMenu) {
-    Array.from(parentMenu.children).forEach(child => {
-      if (child.classList && child.classList.contains("relative")) {
-        const trigger = child.querySelector(':scope > [role="menuitem"]');
-        const submenu = trigger?.nextElementSibling;
-        if (trigger !== currentItem && submenu && submenu.getAttribute("role") === "menu") {
-          this.closeSubmenuAndCleanup(submenu, trigger);
-        }
-      }
-    });
+    closeSiblingSubmenus(currentItem, parentMenu, this.boundCleanupSubmenu);
   }
   handleClickOutside(event) {
+    if (!this.openValue) return;
     if (!this.element.contains(event.target)) {
       this.closeAll();
-      this.isMenubarActive = false;
     }
   }
-  setupKeyboardNavigation() {
-    document.addEventListener("keydown", this.boundHandleKeydown);
-  }
-  teardownKeyboardNavigation() {
-    document.removeEventListener("keydown", this.boundHandleKeydown);
-  }
+  setupKeyboardNavigation() {}
+  teardownKeyboardNavigation() {}
   handleKeydown(event) {
-    if (!this.openValue) {
-      const isTrigger = this.triggerTargets.includes(event.target);
-      if (isTrigger) {
-        this.handleTriggerKeydown(event);
-      }
+    if (!this.openValue || event.defaultPrevented) return;
+    if (this.triggerTargets.includes(event.target)) return;
+    const activeContent = this.activeContent;
+    if (!activeContent || !activeContent.contains(event.target)) return;
+    if (event.key === "Tab") {
+      this.closeAll({
+        returnFocus: true
+      });
       return;
     }
-    const activeContent = this.contentTargets[this.activeIndexValue];
-    if (!activeContent) return;
+    if (isEditableTarget(event.target)) return;
+    if (this.typeahead.isTypeaheadKey(event)) {
+      const match = this.typeahead.handleKey(event, this.getCurrentMenuItems(), this.currentItem());
+      if (match) this.focusMenuItem(match);
+      return;
+    }
     switch (event.key) {
      case "ArrowDown":
       event.preventDefault();
@@ -13437,24 +15096,10 @@ class MenubarController extends Controller {
       this.focusLastMenuItem();
       break;
 
-     case "Escape":
-      event.preventDefault();
-      if (!this.closeCurrentSubmenu()) {
-        this.closeAll({
-          returnFocus: true
-        });
-      }
-      break;
-
      case "Enter":
      case " ":
       event.preventDefault();
       this.activateCurrentItem();
-      break;
-
-     case "Tab":
-      this.closeAll();
-      this.isMenubarActive = false;
       break;
     }
   }
@@ -13478,7 +15123,18 @@ class MenubarController extends Controller {
      case " ":
       event.preventDefault();
       event.stopPropagation();
-      this.openMenu(triggerIndex);
+      this.suppressNativeClick();
+      this.openMenu(triggerIndex, {
+        focus: "first"
+      });
+      break;
+
+     case "ArrowUp":
+      event.preventDefault();
+      event.stopPropagation();
+      this.openMenu(triggerIndex, {
+        focus: "last"
+      });
       break;
 
      case "Home":
@@ -13492,10 +15148,16 @@ class MenubarController extends Controller {
       break;
     }
   }
+  suppressNativeClick() {
+    this.ignoreNextClick = true;
+    clearTimeout(this.ignoreClickTimer);
+    this.ignoreClickTimer = setTimeout(() => {
+      this.ignoreNextClick = false;
+    }, 0);
+  }
   handleArrowRight() {
-    const activeContent = this.contentTargets[this.activeIndexValue];
-    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
-    if (currentItem && hasSubmenu(currentItem)) {
+    const currentItem = this.currentItem();
+    if (currentItem && hasSubmenu(currentItem) && !isItemDisabled(currentItem)) {
       this.openSubmenuWithKeyboard(currentItem);
     } else {
       this.navigateToNextMenu();
@@ -13507,115 +15169,90 @@ class MenubarController extends Controller {
     }
   }
   focusNextTrigger(currentIndex) {
-    const nextIndex = (currentIndex + 1) % this.triggerTargets.length;
-    this.focusTrigger(nextIndex);
+    this.focusTrigger((currentIndex + 1) % this.triggerTargets.length);
   }
   focusPreviousTrigger(currentIndex) {
-    const prevIndex = currentIndex === 0 ? this.triggerTargets.length - 1 : currentIndex - 1;
-    this.focusTrigger(prevIndex);
+    this.focusTrigger(currentIndex === 0 ? this.triggerTargets.length - 1 : currentIndex - 1);
   }
-  focusTrigger(index) {
+  setTriggerTabindex(index) {
     this.triggerTargets.forEach((t, i) => {
       t.setAttribute("tabindex", i === index ? "0" : "-1");
     });
-    this.triggerTargets[index].focus();
+  }
+  focusTrigger(index) {
+    this.setTriggerTabindex(index);
+    this.triggerTargets[index]?.focus();
   }
   navigateToNextMenu() {
     const nextIndex = (this.activeIndexValue + 1) % this.triggerTargets.length;
-    this.openMenu(nextIndex);
+    this.openMenu(nextIndex, {
+      focus: "first"
+    });
   }
   navigateToPreviousMenu() {
     const prevIndex = this.activeIndexValue === 0 ? this.triggerTargets.length - 1 : this.activeIndexValue - 1;
-    this.openMenu(prevIndex);
+    this.openMenu(prevIndex, {
+      focus: "first"
+    });
   }
   getDirectMenuItems(menu) {
-    const items = [];
-    Array.from(menu.children).forEach(child => {
-      const role = child.getAttribute("role");
-      if (role === "menuitem" || role === "menuitemcheckbox" || role === "menuitemradio") {
-        if (!child.hasAttribute("data-disabled")) {
-          items.push(child);
-        }
-      } else if (role === "group") {
-        const radioItems = child.querySelectorAll('[role="menuitemradio"]');
-        radioItems.forEach(item => {
-          if (!item.hasAttribute("data-disabled")) {
-            items.push(item);
-          }
-        });
-      } else if (child.classList && child.classList.contains("relative")) {
-        const trigger = child.querySelector(':scope > [role="menuitem"]');
-        if (trigger && !trigger.hasAttribute("data-disabled")) {
-          items.push(trigger);
-        }
-      }
-    });
-    return items;
+    return getMenuItems(menu);
+  }
+  currentItem() {
+    const activeContent = this.activeContent;
+    if (!activeContent) return null;
+    const active = document.activeElement;
+    if (active && active.matches?.(MENU_ITEM_SELECTOR) && activeContent.contains(active)) return active;
+    return getKeyboardFocusedItem(activeContent) || (this.lastHoveredItem && activeContent.contains(this.lastHoveredItem) ? this.lastHoveredItem : null);
   }
   getCurrentMenuItems() {
-    const activeContent = this.contentTargets[this.activeIndexValue];
+    const activeContent = this.activeContent;
     if (!activeContent) return [];
-    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
-    let currentMenu;
-    if (currentItem) {
-      currentMenu = currentItem.closest('[role="menu"]');
-    } else {
-      currentMenu = activeContent.getAttribute("role") === "menu" ? activeContent : activeContent.querySelector('[role="menu"]');
-    }
-    if (!currentMenu) return [];
-    return this.getDirectMenuItems(currentMenu);
+    const currentItem = this.currentItem();
+    const currentMenu = currentItem ? currentItem.closest('[role="menu"]') : activeContent;
+    return getMenuItems(currentMenu);
   }
   focusMenuItem(item, content) {
     if (!item) return;
-    content = content || this.contentTargets[this.activeIndexValue];
+    content = content || this.activeContent;
     if (!content) return;
     clearAllTabindexes(content);
     item.setAttribute("tabindex", "0");
     item.focus();
     this.lastHoveredItem = item;
     const parentMenu = item.closest('[role="menu"]');
-    if (parentMenu) {
-      this.closeSiblingSubmenus(item, parentMenu);
-    }
+    if (parentMenu) this.closeSiblingSubmenus(item, parentMenu);
   }
   focusNextMenuItem() {
     const items = this.getCurrentMenuItems();
     if (items.length === 0) return;
-    const currentItem = getKeyboardFocusedItem(this.contentTargets[this.activeIndexValue]) || this.lastHoveredItem;
-    let currentIndex = currentItem ? items.indexOf(currentItem) : -1;
+    const currentIndex = items.indexOf(this.currentItem());
     const nextIndex = currentIndex >= items.length - 1 ? 0 : currentIndex + 1;
     this.focusMenuItem(items[nextIndex]);
   }
   focusPreviousMenuItem() {
     const items = this.getCurrentMenuItems();
     if (items.length === 0) return;
-    const currentItem = getKeyboardFocusedItem(this.contentTargets[this.activeIndexValue]) || this.lastHoveredItem;
-    let currentIndex = currentItem ? items.indexOf(currentItem) : -1;
+    const currentIndex = items.indexOf(this.currentItem());
     const prevIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
     this.focusMenuItem(items[prevIndex]);
   }
   focusFirstMenuItem() {
     const items = this.getCurrentMenuItems();
-    if (items.length > 0) {
-      this.focusMenuItem(items[0]);
-    }
+    if (items.length > 0) this.focusMenuItem(items[0]);
   }
   focusLastMenuItem() {
     const items = this.getCurrentMenuItems();
-    if (items.length > 0) {
-      this.focusMenuItem(items[items.length - 1]);
-    }
+    if (items.length > 0) this.focusMenuItem(items[items.length - 1]);
   }
   openSubmenuWithKeyboard(trigger) {
-    const submenu = trigger.nextElementSibling;
-    if (!submenu || submenu.getAttribute("role") !== "menu") return;
-    const activeContent = this.contentTargets[this.activeIndexValue];
+    const submenu = getSubmenu(trigger);
+    if (!submenu || isItemDisabled(trigger)) return;
+    const activeContent = this.activeContent;
     const parentMenu = trigger.closest('[role="menu"]');
-    if (parentMenu) {
-      this.closeSiblingSubmenus(trigger, parentMenu);
-    }
+    if (parentMenu) this.closeSiblingSubmenus(trigger, parentMenu);
     this.openSubmenuWithAutoUpdate(trigger, submenu);
-    const submenuItems = this.getDirectMenuItems(submenu);
+    const submenuItems = getMenuItems(submenu);
     if (submenuItems.length > 0 && activeContent) {
       clearAllTabindexes(activeContent);
       submenuItems[0].setAttribute("tabindex", "0");
@@ -13624,79 +15261,45 @@ class MenubarController extends Controller {
     }
   }
   closeCurrentSubmenu() {
-    const activeContent = this.contentTargets[this.activeIndexValue];
-    if (!activeContent) return false;
-    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
-    if (!currentItem) return false;
+    const activeContent = this.activeContent;
+    const currentItem = this.currentItem();
+    if (!activeContent || !currentItem) return false;
     const parentMenu = currentItem.closest('[role="menu"]');
-    if (!parentMenu) return false;
-    const dataSide = parentMenu.getAttribute("data-side");
-    if (dataSide === "right" || dataSide === "right-start") {
-      const trigger = parentMenu.previousElementSibling;
-      this.closeSubmenuAndCleanup(parentMenu, trigger);
-      if (trigger) {
-        clearAllTabindexes(activeContent);
-        trigger.setAttribute("tabindex", "0");
-        trigger.focus();
-        this.lastHoveredItem = trigger;
-      }
-      return true;
-    }
-    return false;
+    const trigger = getSubmenuTrigger(parentMenu);
+    if (!trigger) return false;
+    this.closeSubmenuAndCleanup(parentMenu, trigger);
+    clearAllTabindexes(activeContent);
+    trigger.setAttribute("tabindex", "0");
+    trigger.focus();
+    this.lastHoveredItem = trigger;
+    return true;
   }
   activateCurrentItem() {
-    const activeContent = this.contentTargets[this.activeIndexValue];
-    if (!activeContent) return;
-    const currentItem = getKeyboardFocusedItem(activeContent) || this.lastHoveredItem;
-    if (!currentItem) return;
+    const currentItem = this.currentItem();
+    if (!currentItem || isItemDisabled(currentItem)) return;
     const role = currentItem.getAttribute("role");
-    if (role === "menuitem") {
-      if (hasSubmenu(currentItem)) {
-        this.openSubmenuWithKeyboard(currentItem);
-      } else {
-        currentItem.click();
-        this.closeAll();
-        this.isMenubarActive = false;
-      }
-    } else if (role === "menuitemcheckbox") {
-      this.toggleCheckbox(currentItem);
-    } else if (role === "menuitemradio") {
-      this.selectRadio(currentItem);
+    if (role === "menuitem" && hasSubmenu(currentItem)) {
+      this.openSubmenuWithKeyboard(currentItem);
+      return;
+    }
+    currentItem.click();
+    if (role === "menuitem" && this.openValue) {
+      this.closeAll({
+        returnFocus: true
+      });
     }
   }
   toggleCheckbox(item) {
-    if (item.getAttribute("role") !== "menuitemcheckbox") return;
-    const currentState = item.getAttribute("data-state");
-    const newState = currentState === "checked" ? "unchecked" : "checked";
-    const isChecked = newState === "checked";
-    item.setAttribute("data-state", newState);
-    item.setAttribute("aria-checked", isChecked);
-    const iconContainer = item.querySelector(".absolute.left-2") || item.querySelector("span.absolute");
-    if (iconContainer) {
-      iconContainer.innerHTML = isChecked ? `\n        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">\n          <path d="M20 6 9 17l-5-5"></path>\n        </svg>\n      ` : "";
-    }
+    toggleCheckbox(item);
   }
   selectRadio(item) {
-    if (item.getAttribute("role") !== "menuitemradio") return;
-    const radioGroup = item.closest('[role="group"]') || item.closest('[role="menu"]');
-    if (!radioGroup) return;
-    const allRadios = radioGroup.querySelectorAll('[role="menuitemradio"]');
-    allRadios.forEach(radio => {
-      radio.setAttribute("data-state", "unchecked");
-      radio.setAttribute("aria-checked", "false");
-      const iconContainer = radio.querySelector(".absolute.left-2") || radio.querySelector("span.absolute");
-      if (iconContainer) {
-        iconContainer.innerHTML = "";
-      }
-    });
-    item.setAttribute("data-state", "checked");
-    item.setAttribute("aria-checked", "true");
-    const iconContainer = item.querySelector(".absolute.left-2") || item.querySelector("span.absolute");
-    if (iconContainer) {
-      iconContainer.innerHTML = `\n        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-2">\n          <circle cx="12" cy="12" r="10"></circle>\n        </svg>\n      `;
-    }
+    selectRadio(item);
   }
 }
+
+const CONTENT_TABBABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const EXIT_FALLBACK_MS = 500;
 
 class NavigationMenuController extends Controller {
   static targets=[ "trigger", "content", "viewport", "item" ];
@@ -13728,21 +15331,65 @@ class NavigationMenuController extends Controller {
     this.skipDelayTimerRef = null;
     this.isOpenDelayed = true;
     this.isMenuActive = false;
+    this.exitCallbacks = new Map;
+    this.buildPairs();
     this.boundHandleClickOutside = this.handleClickOutside.bind(this);
     this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.boundHandleFocusOut = this.handleFocusOut.bind(this);
+    this.boundHandleLinkClick = this.handleLinkClick.bind(this);
+    this.boundBeforeCache = () => this.closeAll();
     document.addEventListener("click", this.boundHandleClickOutside);
-    document.addEventListener("keydown", this.boundHandleKeydown);
+    document.addEventListener("turbo:before-cache", this.boundBeforeCache);
+    this.element.addEventListener("keydown", this.boundHandleKeydown);
+    this.element.addEventListener("focusout", this.boundHandleFocusOut);
+    this.element.addEventListener("click", this.boundHandleLinkClick);
+    this.escapeLayer = createEscapeLayer(() => this.handleEscape(), {
+      element: this.element
+    });
     this.initializeTriggers();
   }
   disconnect() {
     this.clearTimers();
+    this.escapeLayer?.deactivate();
+    this.closeAll();
     document.removeEventListener("click", this.boundHandleClickOutside);
-    document.removeEventListener("keydown", this.boundHandleKeydown);
+    document.removeEventListener("turbo:before-cache", this.boundBeforeCache);
+    this.element.removeEventListener("keydown", this.boundHandleKeydown);
+    this.element.removeEventListener("focusout", this.boundHandleFocusOut);
+    this.element.removeEventListener("click", this.boundHandleLinkClick);
+  }
+  buildPairs() {
+    this.pairs = this.triggerTargets.map(trigger => {
+      const item = trigger.closest('[data-ui--navigation-menu-target="item"]') || trigger.parentElement;
+      const controlled = trigger.getAttribute("aria-controls");
+      const content = controlled && this.element.querySelector(`#${CSS.escape(controlled)}`) || item?.querySelector('[data-ui--navigation-menu-target="content"]') || null;
+      return {
+        trigger: trigger,
+        content: content,
+        item: item
+      };
+    });
   }
   initializeTriggers() {
-    this.triggerTargets.forEach((trigger, index) => {
-      trigger.setAttribute("tabindex", index === 0 ? "0" : "-1");
+    this.pairs.forEach(({trigger: trigger, content: content, item: item}) => {
+      if (trigger.getAttribute("tabindex") === "-1" || trigger.getAttribute("tabindex") === "0") {
+        trigger.removeAttribute("tabindex");
+      }
+      trigger.setAttribute("data-state", "closed");
+      trigger.setAttribute("aria-expanded", "false");
+      if (content) {
+        ensureId(trigger, "navigation-menu-trigger");
+        ensureId(content, "navigation-menu-content");
+        setIdRefs(trigger, "aria-controls", content);
+        setIdRefs(content, "aria-labelledby", trigger);
+        content.setAttribute("data-state", "closed");
+        content.removeAttribute("data-motion");
+        this.moveHome(content, item);
+      }
     });
+  }
+  contentFor(index) {
+    return this.pairs?.[index]?.content || null;
   }
   clearTimers() {
     if (this.openTimerRef) {
@@ -13761,8 +15408,12 @@ class NavigationMenuController extends Controller {
   toggle(event) {
     const trigger = event.currentTarget;
     const triggerIndex = this.triggerTargets.indexOf(trigger);
-    const content = this.contentTargets[triggerIndex];
+    const content = this.contentFor(triggerIndex);
     if (!content) return;
+    if (this.openTimerRef) {
+      clearTimeout(this.openTimerRef);
+      this.openTimerRef = null;
+    }
     const isCurrentlyOpen = trigger.getAttribute("data-state") === "open";
     if (isCurrentlyOpen) {
       this.closeMenu();
@@ -13772,16 +15423,19 @@ class NavigationMenuController extends Controller {
   }
   openMenu(index) {
     const trigger = this.triggerTargets[index];
-    const content = this.contentTargets[index];
+    const content = this.contentFor(index);
     if (!trigger || !content) return;
     const enterMotion = this.calculateEnterMotion(index);
     const exitMotion = this.calculateExitMotion(index);
-    this.triggerTargets.forEach((t, i) => {
-      const c = this.contentTargets[i];
+    this.pairs.forEach(({trigger: t, content: c}, i) => {
       if (c && i !== index && t.getAttribute("data-state") === "open") {
         this.animateContentOut(c, t, exitMotion);
       }
     });
+    this.cancelExit(content);
+    if (this.viewportValue && this.hasViewportTarget) {
+      this.updateViewport(content);
+    }
     content.setAttribute("data-motion", enterMotion);
     content.setAttribute("data-state", "open");
     trigger.setAttribute("data-state", "open");
@@ -13789,28 +15443,61 @@ class NavigationMenuController extends Controller {
     this.previousIndexValue = this.activeIndexValue;
     this.activeIndexValue = index;
     this.isMenuActive = true;
+    this.escapeLayer?.activate();
     if (this.viewportValue && this.hasViewportTarget) {
-      this.updateViewport(content);
+      this.sizeViewport(content);
     }
   }
   animateContentOut(content, trigger, motion) {
     content.setAttribute("data-motion", motion);
     trigger.setAttribute("data-state", "closed");
     trigger.setAttribute("aria-expanded", "false");
-    content.addEventListener("animationend", () => {
+    this.whenExitDone(content, () => {
       content.setAttribute("data-state", "closed");
-    }, {
+      this.moveHome(content);
+    });
+  }
+  whenExitDone(content, callback) {
+    this.cancelExit(content);
+    let frame = null;
+    let timer = null;
+    const finish = () => {
+      if (this.exitCallbacks.get(content) !== entry) return;
+      this.cancelExit(content);
+      callback();
+    };
+    const entry = {
+      cancel: () => {
+        content.removeEventListener("animationend", finish);
+        if (frame) cancelAnimationFrame(frame);
+        if (timer) clearTimeout(timer);
+      }
+    };
+    this.exitCallbacks.set(content, entry);
+    content.addEventListener("animationend", finish, {
       once: true
     });
+    frame = requestAnimationFrame(() => {
+      frame = null;
+      const running = typeof content.getAnimations === "function" ? content.getAnimations() : [];
+      if (running.length === 0) finish();
+    });
+    timer = setTimeout(finish, EXIT_FALLBACK_MS);
+  }
+  cancelExit(content) {
+    const entry = this.exitCallbacks?.get(content);
+    if (entry) {
+      entry.cancel();
+      this.exitCallbacks.delete(content);
+    }
   }
   closeMenu() {
     const index = this.activeIndexValue;
     if (index < 0) return;
     const trigger = this.triggerTargets[index];
-    const content = this.contentTargets[index];
+    const content = this.contentFor(index);
     if (content && trigger) {
-      const motion = "to-none";
-      this.animateContentOut(content, trigger, motion);
+      this.animateContentOut(content, trigger, "to-none");
     }
     if (this.viewportValue && this.hasViewportTarget) {
       this.viewportTarget.setAttribute("data-state", "closed");
@@ -13818,12 +15505,14 @@ class NavigationMenuController extends Controller {
     this.previousIndexValue = this.activeIndexValue;
     this.activeIndexValue = -1;
     this.isMenuActive = false;
+    this.escapeLayer?.deactivate();
   }
   closeAll() {
-    this.triggerTargets.forEach((trigger, index) => {
-      const content = this.contentTargets[index];
+    this.pairs?.forEach(({trigger: trigger, content: content}) => {
       if (content) {
+        this.cancelExit(content);
         content.setAttribute("data-state", "closed");
+        this.moveHome(content);
       }
       trigger.setAttribute("data-state", "closed");
       trigger.setAttribute("aria-expanded", "false");
@@ -13833,6 +15522,7 @@ class NavigationMenuController extends Controller {
     }
     this.activeIndexValue = -1;
     this.isMenuActive = false;
+    this.escapeLayer?.deactivate();
   }
   handleTriggerHover(event) {
     const trigger = event.currentTarget;
@@ -13868,7 +15558,7 @@ class NavigationMenuController extends Controller {
       clearTimeout(this.openTimerRef);
       this.openTimerRef = null;
     }
-    const content = this.contentTargets[triggerIndex];
+    const content = this.contentFor(triggerIndex);
     if (content && content.contains(relatedTarget)) {
       return;
     }
@@ -13884,7 +15574,7 @@ class NavigationMenuController extends Controller {
   }
   handleContentLeave(event) {
     const content = event.currentTarget;
-    const contentIndex = this.contentTargets.indexOf(content);
+    const contentIndex = this.pairs.findIndex(pair => pair.content === content);
     const relatedTarget = event.relatedTarget;
     const trigger = this.triggerTargets[contentIndex];
     if (trigger && trigger.contains(relatedTarget)) {
@@ -13932,111 +15622,143 @@ class NavigationMenuController extends Controller {
   }
   updateViewport(content) {
     if (!this.hasViewportTarget) return;
+    if (content.parentElement !== this.viewportTarget) {
+      this.viewportTarget.appendChild(content);
+    }
+    this.viewportTarget.setAttribute("data-state", "open");
+  }
+  sizeViewport(content) {
     const viewport = this.viewportTarget;
-    viewport.innerHTML = "";
-    const clonedContent = content.cloneNode(true);
-    clonedContent.style.position = "relative";
-    clonedContent.style.left = "auto";
-    clonedContent.style.top = "auto";
-    viewport.appendChild(clonedContent);
-    const contentRect = clonedContent.getBoundingClientRect();
-    viewport.style.setProperty("--ui-navigation-menu-viewport-width", `${contentRect.width}px`);
-    viewport.style.setProperty("--ui-navigation-menu-viewport-height", `${contentRect.height}px`);
-    viewport.setAttribute("data-state", "open");
+    const width = content.offsetWidth || content.getBoundingClientRect().width;
+    const height = content.offsetHeight || content.getBoundingClientRect().height;
+    viewport.style.setProperty("--ui-navigation-menu-viewport-width", `${width}px`);
+    viewport.style.setProperty("--ui-navigation-menu-viewport-height", `${height}px`);
+  }
+  moveHome(content, item = null) {
+    const home = item || this.pairs?.find(pair => pair.content === content)?.item;
+    if (home && content.parentElement !== home) {
+      home.appendChild(content);
+    }
+  }
+  topLevelElements() {
+    const items = this.hasItemTarget ? this.itemTargets : this.pairs.map(pair => pair.item).filter(Boolean);
+    return items.map(item => {
+      const trigger = this.triggerTargets.find(t => item.contains(t));
+      if (trigger) return trigger;
+      return Array.from(item.querySelectorAll("a[href], button")).find(el => !el.closest('[data-ui--navigation-menu-target="content"]'));
+    }).filter(Boolean);
   }
   handleKeydown(event) {
-    if (!this.element.contains(document.activeElement)) return;
-    const trigger = this.triggerTargets.find(t => t === document.activeElement);
-    if (!trigger) {
-      if (this.isMenuActive) {
-        this.handleContentKeydown(event);
-      }
+    const active = document.activeElement;
+    const triggerIndex = this.triggerTargets.indexOf(active);
+    const topLevel = this.topLevelElements();
+    if (triggerIndex === -1 && !topLevel.includes(active)) {
+      if (this.isMenuActive) this.handleContentKeydown(event);
       return;
     }
-    const triggerIndex = this.triggerTargets.indexOf(trigger);
     switch (event.key) {
      case "ArrowRight":
       event.preventDefault();
-      this.focusNextTrigger(triggerIndex);
+      this.focusTopLevel(topLevel, topLevel.indexOf(active) + 1);
       break;
 
      case "ArrowLeft":
       event.preventDefault();
-      this.focusPreviousTrigger(triggerIndex);
-      break;
-
-     case "ArrowDown":
-      event.preventDefault();
-      if (this.activeIndexValue === triggerIndex) {
-        this.focusFirstContentLink();
-      } else {
-        this.openMenu(triggerIndex);
-        setTimeout(() => this.focusFirstContentLink(), 50);
-      }
-      break;
-
-     case "Enter":
-     case " ":
-      event.preventDefault();
-      if (this.activeIndexValue === triggerIndex) {
-        this.closeMenu();
-      } else {
-        this.openMenu(triggerIndex);
-      }
-      break;
-
-     case "Escape":
-      event.preventDefault();
-      if (this.isMenuActive) {
-        this.closeMenu();
-        const activeTrigger = this.triggerTargets[this.previousIndexValue >= 0 ? this.previousIndexValue : 0];
-        if (activeTrigger) activeTrigger.focus();
-      }
+      this.focusTopLevel(topLevel, topLevel.indexOf(active) - 1);
       break;
 
      case "Home":
       event.preventDefault();
-      this.focusTrigger(0);
+      this.focusTopLevel(topLevel, 0);
       break;
 
      case "End":
       event.preventDefault();
-      this.focusTrigger(this.triggerTargets.length - 1);
+      this.focusTopLevel(topLevel, topLevel.length - 1);
+      break;
+
+     case "ArrowDown":
+      if (triggerIndex === -1) return;
+      event.preventDefault();
+      if (this.activeIndexValue !== triggerIndex) this.openMenu(triggerIndex);
+      this.focusFirstContentLink();
       break;
 
      case "Tab":
-      if (!event.shiftKey && this.isMenuActive) ; else if (event.shiftKey && this.isMenuActive) {
-        this.closeMenu();
+      if (!event.shiftKey && triggerIndex !== -1 && triggerIndex === this.activeIndexValue && this.viewportValue && this.hasViewportTarget) {
+        const first = this.contentTabbables(this.contentFor(triggerIndex))[0];
+        if (first) {
+          event.preventDefault();
+          first.focus();
+        }
       }
       break;
     }
   }
   handleContentKeydown(event) {
+    const index = this.activeIndexValue;
+    const content = this.contentFor(index);
+    if (!content || !content.contains(document.activeElement)) return;
+    const tabbables = this.contentTabbables(content);
+    const position = tabbables.indexOf(document.activeElement);
     switch (event.key) {
-     case "Escape":
+     case "ArrowDown":
       event.preventDefault();
-      this.closeMenu();
-      const activeTrigger = this.triggerTargets[this.previousIndexValue >= 0 ? this.previousIndexValue : this.activeIndexValue];
-      if (activeTrigger) activeTrigger.focus();
+      tabbables[Math.min(position + 1, tabbables.length - 1)]?.focus();
+      break;
+
+     case "ArrowUp":
+      event.preventDefault();
+      tabbables[Math.max(position - 1, 0)]?.focus();
+      break;
+
+     case "Home":
+      event.preventDefault();
+      tabbables[0]?.focus();
+      break;
+
+     case "End":
+      event.preventDefault();
+      tabbables[tabbables.length - 1]?.focus();
       break;
 
      case "Tab":
-      const content = this.contentTargets[this.activeIndexValue];
-      if (content) {
-        const focusableElements = content.querySelectorAll('a, button, input, [tabindex]:not([tabindex="-1"])');
-        const lastFocusable = focusableElements[focusableElements.length - 1];
-        if (!event.shiftKey && document.activeElement === lastFocusable) {
+      {
+        if (!this.viewportValue || !this.hasViewportTarget) break;
+        const trigger = this.triggerTargets[index];
+        if (event.shiftKey && position === 0) {
           event.preventDefault();
-          this.closeMenu();
-          this.focusNextTrigger(this.activeIndexValue);
-        } else if (event.shiftKey && document.activeElement === focusableElements[0]) {
+          trigger.focus();
+        } else if (!event.shiftKey && position === tabbables.length - 1) {
           event.preventDefault();
+          const next = this.tabbableAfter(trigger);
           this.closeMenu();
-          this.focusTrigger(this.activeIndexValue >= 0 ? this.activeIndexValue : 0);
+          (next || trigger).focus();
         }
+        break;
       }
-      break;
     }
+  }
+  handleEscape() {
+    const index = this.activeIndexValue;
+    const hadFocus = this.element.contains(document.activeElement);
+    this.closeMenu();
+    if (hadFocus && index >= 0) this.triggerTargets[index]?.focus();
+  }
+  contentTabbables(content) {
+    if (!content) return [];
+    return Array.from(content.querySelectorAll(CONTENT_TABBABLE));
+  }
+  tabbableAfter(trigger) {
+    const skip = this.hasViewportTarget ? this.viewportTarget : null;
+    const list = getTabbableElements(document.body).filter(el => !(skip && skip.contains(el)));
+    const position = list.indexOf(trigger);
+    return position === -1 ? null : list[position + 1] || null;
+  }
+  focusTopLevel(list, index) {
+    if (list.length === 0) return;
+    const wrapped = (index + list.length) % list.length;
+    list[wrapped]?.focus();
   }
   focusNextTrigger(currentIndex) {
     const nextIndex = (currentIndex + 1) % this.triggerTargets.length;
@@ -14047,16 +15769,33 @@ class NavigationMenuController extends Controller {
     this.focusTrigger(prevIndex);
   }
   focusTrigger(index) {
-    this.triggerTargets.forEach((t, i) => {
-      t.setAttribute("tabindex", i === index ? "0" : "-1");
-    });
     this.triggerTargets[index]?.focus();
   }
-  focusFirstContentLink() {
-    const content = this.contentTargets[this.activeIndexValue];
+  focusFirstContentLink(framesLeft = 5) {
+    const content = this.contentFor(this.activeIndexValue);
     if (!content) return;
-    const firstLink = content.querySelector('a, button, [tabindex]:not([tabindex="-1"])');
-    if (firstLink) firstLink.focus();
+    const firstLink = this.contentTabbables(content)[0];
+    if (!firstLink) return;
+    firstLink.focus();
+    if (document.activeElement !== firstLink && framesLeft > 0) {
+      requestAnimationFrame(() => this.focusFirstContentLink(framesLeft - 1));
+    }
+  }
+  handleFocusOut(event) {
+    if (!this.isMenuActive) return;
+    const next = event.relatedTarget;
+    if (!next) return;
+    const index = this.activeIndexValue;
+    const trigger = this.triggerTargets[index];
+    const content = this.contentFor(index);
+    if (trigger?.contains(next) || content?.contains(next)) return;
+    this.closeMenu();
+  }
+  handleLinkClick(event) {
+    const link = event.target.closest?.("a[href]");
+    if (!link || !this.isMenuActive) return;
+    const content = this.contentFor(this.activeIndexValue);
+    if (content?.contains(link)) this.closeMenu();
   }
   handleClickOutside(event) {
     if (!this.element.contains(event.target)) {
@@ -14085,24 +15824,28 @@ class ResizableController extends Controller {
     this.activePointerId = null;
     this.initializePanelSizes();
     this.element.setAttribute("data-panel-group-direction", this.directionValue);
+    this.collapsedFrom = new Map;
     this.handleTargets.forEach((handle, index) => {
       handle.setAttribute("tabindex", "0");
       handle.setAttribute("role", "separator");
-      handle.setAttribute("aria-valuenow", "50");
-      handle.setAttribute("aria-valuemin", "0");
-      handle.setAttribute("aria-valuemax", "100");
+      handle.setAttribute("aria-orientation", this.directionValue === "horizontal" ? "vertical" : "horizontal");
       handle.setAttribute("data-resize-handle-state", "inactive");
       handle.setAttribute("data-panel-group-direction", this.directionValue);
       handle.style.touchAction = "none";
-      handle.addEventListener("keydown", this.handleKeyDown.bind(this, index));
+      const panel = this.panelTargets[index];
+      if (panel) {
+        ensureId(panel, "resizable-panel");
+        setIdRefs(handle, "aria-controls", panel);
+        if (panel.hasAttribute("aria-label") && !handle.hasAttribute("aria-label")) {
+          setIdRefs(handle, "aria-labelledby", panel);
+        }
+      }
+      this.syncHandleAria(index);
     });
     this._boundHandleMove = this.handleMove.bind(this);
     this._boundEndDrag = this.endDrag.bind(this);
   }
   disconnect() {
-    this.handleTargets.forEach((handle, index) => {
-      handle.removeEventListener("keydown", this.handleKeyDown.bind(this, index));
-    });
     document.removeEventListener("pointermove", this._boundHandleMove);
     document.removeEventListener("pointerup", this._boundEndDrag);
     document.removeEventListener("pointercancel", this._boundEndDrag);
@@ -14141,6 +15884,14 @@ class ResizableController extends Controller {
     panel.style.flexGrow = size.toString();
     panel.style.flexShrink = size.toString();
     panel.style.flexBasis = "0";
+  }
+  syncHandleAria(handleIndex) {
+    const handle = this.handleTargets[handleIndex];
+    const panel = this.panelTargets[handleIndex];
+    if (!handle || !panel) return;
+    handle.setAttribute("aria-valuenow", Math.round(this.getPanelSize(panel)));
+    handle.setAttribute("aria-valuemin", Math.round(parseFloat(panel.dataset.minSize) || 0));
+    handle.setAttribute("aria-valuemax", Math.round(parseFloat(panel.dataset.maxSize) || 100));
   }
   getPanelSize(panel) {
     return parseFloat(panel.dataset.panelSize) || 0;
@@ -14264,31 +16015,28 @@ class ResizableController extends Controller {
       event.currentTarget.setAttribute("data-resize-handle-state", "inactive");
     }
   }
-  handleKeyDown(handleIndex, event) {
+  handleKeyDown(event) {
+    const handleIndex = this.handleTargets.indexOf(event.currentTarget);
+    if (handleIndex === -1) return;
     const leftPanel = this.panelTargets[handleIndex];
     const rightPanel = this.panelTargets[handleIndex + 1];
     if (!leftPanel || !rightPanel) return;
     let delta = 0;
     const resizeBy = this.keyboardResizeByValue;
     const isHorizontal = this.directionValue === "horizontal";
+    const leftMinSize = parseFloat(leftPanel.dataset.minSize) || 0;
     switch (event.key) {
      case "ArrowLeft":
-      if (isHorizontal) delta = -resizeBy;
-      event.preventDefault();
-      break;
-
      case "ArrowRight":
-      if (isHorizontal) delta = resizeBy;
+      if (!isHorizontal) return;
+      delta = event.key === "ArrowRight" ? resizeBy : -resizeBy;
       event.preventDefault();
       break;
 
      case "ArrowUp":
-      if (!isHorizontal) delta = -resizeBy;
-      event.preventDefault();
-      break;
-
      case "ArrowDown":
-      if (!isHorizontal) delta = resizeBy;
+      if (isHorizontal) return;
+      delta = event.key === "ArrowDown" ? resizeBy : -resizeBy;
       event.preventDefault();
       break;
 
@@ -14303,9 +16051,19 @@ class ResizableController extends Controller {
       break;
 
      case "Enter":
-     case " ":
-      event.preventDefault();
-      break;
+      {
+        event.preventDefault();
+        const current = this.getPanelSize(leftPanel);
+        const restoreTo = this.collapsedFrom.get(handleIndex);
+        if (restoreTo !== undefined && current <= leftMinSize + .01) {
+          delta = restoreTo - current;
+          this.collapsedFrom.delete(handleIndex);
+        } else {
+          this.collapsedFrom.set(handleIndex, current);
+          delta = leftMinSize - current;
+        }
+        break;
+      }
 
      default:
       return;
@@ -14330,7 +16088,7 @@ class ResizableController extends Controller {
     }
     this.setPanelSize(leftPanel, newLeftSize);
     this.setPanelSize(rightPanel, newRightSize);
-    handle.setAttribute("aria-valuenow", Math.round(newLeftSize));
+    this.syncHandleAria(handleIndex);
     this.dispatch("resize", {
       detail: {
         handleIndex: handleIndex,
@@ -14358,9 +16116,7 @@ class ResizableController extends Controller {
     this.panelTargets.forEach((panel, index) => {
       this.setPanelSize(panel, sizes[index]);
     });
-    this.handleTargets.forEach((handle, index) => {
-      handle.setAttribute("aria-valuenow", Math.round(sizes[index]));
-    });
+    this.handleTargets.forEach((_handle, index) => this.syncHandleAria(index));
     this.dispatch("resize", {
       detail: {
         sizes: this.getCurrentSizes()
